@@ -1,37 +1,41 @@
 import Article from "./Article";
-import React, {useState} from "react";
-import { useNavigate } from "react-router-dom";
-export default function Item(props) {
-  const {Articles, setArticles} = useState([1,2,3]);
-  const {Count, setCount} = useState(0);
-  console.log(Count)
+import React, {useEffect, useState} from "react";
+import { useNavigate ,Navigate} from "react-router-dom";
+
+
+function Item(props) {
+  const [articles, setArticles] = React.useState([]);
+  const [count, setCount] = React.useState(99);
   let navigate = useNavigate();
-
-  document.addEventListener("scroll", () => {
-    let bottom = document.documentElement.clientHeight + window.scrollY >=
-    (document.documentElement.scrollHeight || document.documentElement.clientHeight);
-    if (bottom) console.log("to the end!!!")
-})
-
-  let RequestData = function()  {
-      let token = localStorage.getItem("login")
-      if (null == token) {
-        navigate("/login")
-      }
-      else {
-          
-      }
+  let token = localStorage.getItem("login")
+  if (null === token) {
+    return (<Navigate to="/login" replace/>)
   }
-  React.useEffect(() => {
-      RequestData()
-      return () => {
-        console.log("卸载时触发")
-      }
-    })
-    console.log(Count)
+  let RequestData = function()  {
+    let token = localStorage.getItem("login")
+        setArticles([...articles,count])
+        setCount(value => value + 1)
+}
+if (articles.length == 0) {
+  RequestData()
+}
+document.addEventListener("scroll", () => {
+  let bottom = document.documentElement.clientHeight + window.scrollY >=
+  (document.documentElement.scrollHeight || document.documentElement.clientHeight);
+  if (bottom) RequestData();
+});
+
+
+  // React.useEffect(() => {
+  //   console.log("is doing");
+  //     return () => {
+  //       console.log("trigger when loading")
+  //     }
+  //   })
   return (
-    Articles&&Articles.map(x=>{
+    articles&&articles.map(x=>{
       return <Article key={x}></Article>
     })    
   )
 }
+export default Item
