@@ -15,6 +15,8 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import LanguageIcon from '@mui/icons-material/Language';
+
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -103,7 +105,9 @@ export default function Header() {
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
     </Menu>
   );
+    const handleLanguageMenuOpen = (event)=> {
 
+    }
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
     <Menu
@@ -150,6 +154,7 @@ export default function Header() {
           color="inherit"
         >
         <AccountCircle />
+        <LanguageIcon/>
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -201,6 +206,17 @@ export default function Header() {
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
               </Badge>
+            </IconButton>
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleLanguageMenuOpen}
+              color="inherit"
+            >
+              <LanguageIcon />
             </IconButton>
             <IconButton
               size="large"

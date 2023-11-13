@@ -56,7 +56,7 @@ export default function Login() {
         password: data.get('password'),
         remember:selected
       });
-      axios.post()
+      axios.post("localhost:8080/user")
       
     }
     else {
