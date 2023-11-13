@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useState} from "react"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -31,13 +32,28 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+
+  const [receive, setReceive] = useState(false)
+  const validate =(nickname,username, password)=>{
+    return true
+  }
+  const handleReceive = (event)=>{
+    setReceive(!receive)
+  }
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+      if(!validate(data.get('nickname'),data.get('username'), data.get('password'))) {
+
+      }
+      else {
+        console.log({
+          email: data.get('email'),
+          password: data.get('password'),
+          nickname: data.get('nickname'),
+          recv: receive
+        });
+      }
   };
 
   return (
@@ -60,25 +76,15 @@ export default function SignUp() {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} >
                 <TextField
                   autoComplete="given-name"
-                  name="firstName"
+                  name="nickname"
                   required
                   fullWidth
-                  id="firstName"
-                  label="First Name"
+                  id="nickname"
+                  label="nickname"
                   autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -104,7 +110,7 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
+                  control={<Checkbox onClick={handleReceive} value="allowExtraEmails" color="primary" />}
                   label="I want to receive inspiration, marketing promotions and updates via email."
                 />
               </Grid>
@@ -119,7 +125,7 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/login" replace="true" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>

@@ -4,6 +4,7 @@ import Login  from "./Login"
 import {Route, Routes, useNavigate, Navigate, redirect, BrowserRouter,} from 'react-router-dom'
 import NotFound from "./NotFound"
 import React from "react"
+import SignUp from "./SignUp"
 
 export default function Contents(props) {
 
@@ -16,6 +17,7 @@ export default function Contents(props) {
             <BrowserRouter>
             <Routes>
                 <Route path="/login" element={<Login/>}></Route>
+                <Route path="/signup" element={<SignUp/>}></Route>
                 <Route path="/" element={<Item/>}></Route>
                 <Route path="*" element={<NotFound/>} ></Route>
             </Routes>

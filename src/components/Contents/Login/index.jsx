@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useState} from "react"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,6 +13,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from 'axios';
 
 function Copyright(props) {
   return (
@@ -31,13 +33,35 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function Login() {
+
+  const [selected, setSelected] = useState(false)
+  const validate = (username, password) => {
+    return true
+  }
+
+  const handleSelection = (event) => { 
+    setSelected(!selected)
+  }
+
+  const encryption = (password) => {
+    return password;
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    if (validate(data.get("email"), data.get("password"))){
+      console.log({
+        email: data.get('email'),
+        password: data.get('password'),
+        remember:selected
+      });
+      axios.post()
+      
+    }
+    else {
+
+    }
   };
 
   return (
@@ -80,7 +104,7 @@ export default function Login() {
               autoComplete="current-password"
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox onClick={handleSelection} value="remember" color="primary" />}
               label="Remember me"
             />
             <Button
@@ -98,7 +122,7 @@ export default function Login() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="/signin" variant="body2">
+                <Link href="/signup" replace="true"variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
