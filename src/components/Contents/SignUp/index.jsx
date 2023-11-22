@@ -13,6 +13,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from 'axios';
+import Qs from 'qs'
+import { Navigate } from 'react-router-dom';
 
 function Copyright(props) {
   return (
@@ -31,12 +34,23 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
-export default function SignUp() {
+export default function SignUp(props) {
 
   const [receive, setReceive] = useState(false)
+  const [selected, setSelected] = useState(false) 
+  const {loginState, setLoginState} = props.status
+  console.log(loginState)
+  if (true === loginState) {
+    return <Navigate to="/" replace/>
+  }
   const validate =(nickname,username, password)=>{
     return true
   }
+
+  function encryption(password) {
+    return password;
+  }
+
   const handleReceive = (event)=>{
     setReceive(!receive)
   }
@@ -44,7 +58,7 @@ export default function SignUp() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
       if(!validate(data.get('nickname'),data.get('username'), data.get('password'))) {
-
+        props.setBarState({...props.barState, message:"please check your input", open:true})
       }
       else {
         console.log({
@@ -53,6 +67,28 @@ export default function SignUp() {
           nickname: data.get('nickname'),
           recv: receive
         });
+        axios({
+          url:"http://localhost:8080/account/register", 
+          method:'post',
+          data:{userEmail: data.get('email'),password: encryption(data.get('password')),userName:data.get("nickname"),promotion:selected},
+          transformRequest:[function (data) {
+            // 对 data 进行任意转换处理
+            return Qs.stringify(data)
+        }],
+      }).then(
+        (response)=>{
+          console.log("response");
+          if(response.code === 1)
+          {
+            
+          }
+          else {
+
+          }
+        }
+      ).catch((err)=>{
+        console.log("check your input")
+      })
       }
   };
 
