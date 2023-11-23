@@ -47,13 +47,16 @@ export default function Login(props) {
     return <Navigate to="/" replace/>
   }
   else {
-    console.log("verify")
-    if (localStorage.getItem("token") !== null && verifyTokens(localStorage.getItem("token"))){
-      console.log("login set true")
-      setLoginState(true)
-    }
-    else {
-      localStorage.setItem("token", null)
+    if (localStorage.getItem("token") !== null){
+      verifyTokens(localStorage.getItem("token")).then(response=>{
+          if (response) {
+            console.log("login success")
+            setLoginState(true)
+          }
+          else{
+            localStorage.removeItem("token")            
+          }
+      })
     }
   }
 
@@ -67,8 +70,6 @@ export default function Login(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    
-
     if (validate(data.get("email"), data.get("password"))){
       axios({
         url:"http://localhost:8080/account/login", 
