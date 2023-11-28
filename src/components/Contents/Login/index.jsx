@@ -16,7 +16,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import {Navigate} from "react-router-dom";
 import Qs from "qs"
-import verifyTokens from "../../../utils"
+import verifyTokens from "../../../util/ioUtil"
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>

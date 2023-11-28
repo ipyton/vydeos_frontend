@@ -1,7 +1,7 @@
 import Article from "./Article";
 import React, {useEffect, useState} from "react";
 import { useNavigate ,Navigate} from "react-router-dom";
-import verifyTokens from "../../../utils";
+import verifyTokens from "../../../util/ioUtil";
 
 
 function Item(props) {

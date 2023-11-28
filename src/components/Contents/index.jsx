@@ -6,6 +6,7 @@ import NotFound from "./NotFound"
 import React from "react"
 import SignUp from "./SignUp"
 import { Snackbar } from "@mui/material"
+import UserInfo from "./UserInfo"
 
 export default function Contents(props) {
     const [state, setState] = React.useState({
@@ -27,6 +28,7 @@ export default function Contents(props) {
             <Routes>
                 <Route path="/login" element={<Login barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="/signup" element={<SignUp barState={state} setBarState={setState} status={props}/>}></Route>
+                <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
                 <Route path="/" element={<Item barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
             </Routes>
