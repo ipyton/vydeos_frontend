@@ -30,7 +30,6 @@ function Item(props) {
     console.log("loading")
   }
   if (loginState !== true && localStorage.getItem("token") !== null) {
-
     verifyTokens(localStorage.getItem("token")).then(response => {
       console.log(response)
       if (true === response) {
@@ -42,9 +41,13 @@ function Item(props) {
         setLoginState(false)
       }
     }
-  )}
+  ).catch(err=>{
+    props.setBarState({...props.barState, message:"please login first" + err, open:true})
+  })
+}
 
-  if(loginState !== true && localStorage.getItem("token") === null ) {
+  if(loginState !== true || localStorage.getItem("token") === null ) {
+    console.log("to login")
     return <Navigate to="/login" replace/>
   }
  
@@ -61,9 +64,13 @@ if (articles.length === 0) {
   //     }
   //   })
   return (
-    articles&&articles.map(x=>{
+
+    <div>
+    {articles&&articles.map(x=>{
       return <Article key={x}></Article>
-    })    
+    })}    
+    </div>
+
   )
 }
 export default Item

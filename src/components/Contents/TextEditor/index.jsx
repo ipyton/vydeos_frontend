@@ -1,7 +1,12 @@
+import React, { Component } from 'react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
+
 export default function TextEditor() {
 
     return ( <div className="editor">
-    <h2>Using CKEditor&nbsp;5 build in React</h2>
+    <h2>Edit your activities.</h2>
     <CKEditor
         editor={ ClassicEditor }
         data="<p>Hello from CKEditor&nbsp;5!</p>"

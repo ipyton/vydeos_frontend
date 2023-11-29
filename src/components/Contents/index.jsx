@@ -8,6 +8,8 @@ import SignUp from "./SignUp"
 import { Snackbar } from "@mui/material"
 import UserInfo from "./UserInfo"
 import TextEditor from "./TextEditor"
+import Videos from "./Videos"
+import NetworkError from "./NetworkError"
 
 export default function Contents(props) {
     const [state, setState] = React.useState({
@@ -31,6 +33,8 @@ export default function Contents(props) {
                 <Route path="/signup" element={<SignUp barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
                 <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
+                <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
+                <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props}></NetworkError>}></Route>
                 <Route path="/" element={<Item barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
             </Routes>

@@ -17,6 +17,8 @@ import axios from 'axios';
 import {Navigate} from "react-router-dom";
 import Qs from "qs"
 import verifyTokens from "../../../util/ioUtil"
+import NetworkError from '../NetworkError';
+
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -36,19 +38,30 @@ const defaultTheme = createTheme();
 
 export default function Login(props) {
   const [selected, setSelected] = useState(false)
+  const [networkErr, setNetworkErr] = useState(false)
   const {loginState, setLoginState} = props.status
   console.log(props)
 
+  if (true === networkErr) {
+    return <NetworkError></NetworkError>
+  }
 
   const validate = (username, password) => {
     return true
   }
+
   if(loginState === true) {
     return <Navigate to="/" replace/>
   }
   else {
     if (localStorage.getItem("token") !== null){
-      verifyTokens(localStorage.getItem("token")).then(response=>{
+      verifyTokens(localStorage.getItem("token")).catch(error => {
+        if ("Network Error" ===  error.message) {
+          props.setBarState({...props.barState, message:"network" + error, open:true})
+          console.log("ssdfinsdfindsifndsikfjdsnikfds")
+        }
+        setNetworkErr(true)
+      }).then(response=>{
           if (response) {
             console.log("login success")
             setLoginState(true)
@@ -56,6 +69,7 @@ export default function Login(props) {
           else{
             localStorage.removeItem("token")            
           }
+          setNetworkErr(false)
       })
     }
   }
@@ -79,6 +93,12 @@ export default function Login(props) {
           // 对 data 进行任意转换处理
           return Qs.stringify(data)
       }],
+    }).catch(error => {
+      if ("Network Error" ===  error.message) {
+        props.setBarState({...props.barState, message:"please login first" +error, open:true})
+        setNetworkErr(true)
+      }
+      console.log("--------------------------")
     }).then(function(response) {
         let responseData = response.data
         console.log(responseData)
@@ -87,26 +107,30 @@ export default function Login(props) {
           props.setBarState({...props.barState, message:responseData.message, open:true})
         }
         else if(responseData.code === 1) {
-          console.log("sdfsdfsdfsdfsdfdsf")
           localStorage.setItem("token", responseData.message)
           setLoginState(true)
         }
         else {
-          console.log("sdjfwuebfbwikuegfbbsdckwuefbv")
           console.log(responseData.message)
           props.setBarState({...props.barState, message:responseData.message, open:true})
         }
-
+        setNetworkErr(false)
       }).catch(function(error) {
-        props.setBarState({...props.barState, message:"please login first" +error, open:true})
+        if ("Network Error" ===  error.message) {
+          props.setBarState({...props.barState, message:"please login first" +error, open:true})
+          setNetworkErr(true)
+        }
+        else {
+
+        }
       })
-      
     }
     else {
       props.setBarState({...props.barState, message:"please check your input", open:true})
     }
-
   };
+
+
   return (
       <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">
