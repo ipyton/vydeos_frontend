@@ -9,19 +9,16 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import Qs from 'qs'
 import { Navigate } from 'react-router-dom';
-import SimplePictureUtil from '../../../util/SimplePictureUtil';
 import { deepOrange, deepPurple } from '@mui/material/colors';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
+import { IconButton } from '@mui/material';
+import PictureUtil from '../../../util/pictureUtil';
 
 function Copyright(props) {
     return (
@@ -42,7 +39,9 @@ export default function UserInfo(props) {
   const [receive, setReceive] = useState(false)
   const [selected, setSelected] = useState(false) 
   const {loginState, setLoginState} = props.status
-  console.log(loginState)
+  const [avatar, setAvatar] = useState(null)
+  const [picToUpload, setPicToUpload] = useState(null)
+
   if (true === loginState) {
     return <Navigate to="/" replace/>
   }
@@ -57,6 +56,13 @@ export default function UserInfo(props) {
   const handleReceive = (event)=>{
     setReceive(!receive)
   }
+
+  const picUploadHandler = (event) => {
+    console.log("updated")
+    setAvatar(URL.createObjectURL(event.target.files[0]))
+    PictureUtil.uploadAvatar(event.target.files[0])
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -94,11 +100,23 @@ export default function UserInfo(props) {
       })
       }
   };
+
     let getAvatar = () => {
-        if (null === localStorage.getItem("avatar")) {
-            return <Avatar sx={{ bgcolor: deepOrange[500] }}>N</Avatar>
-        }
-        return <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
+      let mid = <Avatar id="avatar" src={avatar} sx={{ bgcolor: deepOrange[500] }}>N</Avatar>
+      if (null !== localStorage.getItem("avatar")) {
+        mid = <Avatar alt="Travis Howard"  src={avatar} />
+      }
+      console.log(avatar)
+        return (
+          <div>
+            <input id="uploadPic" type="file" onChange={picUploadHandler} hidden></input>
+            <label htmlFor="uploadPic">
+              <IconButton component="span">
+                {mid}
+              </IconButton>
+            </label>
+          </div>
+        )
 
     }
 
