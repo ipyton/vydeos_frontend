@@ -3,7 +3,6 @@ import { InputBase, Stack } from "@mui/material"
 import Header from "./Header"
 import Message from "./Message"
 import InputBox from "./InputBox"
-import { useState } from "react"
 
 
 export default function () {

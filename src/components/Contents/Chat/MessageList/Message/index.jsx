@@ -1,5 +1,4 @@
 import 'react-chat-elements/dist/main.css'
-// MessageBox component
 import { MessageBox } from 'react-chat-elements'
 import { useState } from 'react';
 import { Stack } from '@mui/material';
