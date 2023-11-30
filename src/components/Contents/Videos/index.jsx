@@ -43,8 +43,6 @@ export default function Videos(props) {
         {
             a.map(x=>{return <Clips></Clips>})
         }
-
-
     </div>
 
   );
