@@ -11,6 +11,7 @@ import TextEditor from "./TextEditor"
 import Videos from "./Videos"
 import NetworkError from "./NetworkError"
 import Chat from "./Chat"
+import Settings from "./Settings"
 
 export default function Contents(props) {
     const [state, setState] = React.useState({
@@ -36,6 +37,7 @@ export default function Contents(props) {
                 <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
                 <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
                 <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}></Chat>}></Route>
+                <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                 <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props}></NetworkError>}></Route>
                 <Route path="/" element={<Item barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>

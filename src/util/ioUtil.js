@@ -24,7 +24,7 @@ export default class IOUtil {
     static uploadInformation(data,token){
         async function post(){
                 let response = await axios({
-                    url:"http://localhost:8080/account/setinfo", 
+                    url:"http://localhost:8080/account/setinfo",
                     method:'post',
                     data:{token:localStorage.getItem("token")},
                     transformRequest:[function (data) {
@@ -184,6 +184,53 @@ export default class IOUtil {
         }
         return post()
     }
+
+    static getMessages(token) {
+        async function post(){
+            let response = await axios({
+                url:"http://localhost:8080/message/get_messages", 
+                method:'post',
+                data:{token: localStorage.getItem("token")},
+                transformRequest:[function (data) {
+                  return Qs.stringify(data)
+              }],
+              transformResponse:[function (data) {
+                return Qs.parse(data)
+              }],
+              headers:{token: localStorage.getItem("token"),
+                        userEmail: '1838169994@qq.com',
+                    }
+            })
+            let responseData = response.data
+            console.log(response)
+            return responseData.code === 1
+        }
+        return post()
+    }
+
+    static sendMessages(token) {
+        async function post(){
+            let response = await axios({
+                url:"http://localhost:8080/message/send_message", 
+                method:'post',
+                data:{token: localStorage.getItem("token")},
+                transformRequest:[function (data) {
+                  return Qs.stringify(data)
+              }],
+              transformResponse:[function (data) {
+                return Qs.parse(data)
+              }],
+              headers:{token: localStorage.getItem("token"),
+                        userEmail: '1838169994@qq.com',
+                    }
+            })
+            let responseData = response.data
+            console.log(response)
+            return responseData.code === 1
+        }
+        return post()
+    }
+
 
 }
 

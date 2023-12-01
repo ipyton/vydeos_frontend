@@ -48,21 +48,23 @@ function App() {
       console.log("picture get error")
     }).then(response => {
       const reader = new FileReader()
-      setAvatar(reader.readAsDataURL(response.data))
+      console.log(response)
+      // setAvatar(reader.readAsDataURL(response.data))
     })
   }
 
   if(login && null === badgeContent) {
-    IOUtil.getCommentByObjectID()
+    IOUtil.getMessages()
   }
-
 
   return (
     <div>
       <Header loginState={login} setLoginState={setLogin} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
+      <br></br>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Contents loginState={login} setLoginState={setLogin}></Contents>
       </LocalizationProvider>
+      <br></br>
       <Footer></Footer>
     </div>
   );
