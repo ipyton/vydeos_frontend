@@ -1,7 +1,7 @@
 import Article from "./Article";
 import React, {useEffect, useState} from "react";
 import { useNavigate ,Navigate} from "react-router-dom";
-import verifyTokens from "../../../util/ioUtil";
+import IOUtil from "../../../util/ioUtil";
 
 
 function Item(props) {
@@ -30,7 +30,7 @@ function Item(props) {
     console.log("loading")
   }
   if (loginState !== true && localStorage.getItem("token") !== null) {
-    verifyTokens(localStorage.getItem("token")).then(response => {
+    IOUtil.verifyTokens(localStorage.getItem("token")).then(response => {
       console.log(response)
       if (true === response) {
         setLoginState(true)

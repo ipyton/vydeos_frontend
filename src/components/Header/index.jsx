@@ -12,11 +12,9 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import LanguageIcon from '@mui/icons-material/Language';
-
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -61,9 +59,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [search, setSearch] = React.useState(null);
+
+
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  console.log("---------------------------")
+  console.log(isMobileMenuOpen)
+  console.log(mobileMoreAnchorEl)
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -74,16 +78,31 @@ export default function Header() {
   };
 
   const handleMenuClose = () => {
+    console.log("close")
     setAnchorEl(null);
     handleMobileMenuClose();
   };
 
   const handleMobileMenuOpen = (event) => {
+    console.log("mobile")
+    console.log(event.currentTarget)
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const menuId = 'primary-search-account-menu';
 
+  const handleSearch = (event) => {
+    console.log(event.currentTarget)
+  }
+
+  const handleSearchChange = (event) => {
+    setSearch(event.currentTarget.value)
+    console.log(event.currentTarget.value)
+  }
+
+  const handleLanguageMenuOpen =(event ) => {
+    console.log("language changed")
+  }
+  const menuId = 'primary-search-account-menu';
 
   const renderMenu = (
     <Menu
@@ -101,13 +120,44 @@ export default function Header() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Account Information</MenuItem>
+      {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
+      <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Log Out</MenuItem>
     </Menu>
   );
-    const handleLanguageMenuOpen = (event)=> {
 
-    }
+
+
+
+  const renderLanguageMenu = (
+    <Menu
+    anchorEl={anchorEl}
+    anchorOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    id={menuId}
+    keepMounted
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    open={isMenuOpen}
+    onClose={handleMenuClose}
+  >
+    <MenuItem onClick={handleMenuClose}>English</MenuItem>
+    {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
+    <MenuItem onClick={handleMenuClose}>Chinese</MenuItem>
+    <MenuItem onClick={handleMenuClose}>Japanese</MenuItem>
+  </Menu>
+
+  )
+
+
+
+
+  
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
     <Menu
@@ -126,14 +176,6 @@ export default function Header() {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
         <IconButton
           size="large"
           aria-label="show 17 new notifications"
@@ -145,18 +187,32 @@ export default function Header() {
         </IconButton>
         <p>Notifications</p>
       </MenuItem>
+      <MenuItem onClick={handleLanguageMenuOpen}>
+        <IconButton
+          size="large"
+          aria-label="language"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+        {/* <AccountCircle /> */}
+        <LanguageIcon/>
+       </IconButton>
+        <p>Languages</p>
+      </MenuItem>
+
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
-          aria-label="account of current user"
+          aria-label="account"
           aria-controls="primary-search-account-menu"
           aria-haspopup="true"
           color="inherit"
         >
         <AccountCircle />
-        <LanguageIcon/>
-        </IconButton>
-        <p>Profile</p>
+       </IconButton>
+       
+        <p>Account</p>
       </MenuItem>
     </Menu>
   );
@@ -165,8 +221,9 @@ export default function Header() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
+          
           <IconButton
-            size="large"
+          size="large"
             edge="start"
             color="inherit"
             aria-label="open drawer"
@@ -174,30 +231,41 @@ export default function Header() {
           >
             <MenuIcon />
           </IconButton>
+          
+          
           <Typography
             variant="h6"
             noWrap
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
-            Things you like
+            Everything
           </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
+          <Search>
+            {/* <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search"
+                inputProps={{ 'aria-label': 'search' }}
+              /> */}
+            <InputBase
+              sx={{ ml: 1, flex: 1 }}
+              placeholder="everything you like"
+              inputProps={{ 'aria-label': 'search' }}
+              onChange={handleSearchChange}
+            />
+            <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch} >
+              <SearchIcon />
             </IconButton>
+          </Search>
+
+
+          <Box sx={{ flexGrow: 1 }} />
+
+
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton
               size="large"
               aria-label="show 17 new notifications"
@@ -207,10 +275,12 @@ export default function Header() {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
+
+
             <IconButton
               size="large"
               edge="end"
-              aria-label="account of current user"
+              aria-label="language"
               aria-controls={menuId}
               aria-haspopup="true"
               onClick={handleLanguageMenuOpen}
@@ -218,10 +288,12 @@ export default function Header() {
             >
               <LanguageIcon />
             </IconButton>
+
+
             <IconButton
               size="large"
               edge="end"
-              aria-label="account of current user"
+              aria-label="account"
               aria-controls={menuId}
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
@@ -229,6 +301,8 @@ export default function Header() {
             >
               <AccountCircle />
             </IconButton>
+
+
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton

@@ -20,19 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { IconButton } from '@mui/material';
 import PictureUtil from '../../../util/pictureUtil';
 
-function Copyright(props) {
-    return (
-      <Typography variant="body2" color="text.secondary" align="center" {...props}>
-        {'Copyright © '}
-        <Link color="inherit" href="https://mui.com/">
-          Your Website
-        </Link>{' '}
-        {new Date().getFullYear()}
-        {'.'}
-      </Typography>
-    );
-  }
-  const defaultTheme = createTheme();
+const defaultTheme = createTheme();
 
 export default function UserInfo(props) {
     
@@ -188,7 +176,6 @@ export default function UserInfo(props) {
                 </Button>
               </Box>
             </Box>
-            <Copyright sx={{ mt: 5 }} />
           </Container>
         </ThemeProvider>
       );

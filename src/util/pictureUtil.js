@@ -1,6 +1,7 @@
 
 import { responsiveFontSizes } from "@mui/material"
 import axios from "axios"
+import Qs from 'qs'
 
 export default class PictureUtil {
         static uploadAvatar(data) {
@@ -22,9 +23,12 @@ export default class PictureUtil {
         }
         static uploadArticlePics(data) {
             let response = axios({
-                url:"http://localhost:8080/article/uploadArticlePics", 
+                url:"http://localhost:8080/article/upload_pic", 
                 method:'post',
                 data:{pics: data},
+                transformRequest:[function (data) {
+                    return Qs.stringify(data)
+                }],
               headers:{token: localStorage.getItem("token"),
                         'userEmail': '1838169994@qq.com'}
             })
@@ -33,14 +37,15 @@ export default class PictureUtil {
             return responseData.code === 1
         }
 
-        static downloadArticlePics(articleID, from, to) {
+        static downloadArticlePics(articleID,from, to) {
             async function download() {
                 let response = await axios({
-                    url:"http://localhost:8080/account/uploadAvatar", 
+                    url:"http://localhost:8080/article/get_pic", 
                     method:'post',
                     data:{from:1, from:to, articleID: articleID},
                     headers:{token: localStorage.getItem("token"),
-                           'userEmail': '1838169994@qq.com'}
+                           'userEmail': '1838169994@qq.com'},
+                    responseType:'blob'
                 })
                 let responseData = response.data
                 console.log("-------------------")
@@ -53,7 +58,7 @@ export default class PictureUtil {
         static getAvatar() {
             async function download() {
                 let response = await axios({
-                    url:"http://localhost:8080/account/uploadAvatar", 
+                    url:"http://localhost:8080/account/getAvatar", 
                     method:'post',
                     headers:{token: localStorage.getItem("token"),
                            'userEmail': '1838169994@qq.com'}
