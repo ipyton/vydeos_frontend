@@ -2,7 +2,53 @@ import axios  from "axios"
 import Qs from 'qs'
 
 export default class IOUtil {
-    static verifyTokens(token) {
+
+    static getSearchResult(keyword) {
+        async function post(){
+            let response = await axios({
+                url:"http://localhost:8080/search/search", 
+                method:'post',
+                data:{token:localStorage.getItem("token")},
+                transformRequest:[function (data) {
+                  return Qs.stringify(data)
+              }],transformResponse:[function (data) {
+                return Qs.parse(data)
+              }],
+              headers:{token: localStorage.getItem("token"),
+                        userEmail: '1838169994@qq.com',
+                        keyword:keyword}
+            })
+            let responseData = response.data
+            console.log(response)
+            return responseData.code === 1
+        }
+        return post()
+    }
+
+    static setSearch(config) {
+        async function post(){
+            let response = await axios({
+                url:"http://localhost:8080/search/set", 
+                method:'post',
+                data:{token:localStorage.getItem("token")},
+                transformRequest:[function (data) {
+                  return Qs.stringify(data)
+              }],transformResponse:[function (data) {
+                return Qs.parse(data)
+              }],
+              headers:{token: localStorage.getItem("token"),
+                        userEmail: '1838169994@qq.com',
+                        config:config}
+            })
+            let responseData = response.data
+            console.log(response)
+            return responseData.code === 1
+        }
+        return post()
+
+    }
+
+    static verifyTokens(setState) {
         async function post(){
             let response = await axios({
                 url:"http://localhost:8080/account/verifyToken", 
@@ -15,8 +61,7 @@ export default class IOUtil {
                         'userEmail': '1838169994@qq.com'}
             })
             let responseData = response.data
-            console.log(response)
-            return responseData.code === 1
+            setState(responseData.code === 1)
         }
         return post()
     }

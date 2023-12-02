@@ -29,8 +29,8 @@ export default function Contents(props) {
     return (
         <div>
             <div>
-            <BrowserRouter>
             <Routes>
+                <Route path="/" element={<Item barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="/login" element={<Login barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="/signup" element={<SignUp barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
@@ -39,10 +39,8 @@ export default function Contents(props) {
                 <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}></Chat>}></Route>
                 <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                 <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props}></NetworkError>}></Route>
-                <Route path="/" element={<Item barState={state} setBarState={setState} status={props}/>}></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
             </Routes>
-            </BrowserRouter>
             </div>
             <div>
             <Snackbar

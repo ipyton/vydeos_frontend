@@ -70,6 +70,8 @@ const IOSSwitch = styled((props) => (
 
   
 export default function Settings() {
+  const [settings, setSettings]=React.useState([])
+
   return (
     <Box display="flex" justifyContent="center">
         <List sx={{ width: '100%', bgcolor: 'background.paper'}} >

@@ -16,7 +16,9 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Avatar } from '@mui/material';
-
+import { Navigate, useNavigate } from 'react-router-dom';
+import { SignalCellularNullSharp } from '@mui/icons-material';
+import IOUtil from '../../util/ioUtil';
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -41,13 +43,14 @@ export default function Header(props) {
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-  console.log("---------------------------")
-  console.log(isMobileMenuOpen)
-  console.log(mobileMoreAnchorEl)
+
+  const navigate = useNavigate();
 
   const renderBadge = () => {
 
   }
+  
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -70,7 +73,8 @@ export default function Header(props) {
 
 
   const handleSearch = (event) => {
-    console.log(event.currentTarget)
+    let content = event.currentTarget
+    IOUtil.getSearchResult(content)
   }
 
   const handleSearchChange = (event) => {
@@ -80,10 +84,26 @@ export default function Header(props) {
 
   const handleLanguageMenuOpen =(event) => {
     console.log("language changed")
+    navigate(0)
   }
+
+  const handleLogout = (event) => {
+    localStorage.clear()
+    props.setLogin(false)
+    props.setBadgeContent(null)
+    navigate("/login")
+  }
+
+  const handleInfomation = (event) => {
+    navigate("/userinfo")
+  }
+
+  const handleSettings = (event) => {
+    navigate("/settings")
+  }
+
+
   const menuId = 'primary-search-account-menu';
-  console.log('sdfihboaiswehfoiaweshfhoASIf')
-  console.log(props.avatar)
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -100,10 +120,10 @@ export default function Header(props) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Account Information</MenuItem>
+      <MenuItem onClick={handleInfomation}>Account Information</MenuItem>
       {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
-      <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Log Out</MenuItem>
+      <MenuItem onClick={handleSettings}>Settings</MenuItem>
+      <MenuItem onClick={handleLogout}>Log Out</MenuItem>
     </Menu>
   );
 

@@ -7,10 +7,10 @@ import ListItem from "@mui/material/ListItem";
 import { List } from "@mui/material";
 
 function Item(props) {
-  console.log(localStorage.getItem("token"))
   const [articles, setArticles] = React.useState([1,2,3,4,5]);
   const [count, setCount] = React.useState(99);
-  const {loginState, setLoginState} = props.status
+  const {login, setLogin} = props.status
+
   let init = () => {
     document.addEventListener("scroll", () => {
       console.log(
@@ -31,25 +31,31 @@ function Item(props) {
   let RequestData = function()  {
     console.log("loading")
   }
-  if (loginState !== true && localStorage.getItem("token") !== null) {
-    IOUtil.verifyTokens(localStorage.getItem("token")).then(response => {
-      console.log(response)
-      if (true === response) {
-        setLoginState(true)
+  if (null === login) return <div></div>
+  if (login !== true && localStorage.getItem("token") !== null) {
+    console.log("both none")
+    IOUtil.verifyTokens(setLogin) 
+    .catch(err=>{
+      props.setBarState({...props.barState, message:"please login first" + err, open:true})
+    })
+    // .then(response => {
+    //   console.log(response)
+    //   if (true === response) {
+    //     setLogin(true)
+    //   }
+    //   else {
+    //     console.log("clean")
+    //     localStorage.removeItem("token")
+    //     setLogin(false)
+    //   }
       }
-      else {
-        console.log("clean")
-        localStorage.removeItem("token")
-        setLoginState(false)
-      }
-    }
-  ).catch(err=>{
-    props.setBarState({...props.barState, message:"please login first" + err, open:true})
-  })
-}
+ 
 
-  if(loginState !== true || localStorage.getItem("token") === null ) {
-    console.log("to login")
+
+  if(login !== true || localStorage.getItem("token") === null ) {
+    console.log("(((((((((((")
+    console.log(login)
+    console.log(localStorage.getItem("token"))
     return <Navigate to="/login" replace/>
   }
  
@@ -70,7 +76,7 @@ if (articles.length === 0) {
     <Box display="flex" justifyContent="center">
       <List>
       {articles&&articles.map(x=>{
-        return (<ListItem><Article key={x}></Article></ListItem>)
+        return (<ListItem key={x}><Article></Article></ListItem>)
       })}    
       </List>
     </Box>

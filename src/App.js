@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import { stepButtonClasses } from '@mui/material';
 import IOUtil from './util/ioUtil';
 import PictureUtil from './util/pictureUtil';
+import { BrowserRouter } from 'react-router-dom';
 
 function init(setLoginState, setAvatar, setBadgeContent){
   IOUtil.verifyTokens().then(x => {
@@ -23,8 +24,12 @@ function init(setLoginState, setAvatar, setBadgeContent){
 }
 
 
+
+
+
+
 function App() {
-  const [login,setLogin] = useState(false)
+  const [login,setLogin] = useState(null)
   const [avatar, setAvatar] = useState(null)
   const [badgeContent, setBadgeContent] = useState([])
   //const [picGetter, setPicGetter] = useState(new LRUPicCacheUtil())
@@ -33,14 +38,9 @@ function App() {
   //     picGetter.serialize()
   //   }
   // })
-  if (!login) {
-    IOUtil.verifyTokens().catch(err=> {
-      console.log()
+  if (null === login) {
+    IOUtil.verifyTokens(setLogin).catch(err=> {
 
-    }).then(x => {
-      if (x) {
-        setLogin(true)
-      }
     })
   }
   if (null === avatar)  {
@@ -52,17 +52,20 @@ function App() {
   if(login && null === badgeContent) {
     IOUtil.getMessages()
   }
-
+  console.log("Ppppasidoqabwdouqbdoqwubd")
+  console.log(login)
   return (
+    <BrowserRouter>
     <div>
-      <Header loginState={login} setLoginState={setLogin} avatar={avatar} setAvatar={setAvatar}  badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
+      <Header login={login} setLogin={setLogin} avatar={avatar} setAvatar={setAvatar}  badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
       <br></br>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Contents loginState={login} setLoginState={setLogin}></Contents>
+        <Contents login={login} setLogin={setLogin}></Contents>
       </LocalizationProvider>
       <br></br>
-      <Footer></Footer>
+      <Footer description='good' title='morning'></Footer>
     </div>
+    </BrowserRouter>
   );
 }
 

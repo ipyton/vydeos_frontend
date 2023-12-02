@@ -29,10 +29,15 @@ export default function UserInfo(props) {
   const {login, setLogin} = props.status
   const [avatar, setAvatar] = useState(null)
   const [picToUpload, setPicToUpload] = useState(null)
-
+  console.log("sdfinsiof" + login)
   if (false === login) {
     return <Navigate to="/login" replace/>
   }
+
+  const getUserInformation = () => {
+    
+  }
+
   const validate =(nickname,username, password)=>{
     return true
   }
@@ -46,7 +51,6 @@ export default function UserInfo(props) {
   }
 
   const picUploadHandler = (event) => {
-    console.log("updated")
     setAvatar(URL.createObjectURL(event.target.files[0]))
     PictureUtil.uploadAvatar(event.target.files[0])
   }

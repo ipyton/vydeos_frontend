@@ -16,7 +16,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import {Navigate} from "react-router-dom";
 import Qs from "qs"
-import verifyTokens from "../../../util/ioUtil"
 import NetworkError from '../NetworkError';
 import IOUtil from '../../../util/ioUtil';
 
@@ -40,8 +39,8 @@ const defaultTheme = createTheme();
 export default function Login(props) {
   const [selected, setSelected] = useState(false)
   const [networkErr, setNetworkErr] = useState(false)
-  const {loginState, setLoginState} = props.status
-  console.log(props)
+
+  const {login, setLogin} = props.status
 
   if (true === networkErr) {
     return <NetworkError></NetworkError>
@@ -50,8 +49,7 @@ export default function Login(props) {
   const validate = (username, password) => {
     return true
   }
-
-  if(loginState === true) {
+  if(true === login) {
     return <Navigate to="/" replace/>
   }
   else {
@@ -59,13 +57,11 @@ export default function Login(props) {
       IOUtil.verifyTokens(localStorage.getItem("token")).catch(error => {
         if ("Network Error" ===  error.message) {
           props.setBarState({...props.barState, message:"network" + error, open:true})
-          console.log("ssdfinsdfindsifndsikfjdsnikfds")
         }
         setNetworkErr(true)
       }).then(response=>{
           if (response) {
-            console.log("login success")
-            setLoginState(true)
+            setLogin(true)
           }
           else{
             localStorage.removeItem("token")            
@@ -96,35 +92,32 @@ export default function Login(props) {
       }],
     }).catch(error => {
       if ("Network Error" ===  error.message) {
-        props.setBarState({...props.barState, message:"please login first" +error, open:true})
+        props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
         setNetworkErr(true)
       }
-      console.log("--------------------------")
     }).then(function(response) {
         let responseData = response.data
-        console.log(responseData)
         if (responseData.code === -1) {
-          console.log(responseData.message)
           props.setBarState({...props.barState, message:responseData.message, open:true})
         }
         else if(responseData.code === 1) {
           localStorage.setItem("token", responseData.message)
-          setLoginState(true)
+          setLogin(true)
         }
         else {
-          console.log(responseData.message)
           props.setBarState({...props.barState, message:responseData.message, open:true})
         }
         setNetworkErr(false)
-      }).catch(function(error) {
-        if ("Network Error" ===  error.message) {
-          props.setBarState({...props.barState, message:"please login first" +error, open:true})
-          setNetworkErr(true)
-        }
-        else {
-
-        }
       })
+      // .catch(function(error) {
+      //   if ("Network Error" ===  error.message) {
+      //     props.setBarState({...props.barState, message:"please login first" + error, open:true})
+      //     setNetworkErr(true)
+      //   }
+      //   else {
+
+      //   }
+      // })
     }
     else {
       props.setBarState({...props.barState, message:"please check your input", open:true})
