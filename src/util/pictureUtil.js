@@ -2,7 +2,6 @@
 import { responsiveFontSizes } from "@mui/material"
 import axios from "axios"
 import Qs from 'qs'
-
 export default class PictureUtil {
         static uploadAvatar(data) {
             async function upload() {
@@ -45,7 +44,7 @@ export default class PictureUtil {
                     data:{from:1, from:to, articleID: articleID},
                     headers:{token: localStorage.getItem("token"),
                            'userEmail': '1838169994@qq.com'},
-                    responseType:'blob'
+                    responseType:'arraybuffer'
                 })
                 let responseData = response.data
                 console.log("-------------------")
@@ -61,12 +60,16 @@ export default class PictureUtil {
                     url:"http://localhost:8080/account/getAvatar", 
                     method:'post',
                     headers:{token: localStorage.getItem("token"),
-                           'userEmail': '1838169994@qq.com'}
+                           'userEmail': '1838169994@qq.com'},
+                           responseType:"arraybuffer"
                 })
-                let responseData = response.data
-                console.log("-------------------")
-                console.log(responseData)
-                return responseData.code === 1
+                // console.log(response)
+                const blob = new Blob([response.data], { type: "image/jpg"});
+                const imageUrl = URL.createObjectURL(blob);
+                //let blob = new Blob([response.data],{type: "image/jpeg"});
+                // response = URL.createObjectURL(blob)
+                // console.log(response)
+                return imageUrl
             }
             return download()
         }

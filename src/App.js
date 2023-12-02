@@ -43,13 +43,9 @@ function App() {
       }
     })
   }
-  if (login && null === avatar)  {
-    PictureUtil.getAvatar().catch(err => {
-      console.log("picture get error")
-    }).then(response => {
-      const reader = new FileReader()
-      console.log(response)
-      // setAvatar(reader.readAsDataURL(response.data))
+  if (null === avatar)  {
+    PictureUtil.getAvatar().then(response => {
+      setAvatar(response)
     })
   }
 
@@ -59,7 +55,7 @@ function App() {
 
   return (
     <div>
-      <Header loginState={login} setLoginState={setLogin} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
+      <Header loginState={login} setLoginState={setLogin} avatar={avatar} setAvatar={setAvatar}  badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
       <br></br>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Contents loginState={login} setLoginState={setLogin}></Contents>

@@ -15,6 +15,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import LanguageIcon from '@mui/icons-material/Language';
+import { Avatar } from '@mui/material';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -33,7 +34,7 @@ const Search = styled('div')(({ theme }) => ({
 }));
 
 
-export default function Header() {
+export default function Header(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const [search, setSearch] = React.useState(null);
@@ -44,6 +45,9 @@ export default function Header() {
   console.log(isMobileMenuOpen)
   console.log(mobileMoreAnchorEl)
 
+  const renderBadge = () => {
+
+  }
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -74,11 +78,12 @@ export default function Header() {
     console.log(event.currentTarget.value)
   }
 
-  const handleLanguageMenuOpen =(event ) => {
+  const handleLanguageMenuOpen =(event) => {
     console.log("language changed")
   }
   const menuId = 'primary-search-account-menu';
-
+  console.log('sdfihboaiswehfoiaweshfhoASIf')
+  console.log(props.avatar)
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -101,8 +106,6 @@ export default function Header() {
       <MenuItem onClick={handleMenuClose}>Log Out</MenuItem>
     </Menu>
   );
-
-
 
 
   const renderLanguageMenu = (
@@ -130,9 +133,6 @@ export default function Header() {
   )
 
 
-
-
-  
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
     <Menu
@@ -184,7 +184,7 @@ export default function Header() {
           aria-haspopup="true"
           color="inherit"
         >
-        <AccountCircle />
+        <Avatar alt="Travis Howard"  src={props.avatar} />
        </IconButton>
        
         <p>Account</p>
@@ -274,7 +274,7 @@ export default function Header() {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <AccountCircle />
+            <Avatar alt="Travis Howard"  src={props.avatar} />
             </IconButton>
 
 

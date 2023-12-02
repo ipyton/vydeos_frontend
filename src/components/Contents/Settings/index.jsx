@@ -100,7 +100,7 @@ export default function Settings() {
       <ListItem>
         <ListItemAvatar>
           <Avatar>
-            <BeachAccessIcon />
+            <BeachAccessIcon />   
           </Avatar>
         </ListItemAvatar>
         <ListItemText primary="Vacation" />

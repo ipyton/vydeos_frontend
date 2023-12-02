@@ -18,6 +18,7 @@ import {Navigate} from "react-router-dom";
 import Qs from "qs"
 import verifyTokens from "../../../util/ioUtil"
 import NetworkError from '../NetworkError';
+import IOUtil from '../../../util/ioUtil';
 
 function Copyright(props) {
   return (
@@ -55,7 +56,7 @@ export default function Login(props) {
   }
   else {
     if (localStorage.getItem("token") !== null){
-      verifyTokens(localStorage.getItem("token")).catch(error => {
+      IOUtil.verifyTokens(localStorage.getItem("token")).catch(error => {
         if ("Network Error" ===  error.message) {
           props.setBarState({...props.barState, message:"network" + error, open:true})
           console.log("ssdfinsdfindsifndsikfjdsnikfds")

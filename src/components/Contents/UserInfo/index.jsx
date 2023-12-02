@@ -26,12 +26,12 @@ export default function UserInfo(props) {
     
   const [receive, setReceive] = useState(false)
   const [selected, setSelected] = useState(false) 
-  const {loginState, setLoginState} = props.status
+  const {login, setLogin} = props.status
   const [avatar, setAvatar] = useState(null)
   const [picToUpload, setPicToUpload] = useState(null)
 
-  if (true === loginState) {
-    return <Navigate to="/" replace/>
+  if (false === login) {
+    return <Navigate to="/login" replace/>
   }
   const validate =(nickname,username, password)=>{
     return true
@@ -105,7 +105,6 @@ export default function UserInfo(props) {
             </label>
           </div>
         )
-
     }
 
     return (

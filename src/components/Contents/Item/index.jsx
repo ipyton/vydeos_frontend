@@ -2,7 +2,9 @@ import Article from "./Article";
 import React, {useEffect, useState} from "react";
 import { useNavigate ,Navigate} from "react-router-dom";
 import IOUtil from "../../../util/ioUtil";
-
+import { Box } from "@mui/material";
+import ListItem from "@mui/material/ListItem";
+import { List } from "@mui/material";
 
 function Item(props) {
   console.log(localStorage.getItem("token"))
@@ -65,11 +67,14 @@ if (articles.length === 0) {
   //   })
   return (
 
-    <div>
-    {articles&&articles.map(x=>{
-      return <Article key={x}></Article>
-    })}    
-    </div>
+    <Box display="flex" justifyContent="center">
+      <List>
+      {articles&&articles.map(x=>{
+        return (<ListItem><Article key={x}></Article></ListItem>)
+      })}    
+      </List>
+    </Box>
+
 
   )
 }
