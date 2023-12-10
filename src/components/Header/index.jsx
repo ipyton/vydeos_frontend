@@ -560,30 +560,30 @@ export default function Header(props) {
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { xs: 'none', sm: 'block' } }}
+            sx={{ display: { xs: 'none', sm: 'block' }, marginLeft:"2.5%" }}
           >
-            Everything
+            Everything  
           </Typography>
           <Box sx={{ flexGrow: 1 }}></Box>
           <Box display="flex" justifyContent="center" alignItems="center">
-          <Search >
-            {/* <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search"
+            <Search >
+              {/* <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder="Search"
+                  inputProps={{ 'aria-label': 'search' }}
+                /> */}
+              <InputBase
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="search"
                 inputProps={{ 'aria-label': 'search' }}
-              /> */}
-            <InputBase
-              sx={{ ml: 1, flex: 1 }}
-              placeholder="search"
-              inputProps={{ 'aria-label': 'search' }}
-              onChange={handleSearchChange}
-              onBlur={handleSearchSuggestionClose}
-            />
-            <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch} >
-              <SearchIcon />
-            </IconButton>
+                onChange={handleSearchChange}
+                onBlur={handleSearchSuggestionClose}
+              />
+              <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch} >
+                <SearchIcon />
+              </IconButton>
           </Search>
           </Box>
 
