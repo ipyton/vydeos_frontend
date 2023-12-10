@@ -39,6 +39,7 @@ export default function Contents(props) {
                 <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}></Chat>}></Route>
                 <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                 <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props}></NetworkError>}></Route>
+                <Route path="/error" element={<NetworkError></NetworkError>}></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
             </Routes>
             </div>

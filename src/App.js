@@ -10,6 +10,8 @@ import { stepButtonClasses } from '@mui/material';
 import IOUtil from './util/ioUtil';
 import PictureUtil from './util/pictureUtil';
 import { BrowserRouter } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import NetworkError from './components/Contents/NetworkError';
 
 function init(setLoginState, setAvatar, setBadgeContent){
   IOUtil.verifyTokens().then(x => {
@@ -24,14 +26,12 @@ function init(setLoginState, setAvatar, setBadgeContent){
 }
 
 
-
-
-
-
 function App() {
   const [login,setLogin] = useState(null)
   const [avatar, setAvatar] = useState(null)
   const [badgeContent, setBadgeContent] = useState([])
+  const [networkStatus, setNetworkStatus] = useState(null)
+
   //const [picGetter, setPicGetter] = useState(new LRUPicCacheUtil())
   // useEffect(()=>{
   //   const handleBeforeUnload = (e) => {
@@ -40,11 +40,13 @@ function App() {
   // })
   if (null === login) {
     IOUtil.verifyTokens(setLogin).catch(err=> {
-
+      setNetworkStatus(true)
     })
   }
   if (null === avatar)  {
-    PictureUtil.getAvatar().then(response => {
+    PictureUtil.getAvatar().catch(err=>{
+      setNetworkStatus(true)
+    }).then(response => {
       setAvatar(response)
     })
   }
@@ -54,6 +56,10 @@ function App() {
   }
   console.log("Ppppasidoqabwdouqbdoqwubd")
   console.log(login)
+
+  if (false === networkStatus) {
+    return <NetworkError></NetworkError>
+  }
   return (
     <BrowserRouter>
     <div>
