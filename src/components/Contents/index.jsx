@@ -12,6 +12,8 @@ import Videos from "./Videos"
 import NetworkError from "./NetworkError"
 import Chat from "./Chat"
 import Settings from "./Settings"
+import AppStore from "./AppStore"
+import Friends from "./FriendList"
 
 export default function Contents(props) {
     const [state, setState] = React.useState({
@@ -39,7 +41,10 @@ export default function Contents(props) {
                 <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}></Chat>}></Route>
                 <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                 <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props}></NetworkError>}></Route>
+                <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>
                 <Route path="/error" element={<NetworkError></NetworkError>}></Route>
+                <Route path="/appstore" element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
+                <Route path="/friends" element={<Friends setBarState={setState} status={props}></Friends> }></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
             </Routes>
             </div>

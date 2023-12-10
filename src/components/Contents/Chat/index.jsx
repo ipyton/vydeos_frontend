@@ -25,7 +25,7 @@ export default function Chat() {
   let height = window.innerHeight * 0.8
   console.log(height)
   return (
-    <Stack sx={{marginLeft:'15%',width:'70%',marginTop:3, height:height, overflow:"hidden"}} direction="row" justify="center" spacing={2}>
+    <Stack sx={{marginLeft:'15%',width:'70%',marginTop:3, height:height,}} direction="row" justify="center" spacing={2}>
       <SideBar></SideBar>
       <MessageList></MessageList>
     </Stack>

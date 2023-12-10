@@ -12,6 +12,9 @@ import PictureUtil from './util/pictureUtil';
 import { BrowserRouter } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import NetworkError from './components/Contents/NetworkError';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 
 function init(setLoginState, setAvatar, setBadgeContent){
   IOUtil.verifyTokens().then(x => {
@@ -24,6 +27,7 @@ function init(setLoginState, setAvatar, setBadgeContent){
 
   
 }
+const defaultTheme = createTheme();
 
 
 function App() {
@@ -60,18 +64,22 @@ function App() {
   if (false === networkStatus) {
     return <NetworkError></NetworkError>
   }
+
+
   return (
+    <ThemeProvider theme={defaultTheme}>
     <BrowserRouter>
-    <div>
+    <Box sx={{ display: 'flex' }}>
       <Header login={login} setLogin={setLogin} avatar={avatar} setAvatar={setAvatar}  badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
-      <br></br>
+      <Box width="100%"  justifyContent="center" alignItems="center" marginTop="40px">
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Contents login={login} setLogin={setLogin}></Contents>
       </LocalizationProvider>
-      <br></br>
       <Footer description='good' title='morning'></Footer>
-    </div>
+      </Box>
+      </Box>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

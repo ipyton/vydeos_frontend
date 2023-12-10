@@ -7,7 +7,7 @@ import InputBox from "./InputBox"
 
 export default function () {
 
-	return (<Stack sx={{width:"70%",  borderRadius: 2,boxShadow:1, overflow:'scroll'}}> 
+	return (<Stack sx={{width:"70%", boxShadow:1}}> 
 		<Header></Header>
 		<Message></Message>
 		<InputBox></InputBox>

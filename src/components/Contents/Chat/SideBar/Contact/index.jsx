@@ -4,11 +4,14 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import BeachAccessIcon from '@mui/icons-material/BeachAccess';
+import { ListItemButton } from '@mui/material';
 
 
 export default function Contact() {
-    return (      
-    <ListItem>
+    return (     
+     
+    <ListItemButton sx={{width:"100%"}}>
+    <ListItem sx={{width:"100%"}}>
         <ListItemAvatar>
           <Avatar>
             <BeachAccessIcon />
@@ -16,5 +19,6 @@ export default function Contact() {
         </ListItemAvatar>
         <ListItemText primary="Vacation" secondary="July 20, 2014" />
     </ListItem>
+    </ListItemButton>
 )
 }

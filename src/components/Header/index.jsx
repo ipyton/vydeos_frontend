@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled, alpha } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
+// import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -15,7 +15,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import LanguageIcon from '@mui/icons-material/Language';
-import { Avatar, Fab } from '@mui/material';
+import { Avatar, Fab, ListItemButton } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 import IOUtil from '../../util/ioUtil';
 import List from '@mui/material/List';
@@ -24,8 +24,9 @@ import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import zIndex from '@mui/material/styles/zIndex';
-
-
+import { eventWrapper } from '@testing-library/user-event/dist/utils';
+import FunctionDrawer from './FunctionDrawer';
+import MuiAppBar from '@mui/material/AppBar';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -43,16 +44,43 @@ const Search = styled('div')(({ theme }) => ({
   },
 }));
 
+const drawerWidth = 240;
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+
+
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const [suggestionAnchorEl, setSuggestionAnchorEl] = React.useState(null);
+  const [languageAnchorEl, setLanguageAnchorEl] = React.useState(null);
   const [search, setSearch] = React.useState(null);
+  const [notificationsAnchorEl,setNotificationsAnchorEl] = React.useState(null)
+  const [open, setOpen] = React.useState(false);
+
+
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
-
+  const languageMenuOpen = Boolean(languageAnchorEl)
+  const notificationsOpen = Boolean(notificationsAnchorEl)
   const navigate = useNavigate();
 
   const renderBadge = () => {
@@ -94,8 +122,8 @@ export default function Header(props) {
   }
 
   const handleLanguageMenuOpen =(event) => {
+    setLanguageAnchorEl(event.currentTarget)
     console.log("language changed")
-    navigate(0)
   }
 
   const handleLogout = (event) => {
@@ -120,7 +148,29 @@ export default function Header(props) {
   const handleSearchSuggestionClose = (event) => {
     setSuggestionAnchorEl(null)
   }
+
+  const handleLanguageMenuClose = (event) => {
+    setLanguageAnchorEl(null)
+  }
+
+  const handleSuggestionSelection = (event) => {
+    console.log(event.currentTarget)
+    console.log("select")
+  }
   
+  const handleNotificationOpen = () => {
+
+  }
+
+  const handleNotificationClose = () => {
+
+  }
+
+  const toggleDrawer = () => {
+    setOpen(!open);
+  };
+
+
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -149,7 +199,7 @@ export default function Header(props) {
 
   const renderLanguageMenu = (
     <Menu
-    anchorEl={anchorEl}
+    anchorEl={languageAnchorEl}
     anchorOrigin={{
       vertical: 'top',
       horizontal: 'right',
@@ -160,8 +210,8 @@ export default function Header(props) {
       vertical: 'top',
       horizontal: 'right',
     }}
-    open={isMenuOpen}
-    onClose={handleMenuClose}
+    open={languageMenuOpen}
+    onClose={handleLanguageMenuClose}
   >
     <MenuItem onClick={handleMenuClose}>English</MenuItem>
     {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
@@ -170,75 +220,260 @@ export default function Header(props) {
   </Menu>
 
   )
+  
+
+  const notifications = (
+    <List hidden={!notificationsOpen} sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', zIndex:9999, position: 'absolute', left: '50%',
+    transform: 'translate(-50%, 0)'}}>
+    <ListItemButton onMouseDown={handleNotificationOpen}>
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+        </ListItemAvatar>
+        <ListItemText
+          primary="Brunch this weekend?"
+          secondary={
+            <React.Fragment>
+              <Typography
+                 variant="body2"
+                color="text.primary"
+              >
+                Ali Connors
+              </Typography>
+              {" message1"}
+            </React.Fragment>
+          }
+        />
+      </ListItem>  
+      </ListItemButton>
+      
+      <Divider variant="inset" component="li" />
+      <ListItemButton onMouseDown={handleNotificationOpen}>
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
+        </ListItemAvatar>
+        <ListItemText
+          primary="Summer BBQ"
+          secondary={
+            <React.Fragment>
+              <Typography
+                sx={{ display: 'inline' }}
+                component="span"
+                variant="body2"
+                color="text.primary"
+              >
+                to Scott, Alex, Jennifer
+              </Typography>
+              {" — message 2"}
+            </React.Fragment>
+          }
+        />
+      </ListItem>
+      </ListItemButton>
+    
+      <Divider variant="inset" component="li" />
+
+      <ListItemButton onMouseDown={handleNotificationOpen}>
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+        </ListItemAvatar>
+        <ListItemText
+          primary="Oui Oui"
+          secondary={
+            <React.Fragment>
+              <Typography
+                sx={{ display: 'inline' }}
+                component="span"
+                variant="body2"
+                color="text.primary"
+              >
+                Sandra Adams
+              </Typography>
+              {' — message3'}
+            </React.Fragment>
+          }
+        />
+      </ListItem>
+      </ListItemButton>
+    </List>
+
+
+  )
+
+
+
 
     const suggestionBar = (
-        <List anchorEl={suggestionAnchorEl}  hidden={searchSuggestionOpen} sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', zIndex:9999, position: 'absolute', left: '50%',
-        transform: 'translate(-50%, 0)'}}>
-          <ListItem alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Brunch this weekend?"
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    sx={{ display: 'inline' }}
-                    component="span"
-                    variant="body2"
-                    color="text.primary"
-                  >
-                    Ali Connors
-                  </Typography>
-                  {" — I'll be in your neighborhood doing errands this…"}
-                </React.Fragment>
-              }
-            />
-          </ListItem>
-          <Divider variant="inset" component="li" />
-          <ListItem alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Summer BBQ"
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    sx={{ display: 'inline' }}
-                    component="span"
-                    variant="body2"
-                    color="text.primary"
-                  >
-                    to Scott, Alex, Jennifer
-                  </Typography>
-                  {" — Wish I could come, but I'm out of town this…"}
-                </React.Fragment>
-              }
-            />
-          </ListItem>
-          <Divider variant="inset" component="li" />
-          <ListItem alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Oui Oui"
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    sx={{ display: 'inline' }}
-                    component="span"
-                    variant="body2"
-                    color="text.primary"
-                  >
-                    Sandra Adams
-                  </Typography>
-                  {' — Do you have Paris recommendations? Have you ever…'}
-                </React.Fragment>
-              }
-            />
-          </ListItem>
+      <List hidden={searchSuggestionOpen} sx={{ width: '100%', maxWidth: 360,maxHeight:500, bgcolor: 'background.paper', zIndex:9999, position: 'absolute', left: '50%',
+        transform: 'translate(-50%, 0)',  overflow:"scroll"}}>
+
+          <ListItemButton onMouserunDown={handleSuggestionSelection}>
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+              </ListItemAvatar>
+              <ListItemText
+                primary="Oui Oui"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Sandra Adams
+                    </Typography>
+                    {' — Do you have Paris recommendations? Have you ever…'}
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+          </ListItemButton>
+
+          <ListItemButton onMouseDown={handleSuggestionSelection}>
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+              </ListItemAvatar>
+              <ListItemText
+                primary="Oui Oui"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Sandra Adams
+                    </Typography>
+                    {' — Do you have Paris recommendations? Have you ever…'}
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+          </ListItemButton>
+          <ListItemButton onMouseDown={handleSuggestionSelection}>
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+              </ListItemAvatar>
+              <ListItemText
+                primary="Oui Oui"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Sandra Adams
+                    </Typography>
+                    {' — Do you have Paris recommendations? Have you ever…'}
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+          </ListItemButton>
+          <ListItemButton onMouseDown={handleSuggestionSelection}>
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+              </ListItemAvatar>
+              <ListItemText
+                primary="Oui Oui"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Sandra Adams
+                    </Typography>
+                    {' — Do you have Paris recommendations? Have you ever…'}
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+          </ListItemButton>
+          
+          <ListItemButton onMouseDown={handleSuggestionSelection}>
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+              </ListItemAvatar>
+              <ListItemText
+                primary="Oui Oui"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Sandra Adams
+                    </Typography>
+                    {' — Do you have Paris recommendations? Have you ever…'}
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+          </ListItemButton>
+          
+
+          <ListItemButton onMouseDown={handleSuggestionSelection}>
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+              </ListItemAvatar>
+              <ListItemText
+                primary="Oui Oui"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Sandra Adams
+                    </Typography>
+                    {' — Do you have Paris recommendations? Have you ever…'}
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+          </ListItemButton>
+          <ListItemButton onMouseDown={handleSuggestionSelection}>
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+              </ListItemAvatar>
+              <ListItemText
+                primary="Oui Oui"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Sandra Adams
+                    </Typography>
+                    {' — Do you have Paris recommendations? Have you ever…'}
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+          </ListItemButton>
         </List>
     )
 
@@ -305,20 +540,22 @@ export default function Header(props) {
   );
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+    <Box>
+      <AppBar position="fixed" open={open}>
         <Toolbar>
-          <IconButton
-          size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
+        <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer}
+              sx={{
+                marginRight: '0px',
+                ...(open && { display: 'none' }),
+              }}
+            >
             <MenuIcon />
           </IconButton>
-          
-          
+
           <Typography
             variant="h6"
             noWrap
@@ -327,8 +564,9 @@ export default function Header(props) {
           >
             Everything
           </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <Search>
+          <Box sx={{ flexGrow: 1 }}></Box>
+          <Box display="flex" justifyContent="center" alignItems="center">
+          <Search >
             {/* <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
@@ -347,11 +585,10 @@ export default function Header(props) {
               <SearchIcon />
             </IconButton>
           </Search>
+          </Box>
 
+          <Box sx={{ flexGrow: 1 }}></Box>
 
-
-
-          <Box sx={{ flexGrow: 1 }} />
 
 
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
@@ -393,7 +630,7 @@ export default function Header(props) {
 
 
           </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, alignSelf:"right" }}>
             <IconButton
               size="large"
               aria-label="show more"
@@ -407,12 +644,13 @@ export default function Header(props) {
           </Box>
         </Toolbar>
       </AppBar>
+
       {renderMobileMenu}
       {renderMenu}
       {suggestionBar}
-
-
-
+      {renderLanguageMenu}
+      {notifications}
+      <FunctionDrawer setOpen={setOpen} open={open}></FunctionDrawer>
     </Box>
   );
 }
