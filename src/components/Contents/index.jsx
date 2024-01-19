@@ -14,6 +14,7 @@ import Chat from "./Chat"
 import Settings from "./Settings"
 import AppStore from "./AppStore"
 import Friends from "./FriendList"
+import LongVideos from "./LongVideos"
 
 export default function Contents(props) {
     const [state, setState] = React.useState({
@@ -44,8 +45,10 @@ export default function Contents(props) {
                 <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>
                 <Route path="/error" element={<NetworkError></NetworkError>}></Route>
                 <Route path="/appstore" element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
-                <Route path="/friends" element={<Friends setBarState={setState} status={props}></Friends> }></Route>
+                <Route path="/longvideos" element={<LongVideos setBarState={setState} status={props}></LongVideos> }></Route>
+
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
+                
             </Routes>
             </div>
             <div>
