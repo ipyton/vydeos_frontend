@@ -15,6 +15,7 @@ import Settings from "./Settings"
 import AppStore from "./AppStore"
 import Friends from "./FriendList"
 import LongVideos from "./LongVideos"
+import UploadFile from "./UploadFile"
 
 export default function Contents(props) {
     const [state, setState] = React.useState({
@@ -46,7 +47,7 @@ export default function Contents(props) {
                 <Route path="/error" element={<NetworkError></NetworkError>}></Route>
                 <Route path="/appstore" element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
                 <Route path="/longvideos" element={<LongVideos setBarState={setState} status={props}></LongVideos> }></Route>
-
+                <Route path="/upload" element={<UploadFile setBarState={setState} status={props}></UploadFile> }></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
                 
             </Routes>

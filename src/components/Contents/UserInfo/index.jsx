@@ -51,6 +51,10 @@ export default function UserInfo(props) {
   }
 
   const picUploadHandler = (event) => {
+    
+    
+
+
     setAvatar(URL.createObjectURL(event.target.files[0]))
     PictureUtil.uploadAvatar(event.target.files[0])
   }
@@ -62,12 +66,6 @@ export default function UserInfo(props) {
         props.setBarState({...props.barState, message:"please check your input", open:true})
       }
       else {
-        console.log({
-          email: data.get('email'),
-          password: data.get('password'),
-          nickname: data.get('nickname'),
-          recv: receive
-        });
         axios({
           url:"http://localhost:8080/account/getinfo", 
           method:'post',
