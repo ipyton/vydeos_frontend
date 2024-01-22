@@ -6,7 +6,7 @@ import LongVideo from "./LongVideo";
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
-
+import Comments from "./Comments";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -59,26 +59,29 @@ export default function LongVideos(props) {
 
     
     <div >
-      <Stack sx={{marginLeft:"10%", marginTop:"10%",width:"80%"}}>
+      <Stack sx={{marginLeft:"10%", marginTop:"5%",width:"80%"}}>
         <Item>
           <Stack direction="row" spacing={2}>
           <Item sx={{width:"70%",height:"20%"}}>
             <Stack spacing={2}>
-              <Item></Item>
-              <Item>          <LongVideo></LongVideo></Item>
+              <Item sx={{textAlign:"left",fontSize:20}}>this is a title</Item>
+              <Item>
+                <LongVideo></LongVideo>
+              </Item>
 
             </Stack>
 
           </Item>
-          <Item>
-            yaoyaolingxian
+          <Item sx={{textAlign:"left", width:"30%"}}>
+            playList
           </Item>
           </Stack>
         </Item>
-
-        <Item>
-
-          yaoyaolingxian
+        <Item sx={{textAlign:"left"}}> 
+          comments
+        </Item>
+        <Item >
+          <Comments commentList={[]}></Comments>
         </Item>
 
 

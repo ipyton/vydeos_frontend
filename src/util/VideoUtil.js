@@ -5,27 +5,27 @@ import CryptoJS from "crypto-js";
 const MAX_RETRY = 10
 
 
-function sendWithRetry(config) {
-    axios({
-        url:"http://localhost:8080/video/negotiation", 
-        method:'post',
-        data:{userEmail: localStorage.get("userEmail"), title: title, introduction: introduction, token:localStorage("token")},
-        transformRequest:[function (data) {
-          // 对 data 进行任意转换处理
-          return Qs.stringify(data)
-      }],
-    }).catch(errorHandler(config))
-}
+// function sendWithRetry(config, title, introduction) {
+//     axios({
+//         url:"http://localhost:8080/video/negotiation", 
+//         method:'post',
+//         data:{userEmail: localStorage.get("userEmail"), title: title, introduction: introduction, token:localStorage.getItem("token")},
+//         transformRequest:[function (data) {
+//           // 对 data 进行任意转换处理
+//           return Qs.stringify(data)
+//       }],
+//     }).catch(errorHandler(config))
+// }
 
-function errorHandler(config) {
-    let internal = () => {
-        if(current_try < MAX_RETRY) {
-            current_try ++
-            sendWithRetry(config)
-        }
-    }
-    return internal
-}
+// function errorHandler(err) {
+//     let internal = () => {
+//         if(err.request.tries < MAX_RETRY) {
+//             err.request.tries --
+//             sendWithRetry(err,err.request.title, err.request.introduction)
+//         }
+//     }
+//     return internal
+// }
 
 
 export default class VideoUtil {
@@ -95,9 +95,7 @@ export default class VideoUtil {
                             } else {
                                 console.log("upload error")
                             }
-
                         })
-
                     }
                 }
             }
