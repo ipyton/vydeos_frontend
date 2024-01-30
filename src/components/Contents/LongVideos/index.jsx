@@ -54,10 +54,36 @@ export default function LongVideos(props) {
 //     };
 //   }, [playerRef]);
     let a =[1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,324,543,52,34]
+    const playerRef = React.useRef(null);
+
+    const videoJsOptions = {
+      autoplay: true,
+      controls: true,
+      responsive: true,
+      fluid: true,
+      fill: true,
+      sources: [{
+        src: "https://vjs.zencdn.net/v/oceans.mp4",
+        type: 'video/mp4'
+      }]
+      ,playbackRates:[1,2,3]
+    }
+    const handlePlayerReady = (player) => {
+      playerRef.current = player;
+
+      // You can handle player events here, for example:
+      player.on('waiting', () => {
+        videojs.log('player is waiting');
+      });
+  
+      player.on('dispose', () => {
+        videojs.log('player will dispose');
+      });
+    }
+
+    let playList = false
+
   return (
-
-
-    
     <div >
       <Stack sx={{marginLeft:"10%", marginTop:"5%",width:"80%"}}>
         <Item>
@@ -66,14 +92,17 @@ export default function LongVideos(props) {
             <Stack spacing={2}>
               <Item sx={{textAlign:"left",fontSize:20}}>this is a title</Item>
               <Item>
-                <LongVideo></LongVideo>
+                <LongVideo options={videoJsOptions} onReady={handlePlayerReady}></LongVideo>
               </Item>
-
             </Stack>
 
           </Item>
           <Item sx={{textAlign:"left", width:"30%"}}>
             playList
+            <Stack>
+              <Item >sdif</Item>
+              <Item>afdis</Item>
+            </Stack>
           </Item>
           </Stack>
         </Item>

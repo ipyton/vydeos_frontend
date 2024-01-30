@@ -7,7 +7,7 @@ export default function LongVideo(props) {
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
   const { options, onReady } = props;
-
+  
   React.useEffect(() => {
     // make sure Video.js player is only initialized once
     if (!playerRef.current) {
@@ -29,6 +29,7 @@ export default function LongVideo(props) {
   // Dispose the Video.js player when the functional component unmounts
   React.useEffect(() => {
     const player = playerRef.current;
+    
 
     return () => {
       if (player) {
@@ -38,6 +39,8 @@ export default function LongVideo(props) {
       }
     };
   }, [playerRef]);
+
+  
 
   return (
     <p >
