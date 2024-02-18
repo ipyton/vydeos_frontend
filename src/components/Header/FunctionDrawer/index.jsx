@@ -89,9 +89,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 export default function FunctionDrawer(props) {
   const theme = useTheme();
   const {open, setOpen} = props
-  console.log("-------------------------------------")
-  console.log(open)
-
   const toggleDrawer = () => {
     setOpen(!open);
   };

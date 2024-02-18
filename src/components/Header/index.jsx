@@ -65,12 +65,11 @@ const AppBar = styled(MuiAppBar, {
 
 
 
-
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const [suggestionAnchorEl, setSuggestionAnchorEl] = React.useState(null);
-  const [languageAnchorEl, setLanguageAnchorEl] = React.useState(null);
+  const [languageAnchorEl, setLanguageAnchorEl] = React.useState(null);  
   const [search, setSearch] = React.useState(null);
   const [notificationsAnchorEl,setNotificationsAnchorEl] = React.useState(null)
   const [open, setOpen] = React.useState(false);
@@ -158,12 +157,12 @@ export default function Header(props) {
     console.log("select")
   }
   
-  const handleNotificationOpen = () => {
-
+  const handleNotificationOpen = (event) => {
+    setNotificationsAnchorEl(event.currentTarget)
   }
 
   const handleNotificationClose = () => {
-
+    setNotificationsAnchorEl(null)
   }
 
   const toggleDrawer = () => {
@@ -220,6 +219,32 @@ export default function Header(props) {
   </Menu>
 
   )
+
+
+  const renderMessageMenu = (
+    <Menu
+    anchorEl={notificationsAnchorEl}
+    anchorOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    id={menuId}
+    keepMounted
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    open={notificationsOpen}
+    onClose={handleNotificationClose}
+  >
+    <MenuItem onClick={handleMenuClose}>English</MenuItem>
+    {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
+    <MenuItem onClick={handleMenuClose}>Chinese</MenuItem>
+    <MenuItem onClick={handleMenuClose}>Japanese</MenuItem>
+  </Menu>
+
+  )
+  
   
 
   const notifications = (
@@ -303,11 +328,9 @@ export default function Header(props) {
   )
 
 
-
-
     const suggestionBar = (
-      <List hidden={searchSuggestionOpen} sx={{ width: '100%', maxWidth: 360,maxHeight:500, bgcolor: 'background.paper', zIndex:9999, position: 'absolute', left: '50%',
-        transform: 'translate(-50%, 0)',  overflow:"scroll"}}>
+      <List hidden={searchSuggestionOpen} sx={{ width: '100%', maxWidth: 360,maxHeight:500, bgcolor: 'background.paper', position: 'absolute', left: open? (100*((window.innerWidth+240)/(2*window.innerWidth))+'%'):'51%', top:40,transform: 'translate(-50%, 0)',zIndex:500,
+          overflow:"scroll"}}>
 
           <ListItemButton onMouserunDown={handleSuggestionSelection}>
             <ListItem alignItems="flex-start">
@@ -596,6 +619,7 @@ export default function Header(props) {
               size="large"
               aria-label="show 17 new notifications"
               color="inherit"
+              onClick={handleNotificationOpen}
             >
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
@@ -649,7 +673,7 @@ export default function Header(props) {
       {renderMenu}
       {suggestionBar}
       {renderLanguageMenu}
-      {notifications}
+      {renderMessageMenu}
       <FunctionDrawer setOpen={setOpen} open={open}></FunctionDrawer>
     </Box>
   );

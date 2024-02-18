@@ -55,7 +55,16 @@ export default function LongVideos(props) {
 //   }, [playerRef]);
     let a =[1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,324,543,52,34]
     const playerRef = React.useRef(null);
-
+    videojs.Vhs.xhr.beforeRequest = function (options) {
+      let headers = options.headers || {};
+      headers["token"] = "J2LqH1mnoXE0ZL5typ3VT3n4fe7RFYAO";
+    
+      options.headers = headers;
+    
+      console.log("options", options);
+    
+      return options;
+    }
     const videoJsOptions = {
       autoplay: true,
       controls: true,
@@ -63,8 +72,8 @@ export default function LongVideos(props) {
       fluid: true,
       fill: true,
       sources: [{
-        src: "https://vjs.zencdn.net/v/oceans.mp4",
-        type: 'video/mp4'
+        src: "http://192.168.23.129/videos/longvideos/output/a.m3u8",
+        type: "application/x-mpegURL"
       }]
       ,playbackRates:[1,2,3]
     }
@@ -75,7 +84,7 @@ export default function LongVideos(props) {
       player.on('waiting', () => {
         videojs.log('player is waiting');
       });
-  
+      
       player.on('dispose', () => {
         videojs.log('player will dispose');
       });
