@@ -27,7 +27,13 @@ import zIndex from '@mui/material/styles/zIndex';
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import FunctionDrawer from './FunctionDrawer';
 import MuiAppBar from '@mui/material/AppBar';
-
+import InboxIcon from '@mui/icons-material/Inbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ContentCut from '@mui/icons-material/ContentCut';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import ContentPaste from '@mui/icons-material/ContentPaste';
+ 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -73,7 +79,6 @@ export default function Header(props) {
   const [search, setSearch] = React.useState(null);
   const [notificationsAnchorEl,setNotificationsAnchorEl] = React.useState(null)
   const [open, setOpen] = React.useState(false);
-
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -220,7 +225,7 @@ export default function Header(props) {
 
   )
 
-
+  // messages
   const renderMessageMenu = (
     <Menu
     anchorEl={notificationsAnchorEl}
@@ -236,12 +241,65 @@ export default function Header(props) {
     }}
     open={notificationsOpen}
     onClose={handleNotificationClose}
-  >
-    <MenuItem onClick={handleMenuClose}>English</MenuItem>
-    {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
-    <MenuItem onClick={handleMenuClose}>Chinese</MenuItem>
-    <MenuItem onClick={handleMenuClose}>Japanese</MenuItem>
+   >
+    <MenuItem>
+          <ListItemIcon>
+            <ContentCut fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Cut</ListItemText>
+          <Typography variant="body2" color="text.secondary">
+            ⌘X
+          </Typography>
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <ContentCopy fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Copy</ListItemText>
+          <Typography variant="body2" color="text.secondary">
+            ⌘C
+          </Typography>
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <ContentPaste fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Paste</ListItemText>
+          <Typography variant="body2" color="text.secondary">
+            ⌘V
+          </Typography>
+        </MenuItem>
   </Menu>
+//   <List anchorEl={notificationsAnchorEl}
+//   anchorOrigin={{
+//     vertical: 'top',
+//     horizontal: 'right',
+//   }}
+//   id={menuId}
+//   keepMounted
+//   transformOrigin={{
+//     vertical: 'top',
+//     horizontal: 'right',
+//   }}
+//   open={notificationsOpen}
+//   onClose={handleNotificationClose}>
+//   <ListItem disablePadding>
+//     <ListItemButton>
+//       <ListItemIcon>
+//         <InboxIcon />
+//       </ListItemIcon>
+//       <ListItemText primary="Inbox" />
+//     </ListItemButton>
+//   </ListItem>
+//   <ListItem disablePadding>
+//     <ListItemButton>
+//       <ListItemIcon>
+//         <DraftsIcon />
+//       </ListItemIcon>
+//       <ListItemText primary="Drafts" />
+//     </ListItemButton>
+//   </ListItem>
+// </List>
 
   )
   
