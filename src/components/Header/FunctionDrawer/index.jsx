@@ -18,6 +18,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import MessageIcon from '@mui/icons-material/Message'; 
+import TuneIcon from '@mui/icons-material/Tune';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import HomeIcon from '@mui/icons-material/Home';
 
 const drawerWidth = 240;
 
@@ -95,6 +99,7 @@ export default function FunctionDrawer(props) {
 
   let items = [{name:'Inbox', icon:"Inbox", direct:"www.baidu.com"}]
 
+  let iconList = {InboxIcon, MessageIcon, TuneIcon, WhatshotIcon, HomeIcon}
 
 
   return (
@@ -107,7 +112,7 @@ export default function FunctionDrawer(props) {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          {['Chat', 'Settings', 'Trending', 'Posts'].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
               <ListItemButton
                 sx={{
