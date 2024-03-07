@@ -33,7 +33,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ContentCut from '@mui/icons-material/ContentCut';
 import ContentCopy from '@mui/icons-material/ContentCopy';
 import ContentPaste from '@mui/icons-material/ContentPaste';
- 
+import Paper from '@mui/material/Paper';
+import MenuList from '@mui/material/MenuList';
+
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -227,7 +229,13 @@ export default function Header(props) {
 
   // messages
   const renderMessageMenu = (
+    
     <Menu
+    PaperProps={{  
+      style: {  
+        width: 350,  
+      },  
+   }} 
     anchorEl={notificationsAnchorEl}
     anchorOrigin={{
       vertical: 'top',
@@ -241,65 +249,23 @@ export default function Header(props) {
     }}
     open={notificationsOpen}
     onClose={handleNotificationClose}
+    
    >
-    <MenuItem>
-          <ListItemIcon>
-            <ContentCut fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Cut</ListItemText>
-          <Typography variant="body2" color="text.secondary">
-            ⌘X
-          </Typography>
+        <MenuItem alignItems="flex-start">
+          <ListItemAvatar>
+            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+          </ListItemAvatar>
+          <ListItemText 
+          primary="Sam Smith"
+          secondary={
+            <React.Fragment>
+              {" — I'll be in your neighborhood doing"}
+            </React.Fragment>
+          }>Name</ListItemText>
         </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <ContentCopy fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Copy</ListItemText>
-          <Typography variant="body2" color="text.secondary">
-            ⌘C
-          </Typography>
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <ContentPaste fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Paste</ListItemText>
-          <Typography variant="body2" color="text.secondary">
-            ⌘V
-          </Typography>
-        </MenuItem>
+        
+       
   </Menu>
-//   <List anchorEl={notificationsAnchorEl}
-//   anchorOrigin={{
-//     vertical: 'top',
-//     horizontal: 'right',
-//   }}
-//   id={menuId}
-//   keepMounted
-//   transformOrigin={{
-//     vertical: 'top',
-//     horizontal: 'right',
-//   }}
-//   open={notificationsOpen}
-//   onClose={handleNotificationClose}>
-//   <ListItem disablePadding>
-//     <ListItemButton>
-//       <ListItemIcon>
-//         <InboxIcon />
-//       </ListItemIcon>
-//       <ListItemText primary="Inbox" />
-//     </ListItemButton>
-//   </ListItem>
-//   <ListItem disablePadding>
-//     <ListItemButton>
-//       <ListItemIcon>
-//         <DraftsIcon />
-//       </ListItemIcon>
-//       <ListItemText primary="Drafts" />
-//     </ListItemButton>
-//   </ListItem>
-// </List>
 
   )
   

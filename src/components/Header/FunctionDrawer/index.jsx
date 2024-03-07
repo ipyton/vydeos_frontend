@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,11 +16,14 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import MessageIcon from '@mui/icons-material/Message'; 
 import TuneIcon from '@mui/icons-material/Tune';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import HomeIcon from '@mui/icons-material/Home';
+import * as babel from "babel-standalone";
+import * as ReactDOM from 'react-dom';
+import { useNavigate } from "react-router-dom"
+
 
 const drawerWidth = 240;
 
@@ -92,14 +94,47 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function FunctionDrawer(props) {
   const theme = useTheme();
+  const navigate = useNavigate();
   const {open, setOpen} = props
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   let items = [{name:'Inbox', icon:"Inbox", direct:"www.baidu.com"}]
+  let iconName = "MessageIcon"
 
-  let iconList = {InboxIcon, MessageIcon, TuneIcon, WhatshotIcon, HomeIcon}
+  let predefined_list = {"Inbox":"InboxIcon", "Message":"MessageIcon", "Settings":"TuneIcon", "Trending":"WhatshotIcon", "Posts":"HomeIcon"}
+
+  let iconList = {}
+  for (const [key,value] of Object.entries(predefined_list)) {
+    let iconFunctionString = "()=>{return (<" + value + "></" + value + ">)}"
+    iconList[key] = eval(babel.transform(iconFunctionString,{presets:["react", "es2017",]}).code)
+  }
+
+// const jsxString = '<div>Hello World!</div>'; 
+// const element = React.createElement(eval('(' + jsxString + ')'));
+
+  // const func = new Function("React", "MessageIcon", `return ${iconList["Message"]}`)
+  // const Component = func(MessageIcon)
+  // const Component = eval("MessageIcon")
+  
+  // console.log(iconList)
+  //return eval(iconList["Message"])
+  //return <Component></Component>
+  // functionName: method to create this component.
+
+  //let iconList = {"Inbox":function(){return (<InboxIcon></InboxIcon>)}, "Message":"eval(iconFunctionString)", "Settings":TuneIcon, "Trending":WhatshotIcon, "Posts":HomeIcon}
+
+  let functions = ['Chat', 'Settings', 'Trending', 'Posts']
+  let routeTable = ['/chat', '/settings',  '/trending', '/home']
+  // let routeTable = {'Chat': '/chat', 'Settings': 'settings', 'Trending': 'trending', 'Posts': 'home'}
+
+  let handleMessageJump = (index) => {
+    console.log(functions[index])
+    navigate(routeTable[index])
+
+  }  
+
 
 
   return (
@@ -112,8 +147,8 @@ export default function FunctionDrawer(props) {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Chat', 'Settings', 'Trending', 'Posts'].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+          {functions.map((text, index) => (
+            <ListItem onClick={()=> handleMessageJump(index)} key={text} disablePadding sx={{ display: 'block' }}>
               <ListItemButton
                 sx={{
                   minHeight: 48,
@@ -128,7 +163,7 @@ export default function FunctionDrawer(props) {
                     justifyContent: 'center',
                   }}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {/* {iconList["Inbox"]()} */}
                 </ListItemIcon>
                 <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
