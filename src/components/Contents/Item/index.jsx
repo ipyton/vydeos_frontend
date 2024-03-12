@@ -9,8 +9,8 @@ import { List } from "@mui/material";
 function Item(props) {
   const [articles, setArticles] = React.useState([1,2,3,4,5]);
   const [count, setCount] = React.useState(99);
-  const {login, setLogin} = props.status
-
+  let {login, setLogin} = props
+  login = true
   let init = () => {
     document.addEventListener("scroll", () => {
       console.log(
@@ -53,8 +53,6 @@ function Item(props) {
 
 
   if(login !== true || localStorage.getItem("token") === null ) {
-    console.log("(((((((((((")
-    console.log(login)
     console.log(localStorage.getItem("token"))
     return <Navigate to="/login" replace/>
   }

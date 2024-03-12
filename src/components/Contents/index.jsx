@@ -16,7 +16,7 @@ import AppStore from "./AppStore"
 import Friends from "./FriendList"
 import LongVideos from "./LongVideos"
 import UploadFile from "./UploadFile"
-
+import VideoList from "./VideoList"
 export default function Contents(props) {
     const [state, setState] = React.useState({
         open: false,
@@ -29,6 +29,7 @@ export default function Contents(props) {
       const handleClose = () => {
         setState({ ...state, open: false });
       };
+      
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
     return (
         <div>
@@ -48,6 +49,9 @@ export default function Contents(props) {
                 <Route path="/appstore" element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
                 <Route path="/longvideos" element={<LongVideos setBarState={setState} status={props}></LongVideos> }></Route>
                 <Route path="/upload" element={<UploadFile setBarState={setState} status={props}></UploadFile> }></Route>
+                <Route path="/videolist" element={<VideoList setBarState={setState} status={props}></VideoList> }></Route>
+
+
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
                 
             </Routes>

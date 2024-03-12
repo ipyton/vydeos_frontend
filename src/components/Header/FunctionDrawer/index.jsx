@@ -20,7 +20,7 @@ import MessageIcon from '@mui/icons-material/Message';
 import TuneIcon from '@mui/icons-material/Tune';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import HomeIcon from '@mui/icons-material/Home';
-import * as babel from "babel-standalone";
+// import * as babel from "babel-standalone";
 import * as ReactDOM from 'react-dom';
 import { useNavigate } from "react-router-dom"
 
@@ -105,11 +105,11 @@ export default function FunctionDrawer(props) {
 
   let predefined_list = {"Inbox":"InboxIcon", "Message":"MessageIcon", "Settings":"TuneIcon", "Trending":"WhatshotIcon", "Posts":"HomeIcon"}
 
-  let iconList = {}
-  for (const [key,value] of Object.entries(predefined_list)) {
-    let iconFunctionString = "()=>{return (<" + value + "></" + value + ">)}"
-    iconList[key] = eval(babel.transform(iconFunctionString,{presets:["react", "es2017",]}).code)
-  }
+  // let iconList = {}
+  // for (const [key,value] of Object.entries(predefined_list)) {
+  //   let iconFunctionString = "()=>{return (<" + value + "></" + value + ">)}"
+  //   iconList[key] = eval(babel.transform(iconFunctionString,{presets:["react", "es2017",]}).code)
+  // }
 
 // const jsxString = '<div>Hello World!</div>'; 
 // const element = React.createElement(eval('(' + jsxString + ')'));
@@ -125,8 +125,8 @@ export default function FunctionDrawer(props) {
 
   //let iconList = {"Inbox":function(){return (<InboxIcon></InboxIcon>)}, "Message":"eval(iconFunctionString)", "Settings":TuneIcon, "Trending":WhatshotIcon, "Posts":HomeIcon}
 
-  let functions = ['Chat', 'Settings', 'Trending', 'Posts']
-  let routeTable = ['/chat', '/settings',  '/trending', '/home']
+  let functions = ['Chat', 'Settings', 'Trending', 'Posts', 'Videos', 'Edit']
+  let routeTable = ['/chat', '/settings',  '/trending', '/home', '/longVideos', '/edit']
   // let routeTable = {'Chat': '/chat', 'Settings': 'settings', 'Trending': 'trending', 'Posts': 'home'}
 
   let handleMessageJump = (index) => {

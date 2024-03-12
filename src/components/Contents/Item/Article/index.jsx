@@ -39,7 +39,6 @@ export default function Article(props) {
     <CardHeader
       avatar={
         <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-          
         </Avatar>
       }
       action={

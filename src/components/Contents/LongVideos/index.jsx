@@ -94,7 +94,7 @@ export default function LongVideos(props) {
 
   return (
     <div >
-      <Stack sx={{marginLeft:"10%", marginTop:"5%",width:"80%"}}>
+      <Stack sx={{marginLeft:"10%",width:"80%"}}>
         <Item>
           <Stack direction="row" spacing={2}>
           <Item sx={{width:"70%",height:"20%"}}>

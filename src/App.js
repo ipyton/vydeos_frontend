@@ -58,8 +58,8 @@ function App() {
   if(login && null === badgeContent) {
     IOUtil.getMessages()
   }
-  console.log("Ppppasidoqabwdouqbdoqwubd")
-  console.log(login)
+  // console.log("Ppppasidoqabwdouqbdoqwubd")
+  // console.log(login)
 
   if (false === networkStatus) {
     return <NetworkError></NetworkError>
@@ -71,7 +71,7 @@ function App() {
     <BrowserRouter>
     <Box sx={{ display: 'flex' }}>
       <Header login={login} setLogin={setLogin} avatar={avatar} setAvatar={setAvatar}  badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
-      <Box width="100%"  justifyContent="center" alignItems="center" marginTop="40px">
+      <Box width="100%"  justifyContent="center" alignItems="center" marginTop="5%">
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Contents login={login} setLogin={setLogin}></Contents>
       </LocalizationProvider>
