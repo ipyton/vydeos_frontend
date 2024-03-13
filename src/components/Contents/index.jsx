@@ -17,6 +17,7 @@ import Friends from "./FriendList"
 import LongVideos from "./LongVideos"
 import UploadFile from "./UploadFile"
 import VideoList from "./VideoList"
+import Contacts from "./Contacts"
 export default function Contents(props) {
     const [state, setState] = React.useState({
         open: false,
@@ -45,11 +46,13 @@ export default function Contents(props) {
                 <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                 <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props}></NetworkError>}></Route>
                 <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>
+                <Route path="/contacts" element={<Contacts barState={state} setBarState={setState} status={props}></Contacts>}></Route>
                 <Route path="/error" element={<NetworkError></NetworkError>}></Route>
                 <Route path="/appstore" element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
                 <Route path="/longvideos" element={<LongVideos setBarState={setState} status={props}></LongVideos> }></Route>
                 <Route path="/upload" element={<UploadFile setBarState={setState} status={props}></UploadFile> }></Route>
                 <Route path="/videolist" element={<VideoList setBarState={setState} status={props}></VideoList> }></Route>
+
 
 
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>

@@ -51,10 +51,6 @@ export default function UserInfo(props) {
   }
 
   const picUploadHandler = (event) => {
-    
-    
-
-
     setAvatar(URL.createObjectURL(event.target.files[0]))
     PictureUtil.uploadAvatar(event.target.files[0])
   }
