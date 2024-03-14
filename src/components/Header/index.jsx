@@ -71,7 +71,17 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-
+let socket = new WebSocket("ws://localhost:8080/notification/88488")
+socket.onopen = function(e) {
+  console.log("ws open successfully!!!!")    
+}
+socket.onmessage = (event)=>{
+  console.log(event)
+}
+setInterval(function() {
+  console.log("sending message")
+  socket.send(JSON.stringify({userID:88488, time:9238042, method:"get"}))
+},1000)
 
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
