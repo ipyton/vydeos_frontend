@@ -10,27 +10,20 @@ import { ListItemButton } from '@mui/material';
 
 export default function(){
     return (
-    <ListItemButton sx={{width:"50%"}}>    
-        <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-        primary="Brunch this weekend?"
-        secondary={
-            <React.Fragment>
-            <Typography
-                sx={{ display: 'inline'}}
-                component="span"
-                variant="body2"
-                color="text.primary"
-            >
-                Ali Connors
-            </Typography>
-            {" — I'll be in your neighborhood doing errands this…"}
-            </React.Fragment>
-        }
-        />
-        </ListItem>    
-    </ListItemButton>)
+        <div>
+        <ListItemButton >    
+            <ListItem alignItems="flex-start">
+                <ListItemAvatar>
+                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                </ListItemAvatar>
+                <ListItemText
+                    primary="Tim"
+                />
+            </ListItem>    
+        </ListItemButton>
+        <Divider></Divider>
+
+            
+        </div>
+)
 }

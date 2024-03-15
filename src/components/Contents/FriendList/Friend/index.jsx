@@ -6,10 +6,18 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
-import Friend from './Friend/FriendItem';
+import FriendItem from './FriendItem';
 import { Box } from '@mui/material';
+import Stack from '@mui/material/Stack';
 
 
-export default function Friends(props) {
+export default function(props) {
+    let  a=[1,1,1,1,1,1,1,1,6,6,6,6,6]
+    return (<Stack sx={{width:"30%", boxShadow:1,  borderRadius: 2}} spacing={2}>
 
+    <List sx={{ width: '100%', bgcolor: 'background.paper',overflow:'scroll'}}>
+    {a.map(()=>{return <FriendItem></FriendItem>})}
+    </List>
+
+</Stack>)
 }

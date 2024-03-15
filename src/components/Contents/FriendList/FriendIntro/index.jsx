@@ -1,3 +1,16 @@
+import { ImageList, ImageListItem,  Avatar } from "@mui/material";
+import Stack from '@mui/material/Stack';
+import * as React from 'react';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Divider from '@mui/material/Divider';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+
 export default function(){
     const itemData = [
         {
@@ -52,20 +65,92 @@ export default function(){
 
 
       return (
-        <Stack>
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-            <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
-                {itemData.map((item) => (
-                <ImageListItem key={item.img}>
-                    <img
-                    srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                    src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                    alt={item.title}
-                    loading="lazy"
-                    />
-                </ImageListItem>
-                ))}
-            </ImageList>
+        <Stack sx={{width:"70%", boxShadow:1, overflow:"scroll"}}>
+
+        <Stack direction="row"justifyContent="end" sx={{width:"80%",marginLeft:"10%"}}>
+            <ListItem alignItems="flex-start" >
+          <ListItemAvatar>
+            <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
+          </ListItemAvatar>
+          <ListItemText 
+            primary="Tim"
+          
+            secondary={
+              <React.Fragment>
+                <Typography
+                  sx={{ display: 'inline' }}
+                  component="span"
+                  variant="body2"
+                  color="text.primary"
+                >
+                </Typography>
+                {"人之初性本善"}
+              </React.Fragment>
+            }
+          />
+
+        </ListItem>
+
+
+            <ButtonGroup sx={{ marginTop:"3%",height:"50%"}} aria-label="Basic button group" >
+              <Button>unfollow</Button>
+              <Button>contact</Button>
+          </ButtonGroup>
+            </Stack>
+
+
+        <Stack sx={{width:"70%",marginLeft:"15%"}}>
+          <TextField
+            id="outlined-required"
+            label="Gender"
+            defaultValue="Female"
+            variant="standard"
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+          <TextField
+            id="outlined-required"
+            label="Age"
+            defaultValue="69"
+            variant="standard"
+
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+          <TextField
+            id="outlined-required"
+            label="Location"
+            defaultValue="美国加利福尼亚"
+            variant="standard"
+            InputProps={{
+              readOnly: true,
+            }}
+
+          />
+          <TextField            
+           id="outlined-required"
+            label="NickName"
+            defaultValue="bbbbb"
+            variant="standard" type="search" />
+
+
+
+        </Stack>
+
+              <ImageList sx={{ width: "80%", marginLeft:"10%"}} cols={3} >
+                  {itemData.map((item) => (
+                  <ImageListItem key={item.img}>
+                      <img
+                      srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                      src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                      alt={item.title}
+                      loading="lazy"
+                      />
+                  </ImageListItem>
+                  ))}
+              </ImageList>
         </Stack>
 
       )

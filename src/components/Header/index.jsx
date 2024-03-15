@@ -70,19 +70,31 @@ const AppBar = styled(MuiAppBar, {
     }),
   }),
 }));
+{
+  let socket = null
+    socket = new WebSocket("ws://localhost:8080/notification/88488")
+    socket.onopen = function(e) {
+      console.log("ws open successfully!!!!")    
+    }
+    socket.onmessage = (event)=>{
+      console.log(event)
+    }
+    socket.onerror = (event) => {
+      console.log(event)
+    }
 
-let socket = new WebSocket("ws://localhost:8080/notification/88488")
-socket.onopen = function(e) {
-  console.log("ws open successfully!!!!")    
-}
-socket.onmessage = (event)=>{
-  console.log(event)
-}
-setInterval(function() {
+  setInterval(function() {
   console.log("sending message")
-  socket.send(JSON.stringify({userID:88488, time:9238042, method:"get"}))
+  try {
+    if (socket != null) socket.send(JSON.stringify({userID:88488, time:9238042, method:"get"}))
+  }
+  catch(exception) {
+    console.log("message sending error")
+  }
+
 },1000)
 
+}
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
