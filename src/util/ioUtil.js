@@ -2,11 +2,13 @@ import axios  from "axios"
 import Qs from 'qs'
 
 export default class IOUtil {
+    static url_base = "http://localhost:8000"
 
     static getSearchResult(keyword) {
+        console.log(this.url_base)
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/search/search", 
+                url:this.url_base + "/search/search", 
                 method:'post',
                 data:{token:localStorage.getItem("token")},
                 transformRequest:[function (data) {
@@ -28,7 +30,7 @@ export default class IOUtil {
     static setSearch(config) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/search/set", 
+                url:this.url_base + "/search/set", 
                 method:'post',
                 data:{token:localStorage.getItem("token")},
                 transformRequest:[function (data) {
@@ -50,15 +52,18 @@ export default class IOUtil {
 
     static verifyTokens(setState) {
         async function post(){
+            if (localStorage.getItem("token") === null) {
+                return 
+            }
             let response = await axios({
-                url:"http://localhost:8080/account/verifyToken", 
+                url:this.url_base + "/account/verifyToken", 
                 method:'post',
                 data:{token:localStorage.getItem("token")},
                 transformRequest:[function (data) {
                   return Qs.stringify(data)
               }],
               headers:{token: localStorage.getItem("token"),
-                        'userEmail': '1838169994@qq.com'}
+                        }
             })
             let responseData = response.data
             setState(responseData.code === 1)
@@ -69,7 +74,7 @@ export default class IOUtil {
     static uploadInformation(data,token){
         async function post(){
                 let response = await axios({
-                    url:"http://localhost:8080/account/setinfo",
+                    url: this.url_base + "/account/setinfo",
                     method:'post',
                     data:{token:localStorage.getItem("token")},
                     transformRequest:[function (data) {
@@ -88,7 +93,7 @@ export default class IOUtil {
     static downloadInformation(data,token){
         async function post(){
                 let response = await axios({
-                    url:"http://localhost:8080/account/getinfo", 
+                    url:this.url_base + "/account/getinfo", 
                     method:'post',
                     data:{token:localStorage.getItem("token")},
                     transformRequest:[function (data) {
@@ -107,7 +112,7 @@ export default class IOUtil {
     static uploadArticle(articleid, article) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/article/upload_article", 
+                url:this.url_base + "/article/upload_article", 
                 method:'post',
                 data:{token:localStorage.getItem("token")},
                 transformRequest:[function (data) {
@@ -126,7 +131,7 @@ export default class IOUtil {
     static getRecommendArticles(userID) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/article/get_recommend_articles", 
+                url:this.url_base + "/article/get_recommend_articles", 
                 method:'post',
                 data:{token:localStorage.getItem("token")},
                 transformRequest:[function (data) {
@@ -145,7 +150,7 @@ export default class IOUtil {
     static getArticlesByUserID(userID, from, to) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/article/get_articles_range", 
+                url:this.url_base + "/article/get_articles_range", 
                 method:'post',
                 data:{token:localStorage.getItem("token"),
                         'userEmail': '1838169994@qq.com',
@@ -167,7 +172,7 @@ export default class IOUtil {
     static getArticleByID(articleID) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/article/get_article", 
+                url:this.url_base + "/article/get_article", 
                 method:'post',
                 data:{token: localStorage.getItem("token")},
                 transformRequest:[function (data) {
@@ -186,7 +191,7 @@ export default class IOUtil {
     static getCommentByObjectID(objectID, from, to) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/comment/get", 
+                url:this.url_base + "/comment/get", 
                 method:'post',
                 data:{token: localStorage.getItem("token")},
                 transformRequest:[function (data) {
@@ -209,7 +214,7 @@ export default class IOUtil {
     static setCommentByObjectID(objectID, commentID) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/comment/set", 
+                url:this.url_base + "/comment/set", 
                 method:'post',
                 data:{token: localStorage.getItem("token")},
                 transformRequest:[function (data) {
@@ -233,7 +238,7 @@ export default class IOUtil {
     static getMessages(token) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/message/get_messages", 
+                url:this.url_base + "/message/get_messages", 
                 method:'post',
                 data:{token: localStorage.getItem("token")},
                 transformRequest:[function (data) {
@@ -256,7 +261,7 @@ export default class IOUtil {
     static sendMessages(token) {
         async function post(){
             let response = await axios({
-                url:"http://localhost:8080/message/send_message", 
+                url:this.url_base + "/message/send_message", 
                 method:'post',
                 data:{token: localStorage.getItem("token")},
                 transformRequest:[function (data) {

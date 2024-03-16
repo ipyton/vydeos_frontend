@@ -15,6 +15,8 @@ import NetworkError from './components/Contents/NetworkError';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import Login from './components/Contents/Login';
+
 
 function init(setLoginState, setAvatar, setBadgeContent){
   IOUtil.verifyTokens().then(x => {
@@ -36,16 +38,13 @@ function App() {
   const [badgeContent, setBadgeContent] = useState([])
   const [networkStatus, setNetworkStatus] = useState(null)
 
-  //const [picGetter, setPicGetter] = useState(new LRUPicCacheUtil())
-  // useEffect(()=>{
-  //   const handleBeforeUnload = (e) => {
-  //     picGetter.serialize()
-  //   }
-  // })
   if (null === login) {
     IOUtil.verifyTokens(setLogin).catch(err=> {
       setNetworkStatus(true)
     })
+  }
+  if (null === login) {
+    
   }
   if (null === avatar)  {
     PictureUtil.getAvatar().catch(err=>{
