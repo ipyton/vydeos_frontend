@@ -11,12 +11,13 @@ import IOUtil from './util/ioUtil';
 import PictureUtil from './util/pictureUtil';
 import { BrowserRouter } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
-import NetworkError from './components/Contents/NetworkError';
+import NetworkError from './components/Errors/NetworkError';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import Login from './components/Contents/Login';
-
+import Login from './components/AccountIssue/Login';
+import EndpointNotAvailableError from './components/Errors/EndpointNotAvailableError';
+import AccountIssue from './components/AccountIssue';
 
 function init(setLoginState, setAvatar, setBadgeContent){
   IOUtil.verifyTokens().then(x => {
@@ -31,45 +32,44 @@ function init(setLoginState, setAvatar, setBadgeContent){
 }
 const defaultTheme = createTheme();
 
+function checkNetworkStatus() {
+  return Navigator.onLine
+}
+
+function checkEndpointStauts() {
+  return true;
+}
+
 
 function App() {
-  const [login,setLogin] = useState(null)
+  const [login,setLogin] = useState(false)
   const [avatar, setAvatar] = useState(null)
   const [badgeContent, setBadgeContent] = useState([])
-  const [networkStatus, setNetworkStatus] = useState(null)
+  const [networkStatus, setNetworkStatus] = useState(false)
 
-  if (null === login) {
+  if (checkNetworkStatus() == false) {
+    return <NetworkError></NetworkError>
+  }
+
+  if (checkEndpointStauts() == false) {
+    return <EndpointNotAvailableError></EndpointNotAvailableError>
+  }
+
+  if (login == false) {
     IOUtil.verifyTokens(setLogin).catch(err=> {
       setNetworkStatus(true)
     })
   }
-  if (null === login) {
-    
-  }
-  if (null === avatar)  {
-    PictureUtil.getAvatar().catch(err=>{
-      setNetworkStatus(true)
-    }).then(response => {
-      setAvatar(response)
-    })
-  }
 
-  if(login && null === badgeContent) {
-    IOUtil.getMessages()
+  if (login == false) {
+    return (<AccountIssue loginState={login} setLoginState= {setLogin}></AccountIssue>)
   }
-  // console.log("Ppppasidoqabwdouqbdoqwubd")
-  // console.log(login)
-
-  if (false === networkStatus) {
-    return <NetworkError></NetworkError>
-  }
-
 
   return (
     <ThemeProvider theme={defaultTheme}>
     <BrowserRouter>
     <Box sx={{ display: 'flex' }}>
-      <Header login={login} setLogin={setLogin} avatar={avatar} setAvatar={setAvatar}  badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
+      <Header setLogin={setLogin} avatar={avatar} setAvatar={setAvatar}  badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
       <Box width="100%"  justifyContent="center" alignItems="center" marginTop="5%">
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Contents login={login} setLogin={setLogin}></Contents>
