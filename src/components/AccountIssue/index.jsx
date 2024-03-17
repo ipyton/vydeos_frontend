@@ -14,7 +14,7 @@ export default function(props) {
         <Routes>
                 <Route path="/account/forget" element={<Forget />}></Route>
                 <Route path="/account/login" element={<Login login={props.loginState} setLogin={props.setLoginState} />}></Route>
-                <Route path="/account/signup" element={<SignUp loginState = {props.loginState} setLoginState={props.setLoginState}/>}></Route>
+                <Route path="/account/signup" element={<SignUp loginState = {props.loginState} setLoginState={props.setLoginState} setBarState={props.setBarState}/>}></Route>
                 <Route path="*" element={<NotFound/>} ></Route>
                 
             </Routes>

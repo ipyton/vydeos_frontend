@@ -25,11 +25,9 @@ function init(setLoginState, setAvatar, setBadgeContent){
       setLoginState(true)
     }
   })
-
-
-
-  
 }
+
+
 const defaultTheme = createTheme();
 
 function checkNetworkStatus() {

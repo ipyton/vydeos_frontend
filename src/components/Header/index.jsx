@@ -640,13 +640,6 @@ export default function Header(props) {
           <Box sx={{ flexGrow: 1 }}></Box>
           <Box display="flex" justifyContent="center" alignItems="center">
             <Search >
-              {/* <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search"
-                  inputProps={{ 'aria-label': 'search' }}
-                /> */}
               <InputBase
                 sx={{ ml: 1, flex: 1 }}
                 placeholder="search"

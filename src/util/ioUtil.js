@@ -5,7 +5,6 @@ export default class IOUtil {
     static url_base = "http://localhost:8000"
 
     static getSearchResult(keyword) {
-        console.log(this.url_base)
         async function post(){
             let response = await axios({
                 url:this.url_base + "/search/search", 

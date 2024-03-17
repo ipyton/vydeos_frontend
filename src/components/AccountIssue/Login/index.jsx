@@ -18,6 +18,8 @@ import {Navigate} from "react-router-dom";
 import Qs from "qs"
 import NetworkError from '../../Errors/NetworkError';
 import IOUtil from '../../../util/ioUtil';
+import AccountUtil from '../../../util/io_utils/AccountUtil';
+
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -80,34 +82,10 @@ export default function Login(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    data["remember"] = selected
     if (validate(data.get("email"), data.get("password"))){
-      axios({
-        url:"http://localhost:8080/account/login", 
-        method:'post',
-        data:{email: data.get('email'),password: encryption(data.get('password')),remember:selected},
-        transformRequest:[function (data) {
-          // 对 data 进行任意转换处理
-          return Qs.stringify(data)
-      }],
-    }).catch(error => {
-      if ("Network Error" ===  error.message) {
-        props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
-        setNetworkErr(true)
-      }
-    }).then(function(response) {
-        let responseData = response.data
-        if (responseData.code === -1) {
-          props.setBarState({...props.barState, message:responseData.message, open:true})
-        }
-        else if(responseData.code === 1) {
-          localStorage.setItem("token", responseData.message)
-          setLogin(true)
-        }
-        else {
-          props.setBarState({...props.barState, message:responseData.message, open:true})
-        }
-        setNetworkErr(false)
-      })
+      AccountUtil.login(data, setLogin)
+
       // .catch(function(error) {
       //   if ("Network Error" ===  error.message) {
       //     props.setBarState({...props.barState, message:"please login first" + error, open:true})
@@ -119,7 +97,8 @@ export default function Login(props) {
       // })
     }
     else {
-      props.setBarState({...props.barState, message:"please check your input", open:true})
+      //props.setBarState({...props.barState, message:"please check your input", open:true})
+      console.log("error when login")
     }
   };
 

@@ -67,7 +67,6 @@ export default function UserInfo(props) {
           method:'post',
           data:{userEmail: data.get('email'),password: encryption(data.get('password')),userName:data.get("nickname"),promotion:selected},
           transformRequest:[function (data) {
-            // 对 data 进行任意转换处理
             return Qs.stringify(data)
         }],
       }).then(

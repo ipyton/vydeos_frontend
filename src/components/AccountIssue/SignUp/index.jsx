@@ -21,6 +21,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { Stack } from '@mui/material';
+import AccountUtil from '../../../util/io_utils/AccountUtil';
 
 function Copyright(props) {
   return (
@@ -38,12 +39,15 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp(props) {
-  const [skipped, setSkipped] = React.useState(new Set());
+  const [skipped, setSkipped] = useState(new Set());
   const [receive, setReceive] = useState(false)
   const [selected, setSelected] = useState(false) 
   let [activeStep, setActiveStep] = useState(0);
   let navigate = useNavigate()
   const {loginState, setLoginState} = props
+  const {setBarState} = props
+  const [transactionNumber, setTransactionNumber] = useState("000000")
+
 
   console.log(loginState)
   if (true === loginState) {
@@ -53,18 +57,13 @@ export default function SignUp(props) {
     return true
   }
 
-  function encryption(password) {
-    return password;
-  }
-
   const handleReceive = (event)=>{
     setReceive(!receive)
   }
   const handleSubmit = (event) => {
     event.preventDefault();
-    setActiveStep(activeStep + 1)
     const data = new FormData(event.currentTarget);
-      if(!validate(data.get('nickname'),data.get('username'), data.get('password'))) {
+      if(!validate(data.get('nickname'),data.get('username'), data.get('password')), data.get('selected')) {
         props.setBarState({...props.barState, message:"please check your input", open:true})
       }
       else {
@@ -74,28 +73,9 @@ export default function SignUp(props) {
           nickname: data.get('nickname'),
           recv: receive
         });
-        axios({
-          url:"http://localhost:8080/account/register", 
-          method:'post',
-          data:{userEmail: data.get('email'),password: encryption(data.get('password')),userName:data.get("nickname"),promotion:selected},
-          transformRequest:[function (data) {
-            // 对 data 进行任意转换处理
-            return Qs.stringify(data)
-        }],
-      }).then(
-        (response)=>{
-          console.log("response");
-          if(response.code === 1)
-          {
-            setActiveStep(activeStep + 1)
-          }
-          else {
-
-          }
-        }
-      ).catch((err)=>{
-        console.log("check your input")
-      })
+        console.log("---------------------")
+        console.log(setBarState)
+        AccountUtil.registerStep1(data, activeStep, setActiveStep, setBarState, setTransactionNumber)
       }
   };
   const checkValidationCode = () => {
@@ -176,6 +156,8 @@ export default function SignUp(props) {
                 <FormControlLabel
                   control={<Checkbox onClick={handleReceive} value="allowExtraEmails" color="primary" />}
                   label="I want to receive inspiration, marketing promotions and updates via email."
+                  name="selected"
+                  id="selected"
                 />
               </Grid>
             </Grid>
