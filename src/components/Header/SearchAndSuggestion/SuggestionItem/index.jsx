@@ -8,7 +8,6 @@ import CardMedia from '@mui/material/CardMedia';
 import * as React from 'react';
 
 export default function(props) {
-  console.log(props)
     let {title, introduction, pics, type} = props.searchResult
     let {setSuggestionOpen} = props
 

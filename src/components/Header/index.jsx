@@ -108,19 +108,20 @@ export default function Header(props) {
   const [search, setSearch] = React.useState(null);
   const [notificationsAnchorEl, setNotificationsAnchorEl] = React.useState(null)
   const [open, setOpen] = React.useState(false);
+  const [category, setCategory] = React.useState(false)
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
   const languageMenuOpen = Boolean(languageAnchorEl)
   const notificationsOpen = Boolean(notificationsAnchorEl)
-  const navigate = useNavigate();
 
+  
+  const navigate = useNavigate();
   const renderBadge = () => {
 
   }
   
-
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -198,6 +199,15 @@ export default function Header(props) {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const handleTextBlur = () => {
+    if (category == true) {
+      setCategory(false)
+    } else {
+      setSuggestionAnchorEl(null)
+    }
+
+
+  }
 
 
 
@@ -272,7 +282,6 @@ export default function Header(props) {
     }}
     open={notificationsOpen}
     onClose={handleNotificationClose}
-    
    >
         <MenuItem alignItems="flex-start">
           <ListItemAvatar>
@@ -286,8 +295,6 @@ export default function Header(props) {
             </React.Fragment>
           }>Name</ListItemText>
         </MenuItem>
-        
-       
   </Menu>
 
   )
@@ -339,8 +346,7 @@ export default function Header(props) {
               </Typography>
               {" — message 2"}
             </React.Fragment>
-          }
-        />
+          } />
       </ListItem>
       </ListItemButton>
     
@@ -373,10 +379,10 @@ export default function Header(props) {
 
 
   )
-    console.log("--------------------------")
+
     let mockData = [{title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}, {title:"Helloworld", introduction:"introduction", pic:"", type:"movie"}]
     const suggestionBar = (
-       <SearchAndSuggestion searchResult={mockData} searchSuggestionOpen={searchSuggestionOpen} setSuggestionOpen={setSuggestionAnchorEl} left={open} ></SearchAndSuggestion>
+       <SearchAndSuggestion searchResult={mockData} searchSuggestionOpen={searchSuggestionOpen} setSuggestionOpen={setSuggestionAnchorEl} left={open} setCategory={setCategory}></SearchAndSuggestion>
     )
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
@@ -471,6 +477,7 @@ export default function Header(props) {
                 placeholder="search"
                 inputProps={{ 'aria-label': 'search' }}
                 onChange={handleSearchChange}
+                onBlur={handleTextBlur}
               />
               <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch} >
                 <SearchIcon />
@@ -479,9 +486,6 @@ export default function Header(props) {
           </Box>
 
           <Box sx={{ flexGrow: 1 }}></Box>
-
-
-
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton
               size="large"
@@ -493,7 +497,6 @@ export default function Header(props) {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-
 
             <IconButton
               size="large"
