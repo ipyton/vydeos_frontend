@@ -35,6 +35,7 @@ import ContentCopy from '@mui/icons-material/ContentCopy';
 import ContentPaste from '@mui/icons-material/ContentPaste';
 import Paper from '@mui/material/Paper';
 import MenuList from '@mui/material/MenuList';
+import SearchAndSuggestion from './SearchAndSuggestion';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -105,7 +106,7 @@ export default function Header(props) {
   const [suggestionAnchorEl, setSuggestionAnchorEl] = React.useState(null);
   const [languageAnchorEl, setLanguageAnchorEl] = React.useState(null);  
   const [search, setSearch] = React.useState(null);
-  const [notificationsAnchorEl,setNotificationsAnchorEl] = React.useState(null)
+  const [notificationsAnchorEl, setNotificationsAnchorEl] = React.useState(null)
   const [open, setOpen] = React.useState(false);
 
   const isMenuOpen = Boolean(anchorEl);
@@ -185,10 +186,6 @@ export default function Header(props) {
     setLanguageAnchorEl(null)
   }
 
-  const handleSuggestionSelection = (event) => {
-    console.log(event.currentTarget)
-    console.log("select")
-  }
   
   const handleNotificationOpen = (event) => {
     setNotificationsAnchorEl(event.currentTarget)
@@ -376,182 +373,11 @@ export default function Header(props) {
 
 
   )
-
-
+    console.log("--------------------------")
+    let mockData = [{title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}, {title:"Helloworld", introduction:"introduction", pic:"", type:"movie"}]
     const suggestionBar = (
-      <List hidden={searchSuggestionOpen} sx={{ width: '100%', maxWidth: 360,maxHeight:500, bgcolor: 'background.paper', position: 'absolute', left: open? (100*((window.innerWidth+240)/(2*window.innerWidth))+'%'):'51%', top:40,transform: 'translate(-50%, 0)',zIndex:500,
-          overflow:"scroll"}}>
-
-          <ListItemButton onMouserunDown={handleSuggestionSelection}>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-              </ListItemAvatar>
-              <ListItemText
-                primary="Oui Oui"
-                secondary={
-                  <React.Fragment>
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                    >
-                      Sandra Adams
-                    </Typography>
-                    {' — Do you have Paris recommendations? Have you ever…'}
-                  </React.Fragment>
-                }
-              />
-            </ListItem>
-          </ListItemButton>
-
-          <ListItemButton onMouseDown={handleSuggestionSelection}>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-              </ListItemAvatar>
-              <ListItemText
-                primary="Oui Oui"
-                secondary={
-                  <React.Fragment>
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                    >
-                      Sandra Adams
-                    </Typography>
-                    {' — Do you have Paris recommendations? Have you ever…'}
-                  </React.Fragment>
-                }
-              />
-            </ListItem>
-          </ListItemButton>
-          <ListItemButton onMouseDown={handleSuggestionSelection}>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-              </ListItemAvatar>
-              <ListItemText
-                primary="Oui Oui"
-                secondary={
-                  <React.Fragment>
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                    >
-                      Sandra Adams
-                    </Typography>
-                    {' — Do you have Paris recommendations? Have you ever…'}
-                  </React.Fragment>
-                }
-              />
-            </ListItem>
-          </ListItemButton>
-          <ListItemButton onMouseDown={handleSuggestionSelection}>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-              </ListItemAvatar>
-              <ListItemText
-                primary="Oui Oui"
-                secondary={
-                  <React.Fragment>
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                    >
-                      Sandra Adams
-                    </Typography>
-                    {' — Do you have Paris recommendations? Have you ever…'}
-                  </React.Fragment>
-                }
-              />
-            </ListItem>
-          </ListItemButton>
-          
-          <ListItemButton onMouseDown={handleSuggestionSelection}>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-              </ListItemAvatar>
-              <ListItemText
-                primary="Oui Oui"
-                secondary={
-                  <React.Fragment>
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                    >
-                      Sandra Adams
-                    </Typography>
-                    {' — Do you have Paris recommendations? Have you ever…'}
-                  </React.Fragment>
-                }
-              />
-            </ListItem>
-          </ListItemButton>
-          
-
-          <ListItemButton onMouseDown={handleSuggestionSelection}>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-              </ListItemAvatar>
-              <ListItemText
-                primary="Oui Oui"
-                secondary={
-                  <React.Fragment>
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                    >
-                      Sandra Adams
-                    </Typography>
-                    {' — Do you have Paris recommendations? Have you ever…'}
-                  </React.Fragment>
-                }
-              />
-            </ListItem>
-          </ListItemButton>
-          <ListItemButton onMouseDown={handleSuggestionSelection}>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-              </ListItemAvatar>
-              <ListItemText
-                primary="Oui Oui"
-                secondary={
-                  <React.Fragment>
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                    >
-                      Sandra Adams
-                    </Typography>
-                    {' — Do you have Paris recommendations? Have you ever…'}
-                  </React.Fragment>
-                }
-              />
-            </ListItem>
-          </ListItemButton>
-        </List>
+       <SearchAndSuggestion searchResult={mockData} searchSuggestionOpen={searchSuggestionOpen} setSuggestionOpen={setSuggestionAnchorEl} left={open} ></SearchAndSuggestion>
     )
-
-
-
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
@@ -645,7 +471,6 @@ export default function Header(props) {
                 placeholder="search"
                 inputProps={{ 'aria-label': 'search' }}
                 onChange={handleSearchChange}
-                onBlur={handleSearchSuggestionClose}
               />
               <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch} >
                 <SearchIcon />

@@ -182,11 +182,10 @@ export default function SignUp(props) {
       </Container>
     </ThemeProvider>)
   } else if (activeStep == 1) {
-    stepComponent = (<Stack spacing={3} sx={{marginTop:"20%"}}>
-
-
-<Typography variant="body1" gutterBottom>
-We have sent an email in your box.
+    stepComponent = (
+    <Stack spacing={3} sx={{marginTop:"20%"}}>
+      <Typography variant="body1" gutterBottom>
+        We have sent an email in your box.
         Please Enter 6 digits numbers here
       </Typography>
         <TextField
