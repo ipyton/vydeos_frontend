@@ -18,6 +18,7 @@ import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import Login from './components/AccountIssue/Login';
 import EndpointNotAvailableError from './components/Errors/EndpointNotAvailableError';
 import AccountIssue from './components/AccountIssue';
+import AccountUtil from './util/io_utils/AccountUtil';
 
 function init(setLoginState, setAvatar, setBadgeContent){
   IOUtil.verifyTokens().then(x => {
@@ -54,12 +55,15 @@ function App() {
   }
 
   if (login == false) {
-    IOUtil.verifyTokens(setLogin).catch(err=> {
+    AccountUtil.verifyTokens(setLogin).catch(err=> {
+      console.log(err)
       setNetworkStatus(true)
     })
   }
 
   if (login == false) {
+    console.log(login)
+
     return (<AccountIssue loginState={login} setLoginState= {setLogin}></AccountIssue>)
   }
 

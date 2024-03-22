@@ -10,7 +10,27 @@ export default class AccountUtil {
         return "http://localhost:8000"
     }
 
-
+    static verifyTokens(setState) {
+      async function post(){
+          if (localStorage.getItem("token") === null) {
+              return 
+          }
+          console.log("veryfying tokens")
+          let response = await axios({
+              url:AccountUtil.getUrlBase() + "/account/verifyToken", 
+              method:'post',
+              data:{token:localStorage.getItem("token")},
+              transformRequest:[function (data) {
+                return Qs.stringify(data)
+            }],
+            headers:{token: localStorage.getItem("token"),
+                      }
+          })
+          let responseData = response.data
+          setState(responseData.code === 1)
+      }
+      return post()
+  }
 
     static login(data, setLogin) {
         axios({
@@ -31,7 +51,6 @@ export default class AccountUtil {
             if (response === undefined) {
                 console.log("errror")
             }
-            console.log(response)
             let responseData = response.data
             if (responseData.code === -1) {
               //props.setBarState({...props.barState, message:responseData.message, open:true})
@@ -72,7 +91,6 @@ export default class AccountUtil {
                 if(response.data.code === 1)
                 {
                   setStep(activeStep + 1)
-                  console.log("Success")
                   setTransactionNumber(response.transactionNumber)
                 }
                 else {

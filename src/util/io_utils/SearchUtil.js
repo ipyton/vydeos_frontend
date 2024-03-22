@@ -8,7 +8,7 @@ export default class SearchUtil {
 
     static searchChatContent(keyword, setSearchResults, setPagingStatus, pagingStatus) {
         axios({
-            url: SearchUtil.getUrlBase() + "/search/chatContent", 
+            url: SearchUtil.getBaseUrl() + "/search/chatContent", 
             method:'post',
             data:{token:localStorage.getItem("token"), keyword:keyword, pageStatus: pagingStatus===null?"":pagingStatus},
             transformRequest:[function (data) {
@@ -23,9 +23,11 @@ export default class SearchUtil {
           }
         }).then(function(response) {
             if (response === undefined) {
-                console.log("errror")
+                console.log("did not get message")
             }
-            console.log(response)
+            if (response.data === undefined) {
+                console.log("did not get meesage") 
+            }
             let responseData = response.data
             if (responseData.code === -1) {
               //props.setBarState({...props.barState, message:responseData.message, open:true})
@@ -43,11 +45,11 @@ export default class SearchUtil {
           })
     }
     
-    static searchContacts(keyword, setSearchResults) {
+    static searchContactsById(keyword, setSearchResults) {
         axios({
-            url:SearchUtil.getUrlBase() + "/search/contacts", 
+            url:SearchUtil.getBaseUrl() + "/search/contacts", 
             method:'post',
-            data:{token:localStorage.getItem("token"), keyword: keyword},
+            data:{token:localStorage.getItem("token"), userId: keyword},
             transformRequest:[function (data) {
               // 对 data 进行任意转换处理
               return Qs.stringify(data)
@@ -79,7 +81,14 @@ export default class SearchUtil {
           })
     }
 
+
     static searchVideos(keyword) {
 
     }
+
+
+    static searchArticles(keyword) {
+
+    }
+
 }

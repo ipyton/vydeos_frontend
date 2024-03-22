@@ -3,7 +3,7 @@ import Qs from 'qs'
 
 export default class IOUtil {
     static url_base = "http://localhost:8000"
-
+        
     static getSearchResult(keyword) {
         async function post(){
             let response = await axios({
@@ -54,6 +54,7 @@ export default class IOUtil {
             if (localStorage.getItem("token") === null) {
                 return 
             }
+            console.log("veryfying tokens")
             let response = await axios({
                 url:this.url_base + "/account/verifyToken", 
                 method:'post',

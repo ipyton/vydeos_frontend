@@ -36,6 +36,7 @@ import ContentPaste from '@mui/icons-material/ContentPaste';
 import Paper from '@mui/material/Paper';
 import MenuList from '@mui/material/MenuList';
 import SearchAndSuggestion from './SearchAndSuggestion';
+import SearchUtil from '../../util/io_utils/SearchUtil';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -109,6 +110,7 @@ export default function Header(props) {
   const [notificationsAnchorEl, setNotificationsAnchorEl] = React.useState(null)
   const [open, setOpen] = React.useState(false);
   const [category, setCategory] = React.useState(false)
+  let [categorySelected, setCategorySelected] = React.useState([false, false, false, false, false])
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -121,6 +123,18 @@ export default function Header(props) {
   const renderBadge = () => {
 
   }
+  function onClick(event){ 
+    if (event.target.id!=="category") {
+      setSuggestionAnchorEl(false)
+    }
+  }
+
+  React.useEffect(()=>{
+    window.addEventListener("click",onClick)
+    return ()=>{
+      window.removeEventListener("click", onClick)
+    }
+  },[])
   
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -145,7 +159,20 @@ export default function Header(props) {
 
   const handleSearch = (event) => {
     let content = event.currentTarget
-    IOUtil.getSearchResult(content)
+    if (categorySelected[0]===true) {
+      SearchUtil.searchContactsById("AAAA1111", )
+    } else if (categorySelected[1] === true) {
+
+    } else if (categorySelected[2] === true) {
+
+    } else if (categorySelected[3] === true) {
+
+    } else if (categorySelected[4] === true) {
+
+    } else {
+      SearchUtil.searchArticles("good day")
+    }
+    console.log(categorySelected)
   }
 
   const handleSearchChange = (event) => {
@@ -382,7 +409,9 @@ export default function Header(props) {
 
     let mockData = [{title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}, {title:"Helloworld", introduction:"introduction", pic:"", type:"movie"}]
     const suggestionBar = (
-       <SearchAndSuggestion searchResult={mockData} searchSuggestionOpen={searchSuggestionOpen} setSuggestionOpen={setSuggestionAnchorEl} left={open} setCategory={setCategory}></SearchAndSuggestion>
+      <SearchAndSuggestion categorySelected={categorySelected} setCategorySelected ={setCategorySelected} searchResult={mockData} searchSuggestionOpen={searchSuggestionOpen} setSuggestionOpen={setSuggestionAnchorEl} left={open} setCategory={setCategory}>
+
+       </SearchAndSuggestion>
     )
 
   const mobileMenuId = 'primary-search-account-menu-mobile';

@@ -5,11 +5,11 @@ import * as React from 'react';
 
 
 export default function (props) {
-    let {searchResult, searchSuggestionOpen, left, setSuggestionOpen, setCategory} = props
+    let {searchResult, searchSuggestionOpen, left, setSuggestionOpen, setCategory, categorySelected, setCategorySelected } = props
     //console.log(setSuggestionOpen)
-    let {categorySelected, setCategorySelected} = React.useState([false, false, false, false, false])
+
     let searchResultExample = {title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}
-    console.log(searchSuggestionOpen)
+
     return <List hidden={searchSuggestionOpen} sx={{ marginTop:"1%",width: '100%', maxWidth: 360,maxHeight:500, bgcolor: 'background.paper', position: 'absolute', left: left? (100*((window.innerWidth+240)/(2*window.innerWidth))+'%'):(100*((window.innerWidth +30)/(2*window.innerWidth))+'%'), top:40,transform: 'translate(-50%, 0)',zIndex:500,
     overflow:"scroll"}}>
 

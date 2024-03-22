@@ -16,6 +16,7 @@ import Friends from "./FriendList"
 import LongVideos from "./LongVideos"
 import UploadFile from "./UploadFile"
 import VideoList from "./VideoList"
+import SearchResult from "./SearchResult"
 export default function Contents(props) {
     const [state, setState] = React.useState({
         open: false,
@@ -49,9 +50,7 @@ export default function Contents(props) {
                 <Route path="/longvideos" element={<LongVideos setBarState={setState} status={props}></LongVideos> }></Route>
                 <Route path="/upload" element={<UploadFile setBarState={setState} status={props}></UploadFile> }></Route>
                 <Route path="/videolist" element={<VideoList setBarState={setState} status={props}></VideoList> }></Route>
-
-
-
+                <Route path="/searchresult" element={<SearchResult> </SearchResult>}></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
                 
             </Routes>
