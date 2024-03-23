@@ -60,10 +60,10 @@ function App() {
 
   if (login == false) {
     console.log(login)
-
     return (<AccountIssue loginState={login} setLoginState= {setLogin}></AccountIssue>)
   }
 
+  if (login === true)
   return (
     <ThemeProvider theme={defaultTheme}>
     <BrowserRouter>

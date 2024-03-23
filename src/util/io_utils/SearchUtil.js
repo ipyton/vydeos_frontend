@@ -1,9 +1,27 @@
 import Qs from 'qs'
 import axios  from "axios"
+import {add,clear, batchAdd} from "../../components/redux/searchResult"
+import { UseDispatch, useDispatch } from 'react-redux';
 
 export default class SearchUtil {
     static getBaseUrl() {
         return "http://localhost:8000";
+    }
+
+
+    static stateSetter(list, dispatch) {
+      console.log("89012q8")
+      console.log(list)
+      setInterval(function(){
+        dispatch(batchAdd(list))
+      }, 1000)
+
+    }
+
+
+    static mockSearch(dispatch) {
+      let list = [{name:"james",avatar:"siehru", intro:"sus", type:"contact"}, {name:"time",avatar:"zdxf", intro:"sfs", type:"video"}]
+      this.stateSetter(list, dispatch)
     }
 
     static searchChatContent(keyword, setSearchResults, setPagingStatus, pagingStatus) {

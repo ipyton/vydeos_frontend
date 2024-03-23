@@ -1,4 +1,8 @@
-import {Navigate} from "react-router-dom";
+import { useNavigate, Navigate} from "react-router-dom";
 export default function() {
-    return <div>Do not found this page</div>
+    let navigation = useNavigate()
+    navigation("/login")
+    return <div>sijefjoiwehji</div>
+    //return <Navigate to="/login"/>
+
 }

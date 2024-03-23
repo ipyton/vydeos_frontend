@@ -37,6 +37,7 @@ import Paper from '@mui/material/Paper';
 import MenuList from '@mui/material/MenuList';
 import SearchAndSuggestion from './SearchAndSuggestion';
 import SearchUtil from '../../util/io_utils/SearchUtil';
+import { useDispatch } from 'react-redux';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -117,6 +118,7 @@ export default function Header(props) {
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
   const languageMenuOpen = Boolean(languageAnchorEl)
   const notificationsOpen = Boolean(notificationsAnchorEl)
+  const dispatch = useDispatch()
 
   
   const navigate = useNavigate();
@@ -160,19 +162,19 @@ export default function Header(props) {
   const handleSearch = (event) => {
     let content = event.currentTarget
     if (categorySelected[0]===true) {
-      SearchUtil.searchContactsById("AAAA1111", )
+      SearchUtil.mockSearch(dispatch)
     } else if (categorySelected[1] === true) {
-
+      SearchUtil.mockSearch()
     } else if (categorySelected[2] === true) {
-
+      SearchUtil.mockSearch()
     } else if (categorySelected[3] === true) {
-
+      SearchUtil.mockSearch()
     } else if (categorySelected[4] === true) {
-
+      SearchUtil.mockSearch()
     } else {
       SearchUtil.searchArticles("good day")
     }
-    console.log(categorySelected)
+      navigate("searchresult")
   }
 
   const handleSearchChange = (event) => {

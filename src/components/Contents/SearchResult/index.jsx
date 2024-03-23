@@ -8,11 +8,11 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
+import { useSelector } from 'react-redux';
 
 export default function BasicList() {
-
-
-  
+  const searchResult = useSelector((state) => state.searchResult.value)
+  console.log(searchResult)
   return (
     <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
       <nav aria-label="main mailbox folders">
