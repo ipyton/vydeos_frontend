@@ -10,8 +10,6 @@ export default class SearchUtil {
 
 
     static stateSetter(list, dispatch) {
-      console.log("89012q8")
-      console.log(list)
       setInterval(function(){
         dispatch(batchAdd(list))
       }, 1000)
@@ -20,7 +18,7 @@ export default class SearchUtil {
 
 
     static mockSearch(dispatch) {
-      let list = [{name:"james",avatar:"siehru", intro:"sus", type:"contact"}, {name:"time",avatar:"zdxf", intro:"sfs", type:"video"}]
+      let list = [{name:"james",pics:"siehru", intro:"sus", type:"contact"}, {name:"time",pics:"zdxf", intro:"sfs", type:"movie"}]
       this.stateSetter(list, dispatch)
     }
 

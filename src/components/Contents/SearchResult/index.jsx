@@ -9,14 +9,24 @@ import Divider from '@mui/material/Divider';
 import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import { useSelector } from 'react-redux';
-
+import SearchItem from './SearchItem';
 export default function BasicList() {
   const searchResult = useSelector((state) => state.searchResult.value)
-  console.log(searchResult)
+  console.log(searchResult) 
+  // [{name:"james",pics:"siehru", intro:"sus", type:"contact"}, {name:"time",pics:"zdxf", intro:"sfs", type:"video"}]
   return (
-    <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <nav aria-label="main mailbox folders">
-        <List>
+    <Box sx={{ width: '100%', bgcolor: 'background.paper',display:"flex",
+    flexDirection:"column",
+    justifyContent:"center",
+    alignItems:"center"}}>
+     
+        <List sx={{ height:"100%", width:"50%"}}>
+          {
+            searchResult.map((item, index)=>{
+              return (<SearchItem title={item.name} introduction={item.intro} type={item.type} pics={item.pics}></SearchItem>)
+            }) 
+          } 
+          {/* <nav aria-label="main mailbox folders">
           <ListItem disablePadding>
             <ListItemButton>
               <ListItemIcon>
@@ -40,6 +50,9 @@ export default function BasicList() {
         <List>
           <ListItem disablePadding>
             <ListItemButton>
+            <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
               <ListItemText primary="Trash" />
             </ListItemButton>
           </ListItem>
@@ -49,7 +62,8 @@ export default function BasicList() {
             </ListItemButton>
           </ListItem>
         </List>
-      </nav>
+      </nav> */}
+      </List>
     </Box>
   );
 }
