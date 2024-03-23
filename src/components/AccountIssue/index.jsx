@@ -12,9 +12,9 @@ export default function(props) {
     <BrowserRouter>
         <Box sx={{ display: 'flex' }}>
         <Routes>
-                <Route path="/account/forget" element={<Forget />}></Route>
-                <Route path="/account/login" element={<Login login={props.loginState} setLogin={props.setLoginState} />}></Route>
-                <Route path="/account/signup" element={<SignUp loginState = {props.loginState} setLoginState={props.setLoginState} setBarState={props.setBarState}/>}></Route>
+                <Route path="forget" element={<Forget />}></Route>
+                <Route path="login" element={<Login login={props.loginState} setLogin={props.setLoginState} />}></Route>
+                <Route path="signup" element={<SignUp loginState = {props.loginState} setLoginState={props.setLoginState} setBarState={props.setBarState}/>}></Route>
                 <Route path="*" element={<NotFound/>} ></Route>
                 
             </Routes>

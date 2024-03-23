@@ -11,25 +11,36 @@ export default class AccountUtil {
     }
 
     static verifyTokens(setState) {
-      async function post(){
           if (localStorage.getItem("token") === null) {
               return 
           }
           console.log("veryfying tokens")
-          let response = await axios({
+          axios({
               url:AccountUtil.getUrlBase() + "/account/verifyToken", 
               method:'post',
               data:{token:localStorage.getItem("token")},
               transformRequest:[function (data) {
                 return Qs.stringify(data)
             }],
+            sychronous:true,
             headers:{token: localStorage.getItem("token"),
                       }
-          })
-          let responseData = response.data
-          setState(responseData.code === 1)
-      }
-      return post()
+          }).catch(err=> {
+            console.log("error")
+          }).then(
+            response=> {
+              console.log(response)
+              if (response === undefined || response.data === undefined) {
+                console.log("login error")
+                return
+              }
+  
+            let responseData = response.data
+            setState(responseData.code === 1)
+            console.log(responseData.code === 1)
+            }
+          )
+        
   }
 
     static login(data, setLogin) {

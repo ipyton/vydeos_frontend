@@ -46,19 +46,16 @@ function App() {
   const [badgeContent, setBadgeContent] = useState([])
   const [networkStatus, setNetworkStatus] = useState(false)
 
-  if (checkNetworkStatus() == false) {
+  if (checkNetworkStatus() === false) {
     return <NetworkError></NetworkError>
   }
 
-  if (checkEndpointStauts() == false) {
+  if (checkEndpointStauts() === false) {
     return <EndpointNotAvailableError></EndpointNotAvailableError>
   }
 
-  if (login == false) {
-    AccountUtil.verifyTokens(setLogin).catch(err=> {
-      console.log(err)
-      setNetworkStatus(true)
-    })
+  if (login === false) {
+    AccountUtil.verifyTokens(setLogin)
   }
 
   if (login == false) {
