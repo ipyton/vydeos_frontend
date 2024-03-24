@@ -45,6 +45,12 @@ function App() {
   const [avatar, setAvatar] = useState(null)
   const [badgeContent, setBadgeContent] = useState([])
   const [networkStatus, setNetworkStatus] = useState(false)
+  Notification.requestPermission().then((permission) => {
+    if (permission === "granted") {
+      const notification = new Notification("Hi there!");
+    }
+  })
+
 
   if (checkNetworkStatus() === false) {
     return <NetworkError></NetworkError>
@@ -62,6 +68,7 @@ function App() {
     console.log(login)
     return (<AccountIssue loginState={login} setLoginState= {setLogin}></AccountIssue>)
   }
+
 
   if (login === true)
   return (

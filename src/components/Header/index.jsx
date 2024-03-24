@@ -160,17 +160,17 @@ export default function Header(props) {
 
 
   const handleSearch = (event) => {
-    let content = event.currentTarget
+
     if (categorySelected[0]===true) {
-      SearchUtil.mockSearch(dispatch)
+      SearchUtil.searchChatContactById(search, dispatch)
     } else if (categorySelected[1] === true) {
-      SearchUtil.mockSearch()
+      SearchUtil.mockSearch(dispatch)
     } else if (categorySelected[2] === true) {
-      SearchUtil.mockSearch()
+      SearchUtil.mockSearch(dispatch)
     } else if (categorySelected[3] === true) {
-      SearchUtil.mockSearch()
+      SearchUtil.mockSearch(dispatch)
     } else if (categorySelected[4] === true) {
-      SearchUtil.mockSearch()
+      SearchUtil.mockSearch(dispatch)
     } else {
       SearchUtil.searchArticles("good day")
     }
@@ -179,7 +179,7 @@ export default function Header(props) {
 
   const handleSearchChange = (event) => {
     setSearch(event.currentTarget.value)
-    console.log(event.currentTarget.value)
+
     setSuggestionAnchorEl(event.currentTarget)
     event.currentTarget.focus()
   }

@@ -10,10 +10,13 @@ export default class SearchUtil {
 
 
     static stateSetter(list, dispatch) {
-      setInterval(function(){
-        dispatch(batchAdd(list))
-      }, 1000)
+      dispatch(batchAdd(list))
+  
 
+    }
+
+    static searchChatContactByName(keyword, setSearchResults, setPagingStatus, pagingStatus){
+      
     }
 
 
@@ -22,37 +25,48 @@ export default class SearchUtil {
       this.stateSetter(list, dispatch)
     }
 
-    static searchChatContent(keyword, setSearchResults, setPagingStatus, pagingStatus) {
+    static searchChatContactById(keyword, dispatch) {
         axios({
-            url: SearchUtil.getBaseUrl() + "/search/chatContent", 
+            url: SearchUtil.getBaseUrl() + "/search/contactById", 
             method:'post',
-            data:{token:localStorage.getItem("token"), keyword:keyword, pageStatus: pagingStatus===null?"":pagingStatus},
+            data:{token:localStorage.getItem("token"), userId:keyword},
             transformRequest:[function (data) {
               // 对 data 进行任意转换处理
+              console.log(Qs.stringify(data))
               return Qs.stringify(data)
           }],
         }).catch(error => {
           if ("Network Error" ===  error.message) {
             //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
             // setNetworkErr(true)
-            console.log("error")
+            console.log(error)
           }
         }).then(function(response) {
             if (response === undefined) {
                 console.log("did not get message")
+                return
             }
-            if (response.data === undefined) {
+            if (response.data === undefined) {          
                 console.log("did not get meesage") 
+                return
             }
             let responseData = response.data
+            console.log(responseData)
             if (responseData.code === -1) {
               //props.setBarState({...props.barState, message:responseData.message, open:true})
             }
             else if(responseData.code === 1) {
-                setSearchResults(responseData.result)
-                if (pagingStatus === null) {
-                    setPagingStatus(responseData.pagingStatus)
-                }
+                //setSearchResults(responseData.result)
+                // if (pagingStatus === null) {
+                //     setPagingStatus(responseData.pagingStatus)
+                // }
+                console.log(responseData)
+                let result = JSON.parse(responseData.message)
+                let adder = []
+                result.forEach(element => {
+                  adder.push({name:element.userName, intro:element.introduction, pic:element.avatar, type:"contact"})
+                });
+                SearchUtil.stateSetter(adder, dispatch)
             }
             else {
               //props.setBarState({...props.barState, message:responseData.message, open:true})
@@ -61,7 +75,7 @@ export default class SearchUtil {
           })
     }
     
-    static searchContactsById(keyword, setSearchResults) {
+    static searchContactByName(keyword, setSearchResults, pagingStatus, setPagingStatus) {
         axios({
             url:SearchUtil.getBaseUrl() + "/search/contacts", 
             method:'post',
@@ -104,6 +118,11 @@ export default class SearchUtil {
 
 
     static searchArticles(keyword) {
+
+    }
+
+
+    static accumulativeSearch(keyword,setSearchResults) {
 
     }
 
