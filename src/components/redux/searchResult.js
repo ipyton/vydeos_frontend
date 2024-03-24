@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-export const counterSlice = createSlice({
+export const searchResult = createSlice({
   name: 'searchResults',
   initialState: {
     value: [],
@@ -22,6 +22,6 @@ export const counterSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { add, batchAdd, clear} = counterSlice.actions
+export const { add, batchAdd, clear} = searchResult.actions
 
-export default counterSlice.reducer
+export default searchResult.reducer

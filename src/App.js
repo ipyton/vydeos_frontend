@@ -71,7 +71,7 @@ function App() {
 
 
   if (login === true)
-  return (
+    return (
     <ThemeProvider theme={defaultTheme}>
     <BrowserRouter>
     <Box sx={{ display: 'flex' }}>
@@ -86,6 +86,7 @@ function App() {
     </BrowserRouter>
     </ThemeProvider>
   );
+  return <div> loading</div>
 }
 
 export default App;

@@ -38,6 +38,7 @@ import MenuList from '@mui/material/MenuList';
 import SearchAndSuggestion from './SearchAndSuggestion';
 import SearchUtil from '../../util/io_utils/SearchUtil';
 import { useDispatch } from 'react-redux';
+import {clear} from "../../components/redux/searchResult"
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -160,7 +161,7 @@ export default function Header(props) {
 
 
   const handleSearch = (event) => {
-
+    dispatch()
     if (categorySelected[0]===true) {
       SearchUtil.searchChatContactById(search, dispatch)
     } else if (categorySelected[1] === true) {

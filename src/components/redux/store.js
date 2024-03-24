@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import counterSlice from './searchResult'
+import searchResult from './searchResult'
+import { userInfo } from './UserDetails'
 
 export default configureStore({
   reducer: {
-    searchResult: counterSlice,
+    searchResult: searchResult,
+    userInfo:userInfo,
   },
 })
