@@ -14,7 +14,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 export default function (props) {
 
     let { intro, name, pic, gender, birthdate, location, nickname, imageData } = props
-
+    
 
     imageData = [
         {

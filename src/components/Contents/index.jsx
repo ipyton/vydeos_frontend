@@ -19,6 +19,7 @@ import VideoList from "./VideoList"
 import SearchResult from "./SearchResult"
 import FriendIntro from "./FriendList/FriendIntro"
 import FriendIntroductionCentered from "./Introductions/FriendIntroductionCentered"
+import { useDispatch } from "react-redux"
 export default function Contents(props) {
     const [state, setState] = React.useState({
         open: false,
@@ -31,6 +32,7 @@ export default function Contents(props) {
       const handleClose = () => {
         setState({ ...state, open: false });
       };
+    //   const dispatch = useDispatch
       
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
     return (
@@ -53,7 +55,7 @@ export default function Contents(props) {
                 <Route path="/upload" element={<UploadFile setBarState={setState} status={props}></UploadFile> }></Route>
                 <Route path="/videolist" element={<VideoList setBarState={setState} status={props}></VideoList> }></Route>
                 <Route path="/searchresult" element={<SearchResult> </SearchResult>}></Route>
-                <Route path="/friendInfomation" element={<FriendIntroductionCentered></FriendIntroductionCentered>}></Route>
+                <Route path="/friendInfomation" element={<FriendIntroductionCentered ></FriendIntroductionCentered>}></Route>
                 <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
                 
             </Routes>

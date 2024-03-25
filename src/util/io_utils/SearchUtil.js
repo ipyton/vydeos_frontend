@@ -1,7 +1,6 @@
 import Qs from 'qs'
 import axios  from "axios"
 import {add,clear, batchAdd} from "../../components/redux/searchResult"
-import { UseDispatch, useDispatch } from 'react-redux';
 
 export default class SearchUtil {
     static getBaseUrl() {

@@ -2,21 +2,30 @@ import axios from "axios"
 import Qs from 'qs'
 import EncryptionUtil from "./EncryptionUtil"
 
-
+import { update } from "../../components/redux/UserDetails"
+import { useDispatch } from "react-redux"
 
 export default class AccountUtil {
 
   static getUrlBase() {
     return "http://localhost:8000"
   }
-
-
+  dispatch = useDispatch()
+  static setUserInfomation(information) {
+    this.dispatch(update(information["intro"],
+    information["name"],
+      information["pic"] ,
+      information["gender"] ,
+      information["birthdate"],
+      information["location"],
+      information["nickname"],
+      information["imageData"],))
+  }
 
   static verifyTokens(setState) {
     if (localStorage.getItem("token") === null) {
       return
     }
-    console.log("veryfying tokens")
     axios({
       url: AccountUtil.getUrlBase() + "/account/verifyToken",
       method: 'post',
@@ -81,7 +90,7 @@ export default class AccountUtil {
     })
   }
 
-  static requestUserInfo(token,userId) {
+  static requestUserInfo(token, userId) {
     axios({
       url: AccountUtil.getUrlBase() + "/account/login",
       method: 'post',
@@ -97,7 +106,7 @@ export default class AccountUtil {
         console.log("error")
       }
     }).then(function (response) {
-      if (response === undefined) {
+      if (response === undefined || response.data === undefined) {
         console.log("errror")
       }
       let responseData = response.data
@@ -105,6 +114,7 @@ export default class AccountUtil {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
       }
       else if (responseData.code === 1) {
+
       }
       else {
         //props.setBarState({...props.barState, message:responseData.message, open:true})

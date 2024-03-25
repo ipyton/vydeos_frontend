@@ -5,12 +5,17 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItem from '@mui/material/ListItem';
 import CardMedia from '@mui/material/CardMedia';
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+import AccountUtil from '../../../../util/io_utils/AccountUtil';
 
 export default function (props) {
-    let { title, introduction, pics, type } = props
+    let { title, introduction, pics, type,userId } = props
+    let navigate = useNavigate()
     let miniture = (<div></div>)
     const handleSuggestionSelection = (event) => {
         //console.log(setSuggestionOpen)
+        AccountUtil.requestUserInfo(localStorage.getItem("token"), userId)
+        navigate("/friendInfomation")
     }
 
     if (type === "contact") {

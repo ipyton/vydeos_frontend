@@ -161,7 +161,7 @@ export default function Header(props) {
 
 
   const handleSearch = (event) => {
-    dispatch()
+    //dispatch()
     if (categorySelected[0]===true) {
       SearchUtil.searchChatContactById(search, dispatch)
     } else if (categorySelected[1] === true) {
