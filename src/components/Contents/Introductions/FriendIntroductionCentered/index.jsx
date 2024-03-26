@@ -11,17 +11,19 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { UseSelector } from "react-redux";
+import { UseSelector, useDispatch } from "react-redux";
+import {update, clear} from ""
 
 export default function (props) {
 
-    let { intro, name, pic, gender, birthdate, location, nickname, imageData, relationship } = useSelector((state) => state.userDetails.value)
+    let { userId,intro, name, pic, gender, birthdate, location, nickname, imageData, relationship } = useSelector((state) => state.userDetails.value)
 
     let contactButtonText = ""
 
     let followButtonText = ""
     
     let extraInformation = ""
+    let dispatch = useDispatch()
     //01: you do not follow him/ but he follow you.
     //10: you follow him but he does not follow you.
     //,etc.
@@ -41,7 +43,7 @@ export default function (props) {
 
 
     let handleContact = ()=> {
-        
+        dispatch()
     }
 
 
@@ -107,7 +109,7 @@ export default function (props) {
             direction="column"
             justifyContent="center"
             alignItems="center"
-            spacing={0.5} sx={{ width: "100%", overflow: "scroll", boxShadow: 1, }}>
+            spacing={0.5} sx={{ width: "100%", overflow: "scroll", boxShadow: 1 }}>
             <Stack direction="row" justifyContent="end" sx={{ width: "60%" }}>
                 <ListItem alignItems="flex-start" >
                     <ListItemAvatar>
@@ -178,7 +180,7 @@ export default function (props) {
                 {nickname === undefined ? <div></div> : <TextField
                     id="outlined-required"
                     label="NickName"
-                    defaultValue="bbbbb"
+                    defaultValue={nickname}
                     variant="standard" type="search" />}
 
             </Stack>
