@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-export const userInfo = createSlice({
+export const userDetails = createSlice({
     name: 'userDetails',
     initialState: {
         value: { "intro":"", "name":"", "pic":"", "gender":"", "birthdate":"", "location":"", "nickname":"", "imageData":[]},
     },
     reducers: {
-        update: (state, intro, name, pic, gender, birthdate, location, nickname, imageData) => {
+        update: (state, intro, name, pic, gender, birthdate, location, nickname, imageData, relationship) => {
             state.value["intro"] = intro
             state.value["name"] = name
             state.value["pic"] = pic
@@ -15,9 +15,11 @@ export const userInfo = createSlice({
             state.value["location"] = location
             state.value["nickname"] = nickname
             state.value["imageData"] = imageData
+            state.value["relationship"] = relationship
+
         },
         clear: (state) => {
-            state.value = { "intro": "", "name": "", "pic": "", "gender": "", "birthdate": "", "location": "", "nickname": "", imageData: [] }
+            state.value = { "intro": "", "name": "", "pic": "", "gender": "", "birthdate": "", "location": "", "nickname": "", imageData: [], relationship:0 }
         },
     },
 })
@@ -25,4 +27,4 @@ export const userInfo = createSlice({
 // Action creators are generated for each case reducer function
 export const { update, clear } = userInfo.actions
 
-export default userInfo.reducer
+export default userDetails.reducer

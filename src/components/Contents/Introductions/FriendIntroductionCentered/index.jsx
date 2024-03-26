@@ -11,10 +11,43 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import { UseSelector } from "react-redux";
+
 export default function (props) {
 
-    let { intro, name, pic, gender, birthdate, location, nickname, imageData } = props
+    let { intro, name, pic, gender, birthdate, location, nickname, imageData, relationship } = useSelector((state) => state.userDetails.value)
+
+    let contactButtonText = ""
+
+    let followButtonText = ""
     
+    let extraInformation = ""
+    //01: you do not follow him/ but he follow you.
+    //10: you follow him but he does not follow you.
+    //,etc.
+    if (relationship === 0) {
+        followButtonText = "Follow"
+    } else if (relationship === 1) {
+        followButtonText = "Follow"
+        extraInformation = "He follows you."
+    } else if (relationship === 10) {
+        contactButtonText = "Request"
+        followButtonText = "Unfollow"
+    } else if (relationship === 11) {
+        extraInformation = "He follows you."
+        followButtonText = "Unfollow"
+        contactButtonText = "Contact"
+    }
+
+
+    let handleContact = ()=> {
+        
+    }
+
+
+    let handleFollow = () => {
+
+    }
 
     imageData = [
         {
@@ -101,12 +134,16 @@ export default function (props) {
 
 
                 <ButtonGroup sx={{ marginTop: "3%", height: "50%" }} aria-label="Basic button group" >
-                    <Button>unfollow</Button>
-                    <Button>contact</Button>
+                    {followButtonText.length === 0 ?<div></div>:<Button onClick={handleFollow}> {followButtonText}</Button>}
+                    {contactButtonText.length === 0 ? <div></div>:<Button onClick={handleContact}>{contact}</Button>}
                 </ButtonGroup>
             </Stack>
-
-
+            <Stack>
+                {localStorage.getItem("id")}
+            </Stack>
+            <Stack>
+                {extraInformation}
+            </Stack>
             <Stack sx={{ width: "60%", }}>
                 <TextField
                     id="outlined-required"

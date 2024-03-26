@@ -10,6 +10,8 @@ import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import { useSelector } from 'react-redux';
 import SearchItem from './SearchItem';
+
+
 export default function BasicList() {
   const searchResult = useSelector((state) => state.searchResult.value)
   console.log(searchResult)
