@@ -47,10 +47,9 @@ function App() {
   const [networkStatus, setNetworkStatus] = useState(false)
   Notification.requestPermission().then((permission) => {
     if (permission === "granted") {
-      const notification = new Notification("Hi there!");
+      const notification = new Notification("Welcome!");
     }
   })
-
 
   if (checkNetworkStatus() === false) {
     return <NetworkError></NetworkError>

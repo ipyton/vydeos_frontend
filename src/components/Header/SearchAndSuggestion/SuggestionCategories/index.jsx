@@ -39,7 +39,8 @@ export default function (props) {
 
     return (
         <Stack direction="row">
-            <Checkbox {...label} id="category" icon={<PermContactCalendarOutlinedIcon />} checkedIcon={<PermContactCalendarIcon />} onChange={handleClick(0)} checked={categorySelected[0]} />
+            <Checkbox {...label} id="category" icon={<PermContactCalendarOutlinedIcon />} 
+            checkedIcon={<PermContactCalendarIcon />} onChange={handleClick(0)} checked={categorySelected[0]} />
             <Checkbox
                 id="category"
                 {...label}
