@@ -3,9 +3,12 @@ import { createSlice } from '@reduxjs/toolkit'
 export const userDetails = createSlice({
     name: 'userDetails',
     initialState: {
-        value: { "intro":"", "name":"", "pic":"", "gender":"", "birthdate":"", "location":"", "nickname":"", "imageData":[]},
+        value: { "intro":"", "name":"", "pic":"", "gender":"", "birthdate":"", "location":"", "nickname":"", "imageData":[], "relationship":0},
     },
     reducers: {
+        updateFollowState:(follow)=>{
+            state.value["relationship"] = state.value["relationship"] / 10 + 10*(!follow?1:0)
+        },
         update: (state, intro, name, pic, gender, birthdate, location, nickname, imageData, relationship) => {
             state.value["intro"] = intro
             state.value["name"] = name
@@ -25,6 +28,6 @@ export const userDetails = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { update, clear } = userDetails.actions
+export const { update, clear, updateFollowState } = userDetails.actions
 
 export default userDetails.reducer

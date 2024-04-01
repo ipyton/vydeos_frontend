@@ -17,13 +17,14 @@ import { update, clear } from "../../../redux/UserDetails"
 export default function (props) {
 
     let { userId, intro, name, pic, gender, birthdate, location, nickname, imageData, relationship } = useSelector((state) => state.userDetails.value)
-
     let contactButtonText = ""
 
     let followButtonText = ""
 
     let extraInformation = ""
     let dispatch = useDispatch()
+
+
     //01: you do not follow him/ but he follow you.
     //10: you follow him but he does not follow you.
     //,etc.
@@ -48,6 +49,8 @@ export default function (props) {
 
 
     let handleFollow = () => {
+        SocialMediaUtil.follow(localhost.getItem("userId"), userId, dispatch)
+        
 
     }
 
