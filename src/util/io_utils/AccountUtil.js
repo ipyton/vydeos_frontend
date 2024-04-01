@@ -72,7 +72,7 @@ export default class AccountUtil {
         console.log("error")
       }
     }).then(function (response) {
-      if (response === undefined) {
+      if (response === undefined|| response.data === undefined) {
         console.log("errror")
       }
       let responseData = response.data

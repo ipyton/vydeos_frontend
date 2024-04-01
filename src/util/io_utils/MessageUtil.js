@@ -1,9 +1,11 @@
 import localforage from "localforage"
+import qs from 'qs'
+import axios from "axios"
 
 export default class MessageUtil {
 
     static getUrlBase() {
-        return ""
+        return "localhost:8000/chat"
     }
 
     static initialize() {
@@ -12,7 +14,7 @@ export default class MessageUtil {
 
     static updateMessage(response) {
         response = JSON.parse(response.data)
-        for (i = 0; i < response.size(); i++) {
+        for (let i = 0; i < response.size(); i++) {
             localforage.getItem(response[i]["user_id"]).then(function (value) {
                 value["chatRecords"].push(response[i]["records"])
                 localforage.setItem(response[i]["user_id"], value)
@@ -23,7 +25,7 @@ export default class MessageUtil {
     static getMessageById(userId, receiverId) {
         axios(
             {
-                url: MessageUtil.getUrlBase() + "/getChatRecordsById",
+                url: MessageUtil.getUrlBase() + "/getChatRecordsByUserId",
                 method: "post",
                 data: { token: localStorage.getItem("token") },
                 transformRequest:[function(data) {
@@ -72,6 +74,37 @@ export default class MessageUtil {
                 navigator("chat")
             }
         ) 
+    }
+
+    static sendMessage(userId, sendTo, fromTimestamp ) {
+        axios(
+            {
+                url: MessageUtil.getUrlBase() + "/sendMessage",
+                method: "post",
+                data: { userId: userId, receiverId:sendTo,timstamp: fromTimestamp },
+                transformRequest: [function (data) {
+                    return qs.stringify(data)
+                }],
+                //synchronous: true,
+                header: {
+                    tokenL: localStorage.getItem("token"),
+                }
+            }
+        ).catch(err => {
+            console.log("requestNewMessageError")
+        }).then(
+            response => {
+                MessageUtil.updateMessage(response)
+            }
+        ).catch(err => {
+            console.log("parse Error")
+        }).then(
+            () => {
+                navigator("chat")
+            }
+        ) 
+
+
     }
 
 }

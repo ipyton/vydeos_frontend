@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
+import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -29,7 +30,8 @@ export default function(props) {
 
     };
     const handleSend = () => {
-        console.log(text);
+      MessageUtil.sendMessage()
+      console.log(text);
     }
     const picUploadHandler = () => {
       console.log("sdubfiuebfuie")

@@ -1,6 +1,9 @@
 import { useDispatch, useSelector } from "react-redux"
 import { UseDispatch } from "react-redux"
 import { updateFollowState } from "../../components/redux/UserDetails"
+import qs from 'qs'
+import axios from "axios"
+
 export default class SocialMediaUtil {
 
     static getUrlBase(){

@@ -6,7 +6,7 @@ export const userDetails = createSlice({
         value: { "intro":"", "name":"", "pic":"", "gender":"", "birthdate":"", "location":"", "nickname":"", "imageData":[], "relationship":0},
     },
     reducers: {
-        updateFollowState:(follow)=>{
+        updateFollowState:(state, follow)=>{
             state.value["relationship"] = state.value["relationship"] / 10 + 10*(!follow?1:0)
         },
         update: (state, intro, name, pic, gender, birthdate, location, nickname, imageData, relationship) => {

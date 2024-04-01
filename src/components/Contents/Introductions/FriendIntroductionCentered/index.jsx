@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { useSelector, useDispatch } from "react-redux";
 import { update, clear } from "../../../redux/UserDetails"
+import SocialMediaUtil from "../../../../util/io_utils/SocialMediaUtil";
 
 export default function (props) {
 
@@ -49,7 +50,7 @@ export default function (props) {
 
 
     let handleFollow = () => {
-        SocialMediaUtil.follow(localhost.getItem("userId"), userId, dispatch)
+        SocialMediaUtil.follow(localStorage.getItem("userId"), userId, dispatch)
         
 
     }
