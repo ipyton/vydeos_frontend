@@ -25,6 +25,6 @@ export const userDetails = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { update, clear } = userInfo.actions
+export const { update, clear } = userDetails.actions
 
 export default userDetails.reducer

@@ -7,17 +7,17 @@ import BeachAccessIcon from '@mui/icons-material/BeachAccess';
 import { ListItemButton } from '@mui/material';
 
 
-export default function Contact() {
-    return (     
-     
-    <ListItemButton sx={{width:"100%"}}>
+export default function Contact(props) {
+    let {date, content, name, avatar} = props.content
+  return (     
+    <ListItemButton onClick={props.onClick} sx={{width:"100%"}} >
     <ListItem sx={{width:"100%"}}>
         <ListItemAvatar>
           <Avatar>
             <BeachAccessIcon />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary="Vacation" secondary="July 20, 2014" />
+        <ListItemText primary={content} secondary={date} />
     </ListItem>
     </ListItemButton>
 )

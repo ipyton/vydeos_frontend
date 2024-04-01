@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 import searchResult from './searchResult'
-import { userInfo } from './UserDetails'
+import { userDetails } from './UserDetails'
 
 export default configureStore({
   reducer: {
     searchResult: searchResult,
-    userInfo:userInfo,
+    userInfo:userDetails,
   },
 })

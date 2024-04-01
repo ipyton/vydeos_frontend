@@ -11,17 +11,17 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { UseSelector, useDispatch } from "react-redux";
-import {update, clear} from ""
+import { useSelector, useDispatch } from "react-redux";
+import { update, clear } from "../../../redux/UserDetails"
 
 export default function (props) {
 
-    let { userId,intro, name, pic, gender, birthdate, location, nickname, imageData, relationship } = useSelector((state) => state.userDetails.value)
+    let { userId, intro, name, pic, gender, birthdate, location, nickname, imageData, relationship } = useSelector((state) => state.userDetails.value)
 
     let contactButtonText = ""
 
     let followButtonText = ""
-    
+
     let extraInformation = ""
     let dispatch = useDispatch()
     //01: you do not follow him/ but he follow you.
@@ -42,7 +42,7 @@ export default function (props) {
     }
 
 
-    let handleContact = ()=> {
+    let handleContact = () => {
         dispatch()
     }
 
@@ -103,7 +103,7 @@ export default function (props) {
     ];
 
 
-    
+
     return (
         <Stack
             direction="column"
@@ -136,8 +136,8 @@ export default function (props) {
 
 
                 <ButtonGroup sx={{ marginTop: "3%", height: "50%" }} aria-label="Basic button group" >
-                    {followButtonText.length === 0 ?<div></div>:<Button onClick={handleFollow}> {followButtonText}</Button>}
-                    {contactButtonText.length === 0 ? <div></div>:<Button onClick={handleContact}>{contact}</Button>}
+                    {followButtonText.length === 0 ? <div></div> : <Button onClick={handleFollow}> {followButtonText}</Button>}
+                    {contactButtonText.length === 0 ? <div></div> : <Button onClick={handleContact}>{contactButtonText}</Button>}
                 </ButtonGroup>
             </Stack>
             <Stack>

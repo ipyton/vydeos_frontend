@@ -10,6 +10,7 @@ export default class AccountUtil {
   static getUrlBase() {
     return "http://localhost:8000"
   }
+  
   dispatch = useDispatch()
   static setUserInfomation(information) {
     this.dispatch(update(information["intro"],
