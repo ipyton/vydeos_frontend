@@ -4,8 +4,6 @@ import axios from "axios"
 import { update, clear, updateFollowState } from "../../components/redux/UserDetails"
 export default class MessageUtil {
 
-
-
     static getUrlBase() {
         return "http://localhost:8000"
     }
@@ -15,6 +13,10 @@ export default class MessageUtil {
 
     }
 
+    static setUserIntro(information, dispatch) {
+        console.log(information)
+        dispatch(update(information))
+    }
     static updateMessage(response) {
         // find the newest message.
         response = JSON.parse(response.data)
@@ -111,7 +113,7 @@ export default class MessageUtil {
 
     }
 
-    static requestUserInfo(dispatch, userId) {
+    static requestUserInfo(dispatch, userId, navigator) {
 
         //get information from search/ friend list.
         axios({
@@ -137,8 +139,11 @@ export default class MessageUtil {
                 return
             }
             else if (responseData.code === 1) {
-                console.log(responseData)
-                //dispatch(update())
+                //MessageUtil.setUserIntro(JSON.parse(responseData.message), dispatch)
+                localforage.setItem("userIntro", JSON.parse(responseData.message) ).then(()=>{
+                    navigator("/friendInfomation")
+                })
+
             }
             else {
                 //props.setBarState({...props.barState, message:responseData.message, open:true})

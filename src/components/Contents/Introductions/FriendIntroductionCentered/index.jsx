@@ -14,31 +14,36 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import { useSelector, useDispatch } from "react-redux";
 import { update, clear } from "../../../redux/UserDetails"
 import SocialMediaUtil from "../../../../util/io_utils/SocialMediaUtil";
+import localforage from "localforage";
+import { useState } from "react";
 
 export default function (props) {
+    let [details, setDetails] = useState(null)
+    localforage.getItem("userIntro").then((res) => {
+        setDetails(res)
+    })
 
-    let { userId, intro, name, pic, gender, birthdate, location, nickname, imageData, relationship } = useSelector((state) => state.userDetails.value)
-    console.log(useSelector((state) => state.userDetails.value))
     let contactButtonText = ""
 
     let followButtonText = ""
 
     let extraInformation = ""
-    let dispatch = useDispatch()
-
+    if (details === undefined || details === null) {
+        return <div>loading</div>
+    }
 
     //01: you do not follow him/ but he follow you.
     //10: you follow him but he does not follow you.
     //,etc.
-    if (relationship === 0) {
+    if (details.relationship === 0) {
         followButtonText = "Follow"
-    } else if (relationship === 1) {
+    } else if (details.relationship === 1) {
         followButtonText = "Follow"
         extraInformation = "He follows you."
-    } else if (relationship === 10) {
+    } else if (details.relationship === 10) {
         contactButtonText = "Request"
         followButtonText = "Unfollow"
-    } else if (relationship === 11) {
+    } else if (details.relationship === 11) {
         extraInformation = "He follows you."
         followButtonText = "Unfollow"
         contactButtonText = "Contact"
@@ -46,17 +51,17 @@ export default function (props) {
 
 
     let handleContact = () => {
-        dispatch()
+        
     }
 
 
     let handleFollow = () => {
-        SocialMediaUtil.follow(localStorage.getItem("userId"), userId, dispatch)
+        SocialMediaUtil.follow(localStorage.getItem("userId"), details.userId)
         
 
     }
 
-    imageData = [
+    let imageData = [
         {
             img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
             title: 'Breakfast',
@@ -118,10 +123,10 @@ export default function (props) {
             <Stack direction="row" justifyContent="end" sx={{ width: "60%" }}>
                 <ListItem alignItems="flex-start" >
                     <ListItemAvatar>
-                        <Avatar alt={name} src={pic} />
+                        <Avatar alt={details.userName} src={details.avatar} />
                     </ListItemAvatar>
                     <ListItemText
-                        primary={name}
+                        primary={details.userName}
 
                         secondary={
                             <React.Fragment>
@@ -132,7 +137,7 @@ export default function (props) {
                                     color="text.primary"
                                 >
                                 </Typography>
-                                {intro}
+                                {details.introduction}
                             </React.Fragment>
                         }
                     />
@@ -155,7 +160,7 @@ export default function (props) {
                 <TextField
                     id="outlined-required"
                     label="Gender"
-                    defaultValue={gender}
+                    defaultValue={details.gender}
                     variant="standard"
                     InputProps={{
                         readOnly: true,
@@ -164,7 +169,7 @@ export default function (props) {
                 <TextField
                     id="outlined-required"
                     label="Age"
-                    defaultValue={birthdate}
+                    defaultValue={details.birthdate}
                     variant="standard"
 
                     InputProps={{
@@ -174,7 +179,7 @@ export default function (props) {
                 <TextField
                     id="outlined-required"
                     label="Location"
-                    defaultValue={location}
+                    defaultValue={details.location}
                     variant="standard"
                     InputProps={{
                         readOnly: true,
@@ -182,10 +187,10 @@ export default function (props) {
 
                 />
 
-                {nickname === undefined ? <div></div> : <TextField
+                {details.nickname === undefined ? <div></div> : <TextField
                     id="outlined-required"
                     label="NickName"
-                    defaultValue={nickname}
+                    defaultValue={details.nickname}
                     variant="standard" type="search" />}
 
             </Stack>

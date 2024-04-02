@@ -13,18 +13,6 @@ export default class AccountUtil {
 
   dispatch = useDispatch()
 
-
-  static setUserInfomation(information) {
-    this.dispatch(update(information["intro"],
-    information["name"],
-      information["pic"] ,
-      information["gender"] ,
-      information["birthdate"],
-      information["location"],
-      information["nickname"],
-      information["imageData"],))
-  }
-
   static verifyTokens(setState) {
     if (localStorage.getItem("token") === null) {
       return
@@ -75,8 +63,10 @@ export default class AccountUtil {
         console.log("error")
       }
     }).then(function (response) {
+      console.log(response)
       if (response === undefined|| response.data === undefined) {
         console.log("errror")
+        return
       }
       let responseData = response.data
       if (responseData.code === -1) {
@@ -135,7 +125,7 @@ export default class AccountUtil {
   static registerStep1(data, activeStep, setStep, setBanner, setTransactionNumber) {
     async function post() {
       let response = await axios({
-        url: AccountUtil.getUrlBase() + "/account/register",
+        url: AccountUtil.getUrlBase() + "/account/registerStep1",
         method: 'post',
         data: { userEmail: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), userName: data.get("nickname"), promotion: data.get("selected") },
         transformRequest: [function (data) {
@@ -144,10 +134,11 @@ export default class AccountUtil {
         }],
       }).catch((err) => {
         console.log("Connection error")
+        return
       }).then(
         (response) => {
           console.log(response);
-          if (response.data.code === 1) {
+          if ((response != null && response !== undefined) && response.data != null && response.data !== undefined  && response.data.code === 1) {
             setStep(activeStep + 1)
             setTransactionNumber(response.transactionNumber)
           }
@@ -160,6 +151,32 @@ export default class AccountUtil {
     return post()
   }
 
+  static registerStep3(data, activeStep, setStep, setBanner, setTransactionNumber) {
+    axios({
+        url: AccountUtil.getUrlBase() + "/account/registerStep3",
+        method: 'post',
+        data: { userEmail: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), userName: data.get("nickname"), promotion: data.get("selected") },
+        transformRequest: [function (data) {
+          // transform data -> json
+          return Qs.stringify(data)
+        }],
+      }).catch((err) => {
+        console.log("Connection error")
+        return
+      }).then(
+        (response) => {
+          console.log(response);
+          if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
+            setStep(activeStep + 1)
+            setTransactionNumber(response.transactionNumber)
+          }
+          else {
+            console.log("Please check your input")
+          }
+        }
+      )
+    
+  }
 
 
   static registerValidate() {

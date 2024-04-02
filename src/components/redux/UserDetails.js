@@ -3,27 +3,32 @@ import { createSlice } from '@reduxjs/toolkit'
 export const userDetails = createSlice({
     name: 'userDetails',
     initialState: {
-        value: { "intro":"", "name":"", "pic":"", "gender":"", "birthdate":"", "location":"", "nickname":"", "imageData":[], "relationship":0},
+        value:{}
+
     },
     reducers: {
         updateFollowState:(state, follow)=>{
-            state.value["relationship"] = state.value["relationship"] / 10 + 10*(!follow?1:0)
+            state.relationship = state.relationship / 10 + 10*(!follow?1:0)
         },
-        update: (state, intro, name, pic, gender, birthdate, location, nickname, imageData, relationship) => {
-            state.value["intro"] = intro
-            state.value["name"] = name
-            state.value["pic"] = pic
-            state.value["gender"] = gender
-            state.value["birthdate"] = birthdate
-            state.value["location"] = location
-            state.value["nickname"] = nickname
-            state.value["imageData"] = imageData
-            state.value["relationship"] = relationship
+        update: (state, information) => {
 
+            state.value = information
+            // state.intro = information["introduction"]
+            // state.name = information["name"]
+            // state.avatar = information["avatar"]
+            // state.gender = information["gender"]
+            // state.birthdate = information["dateOfBirth"]
+            // state.location = information["location"]
+            // state.nickname = information["nickname"]
+            // state.imageData = null
+            // state.relationship = information["relationship"]
+            // state.userId = information["userId"]
+
+            // console.log(state.intro)
+            // console.log(information)
         },
         clear: (state) => {
-            state.value = { "intro": "", "name": "", "pic": "", "gender": "", "birthdate": "", "location": "", "nickname": "", imageData: [], relationship:0 }
-        },
+        }
     },
 })
 

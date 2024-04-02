@@ -45,11 +45,11 @@ function App() {
   const [avatar, setAvatar] = useState(null)
   const [badgeContent, setBadgeContent] = useState([])
   const [networkStatus, setNetworkStatus] = useState(false)
-  Notification.requestPermission().then((permission) => {
-    if (permission === "granted") {
-      const notification = new Notification("Welcome!");
-    }
-  })
+  // Notification.requestPermission().then((permission) => {
+  //   if (permission === "granted") {
+  //     const notification = new Notification("Welcome!");
+  //   }
+  // })
 
   if (checkNetworkStatus() === false) {
     return <NetworkError></NetworkError>

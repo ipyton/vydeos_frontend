@@ -13,8 +13,6 @@ import { useDispatch } from 'react-redux';
 
 export default function (props) {
     let { title, introduction, pics, type,userId } = props
-    console.log(props)
-    console.log("+++++++")
     let navigate = useNavigate()
     let avatar = useState(null)
     let miniture = (<div></div>)
@@ -23,8 +21,8 @@ export default function (props) {
         //console.log(setSuggestionOpen)
         console.log(userId)
 
-        MessageUtil.requestUserInfo(dispatch, userId)
-        navigate("/friendInfomation")
+        MessageUtil.requestUserInfo(dispatch, userId, navigate)
+        //navigate("/friendInfomation")
     }
 
     if (type === "contact") {

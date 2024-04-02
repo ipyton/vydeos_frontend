@@ -14,7 +14,6 @@ import SearchItem from './SearchItem';
 
 export default function BasicList() {
   const searchResult = useSelector((state) => state.searchResult.value)
-  console.log(searchResult)
   // [{name:"james",pics:"siehru", intro:"sus", type:"contact"}, {name:"time",pics:"zdxf", intro:"sfs", type:"video"}]
   //pics here means avatar.
   return (

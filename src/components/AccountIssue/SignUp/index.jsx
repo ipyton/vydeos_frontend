@@ -22,6 +22,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { Stack } from '@mui/material';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
+import { useEffect } from 'react';
 
 function Copyright(props) {
   return (
@@ -42,14 +43,25 @@ export default function SignUp(props) {
   const [skipped, setSkipped] = useState(new Set());
   const [receive, setReceive] = useState(false)
   const [selected, setSelected] = useState(false) 
+  const [username, setUserName] = useState("")
+  const [password, setPassword] = useState("")
+  const [validatepw, setValidatepw] = useState("")
   let [activeStep, setActiveStep] = useState(0);
   let navigate = useNavigate()
   const {loginState, setLoginState} = props
   const {setBarState} = props
   const [transactionNumber, setTransactionNumber] = useState("000000")
-
-
-  console.log(loginState)
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      // Custom logic to handle the refresh
+      // Display a confirmation message or perform necessary actions
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
   if (true === loginState) {
     return <Navigate to="/" replace/>
   }
@@ -61,10 +73,13 @@ export default function SignUp(props) {
     setReceive(!receive)
   }
   const handleSubmit = (event) => {
-    event.preventDefault();
+
     const data = new FormData(event.currentTarget);
+    console.log(data)
+      setActiveStep(1)
       if(!validate(data.get('nickname'),data.get('username'), data.get('password')), data.get('selected')) {
-        props.setBarState({...props.barState, message:"please check your input", open:true})
+        // props.setBarState({...props.barState, message:"please check your input", open:true})
+        console.log("error!!")
       }
       else {
         console.log({
@@ -73,17 +88,27 @@ export default function SignUp(props) {
           nickname: data.get('nickname'),
           recv: receive
         });
-        console.log("---------------------")
-        console.log(setBarState)
+
         AccountUtil.registerStep1(data, activeStep, setActiveStep, setBarState, setTransactionNumber)
       }
   };
-  const checkValidationCode = () => {
+
+  const step1=()=> {
+    AccountUtil.registerStep1()
+  }
+  const step2=()=> {
     setActiveStep(activeStep + 1)
+  }
+  const step3=()=> {
+    AccountUtil.registerStep3()
   }
   const isStepOptional = (step) => {
     return false;
   };
+
+  const previousStep = ()=>{
+    setActiveStep(activeStep - 1)
+  }
 
   const isStepSkipped = (step) => {
     return skipped.has(step);
@@ -92,9 +117,9 @@ export default function SignUp(props) {
     navigate("account/login")
   }
   const steps = [
-    'Input Essential Data',
+    'Input Email',
     'Validate',
-    'Input Optional Data',
+    'Input Password',
     'Done',
   ];
   let stepComponent = (<div>something must went wrong!!</div>)
@@ -118,9 +143,9 @@ export default function SignUp(props) {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box component="form" noValidate onSubmit={step1} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} >
+              {/* <Grid item xs={12} >
                 <TextField
                   autoComplete="given-name"
                   name="nickname"
@@ -130,7 +155,7 @@ export default function SignUp(props) {
                   label="nickname"
                   autoFocus
                 />
-              </Grid>
+              </Grid> */}
               <Grid item xs={12}>
                 <TextField
                   required
@@ -139,25 +164,6 @@ export default function SignUp(props) {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox onClick={handleReceive} value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                  name="selected"
-                  id="selected"
                 />
               </Grid>
             </Grid>
@@ -193,12 +199,21 @@ export default function SignUp(props) {
           id="outlined-required"
           label="6 digits"
         />
-        <Button
-              onClick={checkValidationCode}
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >Next Step</Button>
+        <Stack direction="row" spacing={2}>
+          <Button
+            onClick={previousStep}
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >Previous Step</Button>
+          <Button
+            onClick={step2}
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >Next Step</Button>
+
+        </Stack>
     </Stack>)
   } else if (activeStep == 2) {
     stepComponent = (
@@ -210,26 +225,26 @@ export default function SignUp(props) {
         <TextField
           required
           id="outlined-required"
-          label="Location"
+          label="Password"
 
         />
         <TextField
           required
           id="outlined-required"
-          label="Age"
+          label="Retype Password"
 
         />
-        <TextField
-          required
-          id="outlined-required"
-          label="Nickname"
-        />
-      <Button
-            onClick={checkValidationCode}
+  <Stack direction="row" spacing={2}>
+     
+          <Button
+            onClick={step3}
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >Next Step</Button>
+
+  </Stack>
+
 
 
     </Stack>)
