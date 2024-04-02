@@ -7,14 +7,23 @@ import CardMedia from '@mui/material/CardMedia';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AccountUtil from '../../../../util/io_utils/AccountUtil';
+import {useState} from 'react';
+import MessageUtil from '../../../../util/io_utils/MessageUtil';
+import { useDispatch } from 'react-redux';
 
 export default function (props) {
     let { title, introduction, pics, type,userId } = props
+    console.log(props)
+    console.log("+++++++")
     let navigate = useNavigate()
+    let avatar = useState(null)
     let miniture = (<div></div>)
+    let dispatch = useDispatch()
     const handleSuggestionSelection = (event) => {
         //console.log(setSuggestionOpen)
-        AccountUtil.requestUserInfo(localStorage.getItem("token"), userId)
+        console.log(userId)
+
+        MessageUtil.requestUserInfo(dispatch, userId)
         navigate("/friendInfomation")
     }
 

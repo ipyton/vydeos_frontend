@@ -10,13 +10,8 @@ export default class SearchUtil {
 
     static stateSetter(list, dispatch) {
       dispatch(batchAdd(list))
-  
-
     }
 
-    static searchChatContactByName(keyword, setSearchResults, setPagingStatus, pagingStatus){
-      
-    }
 
 
     static mockSearch(dispatch) {
@@ -25,7 +20,7 @@ export default class SearchUtil {
     }
 
     static searchChatContactById(keyword, dispatch) {
-        axios({
+      axios({
             url: SearchUtil.getBaseUrl() + "/search/contactById", 
             method:'post',
             data:{token:localStorage.getItem("token"), userId:keyword},
@@ -33,7 +28,9 @@ export default class SearchUtil {
               // 对 data 进行任意转换处理
               console.log(Qs.stringify(data))
               return Qs.stringify(data)
-          }],
+          }], headers: {
+            token: localStorage.getItem("token"),
+          }
         }).catch(error => {
           if ("Network Error" ===  error.message) {
             //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
@@ -63,7 +60,7 @@ export default class SearchUtil {
                 let result = JSON.parse(responseData.message)
                 let adder = []
                 result.forEach(element => {
-                  adder.push({name:element.userName, intro:element.introduction, pic:element.avatar, type:"contact"})
+                  adder.push({name:element.userName, intro:element.introduction, pic:element.avatar, type:"contact",userId:element.userId, })
                 });
                 SearchUtil.stateSetter(adder, dispatch)
             }
@@ -82,7 +79,9 @@ export default class SearchUtil {
             transformRequest:[function (data) {
               // 对 data 进行任意转换处理
               return Qs.stringify(data)
-          }],
+          }], headers: {
+            token: localStorage.getItem("token"),
+          }
         }).catch(error => {
           if ("Network Error" ===  error.message) {
             //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})

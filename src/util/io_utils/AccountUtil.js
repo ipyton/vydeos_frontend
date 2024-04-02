@@ -12,6 +12,8 @@ export default class AccountUtil {
   }
 
   dispatch = useDispatch()
+
+
   static setUserInfomation(information) {
     this.dispatch(update(information["intro"],
     information["name"],
@@ -65,6 +67,7 @@ export default class AccountUtil {
         // 对 data 进行任意转换处理
         return Qs.stringify(data)
       }],
+
     }).catch(error => {
       if ("Network Error" === error.message) {
         //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
@@ -91,38 +94,41 @@ export default class AccountUtil {
     })
   }
 
-  static requestUserInfo(token, userId) {
-    axios({
-      url: AccountUtil.getUrlBase() + "/account/login",
-      method: 'post',
-      data: { token: token, userId:userId},
-      transformRequest: [function (data) {
-        // 对 data 进行任意转换处理
-        return Qs.stringify(data)
-      }],
-    }).catch(error => {
-      if ("Network Error" === error.message) {
-        //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
-        // setNetworkErr(true)
-        console.log("error")
-      }
-    }).then(function (response) {
-      if (response === undefined || response.data === undefined) {
-        console.log("errror")
-      }
-      let responseData = response.data
-      if (responseData.code === -1) {
-        //props.setBarState({...props.barState, message:responseData.message, open:true})
-      }
-      else if (responseData.code === 1) {
+  // static requestUserInfo(userId) {
+  //   console.log("token" + localStorage.getItem("token"))
+  //   axios({
+  //     url: AccountUtil.getUrlBase() + "/account/userIntro",
+  //     method: 'post',
+  //     data: { token: localStorage.getItem("token"), userIdTofollow:userId},
+  //     transformRequest: [function (data) {
+  //       // 对 data 进行任意转换处理
+  //       return Qs.stringify(data)
+  //     }], headers: {
+  //       token: localStorage.getItem("token"),
+  //     }
+  //   }).catch(error => {
+  //     if ("Network Error" === error.message) {
+  //       //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
+  //       // setNetworkErr(true)
+  //       console.log("error")
+  //     }
+  //   }).then(function (response) {
+  //     if (response === undefined || response.data === undefined) {
+  //       console.log("errror")
+  //     }
+  //     let responseData = response.data
+  //     if (responseData.code === -1) {
+  //       //props.setBarState({...props.barState, message:responseData.message, open:true})
+  //     }
+  //     else if (responseData.code === 1) {
 
-      }
-      else {
-        //props.setBarState({...props.barState, message:responseData.message, open:true})
-      }
-      //setNetworkErr(false)
-    })
-  }
+  //     }
+  //     else {
+  //       //props.setBarState({...props.barState, message:responseData.message, open:true})
+  //     }
+  //     //setNetworkErr(false)
+  //   })
+  // }
 
 
 

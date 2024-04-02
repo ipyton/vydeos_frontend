@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import SearchItem from './SearchItem';
 
 
@@ -16,6 +16,7 @@ export default function BasicList() {
   const searchResult = useSelector((state) => state.searchResult.value)
   console.log(searchResult)
   // [{name:"james",pics:"siehru", intro:"sus", type:"contact"}, {name:"time",pics:"zdxf", intro:"sfs", type:"video"}]
+  //pics here means avatar.
   return (
     <Box sx={{
       width: '100%', bgcolor: 'background.paper', display: "flex",
@@ -23,6 +24,7 @@ export default function BasicList() {
       justifyContent: "center",
       alignItems: "center"
     }}>
+    
 
       <List sx={{ height: "100%", width: "50%" }}>
         {

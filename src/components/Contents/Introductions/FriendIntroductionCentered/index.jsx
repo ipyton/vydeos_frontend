@@ -18,6 +18,7 @@ import SocialMediaUtil from "../../../../util/io_utils/SocialMediaUtil";
 export default function (props) {
 
     let { userId, intro, name, pic, gender, birthdate, location, nickname, imageData, relationship } = useSelector((state) => state.userDetails.value)
+    console.log(useSelector((state) => state.userDetails.value))
     let contactButtonText = ""
 
     let followButtonText = ""
