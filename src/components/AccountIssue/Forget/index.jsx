@@ -7,13 +7,31 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
+import { Navigate, useNavigate } from 'react-router-dom'
 
-const steps = ['Input Details', 'Validate', "New Password",'Success'];
+
+import { useEffect } from 'react';
+
 
 export default function HorizontalLinearStepper() {
+  const steps = ['Input Details', 'Validate', "New Password", 'Success'];
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      // Custom logic to handle the refresh
+      // Display a confirmation message or perform necessary actions
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+
   let stepComponent = <div>must be something wrong</div>
+  let navigation = useNavigate()
   const isStepOptional = (step) => {
     return false;
   };
@@ -33,8 +51,13 @@ export default function HorizontalLinearStepper() {
     setSkipped(newSkipped);
   };
 
+  const returnToMenu = () => {
+    navigation("/login")
+
+  }
+
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setActiveStep(activeStep - 1);
   };
 
   const handleSkip = () => {
@@ -52,13 +75,13 @@ export default function HorizontalLinearStepper() {
     });
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
+  const returnToLogin = () => {
+    navigation("/login")
   };
-  
+
   if (activeStep == 0) {
-    stepComponent = (        
-    <React.Fragment>
+    stepComponent = (
+      <React.Fragment>
         <Typography sx={{ mt: 2, mb: 1 }}>Input Your Email</Typography>
         <TextField
           required
@@ -68,8 +91,8 @@ export default function HorizontalLinearStepper() {
         <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
           <Button
             color="inherit"
-            disabled={activeStep === 0}
-            onClick={handleBack}
+            //disabled={activeStep === 0}
+            onClick={returnToMenu}
             sx={{ mr: 1 }}
           >
             Back
@@ -88,8 +111,8 @@ export default function HorizontalLinearStepper() {
       </React.Fragment>)
   }
   else if (activeStep == 1) {
-    stepComponent = (        
-    <React.Fragment>
+    stepComponent = (
+      <React.Fragment>
         <Typography sx={{ mt: 2, mb: 1 }}>We have sent the email to your mail box. Enter the code you received.</Typography>
         <TextField
           required
@@ -116,66 +139,59 @@ export default function HorizontalLinearStepper() {
             {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
           </Button>
         </Box>
-      </React.Fragment>)
-  } 
-  else if (activeStep== 2) {
-    stepComponent = (        
-        <React.Fragment>
-            
-            <Stack sx={{}}>
-            <Typography sx={{ mt: 2, mb: 1 }}>Please enter your new password.</Typography>
-            <TextField
-          required
-          id="outlined-required"
-          label="Enter Your New Password."
-          type='password'
-        />
-            <TextField
-          required
-          id="outlined-required"
-          label="Enter It Again."
-          type='password'
-        />
-            </Stack>
-            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-              <Button
-                color="inherit"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Back
-              </Button>
-              <Box sx={{ flex: '1 1 auto' }} />
-              {isStepOptional(activeStep) && (
-                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                  Skip
-                </Button>
-              )}
-    
-              <Button onClick={handleNext}>
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-              </Button>
-            </Box>
-          </React.Fragment>)
+      </React.Fragment>
+    )
+  }
+  else if (activeStep == 2) {
+    stepComponent = (
+      <React.Fragment>
+
+        <Stack sx={{}}>
+          <Typography sx={{ mt: 2, mb: 1 }}>Please enter your new password.</Typography>
+          <TextField
+            required
+            id="outlined-required"
+            label="Enter Your New Password."
+            type='password'
+          />
+          <TextField
+            required
+            id="outlined-required"
+            label="Enter It Again."
+            type='password'
+          />
+        </Stack>
+        <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+          <Box sx={{ flex: '1 1 auto' }} />
+          {isStepOptional(activeStep) && (
+            <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
+              Skip
+            </Button>
+          )}
+
+          <Button onClick={handleNext}>
+            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+          </Button>
+        </Box>
+      </React.Fragment>
+    )
   }
   else if (activeStep == 3) {
-    stepComponent = ( <React.Fragment>
+    stepComponent = (
+      <React.Fragment>
         <Typography sx={{ mt: 2, mb: 1 }}>
           You have change your password Successfully!
         </Typography>
-
-
-
         <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
           <Box sx={{ flex: '1 1 auto' }} />
-          <Button onClick={handleReset}>Reset</Button>
+          <Button onClick={returnToLogin}>BackToLogin</Button>
         </Box>
-      </React.Fragment>)
+      </React.Fragment>
+    )
   }
 
   return (
-    <Box sx={{ width: '60%', marginLeft:"20%", marginTop:"5%"}}>
+    <Box sx={{ width: '60%', marginLeft: "20%", marginTop: "5%" }}>
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};

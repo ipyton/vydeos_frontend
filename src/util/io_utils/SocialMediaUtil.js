@@ -6,7 +6,7 @@ import axios from "axios"
 
 export default class SocialMediaUtil {
 
-    static getUrlBase(){
+    static getUrlBase() {
         return "localhost:8080"
     }
     dispath = useDispatch()
@@ -17,7 +17,7 @@ export default class SocialMediaUtil {
             {
                 url: SocialMediaUtil.getUrlBase() + "/follow",
                 method: "post",
-                data: { token: localStorage.getItem("token"), sender:sender, receiver:receiver},
+                data: { token: localStorage.getItem("token"), sender: sender, receiver: receiver },
                 transformRequest: [function (data) {
                     return qs.stringify(data)
                 }],
@@ -29,7 +29,7 @@ export default class SocialMediaUtil {
         ).catch(error => {
             console.log()
         }).then(response => {
-            setFollowState=true
+            setFollowState = true
         }).catch(error => {
             console.log("get message by Id error")
         }).then(() => {
@@ -37,7 +37,7 @@ export default class SocialMediaUtil {
         })
     }
 
-    static getFollowState(sender,receiver, setFollowState) {
+    static getFollowState(sender, receiver, setFollowState) {
         axios({
             url: SocialMediaUtil.getUrlBase() + "/getFollowState",
             method: "post",
@@ -50,12 +50,12 @@ export default class SocialMediaUtil {
                 tokenL: localStorage.getItem("token"),
             }
 
-        }).catch(()=>{
+        }).catch(() => {
             console.log("follow error")
-        }).then((response)=> {
+        }).then((response) => {
             this.dispath(updateFollowState(response.data))
             // write to storage.
-        }).catch(()=>{
+        }).catch(() => {
 
         })
     }

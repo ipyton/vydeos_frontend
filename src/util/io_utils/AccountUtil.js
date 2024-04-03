@@ -64,7 +64,7 @@ export default class AccountUtil {
       }
     }).then(function (response) {
       console.log(response)
-      if (response === undefined|| response.data === undefined) {
+      if (response === undefined || response.data === undefined) {
         console.log("errror")
         return
       }
@@ -122,60 +122,59 @@ export default class AccountUtil {
 
 
 
-  static registerStep1(data, activeStep, setStep, setBanner, setTransactionNumber) {
-    async function post() {
-      let response = await axios({
-        url: AccountUtil.getUrlBase() + "/account/registerStep1",
-        method: 'post',
-        data: { userEmail: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), userName: data.get("nickname"), promotion: data.get("selected") },
-        transformRequest: [function (data) {
-          // transform data -> json
-          return Qs.stringify(data)
-        }],
-      }).catch((err) => {
-        console.log("Connection error")
-        return
-      }).then(
-        (response) => {
-          console.log(response);
-          if ((response != null && response !== undefined) && response.data != null && response.data !== undefined  && response.data.code === 1) {
-            setStep(activeStep + 1)
-            setTransactionNumber(response.transactionNumber)
-          }
-          else {
-            console.log("Please check your input")
-          }
+  static registerStep1(activeStep, setStep, userId) {
+    axios({
+      url: AccountUtil.getUrlBase() + "/account/registerStep1",
+      method: 'post',
+      data: { userId: userId },
+      transformRequest: [function (data) {
+        // transform data -> json
+        return Qs.stringify(data)
+      }],
+    }).catch((err) => {
+      console.log("Connection error")
+      return
+    }).then(
+      (response) => {
+        console.log(response);
+        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
+          setStep(activeStep + 1)
         }
-      )
-    }
-    return post()
+        else {
+          console.log("Please check your input")
+        }
+      }
+    )
+
   }
 
-  static registerStep3(data, activeStep, setStep, setBanner, setTransactionNumber) {
+  static registerStep2(activeStep, setStep, code) {
+    setStep(activeStep + 1)
+  }
+
+  static registerStep3(activeStep, setStep, password, token) {
     axios({
-        url: AccountUtil.getUrlBase() + "/account/registerStep3",
-        method: 'post',
-        data: { userEmail: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), userName: data.get("nickname"), promotion: data.get("selected") },
-        transformRequest: [function (data) {
-          // transform data -> json
-          return Qs.stringify(data)
-        }],
-      }).catch((err) => {
-        console.log("Connection error")
-        return
-      }).then(
-        (response) => {
-          console.log(response);
-          if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
-            setStep(activeStep + 1)
-            setTransactionNumber(response.transactionNumber)
-          }
-          else {
-            console.log("Please check your input")
-          }
+      url: AccountUtil.getUrlBase() + "/account/registerStep3",
+      method: 'post',
+      data: { password: EncryptionUtil.encryption(password), userId:token },
+      transformRequest: [function (data) {
+        // transform data -> json
+        return Qs.stringify(data)
+      }],
+    }).catch((err) => {
+      console.log("Connection error")
+      return
+    }).then(
+      (response) => {
+        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
+          setStep(activeStep + 1)
         }
-      )
-    
+        else {
+          console.log("Please check your input")
+        }
+      }
+    )
+
   }
 
 

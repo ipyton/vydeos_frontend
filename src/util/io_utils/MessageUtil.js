@@ -140,7 +140,7 @@ export default class MessageUtil {
             }
             else if (responseData.code === 1) {
                 //MessageUtil.setUserIntro(JSON.parse(responseData.message), dispatch)
-                localforage.setItem("userIntro", JSON.parse(responseData.message) ).then(()=>{
+                localforage.setItem("userIntro", JSON.parse(responseData.message)).then(() => {
                     navigator("/friendInfomation")
                 })
 

@@ -7,12 +7,12 @@ import CardMedia from '@mui/material/CardMedia';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AccountUtil from '../../../../util/io_utils/AccountUtil';
-import {useState} from 'react';
+import { useState } from 'react';
 import MessageUtil from '../../../../util/io_utils/MessageUtil';
 import { useDispatch } from 'react-redux';
 
 export default function (props) {
-    let { title, introduction, pics, type,userId } = props
+    let { title, introduction, pics, type, userId } = props
     let navigate = useNavigate()
     let avatar = useState(null)
     let miniture = (<div></div>)

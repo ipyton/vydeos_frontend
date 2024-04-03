@@ -8,7 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import Footer from './components/Footer';
 import { stepButtonClasses } from '@mui/material';
 import IOUtil from './util/ioUtil';
-import PictureUtil from './util/pictureUtil';
+import PictureUtil from './util/io_utils/FileUtil';
 import { BrowserRouter } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import NetworkError from './components/Errors/NetworkError';
@@ -20,7 +20,7 @@ import EndpointNotAvailableError from './components/Errors/EndpointNotAvailableE
 import AccountIssue from './components/AccountIssue';
 import AccountUtil from './util/io_utils/AccountUtil';
 
-function init(setLoginState, setAvatar, setBadgeContent){
+function init(setLoginState, setAvatar, setBadgeContent) {
   IOUtil.verifyTokens().then(x => {
     if (x) {
       setLoginState(true)
@@ -41,7 +41,7 @@ function checkEndpointStauts() {
 
 
 function App() {
-  const [login,setLogin] = useState(false)
+  const [login, setLogin] = useState(false)
   const [avatar, setAvatar] = useState(null)
   const [badgeContent, setBadgeContent] = useState([])
   const [networkStatus, setNetworkStatus] = useState(false)
@@ -65,26 +65,26 @@ function App() {
 
   if (login == false) {
     console.log(login)
-    return (<AccountIssue loginState={login} setLoginState= {setLogin}></AccountIssue>)
+    return (<AccountIssue loginState={login} setLoginState={setLogin}></AccountIssue>)
   }
 
 
   if (login === true)
     return (
-    <ThemeProvider theme={defaultTheme}>
-    <BrowserRouter>
-    <Box sx={{ display: 'flex' }}>
-      <Header setLogin={setLogin} avatar={avatar} setAvatar={setAvatar}  badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
-      <Box width="100%"  justifyContent="center" alignItems="center" marginTop="5%">
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Contents login={login} setLogin={setLogin}></Contents>
-      </LocalizationProvider>
-      <Footer description='good' title='morning'></Footer>
-      </Box>
-      </Box>
-    </BrowserRouter>
-    </ThemeProvider>
-  );
+      <ThemeProvider theme={defaultTheme}>
+        <BrowserRouter>
+          <Box sx={{ display: 'flex' }}>
+            <Header setLogin={setLogin} avatar={avatar} setAvatar={setAvatar} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
+            <Box width="100%" justifyContent="center" alignItems="center" marginTop="5%">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Contents login={login} setLogin={setLogin}></Contents>
+              </LocalizationProvider>
+              <Footer description='good' title='morning'></Footer>
+            </Box>
+          </Box>
+        </BrowserRouter>
+      </ThemeProvider>
+    );
   return <div> loading</div>
 }
 

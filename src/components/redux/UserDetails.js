@@ -3,12 +3,12 @@ import { createSlice } from '@reduxjs/toolkit'
 export const userDetails = createSlice({
     name: 'userDetails',
     initialState: {
-        value:{}
+        value: {}
 
     },
     reducers: {
-        updateFollowState:(state, follow)=>{
-            state.relationship = state.relationship / 10 + 10*(!follow?1:0)
+        updateFollowState: (state, follow) => {
+            state.relationship = state.relationship / 10 + 10 * (!follow ? 1 : 0)
         },
         update: (state, information) => {
 

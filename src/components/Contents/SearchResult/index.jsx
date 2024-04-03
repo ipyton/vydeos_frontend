@@ -23,7 +23,7 @@ export default function BasicList() {
       justifyContent: "center",
       alignItems: "center"
     }}>
-    
+
 
       <List sx={{ height: "100%", width: "50%" }}>
         {
