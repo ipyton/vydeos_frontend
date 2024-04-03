@@ -23,7 +23,7 @@ export default class SearchUtil {
     axios({
       url: SearchUtil.getBaseUrl() + "/search/contactById",
       method: 'post',
-      data: { token: localStorage.getItem("token"), userId: keyword },
+      data: { userId: keyword },
       transformRequest: [function (data) {
         // 对 data 进行任意转换处理
         console.log(Qs.stringify(data))
@@ -75,7 +75,7 @@ export default class SearchUtil {
     axios({
       url: SearchUtil.getBaseUrl() + "/search/contacts",
       method: 'post',
-      data: { token: localStorage.getItem("token"), userId: keyword },
+      data: {  userId: keyword },
       transformRequest: [function (data) {
         // 对 data 进行任意转换处理
         return Qs.stringify(data)

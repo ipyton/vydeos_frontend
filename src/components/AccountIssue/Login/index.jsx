@@ -53,24 +53,6 @@ export default function Login(props) {
   if (true === login) {
     return <Navigate to="/" replace />
   }
-  else {
-    if (localStorage.getItem("token") !== null) {
-      IOUtil.verifyTokens(localStorage.getItem("token")).catch(error => {
-        if ("Network Error" === error.message) {
-          props.setBarState({ ...props.barState, message: "network" + error, open: true })
-        }
-        setNetworkErr(true)
-      }).then(response => {
-        if (response) {
-          setLogin(true)
-        }
-        else {
-          localStorage.removeItem("token")
-        }
-        setNetworkErr(false)
-      })
-    }
-  }
 
   const handleSelection = (event) => {
     setSelected(!selected)

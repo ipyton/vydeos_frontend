@@ -16,13 +16,17 @@ import { update, clear } from "../../../redux/UserDetails"
 import SocialMediaUtil from "../../../../util/io_utils/SocialMediaUtil";
 import localforage from "localforage";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function (props) {
     let [details, setDetails] = useState(null)
+    let navigate = useNavigate()
+
+
     localforage.getItem("userIntro").then((res) => {
         setDetails(res)
     })
-
+    
     let contactButtonText = ""
 
     let followButtonText = ""
@@ -31,12 +35,16 @@ export default function (props) {
     if (details === undefined || details === null) {
         return <div>loading</div>
     }
+    //console.log(details)
 
+    //console.log(details.relationship)
     //01: you do not follow him/ but he follow you.
     //10: you follow him but he does not follow you.
     //,etc.
     if (details.relationship === 0) {
         followButtonText = "Follow"
+        extraInformation = ""
+        contactButtonText = ""
     } else if (details.relationship === 1) {
         followButtonText = "Follow"
         extraInformation = "He follows you."
@@ -49,16 +57,25 @@ export default function (props) {
         contactButtonText = "Contact"
     }
 
-
     let handleContact = () => {
-        
+        localforage.setItem("nowContact", details.userId)
+        navigate("/chat")
+    }
+    if (details.userId === localStorage.getItem("userId")) {
+        followButtonText = ""
     }
 
-
     let handleFollow = () => {
-        SocialMediaUtil.follow(localStorage.getItem("userId"), details.userId)
-        
 
+        if(Math.floor(details.relationship/10) === 1) {
+            details.relationship = details.relationship % 10
+            console.log(localStorage.getItem("userId"), details.userId)
+            SocialMediaUtil.unfollow(localStorage.getItem("userId"), details.userId, details, setDetails)
+        } else {
+            console.log(localStorage.getItem("userId"), details.userId)
+            SocialMediaUtil.follow(localStorage.getItem("userId"), details.userId, details, setDetails)
+            details.relationship += 10
+        }
     }
 
     let imageData = [

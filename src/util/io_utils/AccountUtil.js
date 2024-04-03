@@ -24,12 +24,11 @@ export default class AccountUtil {
       transformRequest: [function (data) {
         return Qs.stringify(data)
       }],
-      sychronous: true,
       headers: {
-        token: localStorage.getItem("token"),
+        tokens: localStorage.getItem("token"),
       }
     }).catch(err => {
-      console.log("error")
+      console.log(err)
     }).then(
       response => {
         console.log(response)
@@ -37,8 +36,9 @@ export default class AccountUtil {
           console.log("login error")
           return
         }
-
+        console.log(response)
         let responseData = response.data
+        localStorage.setItem("userId",response.data.message)
         setState(responseData.code === 1)
         console.log(responseData.code === 1)
       }
@@ -74,7 +74,7 @@ export default class AccountUtil {
       }
       else if (responseData.code === 1) {
         localStorage.setItem("token", responseData.message)
-        localStorage.setItem("email", data.get("email"))
+        localStorage.setItem("userId", data.get("email"))
         setLogin(true)
       }
       else {

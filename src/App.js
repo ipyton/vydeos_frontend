@@ -63,8 +63,8 @@ function App() {
     AccountUtil.verifyTokens(setLogin)
   }
 
-  if (login == false) {
-    console.log(login)
+  if (login === false) {
+    //console.log(login)
     return (<AccountIssue loginState={login} setLoginState={setLogin}></AccountIssue>)
   }
 
