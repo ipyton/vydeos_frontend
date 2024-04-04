@@ -23,15 +23,27 @@ const Div = styled('div')(({ theme }) => ({
   }));
   
 
+
 export default function Chat() {
   let height = window.innerHeight * 0.8
+  const [userRecords, setUserRecords] = useState([])
+  const [chatRecords, setChatRecords] = useState({})
+  const [sideBarSelector, setSideBarSelector] = useState("")
+  const afterGetting = () => {
+
+  }
+
+  useEffect(() => {
+    MessageUtil.getNewestMessages(userRecords, setUserRecords, chatRecords, setChatRecords, afterGetting);
+  });
+
+
   let friendList = [{username:" ", userAvatar:"", recentMessages:[]}]
     // userId
-  var sideBarSelector = useState("")
   return (
     <Stack sx={{marginLeft:'15%',width:'70%',marginTop:3, height:height,}} direction="row" justify="center" spacing={2}>
-      <SideBar select={sideBarSelector}></SideBar>
-      <MessageList select={sideBarSelector}></MessageList>
+      <SideBar select={sideBarSelector} setSelect={setSideBarSelector} userRecords={userRecords} setUserRecords={setUserRecords} chatRecords={chatRecords} setChatRecords={setChatRecords}></SideBar>
+      <MessageList select={sideBarSelector} userRecords={userRecords} setUserRecords={setUserRecords} chatRecords={chatRecords} setChatRecords={setChatRecords}></MessageList>
     </Stack>
   );
 }

@@ -2,6 +2,7 @@ import localforage from "localforage"
 import qs from 'qs'
 import axios from "axios"
 import { update, clear, updateFollowState } from "../../components/redux/UserDetails"
+import { resolve } from "babel-standalone"
 export default class MessageUtil {
 
     static getUrlBase() {
@@ -17,6 +18,8 @@ export default class MessageUtil {
         console.log(information)
         dispatch(update(information))
     }
+
+
     static updateMessage(response) {
         // find the newest message.
         response = JSON.parse(response.data)
@@ -45,7 +48,9 @@ export default class MessageUtil {
         ).catch(error => {
             console.log()
         }).then(response => {
-            MessageUtil.updateMessage(response)
+            //MessageUtil.updateMessage(response)
+            console.log(response)
+
         }).catch(error => {
             console.log("get message by Id error")
         }).then(() => {
@@ -53,53 +58,155 @@ export default class MessageUtil {
         })
     }
 
-    static getNewestMessages(userId, fromTimestamp, navigator) {
-        axios(
-            {
-                url: MessageUtil.getUrlBase() + "/getNewestMessage",
-                method: "post",
-                data: { token: localStorage.getItem("token"), userId: userId, timstamp: fromTimestamp },
-                transformRequest: [function (data) {
-                    return qs.stringify(data)
-                }],
-                //synchronous: true,
-                header: {
-                    tokenL: localStorage.getItem("token"),
+    static getNewestMessages(userRecords, setUserRecords, chatRecords, setChatRecords, afterGetting) {
+
+        localforage.getItem("chatLastUpdate").then(timestamp => {
+            if (timestamp === undefined || timestamp === null) {
+                return
+            }
+            axios(
+                {
+                    url: MessageUtil.getUrlBase() + "/getNewestMessage",
+                    method: "post",
+                    data: { userId: userId, timstamp: timestamp },
+                    transformRequest: [function (data) {
+                        return qs.stringify(data)
+                    }],
+                    //synchronous: true,
+                    header: {
+                        token: localStorage.getItem("token"),
+                    }
                 }
-            }
-        ).catch(err => {
-            console.log("requestNewMessageError")
-        }).then(
-            response => {
-                MessageUtil.updateMessage(response)
-            }
-        ).catch(err => {
-            console.log("parse Error")
-        }).then(
-            () => {
-                navigator("chat")
-            }
-        )
+            ).catch(err => {
+                console.log("requestNewMessageError")
+            }).then(
+                async (response) => {
+                    //MessageUtil.updateMessage(response)
+                    //console.log(response)
+
+                    if (!response) {
+                        return
+                    }
+                    if (!response.data) {
+                        console.log("error")
+                        return
+                    }
+
+                    if (response.data.code != 1) {
+                        console.log("logic error")
+                        return
+                    }
+
+                    const messages = JSON.parse(response.data.message)
+                    let records_map = {}
+
+                    //dispatch messages to their sender in a map. 
+                    let maxTimestamp = -1
+                    for (let i = 0; i < messages.size(); i++) {
+                        let userId = messages[i].userId;
+                        if (records_map[userId]) {
+                            records_map[userId].push(messages[i])
+                        } else {
+                            records_map[userId] = [messages[i]]
+                        }
+
+                        maxTimestamp = max(messages[i].timestamp)
+                    }
+
+                    await localforage.setItem("chatLastUpdate", maxTimestamp)
+
+
+                    //write to the database
+                    for (let [key, value] of records_map) {
+                        let result = await localforage.getItem(key + "_records")
+                        if (!result) {
+                            result = { count: value.size(), chats: value }
+                        }
+                        else {
+                            result.count++
+                            result.chats = [result.chats, ...value]
+                        }
+                        await localforage.setItem(key + "_records")
+                    }
+
+
+
+                    // get chat record contacts lists
+                    await localforage.getItem("contactCursor").then((userId) => {
+                        if (!userId) {
+                            localforage.getItem("contactRecordList").then((result) => {
+                                setListItem(result)
+                            })
+                            return
+                        }
+                        localforage.getItem("contactRecordList").catch(() => {
+                        }).then(async (result) => {
+                            if (!result) {
+                                return
+                            }
+                            let contains = -1
+                            for (let i = 0; i < result.length; i++) {
+                                if (result[i].userId === userId) {
+                                    contains = i;
+                                }
+                            }
+
+
+                            // contactDetails
+                            // contactRecordList [{userId:userId, avatar:avatar, userName}, xxx, xxx]
+                            if (contains === -1) {//query from localforage and set information
+                                let detail = await localforage.getItem(userId + "_detail")
+                                if (!detail) {
+                                    console.log("he is not your friend!!!!")
+                                    return
+                                }
+                                result = [...result, { userName: detail.userName, avatar: detail.avatar, userId: detail.userId }]
+                                setUserRecords(result)
+                                localforage.setItem("contactRecordList", result)
+                            }
+                            else {
+                                result = [...result, { userName: detail.userName, avatar: detail.avatar, userId: detail.userId }]
+                                setUserRecords(result)
+                                localforage.setItem("contactRecordList", result)
+                            }
+                        }
+                        )
+                    })
+                }
+            ).catch(err => {
+                console.log("parse Error")
+            }).then(
+                () => {
+                    navigator("chat")
+                }
+            )
+
+
+
+        })
     }
 
-    static sendMessage(userId, sendTo, fromTimestamp) {
+    static sendMessage(userId, sendTo, content) {
         axios(
             {
                 url: MessageUtil.getUrlBase() + "/sendMessage",
                 method: "post",
-                data: { userId: userId, receiverId: sendTo, timstamp: fromTimestamp },
+                data: { userId: userId, receiverId: sendTo, content: content },
                 transformRequest: [function (data) {
                     return qs.stringify(data)
                 }],
                 //synchronous: true,
                 header: {
-                    tokenL: localStorage.getItem("token"),
+                    token: localStorage.getItem("token"),
                 }
             }
         ).catch(err => {
             console.log("requestNewMessageError")
         }).then(
             response => {
+
+
+
                 MessageUtil.updateMessage(response)
             }
         ).catch(err => {
@@ -129,7 +236,7 @@ export default class MessageUtil {
         }).catch(error => {
             console.log(error)
         }).then(function (response) {
-            if (response === undefined || response.data === undefined) {
+            if (!response) {
                 console.log("error")
                 return
             }

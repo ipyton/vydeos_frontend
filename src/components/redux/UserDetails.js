@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+//this function is deprecated.
 export const userDetails = createSlice({
     name: 'userDetails',
     initialState: {

@@ -22,10 +22,12 @@ export default function (props) {
     let [details, setDetails] = useState(null)
     let navigate = useNavigate()
 
-
-    localforage.getItem("userIntro").then((res) => {
-        setDetails(res)
+    React.useEffect(()=> {
+        localforage.getItem("userIntro").then((res) => {
+            setDetails(res)
+        })
     })
+
     
     let contactButtonText = ""
 
@@ -35,8 +37,6 @@ export default function (props) {
     if (details === undefined || details === null) {
         return <div>loading</div>
     }
-    //console.log(details)
-
     //console.log(details.relationship)
     //01: you do not follow him/ but he follow you.
     //10: you follow him but he does not follow you.
@@ -58,7 +58,10 @@ export default function (props) {
     }
 
     let handleContact = () => {
-        localforage.setItem("nowContact", details.userId)
+        if (userId !== localStorage.getItem("userId")) {
+            return 
+        }
+        localforage.setItem("contactCursor", details.userId)
         navigate("/chat")
     }
     if (details.userId === localStorage.getItem("userId")) {
@@ -69,12 +72,13 @@ export default function (props) {
 
         if(Math.floor(details.relationship/10) === 1) {
             details.relationship = details.relationship % 10
-            console.log(localStorage.getItem("userId"), details.userId)
             SocialMediaUtil.unfollow(localStorage.getItem("userId"), details.userId, details, setDetails)
         } else {
-            console.log(localStorage.getItem("userId"), details.userId)
             SocialMediaUtil.follow(localStorage.getItem("userId"), details.userId, details, setDetails)
             details.relationship += 10
+        }
+        if (details.relationship === 11 ) {
+            localforage.setItem(details.userId+ "_friend", {userId: details.userId, name:details.name, avatar: details.avatar}) 
         }
     }
 

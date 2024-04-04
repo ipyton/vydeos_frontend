@@ -69,9 +69,7 @@ export default class SocialMediaUtil {
             if (response.data.code === 1) {
                 localforage.getItem("userIntro").then((res) => {
                     res.relationship = res.relationship % 10
-                    console.log(res.relationship)
                     details.relationship = res.relationship % 10
-                    console.log(details)
                     localforage.setItem("userIntro", res)
                     setDetails(details)
                 })

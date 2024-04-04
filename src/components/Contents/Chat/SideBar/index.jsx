@@ -15,33 +15,26 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-export default function SideBar() {
+export default function SideBar(props) {
     //let a = [1,2,3,5,6,7,8,21,32,3,1,3,12,3,1,3,1,3,1,231,31,3,1,3,12,3,123,123,12,3]
-    let [listItem,setListItem] = useState([])
-
-    
-
-
-    localforage.getItem("chatlist").catch(()=>{
-    }).then((result)=>{
-      if(result === undefined)
-        setListItem([])
-    })
+    const [ select, setSelect , userRecords, setUserRecords, chatRecords, setChatRecords ] = props
+    //let [listItem,setListItem] = useState([])
 
     let onClick= (event, index)=> {
       return ()=>{
-        let mid = listItem[index]
+        let mid = userRecords[index]
         mid["dark"] = true
         setListItem([mid, ...listItem.slice(0, index), ...listItem.slice(index + 1)])
-      }
+        setSelect(userRecords[index].userId)
+      } 
     }
+
+    
     if (listItem.size === 0) {
       return <Stack sx={{ width: "30%", boxShadow: 1, borderRadius: 2 }} spacing={2}>
         <List sx={{ width: '100%', bgcolor: 'background.paper', overflow: 'scroll' }}>
               <div>making some friends first</div>
         </List>
-
-
       </Stack>
 
     }
