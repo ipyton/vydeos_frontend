@@ -36,10 +36,11 @@ import ContentPaste from '@mui/icons-material/ContentPaste';
 import Paper from '@mui/material/Paper';
 import MenuList from '@mui/material/MenuList';
 import localforage from 'localforage';
+import { SingleMessage } from './SingleMessage';
 
 
 export function MessageBox(props) {
-  let [refresh] = props
+  let [refresh, notificationsAnchorEl, menuId, notificationsOpen] = props
   let [message, setMessage] = useState([])
   React.useEffect(()=> {
     let listToShow = []
@@ -53,6 +54,10 @@ export function MessageBox(props) {
         })
       })
     });
+  }).catch(err=> {
+    console.log("messages set error")
+  }).then(()=> {
+    setMessage(listToShow)
   })
 
   },[refresh])
@@ -75,7 +80,7 @@ export function MessageBox(props) {
     socket.send({userID:88488, time:9238042, method:"get"})
   },1000)
 
-    return (    
+    return (     
     <Menu
         PaperProps={{  
           style: {  
@@ -97,18 +102,7 @@ export function MessageBox(props) {
         onClose={handleNotificationClose}
         
        >
-            <MenuItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-              </ListItemAvatar>
-              <ListItemText 
-              primary="Sam Smith"
-              secondary={
-                <React.Fragment>
-                  {" — I'll be in your neighborhood doing"}
-                </React.Fragment>
-              }>Name</ListItemText>
-            </MenuItem>
+        <SingleMessage></SingleMessage>
             
            
       </Menu>)

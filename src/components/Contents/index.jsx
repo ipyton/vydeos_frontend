@@ -17,23 +17,17 @@ import VideoList from "./VideoList"
 import SearchResult from "./SearchResult"
 import FriendIntro from "./FriendList/FriendIntro"
 import FriendIntroductionCentered from "./Introductions/FriendIntroductionCentered"
-import './App.css';
-import Header from './components/Header';
-import Contents from './components/Contents';
+import "../../App.css"
+import Header from "../Header"
 import { useEffect, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import Footer from './components/Footer';
+import Footer from "../Footer"
 import { stepButtonClasses } from '@mui/material';
-import IOUtil from './util/ioUtil';
-import PictureUtil from './util/io_utils/FileUtil';
-import { BrowserRouter } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
-import NetworkError from './components/Errors/NetworkError';
+import IOUtil from '../../util/ioUtil';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import Login from './components/AccountIssue/Login';
 
 const defaultTheme = createTheme();
 
@@ -72,7 +66,7 @@ export default function Contents(props) {
         < ThemeProvider theme={defaultTheme} >
             <BrowserRouter>
                 <Box sx={{ display: 'flex' }}>
-                    <Header setLogin={setLogin} avatar={avatar} setAvatar={setAvatar} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
+                    <Header avatar={avatar} setAvatar={setAvatar} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
                     <Box width="100%" justifyContent="center" alignItems="center" marginTop="5%">
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <div>

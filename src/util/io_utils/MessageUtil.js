@@ -64,6 +64,7 @@ export default class MessageUtil {
             if (timestamp === undefined || timestamp === null) {
                 return
             }
+
             axios(
                 {
                     url: MessageUtil.getUrlBase() + "/getNewestMessage",
@@ -92,7 +93,7 @@ export default class MessageUtil {
                         return
                     }
 
-                    if (response.data.code != 1) {
+                    if (response.data.code !== 1) {
                         console.log("logic error")
                         return
                     }
@@ -110,7 +111,7 @@ export default class MessageUtil {
                             records_map[userId] = [messages[i]]
                         }
 
-                        maxTimestamp = max(messages[i].timestamp)
+                        maxTimestamp = Math.max(messages[i].timestamp, maxTimestamp)
                     }
 
                     await localforage.setItem("chatLastUpdate", maxTimestamp)
@@ -133,7 +134,9 @@ export default class MessageUtil {
                     await localforage.getItem("contactCursor").then((userId) => {
                         if (!userId) {
                             localforage.getItem("contactRecordList").then((result) => {
-                                setListItem(result)
+
+
+
                             })
                             return
                         }
@@ -150,8 +153,8 @@ export default class MessageUtil {
                             }
                             // contactDetails
                             // contactRecordList [{userId:userId, avatar:avatar, userName}, xxx, xxx]
+                            let detail = await localforage.getItem(userId + "_detail")
                             if (contains === -1) {//query from localforage and set information
-                                let detail = await localforage.getItem(userId + "_detail")
                                 if (!detail) {
                                     console.log("he is not your friend!!!!")
                                     return
