@@ -35,12 +35,35 @@ import ContentCopy from '@mui/icons-material/ContentCopy';
 import ContentPaste from '@mui/icons-material/ContentPaste';
 import Paper from '@mui/material/Paper';
 import MenuList from '@mui/material/MenuList';
+import localforage from 'localforage';
 
 
 export function MessageBox(props) {
+  let [refresh] = props
+  let [message, setMessage] = useState([])
+  React.useEffect(()=> {
+    let listToShow = []
+  localforage.getItem("contacts", (contacts)=> {
+    contacts.forEach(async element => {
+      await localforage.getItem( element.userId + "_lastCheck",(last_check_timestamp) => {
+        element.messages.forEach((message) => {
+          if (message.timestamp > last_check_timestamp) {
+            listToShow.push(message)
+          }
+        })
+      })
+    });
+  })
+
+  },[refresh])
+
+
+  let onclick = (idx) => {
+    localforage.setItem(message[idx].userId + "_lastCheck")
+  }
+
   let socket = new WebSocket("ws://localhost:8080/notification/88488")
   //socket.binaryType = "text frames"
-
   socket.onopen = function(e) {
     console.log("ws open successfully!!!!")    
   }

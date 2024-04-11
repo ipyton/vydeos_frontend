@@ -1,9 +1,7 @@
-import { useState } from "react"
 import Item from "./Item"
 import {Route, Routes, useNavigate, Navigate, redirect, BrowserRouter,} from 'react-router-dom'
 import NotFound from "./NotFound"
 import React from "react"
-import SignUp from "../AccountIssue/SignUp"
 import { Snackbar } from "@mui/material"
 import UserInfo from "./UserInfo"
 import TextEditor from "./TextEditor"
@@ -19,57 +17,105 @@ import VideoList from "./VideoList"
 import SearchResult from "./SearchResult"
 import FriendIntro from "./FriendList/FriendIntro"
 import FriendIntroductionCentered from "./Introductions/FriendIntroductionCentered"
-import { useDispatch } from "react-redux"
+import './App.css';
+import Header from './components/Header';
+import Contents from './components/Contents';
+import { useEffect, useState } from 'react';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import Footer from './components/Footer';
+import { stepButtonClasses } from '@mui/material';
+import IOUtil from './util/ioUtil';
+import PictureUtil from './util/io_utils/FileUtil';
+import { BrowserRouter } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import NetworkError from './components/Errors/NetworkError';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import Login from './components/AccountIssue/Login';
+
+const defaultTheme = createTheme();
+
 export default function Contents(props) {
+    //state bar
     const [state, setState] = React.useState({
         open: false,
         vertical: 'top',
         horizontal: 'center',
         message:"helloworld"
       });
-      const { vertical, horizontal, open, message } = state;
     
-      const handleClose = () => {
-        setState({ ...state, open: false });
-      };
-    //   const dispatch = useDispatch
-      
+    const [avatar, setAvatar] = useState(null)
+    const [badgeContent, setBadgeContent] = useState([])
+    const [networkStatus, setNetworkStatus] = useState(false)
+
+
+    const { vertical, horizontal, open, message } = state;
+    const handleClose = () => {
+    setState({ ...state, open: false });
+    }; 
+
+    const [refresh,setRefresh] = useState(false)
+
+    const {worker,setWorker} = useState(null)
+    useEffect(()=> {
+        setWorker(new Worker("NotificationReceiver.js"))
+        worker.onmessage = (e) => {
+            setRefresh(!refresh)
+        }
+    })
+
+
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
     return (
-        <div>
-            <div>
-            <Routes>
-                <Route path="/" element={<Item barState={state} setBarState={setState} status={props}/>}></Route>
-                {/* <Route path="/signup" element={<SignUp barState={state} setBarState={setState} status={props}/>}></Route> */}
-                <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
-                <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
-                <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
-                <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}></Chat>}></Route>
-                <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
-                <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props}></NetworkError>}></Route>
-                <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>
-                {/* <Route path="/contacts" element={<Contacts barState={state} setBarState={setState} status={props}></Contacts>}></Route> */}
-                <Route path="/error" element={<NetworkError></NetworkError>}></Route>
-                <Route path="/appstore" element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
-                <Route path="/longvideos" element={<LongVideos setBarState={setState} status={props}></LongVideos> }></Route>
-                <Route path="/upload" element={<UploadFile setBarState={setState} status={props}></UploadFile> }></Route>
-                <Route path="/videolist" element={<VideoList setBarState={setState} status={props}></VideoList> }></Route>
-                <Route path="/searchresult" element={<SearchResult> </SearchResult>}></Route>
-                <Route path="/friendInfomation" element={<FriendIntroductionCentered ></FriendIntroductionCentered>}></Route>
-                <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props}/>} ></Route>
-                
-            </Routes>
-            </div>
-            <div>
-            <Snackbar
-                anchorOrigin={{ vertical, horizontal }}
-                open={open}
-                onClose={handleClose}
-                message={message}
-                key={vertical + horizontal}
-            />
-            </div>
-        </div>
+        < ThemeProvider theme={defaultTheme} >
+            <BrowserRouter>
+                <Box sx={{ display: 'flex' }}>
+                    <Header setLogin={setLogin} avatar={avatar} setAvatar={setAvatar} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
+                    <Box width="100%" justifyContent="center" alignItems="center" marginTop="5%">
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <div>
+                                <div>
+                                    <Routes>
+                                        <Route path="/" element={<Item barState={state} setBarState={setState} status={props} />}></Route>
+                                        {/* <Route path="/signup" element={<SignUp barState={state} setBarState={setState} status={props}/>}></Route> */}
+                                        <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
+                                        <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
+                                        <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
+                                        <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}></Chat>}></Route>
+                                        <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
+                                        <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
+                                        <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>
+                                        {/* <Route path="/contacts" element={<Contacts barState={state} setBarState={setState} status={props}></Contacts>}></Route> */}
+                                        <Route path="/error" element={<NetworkError></NetworkError>}></Route>
+                                        <Route path="/appstore" element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
+                                        <Route path="/longvideos" element={<LongVideos setBarState={setState} status={props}></LongVideos>}></Route>
+                                        <Route path="/upload" element={<UploadFile setBarState={setState} status={props}></UploadFile>}></Route>
+                                        <Route path="/videolist" element={<VideoList setBarState={setState} status={props}></VideoList>}></Route>
+                                        <Route path="/searchresult" element={<SearchResult> </SearchResult>}></Route>
+                                        <Route path="/friendInfomation" element={<FriendIntroductionCentered ></FriendIntroductionCentered>}></Route>
+                                        <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
+
+                                    </Routes>
+                                </div>
+                                <div>
+                                    <Snackbar
+                                        anchorOrigin={{ vertical, horizontal }}
+                                        open={open}
+                                        onClose={handleClose}
+                                        message={message}
+                                        key={vertical + horizontal}
+                                    />
+                                </div>
+                            </div>
+                        </LocalizationProvider>
+                        <Footer description='good' title='morning'></Footer>
+                    </Box>
+                </Box>
+            </BrowserRouter>
+        </ThemeProvider >
+
 
     )
     

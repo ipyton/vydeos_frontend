@@ -17,20 +17,20 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function SideBar(props) {
     //let a = [1,2,3,5,6,7,8,21,32,3,1,3,12,3,1,3,1,3,1,231,31,3,1,3,12,3,123,123,12,3]
-    const [ select, setSelect , userRecords, setUserRecords, chatRecords, setChatRecords ] = props
+    const [ select, setSelect , userRecords, setUserRecords, chatRecords, setChatRecords] = props
     //let [listItem,setListItem] = useState([])
 
     let onClick= (event, index)=> {
       return ()=>{
         let mid = userRecords[index]
         mid["dark"] = true
-        setListItem([mid, ...listItem.slice(0, index), ...listItem.slice(index + 1)])
+        setUserRecords([mid, ...userRecords.slice(0, index), ...userRecords.slice(index + 1)])
         setSelect(userRecords[index].userId)
       } 
     }
 
     
-    if (listItem.size === 0) {
+    if (userRecords.size === 0) {
       return <Stack sx={{ width: "30%", boxShadow: 1, borderRadius: 2 }} spacing={2}>
         <List sx={{ width: '100%', bgcolor: 'background.paper', overflow: 'scroll' }}>
               <div>making some friends first</div>
@@ -43,7 +43,7 @@ export default function SideBar(props) {
     return (
         <Stack sx={{width:"30%", boxShadow:1,  borderRadius: 2}} spacing={2}>
             <List sx={{ width: '100%', bgcolor: 'background.paper',overflow:'scroll'}}>
-            {listItem.map((content, idx)=>{return <Contact onClick={onClick(idx)} content={content} ></Contact>})}
+            {userRecords.map((content, idx)=>{return <Contact onClick={onClick(idx)} content={content} ></Contact>})}
             </List>
 
         </Stack>

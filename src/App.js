@@ -20,14 +20,6 @@ import EndpointNotAvailableError from './components/Errors/EndpointNotAvailableE
 import AccountIssue from './components/AccountIssue';
 import AccountUtil from './util/io_utils/AccountUtil';
 
-function init(setLoginState, setAvatar, setBadgeContent) {
-  IOUtil.verifyTokens().then(x => {
-    if (x) {
-      setLoginState(true)
-    }
-  })
-}
-
 
 const defaultTheme = createTheme();
 
@@ -71,19 +63,7 @@ function App() {
 
   if (login === true)
     return (
-      <ThemeProvider theme={defaultTheme}>
-        <BrowserRouter>
-          <Box sx={{ display: 'flex' }}>
-            <Header setLogin={setLogin} avatar={avatar} setAvatar={setAvatar} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
-            <Box width="100%" justifyContent="center" alignItems="center" marginTop="5%">
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Contents login={login} setLogin={setLogin}></Contents>
-              </LocalizationProvider>
-              <Footer description='good' title='morning'></Footer>
-            </Box>
-          </Box>
-        </BrowserRouter>
-      </ThemeProvider>
+      <Contents ></Contents>
     );
   return <div> loading</div>
 }

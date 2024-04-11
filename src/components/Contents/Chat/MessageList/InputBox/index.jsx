@@ -22,34 +22,35 @@ export default function (props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [text, setText] = React.useState(null);
+  const [select, userRecords, setUserRecords, chatRecords, setChatRecords] = props
 
 
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
 
   };
+
   const handleSend = () => {
-    if (!text) {
+    if ( !text ) {
       return
     }
-    MessageUtil.sendMessage()
-    console.log(text);
+    MessageUtil.sendMessage(localStorage.getItem("email"), select, text)
   }
+    
   const picUploadHandler = () => {
-    console.log("sdubfiuebfuie")
+    setText("{attachment}")
   }
   const voiUploadHandler = () => {
-    console.log("sdubfiuebfuie")
+    setText("{attachment}")
   }
   const vidUploadHandler = () => {
-    console.log("sdubfiuebfuie")
+    setText("{attachment}")
   }
-
-
 
   return (
     <Stack direction="row" sx={{ width: "90%", marginLeft: 2, marginBottom: 2 }} spacing={2}>

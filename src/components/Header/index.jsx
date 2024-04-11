@@ -113,12 +113,12 @@ export default function Header(props) {
   const [open, setOpen] = React.useState(false);
   const [category, setCategory] = React.useState(false)
   let [categorySelected, setCategorySelected] = React.useState([false, false, false, false, false])
-
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
   const languageMenuOpen = Boolean(languageAnchorEl)
   const notificationsOpen = Boolean(notificationsAnchorEl)
+  const [refresh] = props
   const dispatch = useDispatch()
 
   

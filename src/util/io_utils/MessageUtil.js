@@ -58,7 +58,7 @@ export default class MessageUtil {
         })
     }
 
-    static getNewestMessages(userRecords, setUserRecords, chatRecords, setChatRecords, afterGetting) {
+    static getNewestMessages(userId, timestamp) {
 
         localforage.getItem("chatLastUpdate").then(timestamp => {
             if (timestamp === undefined || timestamp === null) {
@@ -68,7 +68,7 @@ export default class MessageUtil {
                 {
                     url: MessageUtil.getUrlBase() + "/getNewestMessage",
                     method: "post",
-                    data: { userId: userId, timstamp: timestamp },
+                    data: { "userId": userId, "timstamp": timestamp },
                     transformRequest: [function (data) {
                         return qs.stringify(data)
                     }],
@@ -129,8 +129,6 @@ export default class MessageUtil {
                         await localforage.setItem(key + "_records")
                     }
 
-
-
                     // get chat record contacts lists
                     await localforage.getItem("contactCursor").then((userId) => {
                         if (!userId) {
@@ -150,8 +148,6 @@ export default class MessageUtil {
                                     contains = i;
                                 }
                             }
-
-
                             // contactDetails
                             // contactRecordList [{userId:userId, avatar:avatar, userName}, xxx, xxx]
                             if (contains === -1) {//query from localforage and set information
@@ -161,12 +157,10 @@ export default class MessageUtil {
                                     return
                                 }
                                 result = [...result, { userName: detail.userName, avatar: detail.avatar, userId: detail.userId }]
-                                setUserRecords(result)
                                 localforage.setItem("contactRecordList", result)
                             }
                             else {
                                 result = [...result, { userName: detail.userName, avatar: detail.avatar, userId: detail.userId }]
-                                setUserRecords(result)
                                 localforage.setItem("contactRecordList", result)
                             }
                         }
@@ -204,9 +198,6 @@ export default class MessageUtil {
             console.log("requestNewMessageError")
         }).then(
             response => {
-
-
-
                 MessageUtil.updateMessage(response)
             }
         ).catch(err => {
@@ -216,8 +207,6 @@ export default class MessageUtil {
                 navigator("chat")
             }
         )
-
-
     }
 
     static requestUserInfo(dispatch, userId, navigator) {
