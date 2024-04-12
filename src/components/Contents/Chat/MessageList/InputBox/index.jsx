@@ -22,10 +22,7 @@ export default function (props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [text, setText] = React.useState(null);
-  const [select, userRecords, setUserRecords, chatRecords, setChatRecords] = props
-
-
-
+  const {select, userRecords, setUserRecords, chatRecords, setChatRecords} = props
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -88,7 +85,6 @@ export default function (props) {
 
           <label htmlFor="uploadVoi">
             <MenuItem onClick={handleClose}><KeyboardVoiceIcon></KeyboardVoiceIcon>Voices</MenuItem>
-
           </label>
 
         </Menu>

@@ -58,7 +58,7 @@ export default function (props) {
     }
 
     let handleContact = () => {
-        if (userId !== localStorage.getItem("userId")) {
+        if (details.userId !== localStorage.getItem("userId")) {
             return 
         }
         localforage.setItem("contactCursor", details.userId)

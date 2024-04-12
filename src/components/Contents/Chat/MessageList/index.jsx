@@ -20,14 +20,14 @@ const Item = styled(Paper)(({ theme }) => ({
 	textAlign: 'right',
 	color: theme.palette.text.secondary,
 	flexGrow: 2,
-  }));
-  
+}));
+
 
 export default function (props) {
-	let messages = [{from_nickName:"xxx", to_nickName:"xxx", content:"xxx", time:"xxx", position:"right", from_username:"", to_username:"", type:""},]
-	const [select, userRecords, setUserRecords, chatRecords, setChatRecords] = props
-	
-	useEffect(()=>{
+	let messages = [{ from_nickName: "xxx", to_nickName: "xxx", content: "xxx", time: "xxx", position: "right", from_username: "", to_username: "", type: "" },]
+	let {select, userRecords, setUserRecords, chatRecords, setChatRecords} = props
+
+	useEffect(() => {
 		let messageList = []
 		if (!select) {
 			return <div> Start/Select a conversation first!</div>
@@ -38,20 +38,20 @@ export default function (props) {
 					messageList = [...sendto, ...sendFrom]
 				})
 			})
-			messageList.sort((a,b) => {
+			messageList.sort((a, b) => {
 				return a.sendTime - b.sendTime
 			})
 			setChatRecords(messageList)
 
 		}
-	}, [select]) 
+	}, [select])
 
 
-	
-	return (<Stack sx={{width:"70%", boxShadow:1}}> 
-	
+
+	return (<Stack sx={{ width: "70%", boxShadow: 1 }}>
+
 		<Header></Header>
 		<Message chatRecords={chatRecords}  ></Message>
-		<InputBox chatRecords={chatRecords}  setChatRecords={setChatRecords} ></InputBox>
+		<InputBox chatRecords={chatRecords} setChatRecords={setChatRecords} ></InputBox>
 	</Stack>)
 }

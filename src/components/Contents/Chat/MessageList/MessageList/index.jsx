@@ -20,9 +20,9 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function (props ) {
-  let messages = props.messageList;
+  let messages = props.chatRecords;
   console.log(messages);
-  let setMessages = props.setMessageList;
+  let setMessages = props.setChatRecords;
   return (
     <Stack sx={{ borderRadius: 2,boxShadow:1, overflow:'scroll'}} >
           {

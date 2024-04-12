@@ -52,11 +52,12 @@ export default function Contents(props) {
 
     const [refresh,setRefresh] = useState(false)
 
-    const {worker,setWorker} = useState(null)
+    const worker = new Worker("./webworkers/NotificationReceiver.js")
     useEffect(()=> {
-        setWorker(new Worker("NotificationReceiver.js"))
         worker.onmessage = (e) => {
             setRefresh(!refresh)
+            console.log(e)
+            console.log("updated")
         }
     })
 

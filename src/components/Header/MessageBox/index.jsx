@@ -39,7 +39,7 @@ import localforage from 'localforage';
 import { SingleMessage } from './SingleMessage';
 
 
-export function MessageBox(props) {
+export default function MessageBox(props) {
   let [refresh, notificationsAnchorEl, menuId, notificationsOpen] = props
   let [message, setMessage] = useState([])
   React.useEffect(()=> {

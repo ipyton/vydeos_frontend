@@ -99,10 +99,10 @@ const AppBar = styled(MuiAppBar, {
 //   catch(exception) {
 //     console.log("message sending error")
 //   }
-
 // },1000)
-
 }
+
+
 export default function Header(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -118,7 +118,7 @@ export default function Header(props) {
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
   const languageMenuOpen = Boolean(languageAnchorEl)
   const notificationsOpen = Boolean(notificationsAnchorEl)
-  const [refresh] = props
+  //const [refresh] = props
   const dispatch = useDispatch()
 
   
