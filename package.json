@@ -62,7 +62,8 @@
     ]
   },
   "devDependencies": {
-    "video.js": "^8.6.1"
+    "video.js": "^8.6.1",
+    "worker-loader": "^3.0.8"
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",

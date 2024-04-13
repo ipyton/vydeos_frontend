@@ -82,6 +82,9 @@ export default function Settings(props) {
   let handleSave= (event)=> {
     console.log(items)
   }
+  let handleInvalidCache = (event) => {
+
+  }
 
   return (
     <div sx={{top:"1%"}}>
@@ -94,11 +97,15 @@ export default function Settings(props) {
           items={items}
           strategy={verticalListSortingStrategy}
         >
+          {
+            
+          }
           {items.map(id => <ListItem key={id} id={id} name={id +"uigafdiub"} picture ={"pictures"}/>)}
         </SortableContext>
       </DndContext>
 
-      <Button variant="contained" onClick={handleSave} sx={{left:"50%"}}>Save</Button>
+      <Button variant="contained" onClick={handleSave} sx={{left:"40%"}}>Save</Button>
+      <Button variant="contained" onClick={handleInvalidCache} sx={{ left: "50%" }}>Invalid Cache</Button>
 
 
 

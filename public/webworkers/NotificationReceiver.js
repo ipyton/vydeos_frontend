@@ -19,7 +19,6 @@
 //         worker.postMessage({ command: 'timeout:start', timeout: timeout, id: id });
 //         return id;
 //     },
-
 //     // 监听worker 里面的定时器发送的message 然后执行回调函数
 //     onMessage: function (e) {
 //         switch (e.data.message) {
@@ -47,11 +46,24 @@
 //     },
 // };
 
+importScripts("localforage.min.js")
 
 setTimeout(function () {
     console.log("sending message")
-    postMessage({ userID: 88488, time: 9238042, method: "get" })
+    localforage.getItem("userId").then(userId => {
+        if (!userId) {
+            return
+        }
+        localforage.getItem("last_update").then(res => {
+            MessageUtil.getNewestMessages(userId, res)
+        })
+    }
+    )
+    //postMessage("gooooooooooooooo")
+
 }, 1000)
+
+
 
 
 //worker.onmessage = workerTimer.onMessage.bind(workerTimer);

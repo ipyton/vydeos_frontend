@@ -18,16 +18,16 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function SideBar(props) {
     //let a = [1,2,3,5,6,7,8,21,32,3,1,3,12,3,1,3,1,3,1,231,31,3,1,3,12,3,123,123,12,3]
     console.log(props)
-    let {select, setSelect, userRecords, setUserRecords, chatRecords, setChatRecords} = props
+    let {select, setSelect, userRecords, setUserRecords} = props
     //let [listItem,setListItem] = useState([])
 
-    let onClick= (event, index)=> {
-      // return ()=>{
-      //   let mid = userRecords[index]
-      //   mid["dark"] = true
-      //   setUserRecords([mid, ...userRecords.slice(0, index), ...userRecords.slice(index + 1)])
-      //   setSelect(userRecords[index].userId)
-      // } 
+    let onClick= (event, idx)=> {
+      return ()=>{
+        let mid = userRecords[idx]
+        mid["dark"] = true
+        setUserRecords([mid, ...userRecords.slice(0, idx), ...userRecords.slice(idx + 1)])
+        setSelect(idx)
+      } 
     }
 
     
@@ -43,9 +43,9 @@ export default function SideBar(props) {
 
     return (
         <Stack sx={{width:"30%", boxShadow:1,  borderRadius: 2}} spacing={2}>
-            <List sx={{ width: '100%', bgcolor: 'background.paper',overflow:'scroll'}}>
-            {userRecords.map((content, idx)=>{return <Contact onClick={onClick(idx)} content={content} ></Contact>})}
-            </List>
+        <List sx={{ width: '100%', bgcolor: 'background.paper', overflow: 'scroll' }}>
+          {userRecords.map((content, idx) => { return <Contact onClick={onClick(idx)} content={content} ></Contact> })}
+        </List>
 
         </Stack>
 

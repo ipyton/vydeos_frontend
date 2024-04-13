@@ -17,18 +17,19 @@ import SocialMediaUtil from "../../../../util/io_utils/SocialMediaUtil";
 import localforage from "localforage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Navigation } from "@mui/icons-material";
 
 export default function (props) {
     let [details, setDetails] = useState(null)
     let navigate = useNavigate()
 
-    React.useEffect(()=> {
+    React.useEffect(() => {
         localforage.getItem("userIntro").then((res) => {
             setDetails(res)
         })
     })
 
-    
+
     let contactButtonText = ""
 
     let followButtonText = ""
@@ -57,12 +58,13 @@ export default function (props) {
         contactButtonText = "Contact"
     }
 
-    let handleContact = () => {
-        if (details.userId !== localStorage.getItem("userId")) {
-            return 
+    const handleContact = () => {
+        if (details.userId === localStorage.getItem("userId")) {
+            return
         }
         localforage.setItem("contactCursor", details.userId)
         navigate("/chat")
+        console.log("navigate")
     }
     if (details.userId === localStorage.getItem("userId")) {
         followButtonText = ""
@@ -70,15 +72,15 @@ export default function (props) {
 
     let handleFollow = () => {
 
-        if(Math.floor(details.relationship/10) === 1) {
+        if (Math.floor(details.relationship / 10) === 1) {
             details.relationship = details.relationship % 10
             SocialMediaUtil.unfollow(localStorage.getItem("userId"), details.userId, details, setDetails)
         } else {
             SocialMediaUtil.follow(localStorage.getItem("userId"), details.userId, details, setDetails)
             details.relationship += 10
         }
-        if (details.relationship === 11 ) {
-            localforage.setItem(details.userId+ "_friend", {userId: details.userId, name:details.name, avatar: details.avatar}) 
+        if (details.relationship === 11) {
+            localforage.setItem(details.userId + "_friend", { userId: details.userId, name: details.name, avatar: details.avatar })
         }
     }
 
