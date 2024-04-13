@@ -8,7 +8,8 @@ import { ListItemButton } from '@mui/material';
 
 
 export default function Contact(props) {
-    let {date, content, name, avatar} = props.content
+  console.log(props)
+    let { userId, name, avatar} = props.content
   return (     
     <ListItemButton onClick={props.onClick} sx={{width:"100%"}} >
     <ListItem sx={{width:"100%"}}>
@@ -17,7 +18,7 @@ export default function Contact(props) {
             <BeachAccessIcon />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary={content} secondary={date} />
+        <ListItemText primary={name} secondary={userId} />
     </ListItem>
     </ListItemButton>
 )

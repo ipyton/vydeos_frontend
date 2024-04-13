@@ -19,6 +19,7 @@ import Login from './components/AccountIssue/Login';
 import EndpointNotAvailableError from './components/Errors/EndpointNotAvailableError';
 import AccountIssue from './components/AccountIssue';
 import AccountUtil from './util/io_utils/AccountUtil';
+import localforage from 'localforage';
 
 
 const defaultTheme = createTheme();
@@ -60,7 +61,7 @@ function App() {
     return (<AccountIssue loginState={login} setLoginState={setLogin}></AccountIssue>)
   }
 
-
+  localforage.clear()
   if (login === true)
     return (
       <Contents ></Contents>

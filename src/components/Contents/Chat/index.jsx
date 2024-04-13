@@ -42,20 +42,26 @@ export default function Chat(props) {
       if (!res) res=[]
       localforage.getItem(
         "contactCursor"
-      ).then(cursor => {
+      ).then(async cursor => {
         if (!cursor) console.log("can not find the user")
         else {
-          res.forEach((ele)=>{
+          res.forEach(async (ele,idx)=>{
+            console.log(ele)
+            console.log(idx)
+            if (!ele || !ele.userId) {
+              return
+            }
             if (ele.userId === cursor) {
-              res.splice()
+              res = [res[idx],...res.slice(0, idx), res.slice(idx)]
               setUserRecords(res)
+              await localforage.setItem("recent_contacts", res)
               return
             }
           })
-          
           localforage.getItem("friendList").then(list => {
+            console.log(list)
             if (!list) return
-            res[cursor] = { "userId": list[cursor].userId, "userName": list[cursor].userName, "avatar": list[cursor].avatar }
+            res.push({ "userId": list[cursor].userId, "name": list[cursor].name, "avatar": list[cursor].avatar })
             localforage.setItem("recent_contacts", res).then(() => {
               console.log("add success")
             }).then(async () => {
@@ -65,7 +71,11 @@ export default function Chat(props) {
             })
           })
         }
+      
+      localforage.removeItem("contactCursor")
       setUserRecords(res)
+      setSideBarSelector(cursor)
+
       })
     })
 

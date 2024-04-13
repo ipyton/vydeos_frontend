@@ -17,6 +17,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function SideBar(props) {
     //let a = [1,2,3,5,6,7,8,21,32,3,1,3,12,3,1,3,1,3,1,231,31,3,1,3,12,3,123,123,12,3]
+    console.log("useruser")
     console.log(props)
     let {select, setSelect, userRecords, setUserRecords} = props
     //let [listItem,setListItem] = useState([])

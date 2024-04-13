@@ -27,8 +27,7 @@ export default function (props) {
         localforage.getItem("userIntro").then((res) => {
             setDetails(res)
         })
-    })
-
+    },[])
 
     let contactButtonText = ""
 
@@ -80,8 +79,20 @@ export default function (props) {
             details.relationship += 10
         }
         if (details.relationship === 11) {
-            localforage.setItem(details.userId + "_friend", { userId: details.userId, name: details.name, avatar: details.avatar })
+            localforage.getItem("friendList").then(async res=>{
+                if (!res) res = {}
+                res[details.userId] = { userId: details.userId, name: details.name, avatar: details.avatar }
+                await localforage.setItem("friendList", res)
+            })
+        } else {
+
+            localforage.getItem("friendList").then(async res => {
+                if (!res) res = {}
+                res[details.userId] = null
+                await localforage.setItem("friendList", res)
+            })
         }
+        setDetails(details)
     }
 
     let imageData = [
