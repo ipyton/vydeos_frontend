@@ -48,6 +48,8 @@
 
 importScripts("localforage.min.js")
 
+
+
 setTimeout(function () {
     console.log("sending message")
     localforage.getItem("userId").then(userId => {

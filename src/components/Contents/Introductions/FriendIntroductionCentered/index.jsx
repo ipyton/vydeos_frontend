@@ -66,23 +66,31 @@ export default function (props) {
         contactButtonText = "Contact"
     }
 
-    const handleContact = () => {
-        if (details.userId === localStorage.getItem("userId")) {
+    const handleContact = async () => {
+        if (details.userId === await localforage.getItem("userId")) {
             return
         }
         localforage.setItem("contactCursor", details.userId)
         navigate("/chat")
         console.log("navigate")
     }
-    if (details.userId === localStorage.getItem("userId")) {
-        followButtonText = ""
-    }
+
+    localforage.getItem("userId").then(res=> {
+        if(res === details.userId) {
+            followButtonText = ""
+        }
+    })
+
 
     let handleFollow = () => {
         if (Math.floor(relationship / 10) === 1) {
-            SocialMediaUtil.unfollow(localStorage.getItem("userId"), details.userId, details, setRelationship)
+            localStorage.getItem("userId").then(res => {
+                SocialMediaUtil.unfollow(res, details.userId, details, setRelationship)
+            })
         } else {
-            SocialMediaUtil.follow(localStorage.getItem("userId"), details.userId, details, setRelationship)
+            localStorage.getItem("userId").then(res => {
+                SocialMediaUtil.follow(res, details.userId, details, setRelationship)
+            })
         }
         setDetails(details)
     }
@@ -177,7 +185,7 @@ export default function (props) {
                 </ButtonGroup>
             </Stack>
             <Stack>
-                {localStorage.getItem("id")}
+                {localforage.getItem("id")}
             </Stack>
             <Stack>
                 {extraInformation}

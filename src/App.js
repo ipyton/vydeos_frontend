@@ -60,8 +60,6 @@ function App() {
     //console.log(login)
     return (<AccountIssue loginState={login} setLoginState={setLogin}></AccountIssue>)
   }
-
-  //localforage.clear()
   if (login === true)
     return (
       <Contents ></Contents>

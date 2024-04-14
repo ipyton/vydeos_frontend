@@ -10,6 +10,11 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import MessageUtil from '../../../../../util/io_utils/MessageUtil';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import IconButton from '@mui/material/IconButton';
+import localforage from 'localforage';
+
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -37,9 +42,11 @@ export default function (props) {
       return
     }
     console.log(text)
-    setChatRecords([{},...chatRecords]) 
-    MessageUtil.sendMessage(localStorage.getItem("email"), select, text)
-  }
+    setText("")
+    localforage.getItem("userId").then(res=> {
+      MessageUtil.sendMessage(res, select, text, "text", chatRecords, setChatRecords)
+    })
+    }
     
   const picUploadHandler = () => {
     setText("{attachment}")
@@ -55,7 +62,7 @@ export default function (props) {
   return (
     <Stack direction="row" sx={{ width: "90%", marginLeft: 2, marginBottom: 2 }} spacing={2}>
       <div>
-        <Button
+        {/* <Button
           id="basic-button"
           aria-controls={open ? 'basic-menu' : undefined}
           aria-haspopup="true"
@@ -63,7 +70,14 @@ export default function (props) {
           onClick={handleClick}
         >
           Attachments
-        </Button>
+        </Button> */}
+        <IconButton aria-label="Example"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}>
+          <AttachFileIcon></AttachFileIcon>
+        </IconButton>
         <Menu
           id="basic-menu"
           anchorEl={anchorEl}
@@ -94,7 +108,7 @@ export default function (props) {
       </div>
       <TextField sx={{ width: "70%" }} onChange={(event) => {
         setText(event.target.value);
-      }} />
+      }} value={text}/>
       <Button sx={{ width: "20%" }} variant="outlined" onClick={handleSend}>Send</Button>
     </Stack>
 

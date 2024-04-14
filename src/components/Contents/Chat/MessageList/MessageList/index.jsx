@@ -46,11 +46,8 @@ export default function (props) {
       <div className="messagesWrapper" >
         {
           chatRecords.map((x, idx) => {
-            let flag = "right"
-            if (x % 2 == 0) {
-              flag = "left";
-            }
-            return (<SingleMessage content={x} position={flag}></SingleMessage>)
+            
+            return (<SingleMessage content={x}></SingleMessage>)
           })
         }
 

@@ -52,9 +52,11 @@ export default function Chat(props) {
               return
             }
             if (ele.userId === cursor) {
-            res = [res[i], ...res.slice(0, i), res.slice(i)]
+            res = [res[i], ...res.slice(0, i), ...res.slice(i + 1)]
             setUserRecords(res)
             await localforage.setItem("recent_contacts", res)
+            console.log(ele.userId)
+            console.log(cursor)
             return
             }
           }
@@ -74,7 +76,6 @@ export default function Chat(props) {
       localforage.removeItem("contactCursor")
       setUserRecords(res)
       setSideBarSelector(cursor)
-
       })
     })
 

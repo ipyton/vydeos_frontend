@@ -183,12 +183,12 @@ export default class MessageUtil {
         })
     }
 
-    static sendMessage(userId, sendTo, content, setChatRecords) {
+    static sendMessage(userId, sendTo, content, type, chatRecords, setChatRecords) {
         axios(
             {
                 url: MessageUtil.getUrlBase() + "/sendMessage",
                 method: "post",
-                data: { userId: userId, receiverId: sendTo, content: content },
+                data: { userId: userId, receiverId: sendTo, content: content, type: type },
                 transformRequest: [function (data) {
                     return qs.stringify(data)
                 }],
@@ -201,13 +201,21 @@ export default class MessageUtil {
             console.log("requestNewMessageError")
         }).then(
             response => {
-                MessageUtil.updateMessage(response)
+                if (!response) {
+                    if (response.data.code === 1) {
+                        let time = response.data.timestamp
+                        console.log(time)
+                        setChatRecords([...chatRecords, { position: "right", type: type, content: content, timestamp: time }])
+                    }
+
+
+                }
             }
         ).catch(err => {
             console.log("parse Error")
         }).then(
             () => {
-                
+
             }
         )
     }

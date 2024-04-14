@@ -4,6 +4,7 @@ import EncryptionUtil from "./EncryptionUtil"
 
 import { update } from "../../components/redux/UserDetails"
 import { useDispatch } from "react-redux"
+import localforage from "localforage"
 
 export default class AccountUtil {
 
@@ -30,7 +31,7 @@ export default class AccountUtil {
     }).catch(err => {
       console.log(err)
     }).then(
-      response => {
+      async response => {
         console.log(response)
         if (response === undefined || response.data === undefined) {
           console.log("login error")
@@ -38,7 +39,7 @@ export default class AccountUtil {
         }
         console.log(response)
         let responseData = response.data
-        localStorage.setItem("userId",response.data.message)
+        await localforage.setItem("userId",response.data.message)
         setState(responseData.code === 1)
         console.log(responseData.code === 1)
       }

@@ -39,6 +39,7 @@ import SearchAndSuggestion from './SearchAndSuggestion';
 import SearchUtil from '../../util/io_utils/SearchUtil';
 import { useDispatch } from 'react-redux';
 import {clear} from "../../components/redux/searchResult"
+import localforage from 'localforage';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -192,6 +193,7 @@ export default function Header(props) {
 
   const handleLogout = (event) => {
     localStorage.clear()
+    localforage.clear()
     props.setLogin(false)
     props.setBadgeContent(null)
     navigate("/login")
