@@ -13,7 +13,7 @@ export default class SocialMediaUtil {
     dispath = useDispatch()
 
 
-    static follow(sender, receiver, details, setDetails) {
+    static follow(sender, receiver, details, setRelationship) {
         axios(
             {
                 url: SocialMediaUtil.getUrlBase() + "/friends/follow",
@@ -35,7 +35,13 @@ export default class SocialMediaUtil {
                     res.relationship = res.relationship % 10 + 10
                     details.relationship = res.relationship % 10 + 10
                     localforage.setItem("userIntro", res)
-                    setDetails(details)
+                    setRelationship(res.relationship % 10 + 10)
+                    if (details.relationship !== 11) return
+                    localforage.getItem("friendList").then(async res => {
+                        if (!res) res = {}
+                        res[details.userId] = { userId: details.userId, name: details.name, avatar: details.avatar }
+                        await localforage.setItem("friendList", res)
+                    })
                 })
             }
             else {
@@ -48,7 +54,7 @@ export default class SocialMediaUtil {
         })
     }
 
-    static unfollow(sender, receiver, details, setDetails) {
+    static unfollow(sender, receiver, details, setRelationship) {
         axios(
             {
                 url: SocialMediaUtil.getUrlBase() + "/friends/unfollow",
@@ -71,7 +77,13 @@ export default class SocialMediaUtil {
                     res.relationship = res.relationship % 10
                     details.relationship = res.relationship % 10
                     localforage.setItem("userIntro", res)
-                    setDetails(details)
+                    setRelationship(res.relationship % 10)
+                    if (details.relationship === 11) return
+                    localforage.getItem("friendList").then(async res => {
+                        if (!res) res = {}
+                        res[details.userId] = null
+                        await localforage.setItem("friendList", res)
+                    })
                 })
             }
             else {

@@ -59,6 +59,7 @@ export default function Chat(props) {
             }
           })
           localforage.getItem("friendList").then(list => {
+            console.log(cursor) 
             console.log(list)
             if (!list) return
             res.push({ "userId": list[cursor].userId, "name": list[cursor].name, "avatar": list[cursor].avatar })
@@ -66,12 +67,10 @@ export default function Chat(props) {
               console.log("add success")
             }).then(async () => {
               await localforage.setItem("send_to_" + cursor, [])
-              await localforage.setItem(cursor + "_record", [])
-
+              await localforage.setItem("send_from_" + cursor, [])
             })
           })
         }
-      
       localforage.removeItem("contactCursor")
       setUserRecords(res)
       setSideBarSelector(cursor)
@@ -88,7 +87,7 @@ export default function Chat(props) {
   return (
     <Stack sx={{ marginLeft: '15%', width: '70%', marginTop: 3, height: height, }} direction="row" justify="center" spacing={2}>
       <SideBar select={sideBarSelector} setSelect={setSideBarSelector} userRecords={userRecords} setUserRecords={setUserRecords} ></SideBar>
-      <MessageList select={sideBarSelector} setSelector={setSideBarSelector} ></MessageList>
+      <MessageList select={sideBarSelector} setSelector={setSideBarSelector}  ></MessageList>
     </Stack>
   );
 }

@@ -20,21 +20,30 @@ import { useNavigate } from "react-router-dom";
 import { Navigation } from "@mui/icons-material";
 
 export default function (props) {
-    let [details, setDetails] = useState(null)
+    const [details, setDetails] = useState(null)
+    const [relationship, setRelationship] = useState(0) 
+    
     let navigate = useNavigate()
-
+    
     React.useEffect(() => {
         localforage.getItem("userIntro").then((res) => {
+            if (!res) {
+                console.log("does not have userIntro")
+                return
+            }
+            console.log(res)
             setDetails(res)
+            setRelationship(res.relationship)
         })
     },[])
+    console.log(details)
 
     let contactButtonText = ""
 
     let followButtonText = ""
 
     let extraInformation = ""
-    if (details === undefined || details === null) {
+    if (!details) {
         return <div>loading</div>
     }
     //console.log(details.relationship)
@@ -70,27 +79,10 @@ export default function (props) {
     }
 
     let handleFollow = () => {
-
-        if (Math.floor(details.relationship / 10) === 1) {
-            details.relationship = details.relationship % 10
-            SocialMediaUtil.unfollow(localStorage.getItem("userId"), details.userId, details, setDetails)
+        if (Math.floor(relationship / 10) === 1) {
+            SocialMediaUtil.unfollow(localStorage.getItem("userId"), details.userId, details, setRelationship)
         } else {
-            SocialMediaUtil.follow(localStorage.getItem("userId"), details.userId, details, setDetails)
-            details.relationship += 10
-        }
-        if (details.relationship === 11) {
-            localforage.getItem("friendList").then(async res=>{
-                if (!res) res = {}
-                res[details.userId] = { userId: details.userId, name: details.name, avatar: details.avatar }
-                await localforage.setItem("friendList", res)
-            })
-        } else {
-
-            localforage.getItem("friendList").then(async res => {
-                if (!res) res = {}
-                res[details.userId] = null
-                await localforage.setItem("friendList", res)
-            })
+            SocialMediaUtil.follow(localStorage.getItem("userId"), details.userId, details, setRelationship)
         }
         setDetails(details)
     }

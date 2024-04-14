@@ -9,10 +9,10 @@ import { ListItemButton } from '@mui/material';
 
 export default function Contact(props) {
   console.log(props)
-    let { userId, name, avatar} = props.content
+    let { userId, name, avatar, selected} = props.content
   return (     
     <ListItemButton onClick={props.onClick} sx={{width:"100%"}} >
-    <ListItem sx={{width:"100%"}}>
+    <ListItem sx={{width:"100%"}} selected={selected === userId}>
         <ListItemAvatar>
           <Avatar>
             <BeachAccessIcon />

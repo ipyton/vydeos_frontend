@@ -25,24 +25,39 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function (props) {
 	let messages = [{from_nickName:"xxx", to_nickName:"xxx", content:"xxx", time:"xxx", position:"right", from_username:"", to_username:"", type:""},]
-	const {select, userRecords, setUserRecords, chatRecords, setChatRecords} = props
+	const {select} = props
+	const [chatRecords, setChatRecords] = useState([])
+
+	useEffect(()=>{
+		localforage.getItem("send_to_" + select).then(
+			send_to => {
+				localforage.getItem("send_from_" + select).then(
+					async receive_from => {
+						if (!send_to) {
+							send_to = []
+							await localforage.setItem("send_to_" + select, send_to)
+						}
+						if (!receive_from) {
+							receive_from = []
+							await localforage.setItem("send_from_" + select, receive_from)
+						}
+						console.log(send_to)
+						console.log(receive_from)
+						let result = [...send_to, ...receive_from]
+						result.sort((a, b) => {
+							return a.timestamp - b.timestamp
+						})
+						setChatRecords(result)
+					}
+				)
+			}
+		)
+
+	}, [select]) 
+	
 	if (!select) {
 		return <div> Start/Select a conversation first!</div>
 	}
-
-	useEffect(()=>{
-		let messageList = []
-			localforage.getItem("send_to_" + select).then((sendto) => {
-				localforage.getItem(select + "_records").then((sendFrom) => {
-					messageList = [...sendto, ...sendFrom]
-				})
-			})
-			messageList.sort((a,b) => {
-				return a.sendTime - b.sendTime
-			})
-			setChatRecords(messageList)
-
-	}, [select]) 
 
 
 	

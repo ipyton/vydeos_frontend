@@ -9,6 +9,8 @@ import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import * as React from 'react';
 import SingleMessage from './SingleMessage';
+import localforage from 'localforage';
+import { Sort } from '@mui/icons-material';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -19,21 +21,29 @@ const Item = styled(Paper)(({ theme }) => ({
   flexGrow: 2,
 }));
 
-export default function (props ) {
-  let messages = props.chatRecords;
-  console.log(messages);
-  let setMessages = props.setChatRecords;
-  return (
-    <Stack sx={{ borderRadius: 2,boxShadow:1, overflow:'scroll'}} >
-          {
-      messages.map((x,idx)=>{
-        let flag = "right"
-        if (x % 2 ==0) {
-          flag = "left";
-        }
-			return (<SingleMessage content={x} position = {flag}></SingleMessage>)
-		})
+export default function (props) {
+  // record list.
+  let { chatRecords } = props;
+
+
+
+  if (!chatRecords || chatRecords.length === 0) {
+    return <div>Start to chat</div>
   }
+
+
+
+  return (
+    <Stack sx={{ borderRadius: 2, boxShadow: 1, overflow: 'scroll' }} >
+      {
+        chatRecords.map((x, idx) => {
+          let flag = "right"
+          if (x % 2 == 0) {
+            flag = "left";
+          }
+          return (<SingleMessage content={x} position={flag}></SingleMessage>)
+        })
+      }
     </Stack>
   );
 }
