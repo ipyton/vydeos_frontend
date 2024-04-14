@@ -45,26 +45,26 @@ export default function Chat(props) {
       ).then(async cursor => {
         if (!cursor) console.log("can not find the user")
         else {
-          res.forEach(async (ele,idx)=>{
-            console.log(ele)
-            console.log(idx)
+          if (!res) return 
+          for (let i = 0; i < res.length; i ++) {
+            let ele = res[i]
             if (!ele || !ele.userId) {
               return
             }
             if (ele.userId === cursor) {
-              res = [res[idx],...res.slice(0, idx), res.slice(idx)]
-              setUserRecords(res)
-              await localforage.setItem("recent_contacts", res)
-              return
+            res = [res[i], ...res.slice(0, i), res.slice(i)]
+            setUserRecords(res)
+            await localforage.setItem("recent_contacts", res)
+            return
             }
-          })
+          }
+
           localforage.getItem("friendList").then(list => {
             console.log(cursor) 
             console.log(list)
             if (!list) return
             res.push({ "userId": list[cursor].userId, "name": list[cursor].name, "avatar": list[cursor].avatar })
             localforage.setItem("recent_contacts", res).then(() => {
-              console.log("add success")
             }).then(async () => {
               await localforage.setItem("send_to_" + cursor, [])
               await localforage.setItem("send_from_" + cursor, [])
@@ -85,7 +85,7 @@ export default function Chat(props) {
   let friendList = [{ username: " ", userAvatar: "", recentMessages: [] }]
   // userId
   return (
-    <Stack sx={{ marginLeft: '15%', width: '70%', marginTop: 3, height: height, }} direction="row" justify="center" spacing={2}>
+    <Stack sx={{ marginLeft: '15%', width: '70%', height: height, }} direction="row" justify="center" spacing={2}>
       <SideBar select={sideBarSelector} setSelect={setSideBarSelector} userRecords={userRecords} setUserRecords={setUserRecords} ></SideBar>
       <MessageList select={sideBarSelector} setSelector={setSideBarSelector}  ></MessageList>
     </Stack>

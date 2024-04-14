@@ -183,7 +183,7 @@ export default class MessageUtil {
         })
     }
 
-    static sendMessage(userId, sendTo, content) {
+    static sendMessage(userId, sendTo, content, setChatRecords) {
         axios(
             {
                 url: MessageUtil.getUrlBase() + "/sendMessage",
@@ -207,7 +207,7 @@ export default class MessageUtil {
             console.log("parse Error")
         }).then(
             () => {
-                navigator("chat")
+                
             }
         )
     }

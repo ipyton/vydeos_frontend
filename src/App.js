@@ -61,7 +61,7 @@ function App() {
     return (<AccountIssue loginState={login} setLoginState={setLogin}></AccountIssue>)
   }
 
-  localforage.clear()
+  //localforage.clear()
   if (login === true)
     return (
       <Contents ></Contents>

@@ -69,7 +69,7 @@ export default function Contents(props) {
             <BrowserRouter>
                 <Box sx={{ display: 'flex' }}>
                     <Header avatar={avatar} setAvatar={setAvatar} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
-                    <Box width="100%" justifyContent="center" alignItems="center" marginTop="5%">
+                    <Box width="100%" justifyContent="center" alignItems="center" sx={{ marginTop: window.innerHeight* 0.01}}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <div>
                                 <div>

@@ -11,6 +11,8 @@ import * as React from 'react';
 import SingleMessage from './SingleMessage';
 import localforage from 'localforage';
 import { Sort } from '@mui/icons-material';
+import { useRef } from 'react';
+import { useEffect } from 'react';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -26,24 +28,37 @@ export default function (props) {
   let { chatRecords } = props;
 
 
-
   if (!chatRecords || chatRecords.length === 0) {
     return <div>Start to chat</div>
   }
+  const messagesEndRef = useRef(null)
 
+  console.log(messagesEndRef)
+
+  useEffect(()=> {
+    if (!messagesEndRef) return
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [chatRecords])
 
 
   return (
-    <Stack sx={{ borderRadius: 2, boxShadow: 1, overflow: 'scroll' }} >
-      {
-        chatRecords.map((x, idx) => {
-          let flag = "right"
-          if (x % 2 == 0) {
-            flag = "left";
-          }
-          return (<SingleMessage content={x} position={flag}></SingleMessage>)
-        })
-      }
+    <Stack sx={{ borderRadius: 2, overflow: 'scroll' }} >
+      <div className="messagesWrapper" >
+        {
+          chatRecords.map((x, idx) => {
+            let flag = "right"
+            if (x % 2 == 0) {
+              flag = "left";
+            }
+            return (<SingleMessage content={x} position={flag}></SingleMessage>)
+          })
+        }
+
+      <div style={{ float: "left", clear: "both" }}
+        ref={messagesEndRef} />
+
+    </div>
+
     </Stack>
   );
 }

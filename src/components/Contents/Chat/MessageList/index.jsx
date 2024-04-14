@@ -54,7 +54,7 @@ export default function (props) {
 		)
 
 	}, [select]) 
-	
+
 	if (!select) {
 		return <div> Start/Select a conversation first!</div>
 	}
@@ -63,7 +63,7 @@ export default function (props) {
 	
 	return (<Stack sx={{width:"70%", boxShadow:1}}> 
 	
-		<Header></Header>
+		<Header selected={select}></Header>
 		<Message chatRecords={chatRecords}  ></Message>
 		<InputBox chatRecords={chatRecords}  setChatRecords={setChatRecords} ></InputBox>
 	</Stack>)

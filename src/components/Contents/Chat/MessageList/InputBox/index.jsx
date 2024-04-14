@@ -36,6 +36,8 @@ export default function (props) {
     if ( !text ) {
       return
     }
+    console.log(text)
+    setChatRecords([{},...chatRecords]) 
     MessageUtil.sendMessage(localStorage.getItem("email"), select, text)
   }
     
@@ -48,6 +50,7 @@ export default function (props) {
   const vidUploadHandler = () => {
     setText("{attachment}")
   }
+
 
   return (
     <Stack direction="row" sx={{ width: "90%", marginLeft: 2, marginBottom: 2 }} spacing={2}>
