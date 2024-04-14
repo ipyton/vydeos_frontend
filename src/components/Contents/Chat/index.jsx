@@ -74,7 +74,7 @@ export default function Chat(props) {
           })
         }
       localforage.removeItem("contactCursor")
-      setUserRecords(res)
+      setUserRecords([...res])
       setSideBarSelector(cursor)
       })
     })

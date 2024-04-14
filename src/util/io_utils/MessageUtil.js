@@ -207,18 +207,14 @@ export default class MessageUtil {
         }).then(
             response => {
                 if (!response || response.data.code !== 1) {
-                    console.log("c")
-
-
+                    console.log("internal errors ")
                 }
+                console.log(JSON.parse(response.data.message))
+                setChatRecords([...chatRecords, { userId: userId, receiverId: sendTo, content: content, type: type }])
             }
         ).catch(err => {
             console.log("parse Error")
-        }).then(
-            () => {
-
-            }
-        )
+        })
     }
 
     static requestUserInfo(dispatch, userId, navigator) {

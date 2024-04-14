@@ -84,12 +84,12 @@ export default function (props) {
 
     let handleFollow = () => {
         if (Math.floor(relationship / 10) === 1) {
-            localStorage.getItem("userId").then(res => {
+            localforage.getItem("userId").then(res => {
 
                 SocialMediaUtil.unfollow(res, details.userId, details, setRelationship)
             })
         } else {
-            localStorage.getItem("userId").then(res => {
+            localforage.getItem("userId").then(res => {
                 SocialMediaUtil.follow(res, details.userId, details, setRelationship)
             })
         }
