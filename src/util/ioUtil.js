@@ -9,14 +9,14 @@ export default class IOUtil {
             let response = await axios({
                 url: this.url_base + "/search/search",
                 method: 'post',
-                data: { token: localStorage.getItem("token") },
+                data: { tokens: localStorage.getItem("token") },
                 transformRequest: [function (data) {
                     return Qs.stringify(data)
                 }], transformResponse: [function (data) {
                     return Qs.parse(data)
                 }],
                 headers: {
-                    token: localStorage.getItem("token"),
+                    tokens: localStorage.getItem("token"),
                     userEmail: '1838169994@qq.com',
                     keyword: keyword
                 }
@@ -33,7 +33,7 @@ export default class IOUtil {
             let response = await axios({
                 url: this.url_base + "/search/set",
                 method: 'post',
-                data: { token: localStorage.getItem("token") },
+                data: { tokens: localStorage.getItem("token") },
                 transformRequest: [function (data) {
                     return Qs.stringify(data)
                 }], transformResponse: [function (data) {

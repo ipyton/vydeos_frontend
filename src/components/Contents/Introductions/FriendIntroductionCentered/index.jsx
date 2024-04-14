@@ -36,7 +36,7 @@ export default function (props) {
             setRelationship(res.relationship)
         })
     },[])
-    console.log(details)
+    console.log("------------------------------")
 
     let contactButtonText = ""
 
@@ -85,6 +85,7 @@ export default function (props) {
     let handleFollow = () => {
         if (Math.floor(relationship / 10) === 1) {
             localStorage.getItem("userId").then(res => {
+
                 SocialMediaUtil.unfollow(res, details.userId, details, setRelationship)
             })
         } else {
@@ -184,9 +185,9 @@ export default function (props) {
                     {contactButtonText.length === 0 ? <div></div> : <Button onClick={handleContact}>{contactButtonText}</Button>}
                 </ButtonGroup>
             </Stack>
-            <Stack>
-                {localforage.getItem("id")}
-            </Stack>
+            {/* <Stack>
+                {details.userName}
+            </Stack> */}
             <Stack>
                 {extraInformation}
             </Stack>

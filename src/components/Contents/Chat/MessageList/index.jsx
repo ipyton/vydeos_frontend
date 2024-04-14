@@ -65,6 +65,6 @@ export default function (props) {
 	
 		<Header selected={select}></Header>
 		<Message chatRecords={chatRecords}  ></Message>
-		<InputBox chatRecords={chatRecords}  setChatRecords={setChatRecords} ></InputBox>
+		<InputBox chatRecords={chatRecords}  setChatRecords={setChatRecords} select={select}></InputBox>
 	</Stack>)
 }

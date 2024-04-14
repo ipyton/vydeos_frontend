@@ -1,5 +1,5 @@
 import localforage from "localforage"
-import qs from 'qs'
+import Qs from 'qs'
 import axios from "axios"
 import { update, clear, updateFollowState } from "../../components/redux/UserDetails"
 import { resolve } from "babel-standalone"
@@ -38,11 +38,11 @@ export default class MessageUtil {
                 method: "post",
                 data: { token: localStorage.getItem("token") },
                 transformRequest: [function (data) {
-                    return qs.stringify(data)
+                    return Qs.stringify(data)
                 }],
                 //synchronous: true,
                 header: {
-                    tokenL: localStorage.getItem("token"),
+                    token: localStorage.getItem("token"),
                 }
             }
         ).catch(error => {
@@ -71,10 +71,10 @@ export default class MessageUtil {
                     method: "post",
                     data: { "userId": userId, "timstamp": timestamp },
                     transformRequest: [function (data) {
-                        return qs.stringify(data)
+                        return Qs.stringify(data)
                     }],
                     //synchronous: true,
-                    header: {
+                    headers: {
                         token: localStorage.getItem("token"),
                     }
                 }
@@ -184,16 +184,21 @@ export default class MessageUtil {
     }
 
     static sendMessage(userId, sendTo, content, type, chatRecords, setChatRecords) {
+        console.log(sendTo)
+        console.log(content)
+        console.log(type)
         axios(
             {
-                url: MessageUtil.getUrlBase() + "/sendMessage",
+                url: MessageUtil.getUrlBase() + "/chat/sendMessage",
                 method: "post",
                 data: { userId: userId, receiverId: sendTo, content: content, type: type },
                 transformRequest: [function (data) {
-                    return qs.stringify(data)
+                    console.log(Qs.stringify(data))
+
+                    return Qs.stringify(data)
                 }],
                 //synchronous: true,
-                header: {
+                headers: {
                     token: localStorage.getItem("token"),
                 }
             }
@@ -201,12 +206,8 @@ export default class MessageUtil {
             console.log("requestNewMessageError")
         }).then(
             response => {
-                if (!response) {
-                    if (response.data.code === 1) {
-                        let time = response.data.timestamp
-                        console.log(time)
-                        setChatRecords([...chatRecords, { position: "right", type: type, content: content, timestamp: time }])
-                    }
+                if (!response || response.data.code !== 1) {
+                    console.log("c")
 
 
                 }
@@ -229,7 +230,7 @@ export default class MessageUtil {
             data: { token: localStorage.getItem("token"), userIdToFollow: userId },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
-                return qs.stringify(data)
+                return Qs.stringify(data)
             }], headers: {
                 token: localStorage.getItem("token"),
             }
@@ -246,6 +247,7 @@ export default class MessageUtil {
                 return
             }
             else if (responseData.code === 1) {
+                console.log(responseData.message)
                 //MessageUtil.setUserIntro(JSON.parse(responseData.message), dispatch)
                 localforage.setItem("userIntro", JSON.parse(responseData.message)).then(() => {
                     navigator("/friendInfomation")
