@@ -40,6 +40,7 @@ import SearchUtil from '../../util/io_utils/SearchUtil';
 import { useDispatch } from 'react-redux';
 import {clear} from "../../components/redux/searchResult"
 import localforage from 'localforage';
+import { useState } from 'react';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -114,14 +115,20 @@ export default function Header(props) {
   const [open, setOpen] = React.useState(false);
   const [category, setCategory] = React.useState(false)
   let [categorySelected, setCategorySelected] = React.useState([false, false, false, false, false])
+  const [notificationList, setNotificationList] = useState([])
+
+
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
   const languageMenuOpen = Boolean(languageAnchorEl)
   const notificationsOpen = Boolean(notificationsAnchorEl)
-  //const [refresh] = props
+  const [refresh] = props
   const dispatch = useDispatch()
 
+  React.useEffect(async () => {
+    
+  },[refresh])
   
   const navigate = useNavigate();
   const renderBadge = () => {
@@ -294,7 +301,6 @@ export default function Header(props) {
 
   // messages
   const renderMessageMenu = (
-    
     <Menu
     PaperProps={{  
       style: {  

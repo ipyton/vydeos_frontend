@@ -44,41 +44,16 @@ export default function MessageBox(props) {
   let [message, setMessage] = useState([])
   React.useEffect(()=> {
     let listToShow = []
-  localforage.getItem("contacts", (contacts)=> {
-    contacts.forEach(async element => {
-      await localforage.getItem( element.userId + "_lastCheck",(last_check_timestamp) => {
-        element.messages.forEach((message) => {
-          if (message.timestamp > last_check_timestamp) {
-            listToShow.push(message)
-          }
-        })
-      })
-    });
+  localforage.getItem("mailBox", (unreadList)=> {
+    setMessage(unreadList)
   }).catch(err=> {
     console.log("messages set error")
-  }).then(()=> {
-    setMessage(listToShow)
   })
-
   },[refresh])
 
-
   let onclick = (idx) => {
-    localforage.setItem(message[idx].userId + "_lastCheck")
+    localforage.setItem(message[idx].userId + "_lastRead")
   }
-
-  let socket = new WebSocket("ws://localhost:8080/notification/88488")
-  //socket.binaryType = "text frames"
-  socket.onopen = function(e) {
-    console.log("ws open successfully!!!!")    
-  }
-  socket.onmessage = (event)=>{
-    console.log(event)
-  }
-  setTimeout(function() {
-    console.log("sending message")
-    socket.send({userID:88488, time:9238042, method:"get"})
-  },1000)
 
     return (     
     <Menu

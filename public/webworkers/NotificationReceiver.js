@@ -48,22 +48,44 @@
 
 importScripts("localforage.min.js")
 
-
-
-setTimeout(function () {
-    console.log("sending message")
-    localforage.getItem("userId").then(userId => {
-        if (!userId) {
-            return
+localforage.getItem("userId").then(
+    res=>{ 
+        let socket = new WebSocket("ws://localhost:8080/notification/" + res)
+        //socket.binaryType = "text frames"
+        socket.onopen = function (e) {
+            console.log("ws open successfully!!!!")
         }
-        localforage.getItem("last_update").then(res => {
-            MessageUtil.getNewestMessages(userId, res)
-        })
+        socket.onerror = function(err) {
+            console.log(err)
+        }
+        socket.onmessage = (event) => {
+            console.log(event)
+            //isTrusted: true, data: 'success', origin: 'ws://localhost:8080', lastEventId: '', source: null, …
+            if (event.data === "success") {
+                
+            } else {
+                let result = JSON.parse(event.data)
+                postMessage(result)
+            }
+        }
     }
-    )
-    //postMessage("gooooooooooooooo")
+)
 
-}, 1000)
+
+// setTimeout(function () {
+//     console.log("sending message")
+//     localforage.getItem("userId").then(userId => {
+//         if (!userId) {
+//             return
+//         }
+//         localforage.getItem("last_update").then(res => {
+//             MessageUtil.getNewestMessages(userId, res)
+//         })
+//     }
+//     )
+//     //postMessage("gooooooooooooooo")
+
+// }, 1000)
 
 
 
