@@ -217,7 +217,8 @@ export default class MessageUtil {
         })
     }
 
-    static requestUserInfo(dispatch, userId, navigator) {
+    // this is used for show friend details.
+    static requestUserInfo(userId, navigator) {
 
         //get information from search/ friend list.
         axios({

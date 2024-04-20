@@ -28,6 +28,7 @@ import IOUtil from '../../util/ioUtil';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import UserInitializer from "../../util/UserInitializer"
 
 const defaultTheme = createTheme();
 
@@ -60,6 +61,7 @@ export default function Contents(props) {
             console.log(e)
             console.log("updated")
         }
+        UserInitializer.init()
     })
 
 

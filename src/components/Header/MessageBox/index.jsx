@@ -78,7 +78,5 @@ export default function MessageBox(props) {
         
        >
         <SingleMessage></SingleMessage>
-            
-           
       </Menu>)
 }

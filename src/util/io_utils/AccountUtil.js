@@ -5,6 +5,8 @@ import EncryptionUtil from "./EncryptionUtil"
 import { update } from "../../components/redux/UserDetails"
 import { useDispatch } from "react-redux"
 import localforage from "localforage"
+import { decode } from "babel-standalone"
+import { BiSolidCommentDetail } from "react-icons/bi"
 
 export default class AccountUtil {
 
@@ -76,7 +78,10 @@ export default class AccountUtil {
       else if (responseData.code === 1) {
         localStorage.setItem("token", responseData.message)
         localStorage.setItem("userId", data.get("email"))
-        setLogin(true)
+        localforage.setItem("userId", data.get("email")).then(
+          setLogin(true)
+        )
+
       }
       else {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
@@ -176,6 +181,70 @@ export default class AccountUtil {
       }
     )
 
+  }
+
+  // This is about get userInfo
+  static getOwnerInfo(userinfo, setUserInfo) {
+
+    localforage.getItem("userId").then(res=> {
+      axios({
+        url: this.getUrlBase() + "/account/getinfo",
+        method: 'post',
+        data: { userId: res},
+        transformRequest: [function (data) {
+          return Qs.stringify(data)
+        }],
+        headers: {
+          token: localStorage.getItem("token"),
+        }
+      }).catch(err=> {
+
+      }).then(response=> {
+        console.log(response)
+        if (!response || !response.data) {
+            return 
+        }
+        if (response.data.code === -1) {
+          console.log(response.data.message) 
+          return
+        } 
+        let content = response.data.message
+        console.log(content)
+        let decoded = JSON.parse(content)
+        // localforage.setItem();
+        setUserInfo(decoded)
+      })
+    })
+
+
+  }
+
+  static updateUserInfo( introduction, userName, location, pictures, birthdate) {
+
+    localforage.getItem("userId").then(res => {
+      axios({
+        url: this.url_base + "/account/setinfo",
+        method: 'post',
+        data: {
+          userId : res,
+          introduction : introduction,
+          userName : userName,
+          location : location,
+          pictures:pictures,
+          birthdate: birthdate,
+        },
+        transformRequest: [function (data) {
+          return Qs.stringify(data)
+        }],
+        headers: {
+          token: localStorage.getItem("token"),
+        }
+      }).catch(err => {
+
+      }).then(response => {
+        console.log(response)
+      })
+    })
   }
 
 

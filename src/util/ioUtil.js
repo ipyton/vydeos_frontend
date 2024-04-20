@@ -108,7 +108,6 @@ export default class IOUtil {
                 }],
                 headers: {
                     token: localStorage.getItem("token"),
-                    'userEmail': '1838169994@qq.com'
                 }
             })
             let responseData = response.data

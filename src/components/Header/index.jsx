@@ -123,7 +123,7 @@ export default function Header(props) {
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
   const languageMenuOpen = Boolean(languageAnchorEl)
   const notificationsOpen = Boolean(notificationsAnchorEl)
-  const [refresh] = props
+  const {refresh} = props
   const dispatch = useDispatch()
 
   React.useEffect(async () => {

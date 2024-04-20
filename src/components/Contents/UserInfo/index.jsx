@@ -19,6 +19,7 @@ import { deepOrange, deepPurple } from '@mui/material/colors';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { IconButton } from '@mui/material';
 import PictureUtil from '../../../util/io_utils/FileUtil';
+import AccountUtil from '../../../util/io_utils/AccountUtil';
 
 const defaultTheme = createTheme();
 
@@ -29,7 +30,12 @@ export default function UserInfo(props) {
   const { login, setLogin } = props.status
   const [avatar, setAvatar] = useState(null)
   const [picToUpload, setPicToUpload] = useState(null)
-  console.log("sdfinsiof" + login)
+  const [detail, setDetail] = useState({})
+  React.useEffect(()=> {
+    AccountUtil.getOwnerInfo(detail, setDetail)
+    
+  })
+
   if (false === login) {
     return <Navigate to="/login" replace />
   }
@@ -62,26 +68,28 @@ export default function UserInfo(props) {
       props.setBarState({ ...props.barState, message: "please check your input", open: true })
     }
     else {
-      axios({
-        url: "http://localhost:8080/account/getinfo",
-        method: 'post',
-        data: { userEmail: data.get('email'), password: encryption(data.get('password')), userName: data.get("nickname"), promotion: selected },
-        transformRequest: [function (data) {
-          return Qs.stringify(data)
-        }],
-      }).then(
-        (response) => {
-          console.log("response");
-          if (response.code === 1) {
+      // axios({
+      //   url: "http://localhost:8080/account/getinfo",
+      //   method: 'post',
+      //   data: { userEmail: data.get('email'), password: encryption(data.get('password')), userName: data.get("nickname"), promotion: selected },
+      //   transformRequest: [function (data) {
+      //     return Qs.stringify(data)
+      //   }],
+      // }).then(
+      //   (response) => {
+      //     console.log("response");
+      //     if (response.code === 1) {
 
-          }
-          else {
+      //     }
+      //     else {
 
-          }
-        }
-      ).catch((err) => {
-        console.log("check your input")
-      })
+      //     }
+      //   }
+      // ).catch((err) => {
+      //   console.log("check your input")
+      // })
+      AccountUtil.updateUserInfo(data.get("introduction"), data.get("username"), data.get("location"), data.get("pictures"), data.get("birthdate"))
+
     }
   };
 
