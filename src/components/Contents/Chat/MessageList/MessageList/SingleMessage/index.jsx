@@ -20,8 +20,9 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 export default function (props) {
+  let select = props.select;
   console.log(props)
-  if (props.content.position == "left") {
+  if (props.content.userId === select) {
     return (
       <Stack direction="row"  >
         <Stack>
@@ -34,7 +35,7 @@ export default function (props) {
             aria-haspopup="true"
             //onClick={handleProfileMenuOpen}
             color="inherit"
-            textAlign="center">
+>
             <Avatar alt={props.content.avatar} />
           </IconButton>
         </Stack>
@@ -42,7 +43,7 @@ export default function (props) {
         <Stack>
           <MessageBox
             position={'left'}
-            type={props.content.type}
+            type={props.content.messageType}
             text={props.content.content}
             data={{
               uri: 'https://facebook.github.io/react/img/logo.svg',
@@ -62,7 +63,7 @@ export default function (props) {
         <Item>
           <MessageBox
             position={'right'}
-            type={props.content.type}
+            type={props.content.messageType}
             text={props.content.content}
             data={{
               uri: 'https://facebook.github.io/react/img/logo.svg',

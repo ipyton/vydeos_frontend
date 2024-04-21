@@ -52,18 +52,14 @@ export default function Chat(props) {
               return
             }
             if (ele.userId === cursor) {
-            res = [res[i], ...res.slice(0, i), ...res.slice(i + 1)]
-            setUserRecords(res)
-            await localforage.setItem("recent_contacts", res)
-            console.log(ele.userId)
-            console.log(cursor)
-            return
+              res = [res[i], ...res.slice(0, i), ...res.slice(i + 1)]
+              setUserRecords(res)
+              await localforage.setItem("recent_contacts", res)
+              return
             }
           }
 
           localforage.getItem("friendList").then(list => {
-            console.log(cursor) 
-            console.log(list)
             if (!list) return
             res.push({ "userId": list[cursor].userId, "name": list[cursor].name, "avatar": list[cursor].avatar })
             localforage.setItem("recent_contacts", res).then(() => {

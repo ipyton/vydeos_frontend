@@ -12,6 +12,7 @@ import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import localforage from "localforage"
+import MessageUtil from "../../../../util/io_utils/MessageUtil"
 
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -20,15 +21,17 @@ const Item = styled(Paper)(({ theme }) => ({
 	textAlign: 'right',
 	color: theme.palette.text.secondary,
 	flexGrow: 2,
-  }));
-  
+}));
+
 
 export default function (props) {
-	let messages = [{from_nickName:"xxx", to_nickName:"xxx", content:"xxx", time:"xxx", position:"right", from_username:"", to_username:"", type:""},]
-	const {select} = props
+	let messages = [{ from_nickName: "xxx", to_nickName: "xxx", content: "xxx", time: "xxx", position: "right", from_username: "", to_username: "", type: "" },]
+	const { select } = props
 	const [chatRecords, setChatRecords] = useState([])
-	
-	useEffect(()=>{
+
+	useEffect( () => {
+		//MessageUtil.getNewestMessages(select)
+
 		localforage.getItem("send_to_" + select).then(
 			send_to => {
 				localforage.getItem("send_from_" + select).then(
@@ -41,30 +44,31 @@ export default function (props) {
 							receive_from = []
 							await localforage.setItem("send_from_" + select, receive_from)
 						}
-						console.log(send_to)
-						console.log(receive_from)
 						let result = [...send_to, ...receive_from]
+						//console.log(receive_from)
+						console.log(result)
 						result.sort((a, b) => {
-							return a.timestamp - b.timestamp
+							return a.sendTime - b.sendTime
 						})
 						setChatRecords(result)
+						console.log(result)
 					}
 				)
 			}
 		)
 
-	}, [select]) 
+	}, [select])
 
 	if (!select) {
 		return <div> Start/Select a conversation first!</div>
 	}
 
 
-	
-	return (<Stack sx={{width:"70%", boxShadow:1}}> 
-	
+
+	return (<Stack sx={{ width: "70%", boxShadow: 1 }}>
+
 		<Header selected={select}></Header>
-		<Message chatRecords={chatRecords}  ></Message>
-		<InputBox chatRecords={chatRecords}  setChatRecords={setChatRecords} select={select}></InputBox>
+		<Message chatRecords={chatRecords}  select = {select}> </Message>
+		<InputBox chatRecords={chatRecords} setChatRecords={setChatRecords} select={select}></InputBox>
 	</Stack>)
 }

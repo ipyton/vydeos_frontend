@@ -3,6 +3,7 @@ import Qs from 'qs'
 import axios from "axios"
 import { update, clear, updateFollowState } from "../../components/redux/UserDetails"
 import { resolve } from "babel-standalone"
+import { ReceiptRounded } from "@mui/icons-material"
 export default class MessageUtil {
 
     static getUrlBase() {
@@ -58,19 +59,24 @@ export default class MessageUtil {
         })
     }
 
-    static getNewestMessages(userId, timestamp) {
+    static setCheckTime(key) {
+        localforage.setItem("chatLastUpdate")
 
-        localforage.getItem("chatLastUpdate").then(timestamp => {
-            if (timestamp === undefined || timestamp === null) {
-                return
+    }
+
+    static getNewestMessages(friendId,setSelect) {
+        let checkKey = "chatLastUpdate_" + friendId
+        localforage.getItem(checkKey).then(async timestamp => {
+            if (!timestamp) {
+                timestamp = 0;
             }
-
             axios(
                 {
-                    url: MessageUtil.getUrlBase() + "/getNewestMessage",
+                    url: MessageUtil.getUrlBase() + "/chat/getNewestMessages",
                     method: "post",
-                    data: { "userId": userId, "timstamp": timestamp },
+                    data: { "userId": friendId, "timestamp": timestamp },
                     transformRequest: [function (data) {
+                        console.log(Qs.stringify(data))
                         return Qs.stringify(data)
                     }],
                     //synchronous: true,
@@ -78,9 +84,7 @@ export default class MessageUtil {
                         token: localStorage.getItem("token"),
                     }
                 }
-            ).catch(err => {
-                console.log("requestNewMessageError")
-            }).then(
+            ).then(
                 async (response) => {
                     //MessageUtil.updateMessage(response)
                     //console.log(response)
@@ -97,45 +101,42 @@ export default class MessageUtil {
                         console.log("logic error")
                         return
                     }
-
                     const messages = JSON.parse(response.data.message)
                     let records_map = {}
 
                     //dispatch messages to their sender in a map. 
                     let maxTimestamp = -1
-                    for (let i = 0; i < messages.size(); i++) {
+                    for (let i = 0; i < messages.length; i++) {
                         let userId = messages[i].userId;
                         if (records_map[userId]) {
                             records_map[userId].push(messages[i])
                         } else {
                             records_map[userId] = [messages[i]]
                         }
-
                         maxTimestamp = Math.max(messages[i].timestamp, maxTimestamp)
                     }
+                    await localforage.setItem(checkKey, maxTimestamp)
 
-                    await localforage.setItem("chatLastUpdate", maxTimestamp)
 
 
                     //write to the database
-                    for (let [key, value] of records_map) {
+                    for (let key in records_map) {
+                        let value = records_map[key]
                         let result = await localforage.getItem(key + "_records")
                         if (!result) {
-                            result = { count: value.size(), chats: value }
+                            result = { count: value.size, chats: value }
                         }
                         else {
                             result.count++
                             result.chats = [result.chats, ...value]
                         }
-                        await localforage.setItem(key + "_records")
+                        await localforage.setItem("send_from_" + friendId, result.chats)
                     }
 
                     // get chat record contacts lists
                     await localforage.getItem("contactCursor").then((userId) => {
                         if (!userId) {
                             localforage.getItem("contactRecordList").then((result) => {
-
-
 
                             })
                             return
@@ -170,31 +171,21 @@ export default class MessageUtil {
                         )
                     })
                 }
-            ).catch(err => {
-                console.log("parse Error")
-            }).then(
-                () => {
-                    navigator("chat")
-                }
-            )
+            ).then(()=> {
+                setSelect(friendId)
 
-
-
+            })
         })
     }
 
-    static sendMessage(userId, sendTo, content, type, chatRecords, setChatRecords) {
-        console.log(sendTo)
-        console.log(content)
-        console.log(type)
+    static sendMessage(userId, sendTo, content, messageType, chatRecords, setChatRecords, type) {
+        let data = { userId: userId, receiverId: sendTo, content: content, messageType: messageType, type: type }
         axios(
             {
                 url: MessageUtil.getUrlBase() + "/chat/sendMessage",
                 method: "post",
-                data: { userId: userId, receiverId: sendTo, content: content, type: type },
+                data: data,
                 transformRequest: [function (data) {
-                    console.log(Qs.stringify(data))
-
                     return Qs.stringify(data)
                 }],
                 //synchronous: true,
@@ -209,8 +200,20 @@ export default class MessageUtil {
                 if (!response || response.data.code !== 1) {
                     console.log("internal errors ")
                 }
-                console.log(JSON.parse(response.data.message))
-                setChatRecords([...chatRecords, { userId: userId, receiverId: sendTo, content: content, type: type }])
+                let message = JSON.parse(response.data.message)
+                console.log(message)
+                console.log(response.data.message.timestamp)
+                console.log(response.data.message.messageId)
+
+                localforage.getItem("send_to_" + sendTo).then(res => {
+                    data["messageId"] = message.messageId
+                    data["sendTime"] = message.timestamp
+                    localforage.setItem("send_to_" + sendTo, [...res, data]).then(
+                        setChatRecords([...chatRecords, data])
+                    )
+
+                })
+
             }
         ).catch(err => {
             console.log("parse Error")

@@ -41,12 +41,10 @@ export default function (props) {
     if ( !text ) {
       return
     }
-    console.log(text)
     localforage.getItem("userId").then(res=> {
-      MessageUtil.sendMessage(res, select, text, "text", chatRecords, setChatRecords)
+      MessageUtil.sendMessage(res, select, text, "text", chatRecords, setChatRecords, "single")
     }).then(() => {
         setText("")
-
     })
     }
   console.log(chatRecords)

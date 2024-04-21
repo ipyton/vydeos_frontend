@@ -22,7 +22,6 @@ export default class IOUtil {
                 }
             })
             let responseData = response.data
-            console.log(response)
             return responseData.code === 1
         }
         return post()
@@ -46,7 +45,6 @@ export default class IOUtil {
                 }
             })
             let responseData = response.data
-            console.log(response)
             return responseData.code === 1
         }
         return post()

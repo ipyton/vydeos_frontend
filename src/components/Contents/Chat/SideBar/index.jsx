@@ -7,6 +7,7 @@ import List from '@mui/material/List';
 import localforage from 'localforage';
 import { useState } from 'react';
 import { ResetTvOutlined } from '@mui/icons-material';
+import MessageUtil from '../../../../util/io_utils/MessageUtil';
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -26,10 +27,9 @@ export default function SideBar(props) {
   let onClick = (idx) => {
     return () => {
       let mid = userRecords[idx]
-      console.log(userRecords)
-      console.log(idx)
       //setUserRecords([mid, ...userRecords.slice(0, idx), ...userRecords.slice(idx + 1)])
-      setSelect(mid.userId)
+      MessageUtil.getNewestMessages(mid.userId, setSelect)
+      //setSelect(mid.userId)
     }
   }
 

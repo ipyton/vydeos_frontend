@@ -19,7 +19,6 @@ export default function (props) {
     let dispatch = useDispatch()
     const handleSuggestionSelection = (event) => {
         //console.log(setSuggestionOpen)
-        console.log(userId)
         MessageUtil.requestUserInfo(userId, navigate)
         //navigate("/friendInfomation")
     }

@@ -34,12 +34,10 @@ export default class AccountUtil {
       console.log(err)
     }).then(
       async response => {
-        console.log(response)
         if (response === undefined || response.data === undefined) {
           console.log("login error")
           return
         }
-        console.log(response)
         let responseData = response.data
         await localforage.setItem("userId", response.data.message)
         setState(responseData.code === 1)

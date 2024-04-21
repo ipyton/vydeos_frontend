@@ -25,7 +25,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function (props) {
   // record list.
-  let { chatRecords } = props;
+  let { chatRecords, select } = props;
 
 
   if (!chatRecords || chatRecords.length === 0) {
@@ -47,7 +47,7 @@ export default function (props) {
         {
           chatRecords.map((x, idx) => {
             
-            return (<SingleMessage content={x}></SingleMessage>)
+            return (<SingleMessage content={x} select = {select}></SingleMessage>)
           })
         }
 
