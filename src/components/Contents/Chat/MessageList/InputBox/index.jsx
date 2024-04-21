@@ -42,12 +42,14 @@ export default function (props) {
       return
     }
     console.log(text)
-    setText("")
     localforage.getItem("userId").then(res=> {
       MessageUtil.sendMessage(res, select, text, "text", chatRecords, setChatRecords)
+    }).then(() => {
+        setText("")
+
     })
     }
-    
+  console.log(chatRecords)
   const picUploadHandler = () => {
     setText("{attachment}")
   }

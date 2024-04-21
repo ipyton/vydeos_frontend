@@ -20,6 +20,14 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { IconButton } from '@mui/material';
 import PictureUtil from '../../../util/io_utils/FileUtil';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import dayjs from 'dayjs';
+
+var advancedFormat = require('dayjs/plugin/advancedFormat')
+dayjs.extend(advancedFormat)
 
 const defaultTheme = createTheme();
 
@@ -29,12 +37,16 @@ export default function UserInfo(props) {
   const [selected, setSelected] = useState(false)
   const { login, setLogin } = props.status
   const [avatar, setAvatar] = useState(null)
+  const [gender, setGender] = useState(0)
+  const [date, setDate] = useState(dayjs('2022-04-17'))
   const [picToUpload, setPicToUpload] = useState(null)
   const [detail, setDetail] = useState({})
   React.useEffect(()=> {
     AccountUtil.getOwnerInfo(detail, setDetail)
-    
-  })
+  }, [])
+  const handleChange = (event) => {
+    setGender(event.target.value);
+  };
 
   if (false === login) {
     return <Navigate to="/login" replace />
@@ -64,6 +76,7 @@ export default function UserInfo(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    console.log(data)
     if (!validate(data.get('nickname'), data.get('username'), data.get('password'))) {
       props.setBarState({ ...props.barState, message: "please check your input", open: true })
     }
@@ -88,7 +101,8 @@ export default function UserInfo(props) {
       // ).catch((err) => {
       //   console.log("check your input")
       // })
-      AccountUtil.updateUserInfo(data.get("introduction"), data.get("username"), data.get("location"), data.get("pictures"), data.get("birthdate"))
+      console.log(data.get("intro"), data.get("nickname"), data.get("region"), data.get("pictures"), date.format('YYYY-MM-DD'), gender)
+      AccountUtil.updateUserInfo(data.get("intro"), data.get("nickname"), data.get("region"), data.get("pictures"), date.format('YYYY-MM-DD'), gender)
 
     }
   };
@@ -98,7 +112,6 @@ export default function UserInfo(props) {
     if (null !== localStorage.getItem("avatar")) {
       mid = <Avatar alt="Travis Howard" src={avatar} />
     }
-    console.log(avatar)
     return (
       <div>
         <input id="uploadPic" type="file" onChange={picUploadHandler} hidden></input>
@@ -131,12 +144,11 @@ export default function UserInfo(props) {
             <Grid container spacing={2}>
               <Grid item xs={12} >
                 <TextField
-                  autoComplete="nickname"
                   name="nickname"
                   required
                   fullWidth
                   id="nickname"
-                  label="nickname"
+                  label="Nickname"
                   autoFocus
                 />
               </Grid>
@@ -144,30 +156,47 @@ export default function UserInfo(props) {
                 <TextField
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
+                  id="region"
+                  label="Region"
+                  name="region"
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  name="self-intro"
-                  label="self-intro"
-                  type="self-intro"
-                  id="self-intro"
+                  name="intro"
+                  label="intro"
+                  type="intro"
+                  id="intro"
                 />
               </Grid>
               <Grid item xs={12}>
-                <DatePicker />
+                <FormControl fullWidth>
+                  <InputLabel id="gender-select-label">Gender</InputLabel>
+                  <Select
+                    labelId="gender-select-label"
+                    id="gender"
+                    value={gender}
+                    label="gender"
+                    onChange={handleChange}
+                  >
+                    <MenuItem value={true}>Male</MenuItem>
+                    <MenuItem value={false}>Female</MenuItem>
+                    <MenuItem value={null}>Not to tell</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
+              
               <Grid item xs={12}>
+                <DatePicker value={date} onChange={(newDate) => setDate(newDate)}/>
+              </Grid>
+              {/* <Grid item xs={12}>
                 <FormControlLabel
                   control={<Checkbox onClick={handleReceive} value="allowExtraEmails" color="primary" />}
                   label="I want to receive inspiration, marketing promotions and updates via email."
                 />
-              </Grid>
+              </Grid> */}
             </Grid>
             <Button
               type="submit"

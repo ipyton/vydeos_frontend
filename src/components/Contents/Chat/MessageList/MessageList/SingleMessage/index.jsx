@@ -63,7 +63,7 @@ export default function (props) {
           <MessageBox
             position={'right'}
             type={props.content.type}
-            text={props.content.text}
+            text={props.content.content}
             data={{
               uri: 'https://facebook.github.io/react/img/logo.svg',
               status: {

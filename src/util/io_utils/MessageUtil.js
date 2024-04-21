@@ -219,7 +219,7 @@ export default class MessageUtil {
 
     // this is used for show friend details.
     static requestUserInfo(userId, navigator) {
-
+        console.log(userId)
         //get information from search/ friend list.
         axios({
             url: MessageUtil.getUrlBase() + "/friends/getUserIntro",

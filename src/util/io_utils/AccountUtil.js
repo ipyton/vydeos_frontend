@@ -41,7 +41,7 @@ export default class AccountUtil {
         }
         console.log(response)
         let responseData = response.data
-        await localforage.setItem("userId",response.data.message)
+        await localforage.setItem("userId", response.data.message)
         setState(responseData.code === 1)
         console.log(responseData.code === 1)
       }
@@ -162,7 +162,7 @@ export default class AccountUtil {
     axios({
       url: AccountUtil.getUrlBase() + "/account/registerStep3",
       method: 'post',
-      data: { password: EncryptionUtil.encryption(password), userId:token },
+      data: { password: EncryptionUtil.encryption(password), userId: token },
       transformRequest: [function (data) {
         // transform data -> json
         return Qs.stringify(data)
@@ -186,28 +186,28 @@ export default class AccountUtil {
   // This is about get userInfo
   static getOwnerInfo(userinfo, setUserInfo) {
 
-    localforage.getItem("userId").then(res=> {
+    localforage.getItem("userId").then(res => {
       axios({
-        url: this.getUrlBase() + "/account/getinfo",
+        url: AccountUtil.getUrlBase() + "/account/getinfo",
         method: 'post',
-        data: { userId: res},
+        data: { userId: res },
         transformRequest: [function (data) {
           return Qs.stringify(data)
         }],
         headers: {
           token: localStorage.getItem("token"),
         }
-      }).catch(err=> {
+      }).catch(err => {
 
-      }).then(response=> {
+      }).then(response => {
         console.log(response)
         if (!response || !response.data) {
-            return 
+          return
         }
         if (response.data.code === -1) {
-          console.log(response.data.message) 
+          console.log(response.data.message)
           return
-        } 
+        }
         let content = response.data.message
         console.log(content)
         let decoded = JSON.parse(content)
@@ -219,19 +219,21 @@ export default class AccountUtil {
 
   }
 
-  static updateUserInfo( introduction, userName, location, pictures, birthdate) {
+  static updateUserInfo(introduction, nickName, location, pictures, birthdate, gender) {
+    if (!pictures) pictures = []
 
     localforage.getItem("userId").then(res => {
       axios({
-        url: this.url_base + "/account/setinfo",
+        url: AccountUtil.getUrlBase() + "/account/setinfo",
         method: 'post',
         data: {
-          userId : res,
-          introduction : introduction,
-          userName : userName,
-          location : location,
-          pictures:pictures,
-          birthdate: birthdate,
+          userId: res,
+          introduction: introduction,
+          userName: nickName,
+          location: location,
+          pictures: pictures,
+          dateOfBirth: birthdate,
+          gender: gender
         },
         transformRequest: [function (data) {
           return Qs.stringify(data)

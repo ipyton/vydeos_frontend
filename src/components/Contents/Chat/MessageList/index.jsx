@@ -27,7 +27,7 @@ export default function (props) {
 	let messages = [{from_nickName:"xxx", to_nickName:"xxx", content:"xxx", time:"xxx", position:"right", from_username:"", to_username:"", type:""},]
 	const {select} = props
 	const [chatRecords, setChatRecords] = useState([])
-
+	
 	useEffect(()=>{
 		localforage.getItem("send_to_" + select).then(
 			send_to => {
