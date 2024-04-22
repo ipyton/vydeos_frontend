@@ -1,4 +1,3 @@
-import FriendIntro from "../../FriendList/FriendIntro";
 import { ImageList, ImageListItem, Avatar } from "@mui/material";
 import Stack from '@mui/material/Stack';
 import * as React from 'react';
@@ -31,12 +30,10 @@ export default function (props) {
                 console.log("does not have userIntro")
                 return
             }
-            console.log(res)
             setDetails(res)
             setRelationship(res.relationship)
         })
     },[])
-    console.log("------------------------------")
 
     let contactButtonText = ""
 
@@ -85,7 +82,6 @@ export default function (props) {
     let handleFollow = () => {
         if (Math.floor(relationship / 10) === 1) {
             localforage.getItem("userId").then(res => {
-
                 SocialMediaUtil.unfollow(res, details.userId, details, setRelationship)
             })
         } else {

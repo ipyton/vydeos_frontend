@@ -10,15 +10,20 @@ import { ListItemButton } from '@mui/material';
 
 export default function(props){
     let { content, idx } = props
+
+    let handleClick = (idx) => {
+        
+    }
+
     if(0 === idx || 1 === idx || 2 === idx) {
         return (<div>
-            <ListItemButton >
+            <ListItemButton onClick={handleClick(idx)}>
                 <ListItem alignItems="flex-start">
                     <ListItemAvatar>
                         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
                     </ListItemAvatar>
                     <ListItemText
-                        primary="Tim"
+                        primary={content.friend_id}
                     />
                 </ListItem>
             </ListItemButton>
@@ -26,9 +31,9 @@ export default function(props){
 
         </div>)
     }
-    else if (3 === idx ){
+    else if ( 3 === idx ){
         return (<div>
-            <ListItemButton >
+            <ListItemButton onClick={handleClick(idx) }>
                 <ListItem alignItems="flex-start">
                     <ListItemAvatar>
                         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
@@ -44,7 +49,7 @@ export default function(props){
     }
     else if (4 === idx ) {
         return (<div>
-            <ListItemButton >
+            <ListItemButton onClick={handleClick(idx)}>
                 <ListItem alignItems="flex-start">
                     <ListItemAvatar>
                         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
@@ -62,7 +67,7 @@ export default function(props){
     }
     else if (5 === idx) {
         return (<div>
-            <ListItemButton >
+            <ListItemButton onClick={handleClick(idx)}>
                 <ListItem alignItems="flex-start">
                     <ListItemAvatar>
                         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />

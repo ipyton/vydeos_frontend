@@ -31,6 +31,7 @@ export default class SocialMediaUtil {
         }).then(response => {
             if (response.data.code === 1) {
                 localforage.getItem("userIntro").then((res) => {
+                    //res is a userIntro
                     res.relationship = res.relationship % 10 + 10
                     details.relationship = res.relationship % 10 + 10
                     localforage.setItem("userIntro", res)
@@ -122,7 +123,7 @@ export default class SocialMediaUtil {
     }
 
 
-    static getRelationships(idx,setValue) {
+    static getRelationships(idx,setValue,setList) {
         
         let requestName= null;
         if (0 === idx) {
@@ -163,7 +164,9 @@ export default class SocialMediaUtil {
             console.log(err)
         }).then((response)=> {
             console.log(response)
+            let list = JSON.parse(response.data.message)
             setValue(idx)
+            setList(list)
         })
     }
 }

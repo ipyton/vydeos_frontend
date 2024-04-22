@@ -49,20 +49,24 @@ function a11yProps(index) {
 }
 
 
-export default function(props) {
-    let  a = [1,1,1,1,1,1,1,1,6,6,6,6,6]
+export default function (props) {
+    let a = [1, 1, 1, 1, 1, 1, 1, 1, 6, 6, 6, 6, 6]
     const theme = useTheme();
 
-    const [value, setValue] = React.useState(0);
-
+    const [value, setValue] = React.useState(0)
+    const [list, setList] = React.useState([])
+    React.useEffect(()=>{
+        SocialMediaUtil.getRelationships(value, setValue, setList)
+    
+    },[])
     const handleChange = (event, newValue) => {
-        SocialMediaUtil.getRelationships(newValue, setValue)
+        SocialMediaUtil.getRelationships(newValue, setValue, setList)
     };
     const handleChangeIndex = (index) => {
-        
+
         setValue(index);
     };
-    return (<Stack sx={{width:"30%", boxShadow:1,  borderRadius: 2}} spacing={2}>
+    return (<Stack sx={{ width: "30%", boxShadow: 1, borderRadius: 2 }} spacing={2}>
         <Box sx={{ bgcolor: 'background.paper' }}>
             <AppBar position="static">
                 <Tabs
@@ -88,26 +92,38 @@ export default function(props) {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    Friends
+                    {list.map((res, idx) => {
+                        return (<FriendItem content={res} idx={0}></FriendItem>)
+                    })}
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    Follows
+                {list.map((res, idx) => {
+                    return (<FriendItem content={res} idx={1}></FriendItem>)
+                    })}
                 </TabPanel>
                 <TabPanel value={value} index={2} dir={theme.direction}>
-                    Followers
+                    {list.map((res, idx) => {
+                        return (<FriendItem content={res} idx={2}></FriendItem>)
+                    })}
                 </TabPanel>
                 <TabPanel value={value} index={3} dir={theme.direction}>
-                    Groups
+                    {list.map((res, idx) => {
+                        return (<FriendItem content={res} idx={3}></FriendItem>)
+                    })}
                 </TabPanel>
                 <TabPanel value={value} index={4} dir={theme.direction}>
-                    Invitations
+                    {list.map((res, idx) => {
+                        return (<FriendItem content={res} idx={4}></FriendItem>)
+                    })}
                 </TabPanel>
                 <TabPanel value={value} index={5} dir={theme.direction}>
-                    BlackList
+                    {list.map((res, idx) => {
+                        return (<FriendItem content={res} idx={5}></FriendItem>)
+                    })}
                 </TabPanel>
             </SwipeableViews>
         </Box>
 
 
-</Stack>)
+    </Stack>)
 }

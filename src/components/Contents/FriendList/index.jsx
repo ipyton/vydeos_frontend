@@ -12,13 +12,15 @@ import Stack from '@mui/material/Stack';
 import FriendIntro from './FriendIntro';
 
 export default function Friends(props) {
-  let list = [12,12,312,4,13,4123,5,345,34]
+  let list = [12, 12, 312, 4, 13, 4123, 5, 345, 34]
   let height = window.innerHeight * 0.8
+  let [userId, setUserId] = useState(null)
+  let [index, setIndex] = useState(0)
   return (
-  <Stack sx={{marginLeft:'15%',width:'70%',marginTop:3, height:height}} direction="row" justify="center" spacing={2}>
-    <Friend></Friend>
-    <FriendIntro></FriendIntro>
-  </Stack>
+    <Stack sx={{ marginLeft: '15%', width: '70%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
+      <Friend></Friend>
+      <FriendIntro></FriendIntro>
+    </Stack>
 
   );
 }
