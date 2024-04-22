@@ -10,12 +10,16 @@ import Paper from '@mui/material/Paper';
 import * as React from 'react';
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
+  // ...theme.typography.body2,
   // padding: theme.spacing(1),
   textAlign: 'right',
-  color: theme.palette.text.secondary,
+  elevation: 0,
+  //color: theme.palette.text.secondary,
   flexGrow: 2,
+  shadows: ["none"],
+  color: 'darkslategray',
+  //backgroundColor: 'aliceblue',
+
 }));
 
 
@@ -33,9 +37,9 @@ export default function (props) {
             display="none"
             //aria-controls={menuId}
             aria-haspopup="true"
-            //onClick={handleProfileMenuOpen}
-            color="inherit"
->
+          //onClick={handleProfileMenuOpen}
+
+          >
             <Avatar alt={props.content.avatar} />
           </IconButton>
         </Stack>
@@ -60,7 +64,7 @@ export default function (props) {
   else {
     return (
       <Stack direction="row"  >
-        <Item>
+        <Item sx={{ boxShadow: 0 }}>
           <MessageBox
             position={'right'}
             type={props.content.messageType}
@@ -81,9 +85,8 @@ export default function (props) {
           display="none"
           //aria-controls={menuId}
           aria-haspopup="true"
-          //onClick={handleProfileMenuOpen}
-          color="inherit"
-          textAlign="center"
+        //onClick={handleProfileMenuOpen}
+
         >
           <Avatar alt="Travis Howard" />
         </IconButton>

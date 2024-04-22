@@ -10,7 +10,6 @@ export default class SocialMediaUtil {
     static getUrlBase() {
         return "http://localhost:8000"
     }
-    dispath = useDispatch()
 
 
     static follow(sender, receiver, details, setRelationship) {
@@ -119,6 +118,52 @@ export default class SocialMediaUtil {
             // write to storage.
         }).catch(() => {
 
+        })
+    }
+
+
+    static getRelationships(idx,setValue) {
+        
+        let requestName= null;
+        if (0 === idx) {
+            // get friends
+            requestName = "get_friends"
+        }
+        else if (1 === idx) {
+            // get I follow
+            requestName = "get_idols"
+        }
+        else if (2 === idx) {
+            // get followers
+            requestName = "get_followers"
+        }
+        else if (3 === idx) {
+            //get current group
+            requestName = "get_groups"
+        }
+        else if (4 === idx) {
+            // get invitations
+            requestName = "get_invitations"
+        }
+        else if (5 === idx) {
+            requestName = "get_black_list"
+        }
+
+        axios({
+            url: SocialMediaUtil.getUrlBase() + "/friends/" + requestName,
+            method: "post",
+            data: { },
+            transformRequest: [function (data) {
+                return qs.stringify(data)
+            }],
+            headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch( err => {
+            console.log(err)
+        }).then((response)=> {
+            console.log(response)
+            setValue(idx)
         })
     }
 }

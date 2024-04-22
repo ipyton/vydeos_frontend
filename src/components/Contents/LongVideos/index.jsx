@@ -14,6 +14,7 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
   color: theme.palette.text.secondary,
+
 }));
 
 
@@ -95,11 +96,11 @@ export default function LongVideos(props) {
   return (
     <div >
       <Stack sx={{marginLeft:"10%",width:"80%"}}>
-        <Item>
+        <Item sx={{ boxShadow: 0 }}>
           <Stack direction="row" spacing={2}>
-          <Item sx={{width:"70%",height:"20%"}}>
+            <Item sx={{ width: "70%", height: "20%", boxShadow: 0 }}>
             <Stack spacing={2}>
-              <Item sx={{textAlign:"left",fontSize:20}}>this is a title</Item>
+                <Item sx={{ textAlign: "left", fontSize: 20, boxShadow: 0 }}>this is a title</Item>
               <Item>
                 <LongVideo options={videoJsOptions} onReady={handlePlayerReady}></LongVideo>
               </Item>
@@ -107,7 +108,7 @@ export default function LongVideos(props) {
 
           </Item>
           <Item sx={{textAlign:"left", width:"30%"}}>
-            playList
+            PlayList
             <Stack>
               <Item >sdif</Item>
               <Item>afdis</Item>
@@ -115,10 +116,10 @@ export default function LongVideos(props) {
           </Item>
           </Stack>
         </Item>
-        <Item sx={{textAlign:"left"}}> 
-          comments
+        <Item sx={{ textAlign: "left", boxShadow: 0 }}> 
+          Comments
         </Item>
-        <Item >
+        <Item sx={{ boxShadow: 0 }}>
           <Comments commentList={[]}></Comments>
         </Item>
 

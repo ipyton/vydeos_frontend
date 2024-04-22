@@ -29,6 +29,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import UserInitializer from "../../util/UserInitializer"
+import VideoIntroduction from "./VideoIntroduction"
 
 const defaultTheme = createTheme();
 
@@ -93,6 +94,7 @@ export default function Contents(props) {
                                         <Route path="/videolist" element={<VideoList setBarState={setState} status={props}></VideoList>}></Route>
                                         <Route path="/searchresult" element={<SearchResult> </SearchResult>}></Route>
                                         <Route path="/friendInfomation" element={<FriendIntroductionCentered ></FriendIntroductionCentered>}></Route>
+                                        <Route path="videoIntroduction" element={<VideoIntroduction></VideoIntroduction>}> </Route>
                                         <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
                                     </Routes>

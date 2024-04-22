@@ -69,9 +69,11 @@ export default function Chat(props) {
             })
           })
         }
-      localforage.removeItem("contactCursor")
-      setUserRecords([...res])
-      setSideBarSelector(cursor)
+        setSideBarSelector(cursor)
+      }).then(()=>{
+        localforage.removeItem("contactCursor")
+        setUserRecords([...res])
+
       })
     })
 
@@ -79,7 +81,6 @@ export default function Chat(props) {
   },[]);
 
 
-  let friendList = [{ username: " ", userAvatar: "", recentMessages: [] }]
   // userId
   return (
     <Stack sx={{ marginLeft: '15%', width: '70%', height: height, }} direction="row" justify="center" spacing={2}>

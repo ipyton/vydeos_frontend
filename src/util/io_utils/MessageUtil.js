@@ -64,7 +64,7 @@ export default class MessageUtil {
 
     }
 
-    static getNewestMessages(friendId,setSelect) {
+    static getNewestMessages(friendId, setSelect) {
         let checkKey = "chatLastUpdate_" + friendId
         localforage.getItem(checkKey).then(async timestamp => {
             if (!timestamp) {
@@ -105,7 +105,7 @@ export default class MessageUtil {
                     let records_map = {}
 
                     //dispatch messages to their sender in a map. 
-                    let maxTimestamp = -1
+                    let maxTimestamp = timestamp
                     for (let i = 0; i < messages.length; i++) {
                         let userId = messages[i].userId;
                         if (records_map[userId]) {
@@ -113,11 +113,9 @@ export default class MessageUtil {
                         } else {
                             records_map[userId] = [messages[i]]
                         }
-                        maxTimestamp = Math.max(messages[i].timestamp, maxTimestamp)
+                        maxTimestamp = Math.max(messages[i].sendTime, maxTimestamp)
                     }
                     await localforage.setItem(checkKey, maxTimestamp)
-
-
 
                     //write to the database
                     for (let key in records_map) {
@@ -171,8 +169,9 @@ export default class MessageUtil {
                         )
                     })
                 }
-            ).then(()=> {
+            ).then(() => {
                 setSelect(friendId)
+
 
             })
         })
@@ -201,10 +200,6 @@ export default class MessageUtil {
                     console.log("internal errors ")
                 }
                 let message = JSON.parse(response.data.message)
-                console.log(message)
-                console.log(response.data.message.timestamp)
-                console.log(response.data.message.messageId)
-
                 localforage.getItem("send_to_" + sendTo).then(res => {
                     data["messageId"] = message.messageId
                     data["sendTime"] = message.timestamp

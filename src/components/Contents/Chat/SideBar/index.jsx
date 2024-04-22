@@ -21,8 +21,7 @@ export default function SideBar(props) {
   console.log(props)
   let { select, setSelect, userRecords, setUserRecords } = props
 
-  console.log("userRecords")
-  console.log(userRecords)
+
   //let [listItem,setListItem] = useState([])
   let onClick = (idx) => {
     return () => {
@@ -46,7 +45,7 @@ export default function SideBar(props) {
 
   return (
     <Stack sx={{ width: "30%", boxShadow: 1, borderRadius: 2 }} spacing={2}>
-      <List sx={{ width: '100%', bgcolor: 'background.paper', overflow: 'scroll' }}>
+      <List sx={{ width: '100%', bgcolor: 'background.paper', overflow: 'scroll'}}>
         {userRecords.map((content, idx) => { 
           console.log(idx)
           return <Contact onClick={onClick(idx)} content={content} selected={select} ></Contact> })}

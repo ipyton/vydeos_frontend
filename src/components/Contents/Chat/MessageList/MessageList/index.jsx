@@ -46,7 +46,6 @@ export default function (props) {
       <div className="messagesWrapper" >
         {
           chatRecords.map((x, idx) => {
-            
             return (<SingleMessage content={x} select = {select}></SingleMessage>)
           })
         }

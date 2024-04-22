@@ -8,22 +8,74 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { ListItemButton } from '@mui/material';
 
-export default function(){
-    return (
-        <div>
-        <ListItemButton >    
-            <ListItem alignItems="flex-start">
-                <ListItemAvatar>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                </ListItemAvatar>
-                <ListItemText
-                    primary="Tim"
-                />
-            </ListItem>    
-        </ListItemButton>
-        <Divider></Divider>
+export default function(props){
+    let { content, idx } = props
+    if(0 === idx || 1 === idx || 2 === idx) {
+        return (<div>
+            <ListItemButton >
+                <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary="Tim"
+                    />
+                </ListItem>
+            </ListItemButton>
+            <Divider></Divider>
 
-            
-        </div>
-)
+        </div>)
+    }
+    else if (3 === idx ){
+        return (<div>
+            <ListItemButton >
+                <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary="Tim"
+                    />
+                </ListItem>
+            </ListItemButton>
+            <Divider></Divider>
+
+        </div>)
+    }
+    else if (4 === idx ) {
+        return (<div>
+            <ListItemButton >
+                <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary="Tim"
+                    />
+                </ListItem>
+            </ListItemButton>
+            <Divider></Divider>
+
+        </div>)
+
+
+    }
+    else if (5 === idx) {
+        return (<div>
+            <ListItemButton >
+                <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary="Tim"
+                    />
+                </ListItem>
+            </ListItemButton>
+            <Divider></Divider>
+
+        </div>)
+
+
+    }
 }

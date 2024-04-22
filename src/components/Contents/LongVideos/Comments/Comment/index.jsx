@@ -32,22 +32,22 @@ export default function Comment(params) {
     }
     return (
         <Stack direction="row">
-            <Item >
+            <Item sx={{ boxShadow: 0 }}>
                 {avatar}
             </Item>
             <Item sx={{width:"90%"}}>
                 <Stack>
-                    <Item sx={{textAlign:"left"}}>{name}</Item>
-                    <Item sx={{textAlign:"left"}}>{content}</Item>
-                    <Item >
+                    <Item sx={{ textAlign: "left", boxShadow: 0 }}>{name}</Item>
+                    <Item sx={{ textAlign: "left", boxShadow: 0 }}>{content}</Item>
+                    <Item sx={{ boxShadow: 0 }}>
                         <Stack direction="row" justifyContent="flex-end">
-                            <Item>
+                            <Item sx={{ boxShadow: 0 }}>
                                 <IconButton>
                                     <ShareIcon fontSize="small">
                                     </ShareIcon>
                                 </IconButton>
                             </Item>
-                            <Item>
+                            <Item sx={{ boxShadow: 0 }}>
                                 {likes}
                                 <IconButton>
                                     
