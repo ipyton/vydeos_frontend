@@ -10,16 +10,19 @@ import Friend from './Friend';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import FriendIntro from './FriendIntro';
+import FriendIntroductionCentered from '../Introductions/FriendIntroductionCentered';
 
 export default function Friends(props) {
   let list = [12, 12, 312, 4, 13, 4123, 5, 345, 34]
   let height = window.innerHeight * 0.8
-  let [userId, setUserId] = React.useState(null)
+  let [selector, setSelector] = React.useState({type:"userId", content:"null"})
+  const position = "right"
+
   let [index, setIndex] = React.useState(0)
   return (
     <Stack sx={{ marginLeft: '15%', width: '70%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
-      <Friend></Friend>
-      <FriendIntro></FriendIntro>
+      <Friend setSelector={setSelector}></Friend>
+      <FriendIntroductionCentered selector={selector} position={"right"}></FriendIntroductionCentered>
     </Stack>
 
   );

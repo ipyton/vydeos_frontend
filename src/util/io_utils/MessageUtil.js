@@ -245,7 +245,7 @@ export default class MessageUtil {
                 console.log(responseData.message)
                 //MessageUtil.setUserIntro(JSON.parse(responseData.message), dispatch)
                 localforage.setItem("userIntro", JSON.parse(responseData.message)).then(() => {
-                    navigator("/friendInfomation")
+                    navigator("/friendInfomation",{state:{position:"mid"}})
                 })
 
             }

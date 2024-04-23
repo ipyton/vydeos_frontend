@@ -100,8 +100,8 @@ export default function (props) {
 
 
         <ButtonGroup sx={{ marginTop: "3%", height: "50%" }} aria-label="Basic button group" >
-          <Button>unfollow</Button>
-          <Button>contact</Button>
+          <Button>Unfollow</Button>
+          <Button>Contact</Button>
         </ButtonGroup>
       </Stack>
 
