@@ -114,7 +114,7 @@ export default function UserInfo(props) {
     }
     return (
       <div>
-        <input id="uploadPic" type="file" onChange={picUploadHandler} hidden></input>
+        <input id="uploadPic" type="file" onChange={picUploadHandler} value="text" hidden></input>
         <label htmlFor="uploadPic">
           <IconButton component="span">
             {mid}

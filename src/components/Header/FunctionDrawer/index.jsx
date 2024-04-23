@@ -125,8 +125,8 @@ export default function FunctionDrawer(props) {
 
   //let iconList = {"Inbox":function(){return (<InboxIcon></InboxIcon>)}, "Message":"eval(iconFunctionString)", "Settings":TuneIcon, "Trending":WhatshotIcon, "Posts":HomeIcon}
 
-  let functions = ['Chat', 'Settings', 'Trending', 'Posts', 'Videos', 'Edit', 'Friend']
-  let routeTable = ['/chat', '/settings',  '/trending', '/home', '/longVideos', '/edit', '/friends']
+  let functions = ['Chat', 'Trending', 'Posts', 'Videos', 'Edit', 'Friend', 'Settings']
+  let routeTable = ['/chat', '/trending', '/home', '/longVideos', '/edit', '/friends', '/settings']
   // let routeTable = {'Chat': '/chat', 'Settings': 'settings', 'Trending': 'trending', 'Posts': 'home'}
 
   let handleMessageJump = (index) => {
@@ -138,7 +138,6 @@ export default function FunctionDrawer(props) {
 
 
   return (
-
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
           <IconButton onClick={toggleDrawer}>

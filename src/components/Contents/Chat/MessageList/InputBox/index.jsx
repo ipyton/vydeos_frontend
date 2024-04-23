@@ -47,7 +47,6 @@ export default function (props) {
         setText("")
     })
     }
-  console.log(chatRecords)
   const picUploadHandler = () => {
     setText("{attachment}")
   }
@@ -88,9 +87,9 @@ export default function (props) {
           }}
         >
 
-          <input id="uploadPic" type="file" onChange={picUploadHandler} hidden></input>
-          <input id="uploadVid" type="file" onChange={vidUploadHandler} hidden></input>
-          <input id="uploadVoi" type="file" onChange={voiUploadHandler} hidden></input>
+          <input id="uploadPic" type="file" onChange={picUploadHandler}  hidden></input>
+          <input id="uploadVid" type="file" onChange={vidUploadHandler}  hidden></input>
+          <input id="uploadVoi" type="file" onChange={voiUploadHandler}  hidden></input>
 
           <label htmlFor="uploadPic">
             <MenuItem onClick={handleClose}><AddPhotoAlternateIcon></AddPhotoAlternateIcon>Pictures</MenuItem>

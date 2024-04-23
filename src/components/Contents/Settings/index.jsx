@@ -13,6 +13,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+
 import {
   arrayMove,
   SortableContext,
@@ -70,7 +71,7 @@ export default function Settings(props) {
   //   </Box>
     
   // );
-  const [items, setItems] = useState([1, 2, 3]);
+  const [items, setItems] = useState([1,2,3]);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -98,9 +99,7 @@ export default function Settings(props) {
           items={items}
           strategy={verticalListSortingStrategy}
         >
-          {
-            
-          }
+
           {items.map(id => <ListItem key={id} id={id} name={id +"uigafdiub"} picture ={"pictures"}/>)}
         </SortableContext>
       </DndContext>

@@ -25,20 +25,48 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function (props) {
   // record list.
-  let { chatRecords, select } = props;
+  let { chatRecords, setChatRecords, select } = props;
 
 
+  const messagesEndRef = useRef(null)
+  useEffect(() => {
+    //MessageUtil.getNewestMessages(select)
+
+    localforage.getItem("send_to_" + select).then(
+      send_to => {
+        localforage.getItem("send_from_" + select).then(
+          async receive_from => {
+            if (!send_to) {
+              send_to = []
+              await localforage.setItem("send_to_" + select, send_to)
+            }
+            if (!receive_from) {
+              receive_from = []
+              await localforage.setItem("send_from_" + select, receive_from)
+            }
+            let result = [...send_to, ...receive_from]
+            //console.log(receive_from)
+            console.log(result)
+            result.sort((a, b) => {
+              return a.sendTime - b.sendTime
+            })
+            setChatRecords(result)
+            console.log(result)
+          }
+        )
+      }
+    )
+
+  }, [select])
+
+  useEffect(()=> {
+    if (!messagesEndRef || !messagesEndRef.current) return
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [chatRecords])
+  
   if (!chatRecords || chatRecords.length === 0) {
     return <div>Start to chat</div>
   }
-  const messagesEndRef = useRef(null)
-
-  console.log(messagesEndRef)
-
-  useEffect(()=> {
-    if (!messagesEndRef) return
-    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [chatRecords])
 
 
   return (

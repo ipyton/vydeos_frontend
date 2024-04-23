@@ -18,14 +18,12 @@ const Item = styled(Paper)(({ theme }) => ({
   flexGrow: 2,
   shadows: ["none"],
   color: 'darkslategray',
-  //backgroundColor: 'aliceblue',
-
 }));
 
 
 export default function (props) {
   let select = props.select;
-  console.log(props)
+
   if (props.content.userId === select) {
     return (
       <Stack direction="row"  >

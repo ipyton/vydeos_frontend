@@ -12,16 +12,20 @@ export default function(props){
     let { content, idx , setSelector} = props
 
     let handleClick = (idx) => {
-        if (1 === idx || 0 === idx || 2 === idx) {
-            setSelector({ type: "userId", content: content.friend_id })
-        } else if (3 === idx) {
-            setSelector({ type: "groupId", content: content.group_id })
-        } else if (4 === idx) {
-            setSelector({ type: "invitationId", content: content.invitation_id})
-        } else if (5 === idx) {
-            setSelector({ type: "userId", content: content.friend_id })
+        return ()=> {
+            if (1 === idx || 0 === idx || 2 === idx) {
+                setSelector({ type: "userId", content: content.friend_id })
+            } else if (3 === idx) {
+                setSelector({ type: "groupId", content: content.group_id })
+            } else if (4 === idx) {
+                setSelector({ type: "invitationId", content: content.invitation_id })
+            } else if (5 === idx) {
+                setSelector({ type: "userId", content: content.friend_id })
+
+            }
 
         }
+
     }
 
     if(0 === idx || 1 === idx || 2 === idx) {

@@ -30,7 +30,7 @@ import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import UserInitializer from "../../util/UserInitializer"
 import LongVideoIntroduction from "./Introductions/LongVideoIntroduction"
-
+import localforage from "localforage"
 const defaultTheme = createTheme();
 
 export default function Contents(props) {
@@ -53,17 +53,98 @@ export default function Contents(props) {
     }; 
 
     const [refresh,setRefresh] = useState(false)
+    const [notifications,setNotifications] = useState([])
+    const [chatRecords, setChatRecords] = useState([])
+    const [userRecords, setUserRecords] = useState([])
+    const [sideBarSelector, setSideBarSelector] = useState("")
+
 
 
     useEffect(()=> {
-        const worker = new Worker("./webworkers/NotificationReceiver.js")
-        worker.onmessage = (e) => {
-            setRefresh(!refresh)
-            console.log(e)
-            console.log("updated")
-        }
+        //
         UserInitializer.init()
-    })
+        localforage.getItem(
+            "recent_contacts"
+        ).then(res => {
+            if (!res) res = []
+            localforage.getItem(
+                "contactCursor"
+            ).then(async cursor => {
+                if (!cursor) console.log("can not find the user")
+                else {
+                    if (!res) return
+                    for (let i = 0; i < res.length; i++) {
+                        let ele = res[i]
+                        if (!ele || !ele.userId) {
+                            return
+                        }
+                        if (ele.userId === cursor) {
+                            res = [res[i], ...res.slice(0, i), ...res.slice(i + 1)]
+                            await localforage.setItem("recent_contacts", res)
+                            setUserRecords(res)
+                            return
+                        }
+                    }
+
+                    localforage.getItem("friendList").then(list => {
+                        if (!list) return
+                        res.push({ "userId": list[cursor].userId, "name": list[cursor].name, "avatar": list[cursor].avatar, new:false })
+                        localforage.setItem("recent_contacts", res).then(() => {
+                        }).then(async () => {
+                            await localforage.setItem("send_to_" + cursor, [])
+                            await localforage.setItem("send_from_" + cursor, [])
+                        })
+                    })
+                }
+                setSideBarSelector(cursor)
+            }).then(() => {
+                localforage.removeItem("contactCursor")
+                setUserRecords([...res])
+
+            })
+        }).then(()=>{
+
+        }).then(()=> {
+            const worker = new Worker("./webworkers/NotificationReceiver.js")
+            worker.onmessage = (e) => {
+                //setRefresh(!refresh)
+                console.log(e.data)
+                // update userList
+                let flag = false 
+                for (let i = 0; i < userRecords.length; i ++) {
+                    if (userRecords.userId === e.data.userId) {
+                        if (sideBarSelector === e.data.userId) {
+                            break
+                        }
+                        else {
+                            userRecords[i].new =true
+                            setUserRecords(userRecords)
+                            break
+                        }
+                    }
+                }
+                if (!flag) {
+                    localforage.getItem("friendList").then(list => {
+                        if (!list) return
+                        let contact = { "userId": list[e.data.userId].userId, "name": list[e.data.userId].name, "avatar": list[e.data.userId].avatar, new: true }
+                        localforage.setItem("recent_contacts", [contact, ...userRecords]).then(() => {
+                        }).then(()=>{
+                            setUserRecords([contact, ...userRecords])
+                        })
+                    })
+                }
+
+                //update messageList
+                if (sideBarSelector === e.data.userId) {
+                    setChatRecords([e.data, ...chatRecords])
+
+                } 
+                //update notificationList
+                setNotifications([e.data, ...notifications])
+                console.log("updated")
+            }
+        })
+    },[])
 
 
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
@@ -71,7 +152,7 @@ export default function Contents(props) {
         < ThemeProvider theme={defaultTheme} >
             <BrowserRouter>
                 <Box sx={{ display: 'flex' }}>
-                    <Header avatar={avatar} setAvatar={setAvatar} badgeContent={badgeContent} setBadgeContent={setBadgeContent}></Header>
+                    <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setBadgeContent={setNotifications}></Header>
                     <Box width="100%" justifyContent="center" alignItems="center" sx={{ marginTop: window.innerHeight* 0.01}}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <div>
@@ -82,7 +163,7 @@ export default function Contents(props) {
                                         <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
                                         <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
                                         <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
-                                        <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}></Chat>}></Route>
+                                        <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} refresh={refresh}></Chat>}></Route>
                                         <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                                         <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
                                         <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>

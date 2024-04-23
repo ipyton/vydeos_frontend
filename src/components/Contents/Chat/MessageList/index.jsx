@@ -26,38 +26,10 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function (props) {
 	let messages = [{ from_nickName: "xxx", to_nickName: "xxx", content: "xxx", time: "xxx", position: "right", from_username: "", to_username: "", type: "" },]
-	const { select } = props
+	const { select, refresh } = props
 	const [chatRecords, setChatRecords] = useState([])
 
-	useEffect( () => {
-		//MessageUtil.getNewestMessages(select)
 
-		localforage.getItem("send_to_" + select).then(
-			send_to => {
-				localforage.getItem("send_from_" + select).then(
-					async receive_from => {
-						if (!send_to) {
-							send_to = []
-							await localforage.setItem("send_to_" + select, send_to)
-						}
-						if (!receive_from) {
-							receive_from = []
-							await localforage.setItem("send_from_" + select, receive_from)
-						}
-						let result = [...send_to, ...receive_from]
-						//console.log(receive_from)
-						console.log(result)
-						result.sort((a, b) => {
-							return a.sendTime - b.sendTime
-						})
-						setChatRecords(result)
-						console.log(result)
-					}
-				)
-			}
-		)
-
-	}, [select])
 
 	if (!select) {
 		return <div> Start/Select a conversation first!</div>
@@ -68,7 +40,7 @@ export default function (props) {
 	return (<Stack sx={{ width: "70%", boxShadow: 1 }}>
 
 		<Header selected={select}></Header>
-		<Message chatRecords={chatRecords}  select = {select}> </Message>
+		<Message chatRecords={chatRecords}  setChatRecords={setChatRecords} select = {select}> </Message>
 		<InputBox chatRecords={chatRecords} setChatRecords={setChatRecords} select={select}></InputBox>
 	</Stack>)
 }

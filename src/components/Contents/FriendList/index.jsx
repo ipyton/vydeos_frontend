@@ -10,8 +10,8 @@ import Friend from './Friend';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import FriendIntro from './FriendIntro';
-import FriendIntroductionCentered from '../Introductions/FriendIntroductionCentered';
-
+//import FriendIntroductionCentered from '../Introductions/FriendIntroductionCentered';
+import Introductions from "../Introductions"
 export default function Friends(props) {
   let list = [12, 12, 312, 4, 13, 4123, 5, 345, 34]
   let height = window.innerHeight * 0.8
@@ -22,7 +22,7 @@ export default function Friends(props) {
   return (
     <Stack sx={{ marginLeft: '15%', width: '70%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
       <Friend setSelector={setSelector}></Friend>
-      <FriendIntroductionCentered selector={selector} position={"right"}></FriendIntroductionCentered>
+      <Introductions selector={selector} position={"right"}></Introductions>
     </Stack>
 
   );

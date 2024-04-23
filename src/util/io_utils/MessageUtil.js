@@ -65,7 +65,7 @@ export default class MessageUtil {
     }
 
     static getNewestMessages(friendId, setSelect) {
-        let checkKey = "chatLastUpdate_" + friendId
+        let checkKey = "chatLastUpdate" 
         localforage.getItem(checkKey).then(async timestamp => {
             if (!timestamp) {
                 timestamp = 0;

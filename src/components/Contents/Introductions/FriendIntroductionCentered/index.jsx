@@ -17,6 +17,8 @@ import localforage from "localforage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+
+//this is used to show the user information.
 export default function (props) {
     const [details, setDetails] = useState(null)
     const [relationship, setRelationship] = useState(0)

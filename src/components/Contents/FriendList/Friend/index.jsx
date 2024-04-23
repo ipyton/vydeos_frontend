@@ -93,34 +93,57 @@ export default function (props) {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    {list.map((res, idx) => {
-                        return (<FriendItem setSelector={setSelector} content={res} idx={0}></FriendItem>)
-                    })}
+                    <List>
+                        {list.map((res, idx) => {
+                            return (<FriendItem setSelector={setSelector} content={res} idx={0}></FriendItem>)
+                        })}
+                    </List>
+
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                {list.map((res, idx) => {
-                    return (<FriendItem setSelector={setSelector} content={res} idx={1}></FriendItem>)
-                    })}
+                    <List>
+                        {list.map((res, idx) => {
+                            return (<FriendItem setSelector={setSelector} content={res} idx={1}></FriendItem>)
+                        })}
+
+                    </List>
+
                 </TabPanel>
                 <TabPanel value={value} index={2} dir={theme.direction}>
-                    {list.map((res, idx) => {
-                        return (<FriendItem setSelector={setSelector} content={res} idx={2}></FriendItem>)
-                    })}
+                    <List>
+                        {list.map((res, idx) => {
+                            return (<FriendItem setSelector={setSelector} content={res} idx={2}></FriendItem>)
+                        })}
+
+                    </List>
+
                 </TabPanel>
                 <TabPanel value={value} index={3} dir={theme.direction}>
-                    {list.map((res, idx) => {
-                        return (<FriendItem setSelector={setSelector} content={res} idx={3}></FriendItem>)
-                    })}
+                    <List>
+                        {list.map((res, idx) => {
+                            return (<FriendItem setSelector={setSelector} content={res} idx={3}></FriendItem>)
+                        })}
+
+                    </List>
+
                 </TabPanel>
                 <TabPanel value={value} index={4} dir={theme.direction}>
-                    {list.map((res, idx) => {
-                        return (<FriendItem setSelector={setSelector} content={res} idx={4}></FriendItem>)
-                    })}
+                    <List>
+                        {list.map((res, idx) => {
+                            return (<FriendItem setSelector={setSelector} content={res} idx={4}></FriendItem>)
+                        })}
+
+                    </List>
+
                 </TabPanel>
                 <TabPanel value={value} index={5} dir={theme.direction}>
-                    {list.map((res, idx) => {
-                        return (<FriendItem setSelector={setSelector} content={res} idx={5}></FriendItem>)
-                    })}
+                    <List>
+                        {list.map((res, idx) => {
+                            return (<FriendItem setSelector={setSelector} content={res} idx={5}></FriendItem>)
+                        })}
+
+                    </List>
+
                 </TabPanel>
             </SwipeableViews>
         </Box>
