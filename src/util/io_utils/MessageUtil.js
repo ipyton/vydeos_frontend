@@ -20,7 +20,7 @@ export default class MessageUtil {
         dispatch(update(information))
     }
 
-
+    
     static updateMessage(response) {
         // find the newest message.
         response = JSON.parse(response.data)
@@ -171,8 +171,6 @@ export default class MessageUtil {
                 }
             ).then(() => {
                 setSelect(friendId)
-
-
             })
         })
     }

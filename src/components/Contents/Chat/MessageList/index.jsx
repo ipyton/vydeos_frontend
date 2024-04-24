@@ -26,9 +26,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function (props) {
 	let messages = [{ from_nickName: "xxx", to_nickName: "xxx", content: "xxx", time: "xxx", position: "right", from_username: "", to_username: "", type: "" },]
-	const { select, refresh } = props
-	const [chatRecords, setChatRecords] = useState([])
-
+	const { select, setChatRecords, chatRecords } = props
 
 
 	if (!select) {

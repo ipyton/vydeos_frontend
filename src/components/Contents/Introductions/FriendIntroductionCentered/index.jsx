@@ -78,9 +78,12 @@ export default function (props) {
         if (details.userId === await localforage.getItem("userId")) {
             return
         }
-        localforage.setItem("contactCursor", details.userId)
-        navigate("/chat")
-        console.log("navigate")
+        localforage.setItem("contactCursor", details.userId).then(()=>{
+            navigate("/chat", {state:details})
+            console.log("navigate" + details.userId)
+})
+
+
     }
 
     localforage.getItem("userId").then(res => {

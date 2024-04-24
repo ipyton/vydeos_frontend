@@ -8,7 +8,6 @@ import { ListItemButton } from '@mui/material';
 
 
 export default function Contact(props) {
-  console.log(props)
   let { userId, name, avatar } = props.content
   let selected = props.selected
 

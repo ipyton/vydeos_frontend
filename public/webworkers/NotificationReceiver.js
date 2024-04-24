@@ -73,7 +73,7 @@ localforage.getItem("userId").then(
                         if (result.type === "single") {
                             console.log("this is a single class")
                             await localforage.getItem("send_from_" + result.userId).then(res => {
-                                localforage.setItem([event.data, ...res])
+                                localforage.setItem("send_from_" + result.userId, [event.data, ...res])
                             }).then(() => {
                                 localforage.setItem("chatLastUpdate", Math.max(res, result.sendTime))
                             })
@@ -114,25 +114,3 @@ localforage.getItem("userId").then(
 )
 
 
-
-
-
-// setTimeout(function () {
-//     console.log("sending message")
-//     localforage.getItem("userId").then(userId => {
-//         if (!userId) {
-//             return
-//         }
-//         localforage.getItem("last_update").then(res => {
-//             MessageUtil.getNewestMessages(userId, res)
-//         })
-//     }
-//     )
-//     //postMessage("gooooooooooooooo")
-
-// }, 1000)
-
-
-
-
-//worker.onmessage = workerTimer.onMessage.bind(workerTimer);

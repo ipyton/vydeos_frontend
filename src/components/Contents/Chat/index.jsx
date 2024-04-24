@@ -9,6 +9,8 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import MessageUtil from '../../../util/io_utils/MessageUtil';
 import localforage from 'localforage';
+// import { useIsFocused } from '@react-navigation/native';
+import { useLocation } from 'react-router-dom';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -28,8 +30,9 @@ const Div = styled('div')(({ theme }) => ({
 
 export default function Chat(props) {
   let height = window.innerHeight * 0.8
-  const [userRecords, setUserRecords] = useState([])
-  let { refresh,sideBarSelector, setSideBarSelector} = props
+  //const isFocused = useIsFocused();
+  
+  let { refresh, sideBarSelector, setSideBarSelector, setChatRecords, chatRecords, userRecords, setUserRecords } = props
   const afterGetting = () => {
 
 
@@ -37,12 +40,15 @@ export default function Chat(props) {
 
 
 
+  // const history = useLocation()
+  // console.log(history)
+
 
   // userId
   return (
     <Stack sx={{ marginLeft: '15%', width: '70%', height: height, }} direction="row" justify="center" spacing={2}>
       <SideBar select={sideBarSelector} setSelect={setSideBarSelector} userRecords={userRecords} setUserRecords={setUserRecords} ></SideBar>
-      <MessageList select={sideBarSelector} setSelector={setSideBarSelector} refresh={refresh} ></MessageList>
+      <MessageList select={sideBarSelector} setSelector={setSideBarSelector} refresh={refresh} chatRecords={chatRecords} setChatRecords={setChatRecords}></MessageList>
     </Stack>
   );
 }

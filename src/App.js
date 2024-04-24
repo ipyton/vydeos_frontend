@@ -61,7 +61,9 @@ function App() {
   }
   if (login === true)
     return (
+  <BrowserRouter>
       <Contents ></Contents>
+      </BrowserRouter>
     );
   return <div> loading</div>
 }
