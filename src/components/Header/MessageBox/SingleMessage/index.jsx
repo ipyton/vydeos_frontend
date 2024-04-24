@@ -1,6 +1,11 @@
+import * as React from 'react';
 import { useNavigate } from "react-router-dom"
-import EventTarget from "video.js/dist/types/event-target";
+import { MenuItem } from "@mui/material";
+import ListItemAvatar from '@mui/material/ListItemAvatar';
 
+import Avatar from "@mui/material/Avatar";
+import { useState } from "react";
+import ListItemText from '@mui/material/ListItemText';
 export function SingleMessage(props) {
     const navigate = useNavigate();
     let handleMessageJump = (event, target) => {

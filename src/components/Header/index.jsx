@@ -32,6 +32,9 @@ import { useDispatch } from 'react-redux';
 import {clear} from "../../components/redux/searchResult"
 import localforage from 'localforage';
 import { useState } from 'react';
+import MessageBox from './MessageBox';
+
+
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -114,17 +117,16 @@ export default function Header(props) {
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
   const languageMenuOpen = Boolean(languageAnchorEl)
   const notificationsOpen = Boolean(notificationsAnchorEl)
-  const {refresh} = props
   const dispatch = useDispatch()
+  const {notifications, setNotifications} = props
 
-  React.useEffect(async () => {
-    
-  },[refresh])
   
   const navigate = useNavigate();
   const renderBadge = () => {
 
   }
+
+
   function onClick(event){ 
     if (event.target.id!=="category") {
       setSuggestionAnchorEl(false)
@@ -222,9 +224,7 @@ export default function Header(props) {
     setNotificationsAnchorEl(event.currentTarget)
   }
 
-  const handleNotificationClose = () => {
-    setNotificationsAnchorEl(null)
-  }
+
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -292,122 +292,89 @@ export default function Header(props) {
 
   // messages
   const renderMessageMenu = (
-    <Menu
-    PaperProps={{  
-      style: {  
-        width: 350,  
-      },  
-   }} 
-    anchorEl={notificationsAnchorEl}
-    anchorOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    id={menuId}
-    keepMounted
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    open={notificationsOpen}
-    onClose={handleNotificationClose}
-   >
-        <MenuItem alignItems="flex-start">
-          <ListItemAvatar>
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-          </ListItemAvatar>
-          <ListItemText 
-          primary="Sam Smith"
-          secondary={
-            <React.Fragment>
-              {" — I'll be in your neighborhood doing"}
-            </React.Fragment>
-          }>Name</ListItemText>
-        </MenuItem>
-  </Menu>
-
+      <MessageBox notificationsAnchorEl={notificationsAnchorEl} setNotificationsAnchorEl={setNotificationsAnchorEl} notificationsOpen={notificationsOpen}></MessageBox>
   )
   
   
 
-  const notifications = (
-    <List hidden={!notificationsOpen} sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', zIndex:9999, position: 'absolute', left: '50%',
-    transform: 'translate(-50%, 0)'}}>
-    <ListItemButton onMouseDown={handleNotificationOpen}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Brunch this weekend?"
-          secondary={
-            <React.Fragment>
-              <Typography
-                 variant="body2"
-                color="text.primary"
-              >
-                Ali Connors
-              </Typography>
-              {" message1"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>  
-      </ListItemButton>
+  // const notifications = (
+  //   <List hidden={!notificationsOpen} sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', zIndex:9999, position: 'absolute', left: '50%',
+  //   transform: 'translate(-50%, 0)'}}>
+  //   <ListItemButton onMouseDown={handleNotificationOpen}>
+  //     <ListItem alignItems="flex-start">
+  //       <ListItemAvatar>
+  //         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+  //       </ListItemAvatar>
+  //       <ListItemText
+  //         primary="Brunch this weekend?"
+  //         secondary={
+  //           <React.Fragment>
+  //             <Typography
+  //                variant="body2"
+  //               color="text.primary"
+  //             >
+  //               Ali Connors
+  //             </Typography>
+  //             {" message1"}
+  //           </React.Fragment>
+  //         }
+  //       />
+  //     </ListItem>  
+  //     </ListItemButton>
       
-      <Divider variant="inset" component="li" />
-      <ListItemButton onMouseDown={handleNotificationOpen}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Summer BBQ"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                to Scott, Alex, Jennifer
-              </Typography>
-              {" — message 2"}
-            </React.Fragment>
-          } />
-      </ListItem>
-      </ListItemButton>
+  //     <Divider variant="inset" component="li" />
+  //     <ListItemButton onMouseDown={handleNotificationOpen}>
+  //     <ListItem alignItems="flex-start">
+  //       <ListItemAvatar>
+  //         <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
+  //       </ListItemAvatar>
+  //       <ListItemText
+  //         primary="Summer BBQ"
+  //         secondary={
+  //           <React.Fragment>
+  //             <Typography
+  //               sx={{ display: 'inline' }}
+  //               component="span"
+  //               variant="body2"
+  //               color="text.primary"
+  //             >
+  //               to Scott, Alex, Jennifer
+  //             </Typography>
+  //             {" — message 2"}
+  //           </React.Fragment>
+  //         } />
+  //     </ListItem>
+  //     </ListItemButton>
     
-      <Divider variant="inset" component="li" />
+  //     <Divider variant="inset" component="li" />
 
-      <ListItemButton onMouseDown={handleNotificationOpen}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Oui Oui"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                Sandra Adams
-              </Typography>
-              {' — message3'}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      </ListItemButton>
-    </List>
+  //     <ListItemButton onMouseDown={handleNotificationOpen}>
+  //     <ListItem alignItems="flex-start">
+  //       <ListItemAvatar>
+  //         <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+  //       </ListItemAvatar>
+  //       <ListItemText
+  //         primary="Oui Oui"
+  //         secondary={
+  //           <React.Fragment>
+  //             <Typography
+  //               sx={{ display: 'inline' }}
+  //               component="span"
+  //               variant="body2"
+  //               color="text.primary"
+  //             >
+  //               Sandra Adams
+  //             </Typography>
+  //             {' — message3'}
+  //           </React.Fragment>
+  //         }
+  //       />
+  //     </ListItem>
+  //     </ListItemButton>
+  //   </List>
 
 
-  )
+  // )
 
     let mockData = [{title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}, {title:"Helloworld", introduction:"introduction", pic:"", type:"movie"}]
     const suggestionBar = (
