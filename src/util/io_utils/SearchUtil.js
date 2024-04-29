@@ -9,6 +9,7 @@ export default class SearchUtil {
 
 
   static stateSetter(list, dispatch) {
+    dispatch(clear())
     dispatch(batchAdd(list))
   }
 
@@ -111,7 +112,39 @@ export default class SearchUtil {
 
 
   static searchVideos(keyword) {
-
+    axios({
+      url: "http://localhost:5000"+ "/movie/search",
+      method: 'post',
+      data: { keyword: keyword, page_number:1 },
+      transformRequest: [function (data) {
+        // 对 data 进行任意转换处理
+        return Qs.stringify(data)
+      }], headers: {
+        token: localStorage.getItem("token"),
+      }
+    }).catch(error => {
+      if ("Network Error" === error.message) {
+        //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
+        // setNetworkErr(true)
+        console.log("error")
+      }
+    }).then(function (response) {
+      if (response === undefined) {
+        console.log("errror")
+      }
+      console.log(response)
+      let responseData = response.data
+      if (responseData.code === -1) {
+        //props.setBarState({...props.barState, message:responseData.message, open:true})
+      }
+      else if (responseData.code === 1) {
+        if (responseData.result !== null) {
+        }
+      }
+      else {
+        //props.setBarState({...props.barState, message:responseData.message, open:true})
+      }
+  })
   }
 
 

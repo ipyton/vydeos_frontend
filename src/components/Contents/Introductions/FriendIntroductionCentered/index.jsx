@@ -80,7 +80,6 @@ export default function (props) {
         }
         localforage.setItem("contactCursor", details.userId).then(()=>{
             navigate("/chat", {state:details})
-            console.log("navigate" + details.userId)
 })
 
 

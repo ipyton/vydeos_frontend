@@ -10,16 +10,18 @@ import AccountUtil from '../../../../util/io_utils/AccountUtil';
 import { useState } from 'react';
 import MessageUtil from '../../../../util/io_utils/MessageUtil';
 import { useDispatch } from 'react-redux';
+import SearchUtil from '../../../../util/io_utils/SearchUtil';
 
 export default function (props) {
-    let { title, introduction, pics, type, userId } = props
+    let { title, introduction, pics, type, objectId } = props
     let navigate = useNavigate()
     let avatar = useState(null)
     let miniture = (<div></div>)
     let dispatch = useDispatch()
     const handleSuggestionSelection = (event) => {
         //console.log(setSuggestionOpen)
-        MessageUtil.requestUserInfo(userId, navigate)
+        if (type === "contact") MessageUtil.requestUserInfo(objectId, navigate)
+        else if (type === "movie") SearchUtil.searchVideos()
         //navigate("/friendInfomation")
     }
 
@@ -37,7 +39,7 @@ export default function (props) {
                     alt="Paella dish"
                 />
             </ListItemAvatar>)
-    } else if (type === "") {
+    } else if (type === "music") {
 
     }
 

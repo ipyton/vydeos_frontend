@@ -28,7 +28,7 @@ export default function BasicList() {
       <List sx={{ height: "100%", width: "50%" }}>
         {
           searchResult.map((item, index) => {
-            return (<SearchItem title={item.name} introduction={item.intro} type={item.type} pics={item.pics} userId={item.userId}></SearchItem>)
+            return (<SearchItem title={item.name} introduction={item.intro} type={item.type} pics={item.pics} objectId={item.userId}></SearchItem>)
           })
         }
         {/* <nav aria-label="main mailbox folders">

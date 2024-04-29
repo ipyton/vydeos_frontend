@@ -23,7 +23,8 @@ export default function SideBar(props) {
   console.log(props)
   let { select, setSelect, userRecords, setUserRecords } = props
   const location = useLocation()
-  console.log(select)
+  console.log("sdknsndf")
+  console.log(location)
   useEffect(() => {
     if (location.state) {
       localforage.getItem(
@@ -59,7 +60,11 @@ export default function SideBar(props) {
           await localforage.setItem("send_from_" + cursor, [])
           localforage.setItem("recent_contacts", res)
         }
-        if (cursor) setSelect(cursor)
+        
+      }).then(()=>{
+        if (location.state.userId) {
+          setSelect(location.state.userId)
+        }
       })
     }
 
