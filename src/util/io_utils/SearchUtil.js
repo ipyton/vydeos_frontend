@@ -17,7 +17,7 @@ export default class SearchUtil {
     this.stateSetter(list, dispatch)
   }
 
-  static searchChatContactById(keyword, dispatch) {
+  static searchChatContactById(keyword, setList) {
     axios({
       url: SearchUtil.getBaseUrl() + "/search/contactById",
       method: 'post',
@@ -45,7 +45,6 @@ export default class SearchUtil {
         return
       }
       let responseData = response.data
-      console.log(responseData)
       if (responseData.code === -1) {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
       }
@@ -54,13 +53,13 @@ export default class SearchUtil {
         // if (pagingStatus === null) {
         //     setPagingStatus(responseData.pagingStatus)
         // }
-        console.log(responseData)
         let result = JSON.parse(responseData.message)
+        console.log(result)
         let adder = []
         result.forEach(element => {
           adder.push({ name: element.userName, intro: element.introduction, pic: element.avatar, type: "contact", userId: element.userId, })
         });
-        SearchUtil.stateSetter(adder, dispatch)
+        setList(adder)
       }
       else {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
@@ -107,7 +106,8 @@ export default class SearchUtil {
     })
   }
 
-  static searchVideos(keyword, dispatch) {
+  static searchVideos(keyword, setList) {
+    setList([])
     axios({
       url: "http://localhost:5000"+ "/movie/search",
       method: 'get',
@@ -119,18 +119,14 @@ export default class SearchUtil {
         token: localStorage.getItem("token"),
       }
     }).catch(error => {
-      if ("Network Error" === error.message) {
-        //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
-        // setNetworkErr(true)
-        console.log("error")
-      }
+      console.log(error)
     }).then(function (response) {
       console.log(response)
       if (response === undefined) {
         console.log("errror")
       }
-      console.log(response)
-
+      setList(response.data)
+      
         // let result = JSON.parse(response.data)
         // let movies = []
         // result.forEach((element, index)=> {
@@ -139,16 +135,22 @@ export default class SearchUtil {
 
         // SearchUtil.stateSetter(movies, dispatch)
         // //props.setBarState({...props.barState, message:responseData.message, open:true})
-      
   })
   }
 
-  static searchArticles(keyword) {
-
+  static searchPosts(keyword, setList) {
+    setList([{type:"posttesttest"}])
   }
 
-  static accumulativeSearch(keyword, setSearchResults) {
-
+  static getSuggestions(keyword, setList) {
+    setList([{ type: "testtest" }])
   }
 
+  static searchMusics(keyword, setList) {
+    setList([{ type: "musictesttest" }])
+  }
+  
+  static searchLocalResult(keyword, setList) {
+    setList([{ type: "chatrecord testtest" }])
+  } 
 }

@@ -50,7 +50,6 @@ function a11yProps(index) {
 
 
 export default function (props) {
-    let a = [1, 1, 1, 1, 1, 1, 1, 1, 6, 6, 6, 6, 6]
     const theme = useTheme();
 
     const [value, setValue] = React.useState(0)

@@ -64,6 +64,13 @@ export default class MessageUtil {
 
     }
 
+
+    static searchLocalRecords(keywords, dispatch) {
+
+
+
+    }
+
     static getNewestMessages(friendId, setSelect) {
         let checkKey = "chatLastUpdate" 
         localforage.getItem(checkKey).then(async timestamp => {
@@ -214,8 +221,7 @@ export default class MessageUtil {
     }
 
     // this is used for show friend details.
-    static requestUserInfo(userId, navigator) {
-        console.log(userId)
+    static requestUserInfo(userId, setDetails) {
         //get information from search/ friend list.
         axios({
             url: MessageUtil.getUrlBase() + "/friends/getUserIntro",
@@ -240,11 +246,12 @@ export default class MessageUtil {
                 return
             }
             else if (responseData.code === 1) {
-                console.log(responseData.message)
+                console.log(JSON.parse(responseData.message))
                 //MessageUtil.setUserIntro(JSON.parse(responseData.message), dispatch)
-                localforage.setItem("userIntro", JSON.parse(responseData.message)).then(() => {
-                    navigator("/friendInfomation",{state:{position:"mid"}})
-                })
+                setDetails({...JSON.parse(responseData.message)})
+                // localforage.setItem("userIntro", JSON.parse(responseData.message)).then(() => {
+                //     navigator("/friendInfomation",{state:{position:"mid"}})
+                // })
 
             }
             else {

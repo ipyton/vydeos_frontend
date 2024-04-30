@@ -6,14 +6,19 @@ import InvitationIntroduction from "./InvitationIntroduction"
 export default function (props) {
     const { selector , position} = props
     console.log(selector)
-    if ("longvideo" === selector.type) {
-        return (<LongVideoIntroduction videoId={selector.content} position={position}></LongVideoIntroduction>)
-    } else if ("userId" === selector.type) {
-        return <FriendIntroductionCentered userId={selector.content} position={position}></FriendIntroductionCentered>
-    } else if ("groupId" === selector.type) {
-        return <GroupIntroduction groupId={selector.content} position={position}></GroupIntroduction>
-    } else if ("invitaionId" === selector.type) {
-        return (<InvitationIntroduction invitationId={selector.content} position={position}></InvitationIntroduction>)
-    } 
+    if ("movie" === selector.type) {
+        return (<LongVideoIntroduction videoId={selector.content} position={"right"}></LongVideoIntroduction>)
+    } else if ("contact" === selector.type) {
+        return <FriendIntroductionCentered userId={selector.userId} position={"right"}></FriendIntroductionCentered>
+    } else if ("group" === selector.type) {
+        return <div>haven't finished this group record function yet</div>
+    } else if ("music" === selector.type) {
+        return <div>haven't finished this music record function yet</div>
+    } else if ("chatRecords" === selector.type) {
+        return <div>haven't finished this chat record function yet</div>
+    }
+    else {
+        return ("Select one to view details")
+    }
 
 }

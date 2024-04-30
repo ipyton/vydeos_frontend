@@ -60,7 +60,7 @@ export default function Contents(props) {
     const [sideBarSelector, setSideBarSelector] = useState("")
     const [worker, setWorker] = useState(null)
     const location = useLocation()
-    console.log(location)
+
     useEffect(()=>{
         if (!location.pathname.startsWith("/chat")) {
             setSideBarSelector(null)
@@ -82,7 +82,6 @@ export default function Contents(props) {
     }
 
     useLayoutEffect(() => {
-        //
         UserInitializer.init()
         register()
     }, [])
@@ -133,12 +132,9 @@ export default function Contents(props) {
                 setNotifications([e.data, ...notifications])
             }
             //update notificationList
-            console.log("updated")
         }
     },[worker, sideBarSelector, chatRecords, notifications])
 
-    console.log("sidebar")
-    console.log(sideBarSelector)
 
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
     return (

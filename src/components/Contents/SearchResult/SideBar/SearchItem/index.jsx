@@ -13,49 +13,73 @@ import SearchUtil from '../../../../../util/io_utils/SearchUtil';
 import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 import SocialMediaUtil from '../../../../../util/io_utils/SocialMediaUtil';
 import MusicUtil from '../../../../../util/io_utils/MusicUtil';
-
+import VideoUtil from '../../../../../util/io_utils/VideoUtil';
+import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
 
 
 export default function (props) {
-    let { title, introduction, pics, type, objectId } = props
+    let { title, introduction, pics, type, setSelector } = props
+    console.log(props)
     let navigate = useNavigate()
     let avatar = useState(null)
     let miniture = (<div></div>)
-    let dispatch = useDispatch()
-    const handleSuggestionSelection = (event) => {
-        //console.log(setSuggestionOpen)
-        if (type === "contact") {
-            MessageUtil.requestUserInfo(objectId, navigate)
+    const handleClick = (event) => {
+        if (props.content.type === "contact") {
+            setSelector({ userId: props.content.userId, type: props.content.type })
         }
         else if (type === "movie") {
-            SearchUtil.searchVideos()
+            setSelector({ videoId: props.content.videoId, type: props.content.type })
         }
         else if (type === "music") {
-            
         }
         else if (type === "chatRecords") {
 
         }
         else if (type === "posts") {
-        
+
         }
-        //navigate("/friendInfomation")
     }
 
-    if (type === "contact") {
-        miniture = (
-            <ListItemAvatar>
-                <Avatar alt="Cindy Baker" src={pics} />
-            </ListItemAvatar>)
-    } else if (type === "movie") {
-        miniture = (
-            <ListItemAvatar>
-                <Avatar
-                    variant="square"
-                    src={"https://handletheheat.com/wp-content/uploads/2015/03/Best-Birthday-Cake-with-milk-chocolate-buttercream-SQUARE.jpg"}
-                    alt="Paella dish"
+    if (props.content.type === "contact") {
+        return (<ListItemButton onClick={handleClick} sx={{ width: "100%" }}>
+            <ListItem alignItems="flex-start">
+                <ListItemAvatar>
+                    <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                </ListItemAvatar>
+                <ListItemText
+                    primary={props.content.name}
+                    secondary={props.content.intro}
                 />
-            </ListItemAvatar>)
+            </ListItem>
+        </ListItemButton>)
+
+    } else if (type === "movie") {
+        return (
+            <ListItemButton onClick={handleClick} sx={{ width: "100%" }}>
+                <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                        <Avatar variant="square"
+                            src={props.content.image_address}
+                            alt="Paella dish" />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary={(props.content.translated_name ? props.content.translated_name : "") + (props.content.original_name ? props.content.original_name :"")}
+                        secondary={<React.Fragment>
+                            <Typography
+                                sx={{ display:"block" }}
+                                component="span"
+                                variant="body2"
+                                color="text.primary"
+                            >
+                                {props.content.release_date }
+                            </Typography>
+                            {props.content.introduction ? props.content.introduction.substring(0, 30) + "..." : ""}
+                        </React.Fragment>}
+
+                    />
+                </ListItem>
+            </ListItemButton>)
     } else if (type === "music") {
 
     } else if (type === "chatRecords") {
@@ -66,21 +90,4 @@ export default function (props) {
 
 
 
-    return (
-        <ListItemButton onClick={handleSuggestionSelection}>
-            <ListItem alignItems="flex-start">
-                {
-                    miniture
-                }
-                <ListItemText
-                    primary={title}
-                    secondary={
-                        <React.Fragment>
-                            {introduction}
-                        </React.Fragment>
-                    }
-                />
-            </ListItem>
-        </ListItemButton>
-    )
 }

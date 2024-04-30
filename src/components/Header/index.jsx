@@ -33,8 +33,9 @@ import {clear} from "../../components/redux/searchResult"
 import localforage from 'localforage';
 import { useState } from 'react';
 import MessageBox from './MessageBox';
-
-
+import MessageUtil from '../../util/io_utils/MessageUtil';
+import MusicUtil from '../../util/io_utils/MusicUtil';
+import {set} from "../redux/Search"
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -71,32 +72,6 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-
-
-{
-  // websocket heart beat.
-//   let socket = null
-//     socket = new WebSocket("ws://localhost:8080/notification/88488")
-//     socket.onopen = function(e) {
-//       console.log("ws open successfully!!!!")    
-//     }
-//     socket.onmessage = (event)=>{
-//       console.log(event)
-//     }
-//     socket.onerror = (event) => {
-//       console.log(event)
-//     }
-
-//   setInterval(function() {
-//   console.log("sending message")
-//   try {
-//     if (socket != null) socket.send(JSON.stringify({userID:88488, time:9238042, method:"get"}))
-//   }
-//   catch(exception) {
-//     console.log("message sending error")
-//   }
-// },1000)
-}
 
 
 export default function Header(props) {
@@ -163,25 +138,27 @@ export default function Header(props) {
 
   const handleSearch = (event) => {
     //dispatch()
+    let index = -1
     if (categorySelected[0]===true) {
-      SearchUtil.searchChatContactById(search, dispatch)
+      index = 0
     } else if (categorySelected[1] === true) {
-      SearchUtil.mockSearch(search, dispatch)
+      // find local chat records.
+      index = 1
     } else if (categorySelected[2] === true) {
-      SearchUtil.searchVideos(search,dispatch)
+      index = 2
     } else if (categorySelected[3] === true) {
-      SearchUtil.mockSearch(dispatch)
+      index = 3
     } else if (categorySelected[4] === true) {
-      SearchUtil.mockSearch(dispatch)
+      index = 4
     } else {
-      SearchUtil.searchArticles("good day")
+      console.log("good day")
     }
-      navigate("searchresult")
+    dispatch(set({search:search, type:index}))
+    navigate("searchresult" )
   }
 
   const handleSearchChange = (event) => {
     setSearch(event.currentTarget.value)
-
     setSuggestionAnchorEl(event.currentTarget)
     event.currentTarget.focus()
   }

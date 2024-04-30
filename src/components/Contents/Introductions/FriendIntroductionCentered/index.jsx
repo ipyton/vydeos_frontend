@@ -17,25 +17,17 @@ import localforage from "localforage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import MessageUtil from "../../../../util/io_utils/MessageUtil";
 
 //this is used to show the user information.
 export default function (props) {
-    const [details, setDetails] = useState(null)
-    const [relationship, setRelationship] = useState(0)
+    const [details, setDetails] = useState({})
     const [userID, setUserID] = useState(0)
     const [contactButtonText, setContactButtonText] = useState("")
     const [followButtonText, setFollowButtonText] = useState("")
     const [extraInformation, setExtraInformation] = useState("")
-
-
-
-    const {userId} = props
+    const { userId } = props
     let position = "center";
-    const location = useLocation()
-
-
-
-
     // if (location.state ) {
     //     position = location.state.position
     // }
@@ -44,38 +36,24 @@ export default function (props) {
 
 
     let navigate = useNavigate()
-
-    React.useEffect(()=>{
-        localforage.getItem("userIntro").then(async (res) => {
-            if (!res) {
-                console.log("does not have userIntro")
-                return
-            }
-            setDetails(res)
-            setRelationship(res.relationship)
-            localforage.getItem("userId").then(userId=>{
-                setUserID(userId)
-            })
-
-        })
-    },[])
-
-
     React.useEffect(() => {
-        if (!details || !relationship) {
+
+        if (!details || details.relationship== null || details.relationship == undefined) {
+            console.log("updating")
 
         } else {
-            if (relationship === 0) {
+
+            if (details.relationship === 0) {
                 setFollowButtonText("Follow")
                 setExtraInformation("")
                 setContactButtonText("")
-            } else if (relationship === 1) {
+            } else if (details.relationship === 1) {
                 setFollowButtonText("Follow")
                 setExtraInformation("He follows you.")
-            } else if (relationship === 10) {
+            } else if (details.relationship === 10) {
                 setContactButtonText("Request")
                 setFollowButtonText("Unfollow")
-            } else if (relationship === 11) {
+            } else if (details.relationship === 11) {
                 setExtraInformation("He follows you.")
                 setFollowButtonText("Unfollow")
                 setContactButtonText("Contact")
@@ -87,7 +65,26 @@ export default function (props) {
             }
         }
 
-    }, [details, relationship, userID])
+    }, [details.relationship, details.userId, userID])
+    console.log(extraInformation)
+    React.useEffect(() => {
+        console.log("changing")
+        MessageUtil.requestUserInfo(userId, setDetails)
+        localforage.getItem("userId").then(response => {
+            setUserID(response)
+        })
+        // localforage.getItem("userIntro").then(async (res) => {
+        //     if (!res) {
+        //         console.log("does not have userIntro")
+        //         return
+        //     }
+        //     setDetails(res)
+        //     setRelationship(res.relationship)
+
+        // })
+    }, [userId])
+    console.log(details, userID)
+
 
 
     if (!details) {
@@ -103,9 +100,9 @@ export default function (props) {
         if (details.userId === await localforage.getItem("userId")) {
             return
         }
-        localforage.setItem("contactCursor", details.userId).then(()=>{
-            navigate("/chat", {state:details})
-})
+        localforage.setItem("contactCursor", details.userId).then(() => {
+            navigate("/chat", { state: details })
+        })
 
 
     }
@@ -113,16 +110,15 @@ export default function (props) {
 
 
     let handleFollow = () => {
-        if (Math.floor(relationship / 10) === 1) {
+        if (Math.floor(details.relationship / 10) === 1) {
             localforage.getItem("userId").then(res => {
-                SocialMediaUtil.unfollow(res, details.userId, details, setRelationship)
+                SocialMediaUtil.unfollow(res, details.userId, details, setDetails)
             })
         } else {
             localforage.getItem("userId").then(res => {
-                SocialMediaUtil.follow(res, details.userId, details, setRelationship)
+                SocialMediaUtil.follow(res, details.userId, details, setDetails)
             })
         }
-        setDetails(details)
     }
 
     let imageData = [
@@ -253,8 +249,11 @@ export default function (props) {
 
 
     } else {
-        return <Stack sx={{ overflow: "scroll", width: "70%", boxShadow: 1, }}>
-            <Stack direction="row" justifyContent="end" sx={{ width: "80%", marginLeft: "10%" }}>
+        return <Stack direction="column"
+
+            alignItems="center"
+sx={{ overflow: "scroll", width: "100%", boxShadow: 1, }}>
+            <Stack direction="row" justifyContent="end" sx={{ width: "80%" }}>
                 <ListItem alignItems="flex-start" >
                     <ListItemAvatar>
                         <Avatar alt={details.userName} src={details.avatar} />
@@ -284,9 +283,11 @@ export default function (props) {
                     {contactButtonText.length === 0 ? <div></div> : <Button onClick={handleContact}>{contactButtonText}</Button>}
                 </ButtonGroup>
             </Stack>
+            <Stack>
+                {extraInformation}
+            </Stack>
 
-
-            <Stack sx={{ width: "80%", marginLeft: "15%" }}>
+            <Stack sx={{ width: "80%"}}>
                 <TextField
                     id="outlined-required"
                     label="Gender"
@@ -326,7 +327,7 @@ export default function (props) {
             </Stack>
 
 
-            {imageData === undefined ? <div></div> : <ImageList sx={{ width: "80%", marginLeft: "10%" }} cols={3} >
+            {imageData === undefined ? <div></div> : <ImageList sx={{ width: "80%" }} cols={3} >
                 {imageData.map((item) => (
                     <ImageListItem key={item.img}>
                         <img

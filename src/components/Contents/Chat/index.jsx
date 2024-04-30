@@ -33,12 +33,6 @@ export default function Chat(props) {
   //const isFocused = useIsFocused();
   
   let { refresh, sideBarSelector, setSideBarSelector, setChatRecords, chatRecords, userRecords, setUserRecords } = props
-  const afterGetting = () => {
-
-
-  }
-
-
 
   // const history = useLocation()
   // console.log(history)

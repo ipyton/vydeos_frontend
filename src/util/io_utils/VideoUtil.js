@@ -1,4 +1,5 @@
-import Qs from qs
+import Qs from 'qs'
+import axios from "axios"
 
 export default class VideoUtil{
 
@@ -25,7 +26,7 @@ export default class VideoUtil{
             }
             console.log(response)
             //props.setBarState({...props.barState, message:responseData.message, open:true})
-            let data = JSON.parse(responseData)
+            let data = JSON.parse(response)
             data["type"] = "movie"
             setState(data)
         })

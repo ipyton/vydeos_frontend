@@ -10,64 +10,21 @@ import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import { useDispatch, useSelector } from 'react-redux';
 import SearchItem from './SideBar/SearchItem';
+import Introductions from '../Introductions';
+import SideBar from './SideBar';
+import { Stack } from '@mui/material';
+
 
 export default function BasicList() {
   const searchResult = useSelector((state) => state.searchResult.value)
   // [{name:"james",pics:"siehru", intro:"sus", type:"contact"}, {name:"time",pics:"zdxf", intro:"sfs", type:"video"}]
   //pics here means avatar.
+  let [selector, setSelector] = React.useState({ type: "", objectId: "null" })
+  let height = window.innerHeight * 0.8
   return (
-    <Box sx={{
-      width: '100%', bgcolor: 'background.paper', display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center"
-    }}>
-
-
-      <List sx={{ height: "100%", width: "50%" }}>
-        {
-          searchResult.map((item, index) => {
-            return (<SearchItem title={item.name} introduction={item.intro} type={item.type} pics={item.pics} objectId={item.userId}></SearchItem>)
-          })
-        }
-        {/* <nav aria-label="main mailbox folders">
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Inbox" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <DraftsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Drafts" />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </nav>
-      <Divider />
-      <nav aria-label="secondary mailbox folders">
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-            <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Trash" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component="a" href="#simple-list">
-              <ListItemText primary="Spam" />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </nav> */}
-      </List>
-    </Box>
+    <Stack sx={{ marginLeft: '10%', width: '80%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
+      <SideBar setSelector={setSelector}></SideBar>
+      <Introductions selector={selector} position={"right"}></Introductions>
+    </Stack>
   );
 }

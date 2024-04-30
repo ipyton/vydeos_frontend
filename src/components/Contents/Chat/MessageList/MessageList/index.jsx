@@ -29,6 +29,7 @@ export default function (props) {
 
   console.log(chatRecords)
   const messagesEndRef = useRef(null)
+  
   useEffect(() => {
     //MessageUtil.getNewestMessages(select)
     localforage.getItem("send_to_" + select).then(
@@ -44,7 +45,6 @@ export default function (props) {
               await localforage.setItem("send_from_" + select, receive_from)
             }
             let result = [...send_to, ...receive_from]
-            //console.log(receive_from)
             result.sort((a, b) => {
               return a.sendTime - b.sendTime
             })

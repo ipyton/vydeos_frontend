@@ -4,6 +4,7 @@ import { updateFollowState } from "../../components/redux/UserDetails"
 import qs from 'qs'
 import axios from "axios"
 import localforage from "localforage"
+import { SettingsSystemDaydreamTwoTone } from "@mui/icons-material"
 
 export default class SocialMediaUtil {
 
@@ -12,7 +13,7 @@ export default class SocialMediaUtil {
     }
 
 
-    static follow(sender, receiver, details, setRelationship) {
+    static follow(sender, receiver, details, setDetails) {
         axios(
             {
                 url: SocialMediaUtil.getUrlBase() + "/friends/follow",
@@ -35,7 +36,8 @@ export default class SocialMediaUtil {
                     res.relationship = res.relationship % 10 + 10
                     details.relationship = res.relationship % 10 + 10
                     localforage.setItem("userIntro", res)
-                    setRelationship(res.relationship % 10 + 10)
+                    details.relationship = res.relationship % 10 + 10
+                    setDetails({...details})                    
                     if (details.relationship !== 11) return
                     localforage.getItem("friendList").then(async res => {
                         if (!res) res = {}
@@ -54,7 +56,7 @@ export default class SocialMediaUtil {
         })
     }
 
-    static unfollow(sender, receiver, details, setRelationship) {
+    static unfollow(sender, receiver, details, setDetails) {
         axios(
             {
                 url: SocialMediaUtil.getUrlBase() + "/friends/unfollow",
@@ -75,9 +77,9 @@ export default class SocialMediaUtil {
             if (response.data.code === 1) {
                 localforage.getItem("userIntro").then((res) => {
                     res.relationship = res.relationship % 10
-                    details.relationship = res.relationship % 10
+                    details.relationship = res.relationship
                     localforage.setItem("userIntro", res)
-                    setRelationship(res.relationship % 10)
+                    setDetails({...details})
                     if (details.relationship === 11) return
                     localforage.getItem("friendList").then(async res => {
                         if (!res) res = {}

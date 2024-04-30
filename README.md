@@ -73,3 +73,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 Features of this project:
 1. 
+
+
+Todos in this project:
+1. Dynamic change the friends introductions
+2. Implement diffrent kinds of items.
+3. Implement diffrent kinds of item introductions.
