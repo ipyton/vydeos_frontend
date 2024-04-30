@@ -166,9 +166,9 @@ export default function Header(props) {
     if (categorySelected[0]===true) {
       SearchUtil.searchChatContactById(search, dispatch)
     } else if (categorySelected[1] === true) {
-      SearchUtil.mockSearch(dispatch)
+      SearchUtil.mockSearch(search, dispatch)
     } else if (categorySelected[2] === true) {
-      SearchUtil.mockSearch(dispatch)
+      SearchUtil.searchVideos(search,dispatch)
     } else if (categorySelected[3] === true) {
       SearchUtil.mockSearch(dispatch)
     } else if (categorySelected[4] === true) {

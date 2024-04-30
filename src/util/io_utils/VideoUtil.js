@@ -2,11 +2,11 @@ import Qs from qs
 
 export default class VideoUtil{
 
-    static getVideoInformation(movie_id,navigate) {
+    static getVideoInformation(movie_id,setState) {
         axios({
             url: "http://localhost:5000" + "/movie/get_meta",
-            method: 'post',
-            data: { detail_address: movie_id },
+            method: 'get',
+            params: { detail_address: movie_id },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -24,17 +24,12 @@ export default class VideoUtil{
                 console.log("errror")
             }
             console.log(response)
-            let responseData = response.data
-            if (responseData.code === -1) {
-                //props.setBarState({...props.barState, message:responseData.message, open:true})
-            }
-            else if (responseData.code === 1) {
-                if (responseData.result !== null) {
-                }
-            }
-            else {
-                //props.setBarState({...props.barState, message:responseData.message, open:true})
-            }
+            //props.setBarState({...props.barState, message:responseData.message, open:true})
+            let data = JSON.parse(responseData)
+            data["type"] = "movie"
+            setState(data)
         })
     }
+
+
 }

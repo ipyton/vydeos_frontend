@@ -129,6 +129,8 @@ export default function (props) {
         },
 
     ];
+    const recommendData = []
+    
 
     const itemData = [
         {
@@ -303,7 +305,7 @@ export default function (props) {
                                 label="导演"
                                 defaultValue={""}
                                 variant="standard" type="search" />
-                                
+
                             <TextField
                                 id="outlined-required"
                                 label="Writter"

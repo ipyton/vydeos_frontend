@@ -7,13 +7,10 @@ export default class SearchUtil {
     return "http://localhost:8000";
   }
 
-
   static stateSetter(list, dispatch) {
     dispatch(clear())
     dispatch(batchAdd(list))
   }
-
-
 
   static mockSearch(dispatch) {
     let list = [{ name: "james", pics: "siehru", intro: "sus", type: "contact" }, { name: "time", pics: "zdxf", intro: "sfs", type: "movie" }]
@@ -110,12 +107,11 @@ export default class SearchUtil {
     })
   }
 
-
-  static searchVideos(keyword) {
+  static searchVideos(keyword, dispatch) {
     axios({
       url: "http://localhost:5000"+ "/movie/search",
-      method: 'post',
-      data: { keyword: keyword, page_number:1 },
+      method: 'get',
+      params: { "keyword": keyword, page_number:1 },
       transformRequest: [function (data) {
         // 对 data 进行任意转换处理
         return Qs.stringify(data)
@@ -129,29 +125,27 @@ export default class SearchUtil {
         console.log("error")
       }
     }).then(function (response) {
+      console.log(response)
       if (response === undefined) {
         console.log("errror")
       }
       console.log(response)
-      let responseData = response.data
-      if (responseData.code === -1) {
-        //props.setBarState({...props.barState, message:responseData.message, open:true})
-      }
-      else if (responseData.code === 1) {
-        if (responseData.result !== null) {
-        }
-      }
-      else {
-        //props.setBarState({...props.barState, message:responseData.message, open:true})
-      }
+
+        // let result = JSON.parse(response.data)
+        // let movies = []
+        // result.forEach((element, index)=> {
+        //   movies.append({ type: "movie", "image_address": element.img_address, "translated_name": element.translated_name, "original_name": element.original_name, "release_date": element.release_date, "introduction": element.introduction, "detail_address": element.detail_address })
+        // })
+
+        // SearchUtil.stateSetter(movies, dispatch)
+        // //props.setBarState({...props.barState, message:responseData.message, open:true})
+      
   })
   }
-
 
   static searchArticles(keyword) {
 
   }
-
 
   static accumulativeSearch(keyword, setSearchResults) {
 

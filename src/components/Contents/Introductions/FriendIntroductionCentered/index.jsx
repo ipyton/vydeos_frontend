@@ -22,9 +22,19 @@ import { useLocation } from "react-router-dom";
 export default function (props) {
     const [details, setDetails] = useState(null)
     const [relationship, setRelationship] = useState(0)
+    const [userID, setUserID] = useState(0)
+    const [contactButtonText, setContactButtonText] = useState("")
+    const [followButtonText, setFollowButtonText] = useState("")
+    const [extraInformation, setExtraInformation] = useState("")
+
+
+
     const {userId} = props
     let position = "center";
     const location = useLocation()
+
+
+
 
     // if (location.state ) {
     //     position = location.state.position
@@ -33,46 +43,61 @@ export default function (props) {
     position = (!props.position ? position : props.position)
 
 
-
     let navigate = useNavigate()
-    React.useEffect(() => {
-        localforage.getItem("userIntro").then((res) => {
+
+    React.useEffect(()=>{
+        localforage.getItem("userIntro").then(async (res) => {
             if (!res) {
                 console.log("does not have userIntro")
                 return
             }
             setDetails(res)
             setRelationship(res.relationship)
+            localforage.getItem("userId").then(userId=>{
+                setUserID(userId)
+            })
+
         })
-    }, [])
+    },[])
 
-    let contactButtonText = ""
 
-    let followButtonText = ""
+    React.useEffect(() => {
+        if (!details || !relationship) {
 
-    let extraInformation = ""
+        } else {
+            if (relationship === 0) {
+                setFollowButtonText("Follow")
+                setExtraInformation("")
+                setContactButtonText("")
+            } else if (relationship === 1) {
+                setFollowButtonText("Follow")
+                setExtraInformation("He follows you.")
+            } else if (relationship === 10) {
+                setContactButtonText("Request")
+                setFollowButtonText("Unfollow")
+            } else if (relationship === 11) {
+                setExtraInformation("He follows you.")
+                setFollowButtonText("Unfollow")
+                setContactButtonText("Contact")
+            }
+            if (userID === details.userId) {
+                setFollowButtonText("")
+                setContactButtonText("")
+                setExtraInformation("This is yourself")
+            }
+        }
+
+    }, [details, relationship, userID])
+
+
     if (!details) {
         return <div>loading</div>
     }
+
     //console.log(details.relationship)
     //01: you do not follow him/ but he follow you.
     //10: you follow him but he does not follow you.
     //,etc.
-    if (details.relationship === 0) {
-        followButtonText = "Follow"
-        extraInformation = ""
-        contactButtonText = ""
-    } else if (details.relationship === 1) {
-        followButtonText = "Follow"
-        extraInformation = "He follows you."
-    } else if (details.relationship === 10) {
-        contactButtonText = "Request"
-        followButtonText = "Unfollow"
-    } else if (details.relationship === 11) {
-        extraInformation = "He follows you."
-        followButtonText = "Unfollow"
-        contactButtonText = "Contact"
-    }
 
     const handleContact = async () => {
         if (details.userId === await localforage.getItem("userId")) {
@@ -85,11 +110,6 @@ export default function (props) {
 
     }
 
-    localforage.getItem("userId").then(res => {
-        if (res === details.userId) {
-            followButtonText = ""
-        }
-    })
 
 
     let handleFollow = () => {

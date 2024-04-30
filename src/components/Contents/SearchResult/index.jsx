@@ -9,8 +9,7 @@ import Divider from '@mui/material/Divider';
 import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import { useDispatch, useSelector } from 'react-redux';
-import SearchItem from './SearchItem';
-
+import SearchItem from './SideBar/SearchItem';
 
 export default function BasicList() {
   const searchResult = useSelector((state) => state.searchResult.value)

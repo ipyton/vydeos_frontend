@@ -6,11 +6,15 @@ import ListItem from '@mui/material/ListItem';
 import CardMedia from '@mui/material/CardMedia';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import AccountUtil from '../../../../util/io_utils/AccountUtil';
 import { useState } from 'react';
-import MessageUtil from '../../../../util/io_utils/MessageUtil';
 import { useDispatch } from 'react-redux';
-import SearchUtil from '../../../../util/io_utils/SearchUtil';
+import AccountUtil from '../../../../../util/io_utils/AccountUtil';
+import SearchUtil from '../../../../../util/io_utils/SearchUtil';
+import MessageUtil from '../../../../../util/io_utils/MessageUtil';
+import SocialMediaUtil from '../../../../../util/io_utils/SocialMediaUtil';
+import MusicUtil from '../../../../../util/io_utils/MusicUtil';
+
+
 
 export default function (props) {
     let { title, introduction, pics, type, objectId } = props
@@ -20,8 +24,21 @@ export default function (props) {
     let dispatch = useDispatch()
     const handleSuggestionSelection = (event) => {
         //console.log(setSuggestionOpen)
-        if (type === "contact") MessageUtil.requestUserInfo(objectId, navigate)
-        else if (type === "movie") SearchUtil.searchVideos()
+        if (type === "contact") {
+            MessageUtil.requestUserInfo(objectId, navigate)
+        }
+        else if (type === "movie") {
+            SearchUtil.searchVideos()
+        }
+        else if (type === "music") {
+            
+        }
+        else if (type === "chatRecords") {
+
+        }
+        else if (type === "posts") {
+        
+        }
         //navigate("/friendInfomation")
     }
 
@@ -41,7 +58,12 @@ export default function (props) {
             </ListItemAvatar>)
     } else if (type === "music") {
 
+    } else if (type === "chatRecords") {
+
+    } else if (type === "posts") {
+
     }
+
 
 
     return (
