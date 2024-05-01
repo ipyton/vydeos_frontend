@@ -24,7 +24,7 @@ export default function BasicList() {
   return (
     <Stack sx={{ marginLeft: '10%', width: '80%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
       <SideBar setSelector={setSelector}></SideBar>
-      <Introductions selector={selector} position={"right"}></Introductions>
+      <Stack sx={{overflow:"scroll",width:"70%", height:"100%", boxShadow: 1, borderRadius: 2 }} ><Introductions selector={selector} position={"right"}></Introductions> </Stack>
     </Stack>
   );
 }

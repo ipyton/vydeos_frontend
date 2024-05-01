@@ -148,14 +148,14 @@ export default function (props) {
         }
     ];
 
-    if (position === "center") {
+    if (true) {
         return (
             <Stack
                 direction="column"
-                justifyContent="center"
+                // justifyContent="center"
                 alignItems="center"
-                spacing={0.5} sx={{ width: "100%", overflow: "scroll", boxShadow: 1 }}>
-                <Stack direction="row" justifyContent="end" sx={{ width: "60%" }}>
+                spacing={0.5} sx={{ width: "100%", overflow: "scroll", boxShadow: 0,height:"100%"}}>
+                <Stack direction="row" justifyContent="end" sx={{ width: "70%" }}>
                     <ListItem alignItems="flex-start" >
                         <ListItemAvatar>
                             <Avatar alt={details.userName} src={details.avatar} />
@@ -185,9 +185,7 @@ export default function (props) {
                         {contactButtonText.length === 0 ? <div></div> : <Button onClick={handleContact}>{contactButtonText}</Button>}
                     </ButtonGroup>
                 </Stack>
-                {/* <Stack>
-                {details.userName}
-            </Stack> */}
+
                 <Stack>
                     {extraInformation}
                 </Stack>

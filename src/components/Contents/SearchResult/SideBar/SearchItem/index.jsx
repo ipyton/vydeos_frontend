@@ -20,7 +20,6 @@ import Typography from '@mui/material/Typography';
 
 export default function (props) {
     let { title, introduction, pics, type, setSelector } = props
-    console.log(props)
     let navigate = useNavigate()
     let avatar = useState(null)
     let miniture = (<div></div>)
@@ -29,7 +28,7 @@ export default function (props) {
             setSelector({ userId: props.content.userId, type: props.content.type })
         }
         else if (type === "movie") {
-            setSelector({ videoId: props.content.videoId, type: props.content.type })
+            setSelector({ videoId: props.content.detail_address, type: "movie" })
         }
         else if (type === "music") {
         }

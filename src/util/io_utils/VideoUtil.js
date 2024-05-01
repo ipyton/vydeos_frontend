@@ -4,6 +4,7 @@ import axios from "axios"
 export default class VideoUtil{
 
     static getVideoInformation(movie_id,setState) {
+        setState(null)
         axios({
             url: "http://localhost:5000" + "/movie/get_meta",
             method: 'get',
@@ -15,18 +16,13 @@ export default class VideoUtil{
                 token: localStorage.getItem("token"),
             }
         }).catch(error => {
-            if ("Network Error" === error.message) {
-                //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
-                // setNetworkErr(true)
-                console.log("error")
-            }
+            
         }).then(function (response) {
             if (response === undefined) {
                 console.log("errror")
             }
-            console.log(response)
             //props.setBarState({...props.barState, message:responseData.message, open:true})
-            let data = JSON.parse(response)
+            let data = response.data
             data["type"] = "movie"
             setState(data)
         })

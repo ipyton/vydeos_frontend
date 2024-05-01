@@ -7,7 +7,7 @@ export default function (props) {
     const { selector , position} = props
     console.log(selector)
     if ("movie" === selector.type) {
-        return (<LongVideoIntroduction videoId={selector.content} position={"right"}></LongVideoIntroduction>)
+        return (<LongVideoIntroduction videoId={selector.videoId} position={"right"}></LongVideoIntroduction>)
     } else if ("contact" === selector.type) {
         return <FriendIntroductionCentered userId={selector.userId} position={"right"}></FriendIntroductionCentered>
     } else if ("group" === selector.type) {

@@ -24,11 +24,16 @@ import ImageListItemBar from '@mui/material/ImageListItemBar';
 import ListSubheader from '@mui/material/ListSubheader';
 import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
+import VideoUtil from "../../../../util/io_utils/VideoUtil";
+import Rating from '@mui/material/Rating';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+
 
 
 
 function Item(props) {
-    console.log(props)
     return (
         <Box
             component="img"
@@ -49,188 +54,56 @@ function Item(props) {
 export default function (props) {
     const [details, setDetails] = useState(null)
     const [relationship, setRelationship] = useState(0)
-    console.log(props)
+    const {videoId} = props
     let position = "center";
     const location = useLocation()
 
-    // if (location.state ) {
-    //     position = location.state.position
-    // }
-
     position = (!props.position ? position : props.position)
-
-    // var items = [
-    //     {
-    //         name: "Random Name #1",
-    //         description: "Probably the most random thing you have ever seen!"
-    //     },
-    //     {
-    //         name: "Random Name #2",
-    //         description: "Hello World!"
-    //     }
-    // ]
-
-
-    let navigate = useNavigate()
-    React.useEffect(() => {
-        localforage.getItem("userIntro").then((res) => {
-            if (!res) {
-                console.log("does not have userIntro")
-                return
-            }
-            setDetails(res)
-            setRelationship(res.relationship)
-        })
-    }, [])
-
-    let contactButtonText = ""
-
-    let followButtonText = ""
-
-    let extraInformation = ""
-    // if (!details) {
-    //     return <div>loading</div>
-    // }
-    //console.log(details.relationship)
-    //01: you do not follow him/ but he follow you.
-    //10: you follow him but he does not follow you.
-    //,etc.
-
-
-    const handleRequest = () => {
+    let handleRequest = ()=> {
 
     }
 
-    // localforage.getItem("userId").then(res => {
-    //     if (res === details.userId) {
-    //         followButtonText = ""
-    //     }
-    // })
+    React.useEffect(()=>{
+        VideoUtil.getVideoInformation(videoId, setDetails)
+    },[videoId])
 
+    let genresList = ""
+    if (details) {
+        for (let i = 0; i < details.genre_list.length; i ++) {
+            genresList += details.genre_list[i]
+            genresList += ","
+        }
+        genresList.substring(0, -1)
+    }
 
-
-
-    let items = [
-        {
-            original: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-            title: 'Breakfast',
-        },
-        {
-            original: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-            title: 'Burger',
-        },
-        {
-            original: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-            title: 'Camera',
-        },
-        {
-            original: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-            title: 'Coffee',
-        },
-
-    ];
     const recommendData = []
-    
 
-    const itemData = [
-        {
-            img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-            title: 'Breakfast',
-            author: '@bkristastucchio',
-            rows: 2,
-            cols: 2,
-            featured: true,
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-            title: 'Burger',
-            author: '@rollelflex_graphy726',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-            title: 'Camera',
-            author: '@helloimnik',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-            title: 'Coffee',
-            author: '@nolanissac',
-            cols: 2,
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-            title: 'Hats',
-            author: '@hjrc33',
-            cols: 2,
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
-            title: 'Honey',
-            author: '@arwinneil',
-            rows: 2,
-            cols: 2,
-            featured: true,
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
-            title: 'Basketball',
-            author: '@tjdragotta',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
-            title: 'Fern',
-            author: '@katie_wasserman',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
-            title: 'Mushrooms',
-            author: '@silverdalex',
-            rows: 2,
-            cols: 2,
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
-            title: 'Tomato basil',
-            author: '@shelleypauls',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
-            title: 'Sea star',
-            author: '@peterlaster',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
-            title: 'Bike',
-            author: '@southside_customs',
-            cols: 2,
-        },
-    ];
-
-    if (position === "center") {
+    if (!details) {
+        return <div>loading</div>
+    }
+    details.makerList.map((item)=>{
+       console.log(item.name)
+    })
+    if (position === "right") {
         return (
             <Stack direction="column"
                 //justifyContent="center"
-                alignItems="center"
                 sx={{ width: "100%", overflow: "scroll" }}>
                 <Stack direction="row"
-                    spacing={0.5} sx={{ width: "70%", overflow: "scroll", boxShadow: 1 }}>
-                    <Stack sx={{ width: "40%", height: "10%" }}> <Carousel>
-                        {
-                            items.map((item, i) => <Item key={i} item={item} />)
-                        }
-                    </Carousel></Stack>
+                    spacing={0.5} sx={{ width: "100%", boxShadow: 1 }}>
+                    <Stack sx={{width:"30%"}}>
+                        <Box>
+                            <Item item={{original:details.poster}}></Item>
+                        </Box>
+                    </Stack>
                     <Stack
                         direction="column"
                         sx={{ width: "60%" }}
                     >
                         <Stack direction="row" justifyContent="end" sx={{ width: "100%" }}>
                             <ListItem alignItems="flex-start" >
-                                <ListItemAvatar>
-                                    <Avatar alt={""} src={""} />
-                                </ListItemAvatar>
                                 <ListItemText
-                                    primary={"这里是电影名称"}
-
+                                    primary={details.movie_name}
                                     secondary={
                                         <React.Fragment>
                                             <Typography
@@ -240,7 +113,7 @@ export default function (props) {
                                                 color="text.primary"
                                             >
                                             </Typography>
-                                            "原名"
+                                            {details.tag}
                                         </React.Fragment>
                                     }
                                 />
@@ -253,76 +126,103 @@ export default function (props) {
                                 {<Button onClick={handleRequest}>request</Button>}
                             </ButtonGroup>
                         </Stack>
-                        {/* <Stack>
-                {details.userName}
-            </Stack> */}
-                        <Stack>
-                            {extraInformation}
-                        </Stack>
                         <Stack sx={{ width: "100%", }}>
-                            <TextField
-                                id="outlined-required"
-                                label="发行年份"
-                                defaultValue={"1989"}
-                                variant="standard"
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                            <TextField
-                                id="outlined-required"
-                                label="发行地"
-                                defaultValue={"美国加利福尼亚"}
-                                variant="standard"
 
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                            <TextField
-                                id="outlined-required"
-                                label="类型"
-                                defaultValue={"爱情动作片"}
-                                variant="standard"
-                                InputProps={{
-                                    readOnly: true,
-                                }}
+                            <React.Fragment>
+                                <CardContent>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                        Release Year
+                                    </Typography>
+                                    <Typography variant="h7" component="div">
+                                        {details.release_year}
+                                    </Typography>
+                                </CardContent>
+                                <CardContent>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                        Type
+                                    </Typography>
+                                    <Typography variant="h7" component="div">
+                                        {genresList}
+                                    </Typography>
+                                </CardContent>
+                                <CardContent>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                        Introduction
+                                    </Typography>
+                                    <Typography variant="h7" component="div">
+                                        {details.introduction}
+                                    </Typography>
+                                </CardContent>
+                                {details.makerList.map((maker) => {
+                                    console.log(maker)
+                                    return <CardContent>
+                                                                                <Typography variant="h7" component="div">
 
-                            />
-                            <TextField
-                                id="outlined-required"
-                                label="简介"
-                                defaultValue={"急急急急急急就"}
-                                variant="standard"
-                                InputProps={{
-                                    readOnly: true,
-                                }}
+                                            {maker.name}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                            {maker.role}
+                                        </Typography>
 
-                            />
+                                    </CardContent>
 
-                            <TextField
-                                id="outlined-required"
-                                label="导演"
-                                defaultValue={""}
-                                variant="standard" type="search" />
+                                })}
 
-                            <TextField
-                                id="outlined-required"
-                                label="Writter"
-                                defaultValue={""}
-                                variant="standard" type="search" />
+                            </React.Fragment>
+
+
 
                         </Stack>
                     </Stack>
                 </Stack>
-                Stars
+                  Stars
+                <Stack>
 
+
+                <ImageList
+                    sx={{
+                        gridAutoFlow: "column",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr)) !important",
+                        gridAutoColumns: "minmax(200px, 1fr)",
+                        width: "100%",
+                        height: "100%",
+                        // overflow: "scroll",
+                        boxShadow: 0,
+                    }}
+                >
+
+                    {details.actressList.map((item) => (
+
+                        <ImageListItem key={item.avatar}  sx={{
+                            display: 'flex', flexDirection: 'row',
+                            // width: undefined,
+                            // Without height undefined it won't work
+                            // height: "100%", aspectRatio: 135 / 76
+                        }} >
+                            <Item item={{ original: item.avatar }}></Item>
+                            <ImageListItemBar
+                                title={item.name}
+                                subtitle={"Character:" + item.character}
+                                actionIcon={
+                                    <IconButton
+                                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                        aria-label={`info about ${item.title}`}
+                                    >
+                                        <InfoIcon />
+                                    </IconButton>
+                                }
+                            />
+                        </ImageListItem>
+
+                    ))}
+                </ImageList>
+                {/* recommendations
                 <ImageList
                     sx={{
                         gridAutoFlow: "column",
                         gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr)) !important",
                         gridAutoColumns: "minmax(160px, 1fr)",
-                        width: "70%",
+                        width: "100%",
                         height: 300,
                         overflow: "scroll",
                         boxShadow: 0,
@@ -331,7 +231,7 @@ export default function (props) {
 
                     {itemData.map((item) => (
 
-                        <ImageListItem key={item.img} cols={2} sx={{
+                        <ImageListItem key={item.img} cols={3} sx={{
                             display: 'flex', flexDirection: 'row', width: undefined,
                             // Without height undefined it won't work
                             height: "100%", aspectRatio: 135 / 76
@@ -357,50 +257,8 @@ export default function (props) {
                         </ImageListItem>
 
                     ))}
-                </ImageList>
-                recommendations
-                <ImageList
-                    sx={{
-                        gridAutoFlow: "column",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr)) !important",
-                        gridAutoColumns: "minmax(160px, 1fr)",
-                        width: "70%",
-                        height: 300,
-                        overflow: "scroll",
-                        boxShadow: 0,
-                    }}
-                >
-
-                    {itemData.map((item) => (
-
-                        <ImageListItem key={item.img} cols={2} sx={{
-                            display: 'flex', flexDirection: 'row', width: undefined,
-                            // Without height undefined it won't work
-                            height: "100%", aspectRatio: 135 / 76
-                        }} >
-                            <img
-                                srcSet={`${item.img}`}
-                                src={`${item.img}`}
-                                alt={item.title}
-                                loading="lazy"
-                            />
-                            <ImageListItemBar
-                                title={item.title}
-                                subtitle={item.author}
-                                actionIcon={
-                                    <IconButton
-                                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                        aria-label={`info about ${item.title}`}
-                                    >
-                                        <InfoIcon />
-                                    </IconButton>
-                                }
-                            />
-                        </ImageListItem>
-
-                    ))}
-                </ImageList>
-                    
+                </ImageList> */}
+                </Stack>
             </Stack>
 
         )
