@@ -32,6 +32,7 @@ import UserInitializer from "../../util/UserInitializer"
 import LongVideoIntroduction from "./Introductions/LongVideoIntroduction"
 import localforage from "localforage"
 import { useLayoutEffect } from "react"
+import Trends from "./Trends"
 const defaultTheme = createTheme();
 
 export default function Contents(props) {
@@ -165,6 +166,10 @@ export default function Contents(props) {
                                         <Route path="/searchresult"  element={<SearchResult> </SearchResult>}></Route>
                                         <Route path="/friendInfomation"  element={<FriendIntroductionCentered ></FriendIntroductionCentered>}></Route>
                                         <Route path="/videoIntroduction"  element={<LongVideoIntroduction></LongVideoIntroduction>}> </Route>
+                                        <Route path="/trending" element={<Trends></Trends>}> </Route>
+                                        
+                                        
+                                        
                                         <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
                                     </Routes>

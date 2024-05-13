@@ -20,5 +20,4 @@ export default function (props) {
     else {
         return ("Select one to view details")
     }
-
 }
