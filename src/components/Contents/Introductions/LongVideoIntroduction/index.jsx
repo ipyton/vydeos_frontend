@@ -19,6 +19,11 @@ import { useLocation } from "react-router-dom";
 import Carousel from 'react-material-ui-carousel'
 import { Paper, Button } from '@mui/material'
 import Box from "@mui/material/Box";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import ListSubheader from '@mui/material/ListSubheader';
@@ -29,9 +34,12 @@ import Rating from '@mui/material/Rating';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-
-
-
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Switch from '@mui/material/Switch';
+import WifiIcon from '@mui/icons-material/Wifi';
+import BluetoothIcon from '@mui/icons-material/Bluetooth';
+import PropTypes from 'prop-types';
+import CircularProgress from '@mui/material/CircularProgress';
 
 function Item(props) {
     return (
@@ -46,7 +54,6 @@ function Item(props) {
             src={props.item.original}
 
         />
-
     )
 }
 
@@ -55,13 +62,46 @@ export default function (props) {
     const [details, setDetails] = useState(null)
     const [relationship, setRelationship] = useState(0)
     const {videoId} = props
+    const [open, setOpen] = React.useState(false);
     let position = "center";
     const location = useLocation()
 
     position = (!props.position ? position : props.position)
-    let handleRequest = ()=> {
+    const [checked, setChecked] = React.useState(['wifi']);
 
-    }
+
+    const [progress, setProgress] = React.useState(10);
+
+    React.useEffect(() => {
+        const timer = setInterval(() => {
+            setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
+        }, 800);
+        return () => {
+            clearInterval(timer);
+        };
+    }, []);
+
+    const handleToggle = (value) => () => {
+        const currentIndex = checked.indexOf(value);
+        const newChecked = [...checked];
+
+        if (currentIndex === -1) {
+            newChecked.push(value);
+        } else {
+            newChecked.splice(currentIndex, 1);
+        }
+
+        setChecked(newChecked);
+    };
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
 
     React.useEffect(()=>{
         VideoUtil.getVideoInformation(videoId, setDetails)
@@ -85,7 +125,7 @@ export default function (props) {
        console.log(item.name)
     })
     if (position === "right") {
-        return (
+        return (<div>
             <Stack direction="column"
                 //justifyContent="center"
                 sx={{ width: "100%", overflow: "scroll" }}>
@@ -120,10 +160,9 @@ export default function (props) {
 
                             </ListItem>
 
-
                             <ButtonGroup sx={{ marginTop: "3%", height: "50%", marginRight: "2%" }} aria-label="Basic button group" >
                                 {<Button > Star</Button>}
-                                {<Button onClick={handleRequest}>request</Button>}
+                                {<Button onClick={handleClickOpen}>request</Button>}
                             </ButtonGroup>
                         </Stack>
                         <Stack sx={{ width: "100%", }}>
@@ -156,8 +195,7 @@ export default function (props) {
                                 {details.makerList.map((maker) => {
                                     console.log(maker)
                                     return <CardContent>
-                                                                                <Typography variant="h7" component="div">
-
+                                        <Typography variant="h7" component="div">
                                             {maker.name}
                                         </Typography>
                                         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
@@ -165,20 +203,13 @@ export default function (props) {
                                         </Typography>
 
                                     </CardContent>
-
                                 })}
-
                             </React.Fragment>
-
-
-
                         </Stack>
                     </Stack>
                 </Stack>
                   Stars
                 <Stack>
-
-
                 <ImageList
                     sx={{
                         gridAutoFlow: "column",
@@ -216,51 +247,106 @@ export default function (props) {
 
                     ))}
                 </ImageList>
-                {/* recommendations
-                <ImageList
-                    sx={{
-                        gridAutoFlow: "column",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr)) !important",
-                        gridAutoColumns: "minmax(160px, 1fr)",
-                        width: "100%",
-                        height: 300,
-                        overflow: "scroll",
-                        boxShadow: 0,
-                    }}
-                >
-
-                    {itemData.map((item) => (
-
-                        <ImageListItem key={item.img} cols={3} sx={{
-                            display: 'flex', flexDirection: 'row', width: undefined,
-                            // Without height undefined it won't work
-                            height: "100%", aspectRatio: 135 / 76
-                        }} >
-                            <img
-                                srcSet={`${item.img}`}
-                                src={`${item.img}`}
-                                alt={item.title}
-                                loading="lazy"
-                            />
-                            <ImageListItemBar
-                                title={item.title}
-                                subtitle={item.author}
-                                actionIcon={
-                                    <IconButton
-                                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                        aria-label={`info about ${item.title}`}
-                                    >
-                                        <InfoIcon />
-                                    </IconButton>
-                                }
-                            />
-                        </ImageListItem>
-
-                    ))}
-                </ImageList> */}
                 </Stack>
             </Stack>
+        <Dialog
+        sx={{width:"100%"}}
+        open={open}
+        onClose={handleClose}
+        //sx={{width:"50%"}}
 
+      >
+        <DialogTitle>Sources</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Edit the resouces for the movie to download.
+          </DialogContentText>
+        <List
+            sx={{ width: '100%', bgcolor: 'background.paper' }}
+        >
+            <ListItem >
+
+                <Stack direction="row" spacing={1} >
+
+                    <Box sx={{ position: 'relative', display: 'inline-flex'}}>
+                        <CircularProgress variant="determinate" value={progress} />
+                        <Box
+                            sx={{
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                position: 'absolute',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Typography variant="caption" component="div" color="text.secondary">
+                                {`${Math.round(progress)}%`}
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    <TextField
+                        hiddenLabel
+                        id="filled-hidden-label-small"
+                        defaultValue="Small"
+                        variant="filled"
+                        size="small"
+                    />
+                    <Button variant="contained">Delete</Button>
+                    <Button variant="contained">Confirm</Button>
+                </Stack>
+                    
+
+            </ListItem>
+                <ListItem >
+
+                    <Stack direction="row" spacing={1} >
+
+                        <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                            <CircularProgress variant="determinate" value={progress} />
+                            <Box
+                                sx={{
+                                    top: 0,
+                                    left: 0,
+                                    bottom: 0,
+                                    right: 0,
+                                    position: 'absolute',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <Typography variant="caption" component="div" color="text.secondary">
+                                    {`${Math.round(progress)}%`}
+                                </Typography>
+                            </Box>
+                        </Box>
+
+                        <TextField
+                            hiddenLabel
+                            id="filled-hidden-label-small"
+                            defaultValue="Small"
+                            variant="filled"
+                            size="small"
+                        />
+                        <Button variant="contained">Delete</Button>
+                        <Button variant="contained">Confirm</Button>
+                    </Stack>
+
+
+                </ListItem>
+
+        </List>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button type="submit">Subscribe</Button>
+        </DialogActions>
+      </Dialog>
+        </div>
         )
 
 

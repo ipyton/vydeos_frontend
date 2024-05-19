@@ -8,22 +8,29 @@ import Typography from '@mui/material/Typography';
 import { List } from '@mui/material';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
 
 const style = {
     py: 0,
     width: '100%',
-    maxWidth: 360,
     borderRadius: 2,
     border: '1px solid',
     borderColor: 'divider',
     backgroundColor: 'background.paper',
+    alignItems:"center",
+    justify:"center"
+
+
 };
 
 
 export default function Trends() {
-    return (<List sx={style}>
-        <Card variant="outlined" sx={{ maxWidth: 360 }}>
-            <Box sx={{ p: 2 }}>
+    return (<List sx={style} >
+        <ListItemButton
+            sx={{left:"25%",width:"50%"}}
+        >
+        <Card variant="outlined" sx={{width:"100%"}} >
+            <Box sx={{ p: 2}}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Typography gutterBottom variant="h6" component="div">
                         #1
@@ -40,24 +47,29 @@ export default function Trends() {
             </Box>
 
         </Card>
-        <Card variant="outlined" sx={{ maxWidth: 360 }}>
-            <Box sx={{ p: 2 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography gutterBottom variant="h6" component="div">
-                        #2
-                    </Typography>
-                    <Typography gutterBottom variant="h5" component="div">
-                        Toothbrush
-                    </Typography>
+        </ListItemButton>
+        <ListItemButton
+            sx={{ left: "25%", width: "50%" }}
+        >
+            <Card variant="outlined" sx={{ width: "100%" }} >
+                <Box sx={{ p: 2 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography gutterBottom variant="h6" component="div">
+                            #2
+                        </Typography>
+                        <Typography gutterBottom variant="h5" component="div">
+                            Toothbrush
+                        </Typography>
 
-                </Stack>
-                <Typography color="text.secondary" variant="body2">
-                    Pinstriped cornflower blue cotton blouse takes you on a walk to the park or
-                    just down the hall.
-                </Typography>
-            </Box>
+                    </Stack>
+                    <Typography color="text.secondary" variant="body2">
+                        Pinstriped cornflower blue cotton blouse takes you on a walk to the park or
+                        just down the hall.
+                    </Typography>
+                </Box>
 
-        </Card>
+            </Card>
+        </ListItemButton>
         <Card variant="outlined" sx={{ maxWidth: 360 }}>
             <Box sx={{ p: 2 }}>
 

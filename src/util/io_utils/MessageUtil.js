@@ -20,7 +20,7 @@ export default class MessageUtil {
         dispatch(update(information))
     }
 
-    
+
     static updateMessage(response) {
         // find the newest message.
         response = JSON.parse(response.data)
@@ -72,7 +72,7 @@ export default class MessageUtil {
     }
 
     static getNewestMessages(friendId, setSelect) {
-        let checkKey = "chatLastUpdate" 
+        let checkKey = "chatLastUpdate"
         localforage.getItem(checkKey).then(async timestamp => {
             if (!timestamp) {
                 timestamp = 0;
@@ -184,6 +184,7 @@ export default class MessageUtil {
 
     static sendMessage(userId, sendTo, content, messageType, chatRecords, setChatRecords, type) {
         let data = { userId: userId, receiverId: sendTo, content: content, messageType: messageType, type: type }
+        console.log(data)
         axios(
             {
                 url: MessageUtil.getUrlBase() + "/chat/sendMessage",
@@ -248,7 +249,7 @@ export default class MessageUtil {
             else if (responseData.code === 1) {
                 console.log(JSON.parse(responseData.message))
                 //MessageUtil.setUserIntro(JSON.parse(responseData.message), dispatch)
-                setDetails({...JSON.parse(responseData.message)})
+                setDetails({ ...JSON.parse(responseData.message) })
                 // localforage.setItem("userIntro", JSON.parse(responseData.message)).then(() => {
                 //     navigator("/friendInfomation",{state:{position:"mid"}})
                 // })

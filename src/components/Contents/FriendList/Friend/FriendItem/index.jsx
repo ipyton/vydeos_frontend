@@ -14,7 +14,7 @@ export default function(props){
     let handleClick = (idx) => {
         return ()=> {
             if (1 === idx || 0 === idx || 2 === idx) {
-                setSelector({ type: "userId", content: content.friend_id })
+                setSelector({ type: "contact", userId: content.friend_id })
             } else if (3 === idx) {
                 setSelector({ type: "groupId", content: content.group_id })
             } else if (4 === idx) {

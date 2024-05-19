@@ -4,7 +4,7 @@ import GroupIntroduction from "./GroupIntroduction"
 import InvitationIntroduction from "./InvitationIntroduction"
 
 export default function (props) {
-    const { selector , position} = props
+    const { selector } = props
     console.log(selector)
     if ("movie" === selector.type) {
         return (<LongVideoIntroduction videoId={selector.videoId} position={"right"}></LongVideoIntroduction>)
