@@ -72,14 +72,14 @@ export default function (props) {
 
     const [progress, setProgress] = React.useState(10);
 
-    React.useEffect(() => {
-        const timer = setInterval(() => {
-            setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
-        }, 800);
-        return () => {
-            clearInterval(timer);
-        };
-    }, []);
+    // React.useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
+    //     }, 800);
+    //     return () => {
+    //         clearInterval(timer);
+    //     };
+    // }, []);
 
     const handleToggle = (value) => () => {
         const currentIndex = checked.indexOf(value);
@@ -121,9 +121,7 @@ export default function (props) {
     if (!details) {
         return <div>loading</div>
     }
-    details.makerList.map((item)=>{
-       console.log(item.name)
-    })
+    console.log(details)
     if (position === "right") {
         return (<div>
             <Stack direction="column"
@@ -192,18 +190,20 @@ export default function (props) {
                                         {details.introduction}
                                     </Typography>
                                 </CardContent>
-                                {details.makerList.map((maker) => {
-                                    console.log(maker)
+                                {
+                                Object.keys(details.makerList).forEach(element => {
                                     return <CardContent>
-                                        <Typography variant="h7" component="div">
-                                            {maker.name}
-                                        </Typography>
-                                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                            {maker.role}
-                                        </Typography>
+                                    <Typography variant="h7" component="div">
+                                        {element}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                        {details.makerList[element]}
+                                    </Typography>
 
-                                    </CardContent>
-                                })}
+                                </CardContent>
+                                })
+                                
+                                }
                             </React.Fragment>
                         </Stack>
                     </Stack>
@@ -222,8 +222,9 @@ export default function (props) {
                     }}
                 >
 
-                    {details.actressList.map((item) => (
-
+                    {details.actressList.map((item) => {
+                        
+                        return (
                         <ImageListItem key={item.avatar}  sx={{
                             display: 'flex', flexDirection: 'row',
                             // width: undefined,
@@ -245,7 +246,7 @@ export default function (props) {
                             />
                         </ImageListItem>
 
-                    ))}
+                    )})}
                 </ImageList>
                 </Stack>
             </Stack>
@@ -348,9 +349,6 @@ export default function (props) {
       </Dialog>
         </div>
         )
-
-
-
     } else {
 
 

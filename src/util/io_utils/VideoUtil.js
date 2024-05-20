@@ -1,9 +1,9 @@
 import Qs from 'qs'
 import axios from "axios"
 
-export default class VideoUtil{
+export default class VideoUtil {
 
-    static getVideoInformation(movie_id,setState) {
+    static getVideoInformation(movie_id, setState) {
         setState(null)
         axios({
             url: "http://localhost:5000" + "/movie/get_meta",
@@ -16,14 +16,25 @@ export default class VideoUtil{
                 token: localStorage.getItem("token"),
             }
         }).catch(error => {
-            
+
         }).then(function (response) {
             if (response === undefined) {
                 console.log("errror")
+                return
             }
             //props.setBarState({...props.barState, message:responseData.message, open:true})
             let data = response.data
+            console.log(data)
+            let actresses = []
             data["type"] = "movie"
+            console.log(data["actressList"])
+            data["actressList"].forEach(element => {
+                console.log(element)
+                actresses.push(JSON.parse(element))
+                console.log(JSON.parse(element))
+            });
+            data["actressList"] = actresses
+
             setState(data)
         })
     }
