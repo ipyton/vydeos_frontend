@@ -125,8 +125,8 @@ export default function FunctionDrawer(props) {
 
   //let iconList = {"Inbox":function(){return (<InboxIcon></InboxIcon>)}, "Message":"eval(iconFunctionString)", "Settings":TuneIcon, "Trending":WhatshotIcon, "Posts":HomeIcon}
 
-  let functions = ['Chat', 'Trending', 'Posts', 'Videos', 'Edit', 'Friend', 'Settings']
-  let routeTable = ['/chat', '/trending', '/', '/longVideos', '/edit', '/friends', '/settings']
+  let functions = ['Chat', 'Trending', 'Posts', 'Videos', 'Edit', 'Friend', 'Settings', "Download"]
+  let routeTable = ['/chat', '/trending', '/', '/longVideos', '/edit', '/friends', '/settings', "/download"]
   // let routeTable = {'Chat': '/chat', 'Settings': 'settings', 'Trending': 'trending', 'Posts': 'home'}
 
   let handleMessageJump = (index) => {

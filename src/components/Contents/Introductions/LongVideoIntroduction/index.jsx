@@ -60,8 +60,7 @@ function Item(props) {
 
 export default function (props) {
     const [details, setDetails] = useState(null)
-    const [relationship, setRelationship] = useState(0)
-    const {videoId} = props
+    const { videoId } = props
     const [open, setOpen] = React.useState(false);
     let position = "center";
     const location = useLocation()
@@ -70,7 +69,16 @@ export default function (props) {
     const [checked, setChecked] = React.useState(['wifi']);
 
 
-    const [progress, setProgress] = React.useState(10);
+    //const [progress, setProgress] = React.useState([0,0,0,0]);
+    const [sources, setSources] = React.useState([{ videoId: videoId, source: "xxxx1", status: "init" }, { videoId: videoId, source: "xxxx2", status: "downloading" }, { videoId: videoId, source: "xxxx3", status: "paused" }, { videoId: videoId, source: "xxxx4", status: "cancelled" }])
+
+    const [input, setInput] = React.useState("")
+
+    // React.useEffect(() => {
+    //     VideoUtil.get_download_source(videoId, setSources)
+    // }, [])
+
+
 
     // React.useEffect(() => {
     //     const timer = setInterval(() => {
@@ -96,24 +104,48 @@ export default function (props) {
 
     const handleClickOpen = () => {
         setOpen(true);
+        VideoUtil.get_download_source(videoId, setSources)
     };
+
+    const handleInput = (event) => {
+        console.log(event)
+        setInput(event.target.value)
+    }
+
+
+    const handleSubmit = () => {
+        console.log(input)
+        if (!input || input.length == 0) {
+            return
+        }
+        VideoUtil.add_download_source(videoId, input, sources, setSources)
+        setInput("")
+    }
 
     const handleClose = () => {
         setOpen(false);
     };
 
+    const handleDelete = (source) => {
+        return ()=>{
+            VideoUtil.remove_download_source(videoId, source, sources, setSources)
+        }
 
-    React.useEffect(()=>{
+
+    }
+
+
+    React.useEffect(() => {
         VideoUtil.getVideoInformation(videoId, setDetails)
-    },[videoId])
+    }, [videoId])
 
     let genresList = ""
     if (details) {
-        for (let i = 0; i < details.genre_list.length; i ++) {
+        for (let i = 0; i < details.genre_list.length; i++) {
             genresList += details.genre_list[i]
             genresList += ","
         }
-        genresList.substring(0, -1)
+        genresList.substring(0, -2)
     }
 
     const recommendData = []
@@ -121,7 +153,7 @@ export default function (props) {
     if (!details) {
         return <div>loading</div>
     }
-    console.log(details)
+    console.log(sources)
     if (position === "right") {
         return (<div>
             <Stack direction="column"
@@ -129,9 +161,9 @@ export default function (props) {
                 sx={{ width: "100%", overflow: "scroll" }}>
                 <Stack direction="row"
                     spacing={0.5} sx={{ width: "100%", boxShadow: 1 }}>
-                    <Stack sx={{width:"30%"}}>
+                    <Stack sx={{ width: "30%" }}>
                         <Box>
-                            <Item item={{original:details.poster}}></Item>
+                            <Item item={{ original: details.poster }}></Item>
                         </Box>
                     </Stack>
                     <Stack
@@ -191,162 +223,124 @@ export default function (props) {
                                     </Typography>
                                 </CardContent>
                                 {
-                                Object.keys(details.makerList).forEach(element => {
-                                    return <CardContent>
-                                    <Typography variant="h7" component="div">
-                                        {element}
-                                    </Typography>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                        {details.makerList[element]}
-                                    </Typography>
+                                    Object.keys(details.makerList).forEach(element => {
+                                        return <CardContent>
+                                            <Typography variant="h7" component="div">
+                                                {element}
+                                            </Typography>
+                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                {details.makerList[element]}
+                                            </Typography>
 
-                                </CardContent>
-                                })
-                                
+                                        </CardContent>
+                                    })
+
                                 }
                             </React.Fragment>
                         </Stack>
                     </Stack>
                 </Stack>
-                  Stars
+                Stars
                 <Stack>
-                <ImageList
-                    sx={{
-                        gridAutoFlow: "column",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr)) !important",
-                        gridAutoColumns: "minmax(200px, 1fr)",
-                        width: "100%",
-                        height: "100%",
-                        // overflow: "scroll",
-                        boxShadow: 0,
-                    }}
-                >
+                    <ImageList
+                        sx={{
+                            gridAutoFlow: "column",
+                            gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr)) !important",
+                            gridAutoColumns: "minmax(200px, 1fr)",
+                            width: "100%",
+                            height: "100%",
+                            // overflow: "scroll",
+                            boxShadow: 0,
+                        }}
+                    >
 
-                    {details.actressList.map((item) => {
-                        
-                        return (
-                        <ImageListItem key={item.avatar}  sx={{
-                            display: 'flex', flexDirection: 'row',
-                            // width: undefined,
-                            // Without height undefined it won't work
-                            // height: "100%", aspectRatio: 135 / 76
-                        }} >
-                            <Item item={{ original: item.avatar }}></Item>
-                            <ImageListItemBar
-                                title={item.name}
-                                subtitle={"Character:" + item.character}
-                                actionIcon={
-                                    <IconButton
-                                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                        aria-label={`info about ${item.title}`}
-                                    >
-                                        <InfoIcon />
-                                    </IconButton>
-                                }
-                            />
-                        </ImageListItem>
+                        {details.actressList.map((item) => {
 
-                    )})}
-                </ImageList>
+                            return (
+                                <ImageListItem key={item.avatar} sx={{
+                                    display: 'flex', flexDirection: 'row',
+                                    // width: undefined,
+                                    // Without height undefined it won't work
+                                    // height: "100%", aspectRatio: 135 / 76
+                                }} >
+                                    <Item item={{ original: item.avatar }}></Item>
+                                    <ImageListItemBar
+                                        title={item.name}
+                                        subtitle={"Character:" + item.character}
+                                        actionIcon={
+                                            <IconButton
+                                                sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                                aria-label={`info about ${item.title}`}
+                                            >
+                                                <InfoIcon />
+                                            </IconButton>
+                                        }
+                                    />
+                                </ImageListItem>
+
+                            )
+                        })}
+                    </ImageList>
                 </Stack>
             </Stack>
-        <Dialog
-        sx={{width:"100%"}}
-        open={open}
-        onClose={handleClose}
-        //sx={{width:"50%"}}
+            <Dialog
+                sx={{ width: "100%" }}
+                open={open}
+                onClose={handleClose}
+            //sx={{width:"50%"}}
 
-      >
-        <DialogTitle>Sources</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Edit the resouces for the movie to download.
-          </DialogContentText>
-        <List
-            sx={{ width: '100%', bgcolor: 'background.paper' }}
-        >
-            <ListItem >
+            >
+                <DialogTitle>Sources</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Edit the resouces for the movie to download.
+                    </DialogContentText>
+                    <List
+                        sx={{ width: '100%', bgcolor: 'background.paper' }}
+                    >
 
-                <Stack direction="row" spacing={1} >
+                        {
+                            sources.map(item => {
+                                console.log(item)
+                                return (<ListItem sx={{ width: "100%" }}>
+                                    <Stack direction="row" spacing={1} sx={{ width: "100%" }} >
+                                        <ListItemText
+                                            primary={item.source}
+                                            sx={{ width: "80%" }}
+                                        />
 
-                    <Box sx={{ position: 'relative', display: 'inline-flex'}}>
-                        <CircularProgress variant="determinate" value={progress} />
-                        <Box
-                            sx={{
-                                top: 0,
-                                left: 0,
-                                bottom: 0,
-                                right: 0,
-                                position: 'absolute',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <Typography variant="caption" component="div" color="text.secondary">
-                                {`${Math.round(progress)}%`}
-                            </Typography>
-                        </Box>
-                    </Box>
-
-                    <TextField
-                        hiddenLabel
-                        id="filled-hidden-label-small"
-                        defaultValue="Small"
-                        variant="filled"
-                        size="small"
-                    />
-                    <Button variant="contained">Delete</Button>
-                    <Button variant="contained">Confirm</Button>
-                </Stack>
-                    
-
-            </ListItem>
-                <ListItem >
-
-                    <Stack direction="row" spacing={1} >
-
-                        <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                            <CircularProgress variant="determinate" value={progress} />
-                            <Box
-                                sx={{
-                                    top: 0,
-                                    left: 0,
-                                    bottom: 0,
-                                    right: 0,
-                                    position: 'absolute',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Typography variant="caption" component="div" color="text.secondary">
-                                    {`${Math.round(progress)}%`}
-                                </Typography>
-                            </Box>
-                        </Box>
-
-                        <TextField
-                            hiddenLabel
-                            id="filled-hidden-label-small"
-                            defaultValue="Small"
-                            variant="filled"
-                            size="small"
-                        />
-                        <Button variant="contained">Delete</Button>
-                        <Button variant="contained">Confirm</Button>
-                    </Stack>
+                                        <Button variant="contained" onClick={handleDelete(item.source)} >Del</Button>
+                                        {
+                                            (item.status === "init" || item.status === "paused" || item.status === "cancelled")
+                                                ? (<Button variant="contained" >Pull</Button>) : <div></div>}
+                                    </Stack>
+                                </ListItem>)
+                            })
 
 
-                </ListItem>
+                        }
+                        <ListItem sx={{ width: "100%" }}>
 
-        </List>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Subscribe</Button>
-        </DialogActions>
-      </Dialog>
+                            <Stack direction="row" spacing={1} >
+                                <TextField
+                                    hiddenLabel
+                                    id="filled-hidden-label-small"
+                                    variant="filled"
+                                    size="small"
+                                    onChange={handleInput}
+                                    value={input}
+                                />
+                                <Button variant="contained" onClick={handleSubmit}>Add</Button>
+                            </Stack>
+                        </ListItem>
+
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button type="submit">Ok</Button>
+                </DialogActions>
+            </Dialog>
         </div>
         )
     } else {
