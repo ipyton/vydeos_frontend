@@ -112,6 +112,9 @@ export default function (props) {
         setInput(event.target.value)
     }
 
+    const handleDownload = (source) => () => {
+        VideoUtil.start_download(videoId, source, sources, setSources)
+    }
 
     const handleSubmit = () => {
         console.log(input)
@@ -127,11 +130,9 @@ export default function (props) {
     };
 
     const handleDelete = (source) => {
-        return ()=>{
+        return () => {
             VideoUtil.remove_download_source(videoId, source, sources, setSources)
         }
-
-
     }
 
 
@@ -311,8 +312,8 @@ export default function (props) {
 
                                         <Button variant="contained" onClick={handleDelete(item.source)} >Del</Button>
                                         {
-                                            (item.status === "init" || item.status === "paused" || item.status === "cancelled")
-                                                ? (<Button variant="contained" >Pull</Button>) : <div></div>}
+                                            (item.gid !== "" || !item.gid)
+                                                ? (<Button variant="contained" onClick={handleDownload(item.source)} >Pull</Button>) : <div></div>}
                                     </Stack>
                                 </ListItem>)
                             })
@@ -337,8 +338,7 @@ export default function (props) {
                     </List>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button type="submit">Ok</Button>
+                    <Button onClick={handleClose}>Ok</Button>
                 </DialogActions>
             </Dialog>
         </div>

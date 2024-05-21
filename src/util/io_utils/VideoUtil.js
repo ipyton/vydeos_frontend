@@ -8,6 +8,93 @@ export default class VideoUtil {
     }
 
 
+    static batchStop(movies, downloadRecords, setDownloadRecords) {
+        axios({
+            url: VideoUtil.getUrlBase() + "/movie/batch_stop",
+            method: 'post',
+            data: { movies: movies },
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }], headers: {
+                token: localStorage.getItem("token"),
+            }
+        }).catch(error => {
+
+        }).then(function (response) {
+            if (response === undefined) {
+                console.log("errror")
+                return
+            }
+            //props.setBarState({...props.barState, message:responseData.message, open:true})
+
+            let list = []
+
+
+
+        })
+
+    }
+
+    static batchPause(movies, downloadRecords, setDownloadRecords) {
+        console.log(Qs.stringify({ downloads: movies }))
+        axios({
+            url: VideoUtil.getUrlBase() + "/movie/batch_pause",
+            method: 'post',
+            data: { downloads: movies },
+            headers: {
+                token: localStorage.getItem("token"),
+            }
+        }).catch(error => {
+
+        }).then(function (response) {
+            if (response === undefined) {
+                console.log("errror")
+                return
+            }
+            //props.setBarState({...props.barState, message:responseData.message, open:true})
+            let list = []
+        })
+    }
+
+    static batchContinue(movies, downloadRecords, setDownloadRecords) {
+        axios({
+            url: VideoUtil.getUrlBase() + "/movie/batch_continue",
+            method: 'post',
+            data: { downloads: movies }, headers: {
+                token: localStorage.getItem("token"),
+            }
+        }).catch(error => {
+
+        }).then(function (response) {
+            if (response === undefined) {
+                console.log("errror")
+                return
+            }
+
+        })
+    }
+
+
+    static batchRemove(movies, downloadRecords, setDownloadRecords) {
+        axios({
+            url: VideoUtil.getUrlBase() + "/movie/batch_remove",
+            method: 'post',
+            data: { downloads: movies }, headers: {
+                token: localStorage.getItem("token"),
+            }
+        }).catch(error => {
+
+        }).then(function (response) {
+            if (response === undefined) {
+                console.log("errror")
+                return
+            }
+
+
+        })
+    }
+
     static getVideoInformation(movie_id, setState) {
         setState(null)
         axios({
@@ -130,11 +217,11 @@ export default class VideoUtil {
 
     }
 
-    static start_download(movie_id, source_id, setRecords) {
+    static start_download(movie_id, source_id, sources, setSources) {
         axios({
             url: VideoUtil.getUrlBase() + "/movie/start",
             method: 'post',
-            data: { movie_id: movie_id, source_id },
+            data: { movieId: movie_id, source: source_id },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -144,12 +231,22 @@ export default class VideoUtil {
         }).catch(error => {
 
         }).then(function (response) {
-            if (response === undefined) {
+            if (response === undefined || !response.data) {
                 console.log("errror")
+                return
             }
+            if (response.data === "exist!") {
+                return
+            }
+            console.log(response)
+
+            for (let i = 0; i < sources.length; i++) {
+                if (sources[i].source === source_id) {
+                    sources[i].gid = response.data
+                }
+            }
+            setSources([...sources])
             //props.setBarState({...props.barState, message:responseData.message, open:true})
-            let data = response.data
-            data["type"] = "movie"
         })
     }
 
@@ -236,12 +333,15 @@ export default class VideoUtil {
         }).catch(error => {
 
         }).then(function (response) {
-            if (response === undefined) {
+            if (response === undefined || !response.data) {
                 console.log("errror")
+                return
             }
+            console.log(response)
             //props.setBarState({...props.barState, message:responseData.message, open:true})
             let data = response.data
-            data["type"] = "movie"
+            setRecord(response.data)
+
         })
     }
 

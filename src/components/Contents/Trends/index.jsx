@@ -25,92 +25,51 @@ const style = {
 
 
 export default function Trends() {
+
+
+    let list = [{ title: "title", introduction: "this is an introduction", pic:""}, { title: "title", introduction: "this is an introduction", pic:"" }, { title: "title", introduction: "this is an introduction", pic:"" },
+        { title: "title", introduction: "this is an introduction", pic: "" }, { title: "title", introduction: "this is an introduction", pic: "" }, { title: "title", introduction: "this is an introduction", pic: "" },
+        { title: "title", introduction: "this is an introduction", pic: "" }, { title: "title", introduction: "this is an introduction", pic: "" }, { title: "title", introduction: "this is an introduction", pic: "" },
+        { title: "title", introduction: "this is an introduction", pic: "" }, { title: "title", introduction: "this is an introduction", pic: "" }, { title: "title", introduction: "this is an introduction", pic: "" }
+     ]
+
     return (<List sx={style} >
-        <ListItemButton
-            sx={{left:"25%",width:"50%"}}
-        >
-        <Card variant="outlined" sx={{width:"100%"}} >
-            <Box sx={{ p: 2}}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography gutterBottom variant="h6" component="div">
-                        #1
-                    </Typography>
-                    <Typography gutterBottom variant="h5" component="div">
-                        Toothbrush
-                    </Typography>
 
-                </Stack>
-                <Typography color="text.secondary" variant="body2">
-                    Pinstriped cornflower blue cotton blouse takes you on a walk to the park or
-                    just down the hall.
-                </Typography>
-            </Box>
+        {
+            list.map((item,idx)=>{
+                return (<ListItemButton
+                    sx={{ left: "25%", width: "50%" }}
+                >
+                    <Card variant="outlined" sx={{ width: "100%" }} >
+                        <Box sx={{ p: 2 }}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Typography gutterBottom variant="h6" component="div">
+                                    {
+                                        "#" + (idx  +1)
+                                    }
+                                </Typography>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    {
+                                    item.title
+                                    }
+                                </Typography>
 
-        </Card>
-        </ListItemButton>
-        <ListItemButton
-            sx={{ left: "25%", width: "50%" }}
-        >
-            <Card variant="outlined" sx={{ width: "100%" }} >
-                <Box sx={{ p: 2 }}>
-                    <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography gutterBottom variant="h6" component="div">
-                            #2
-                        </Typography>
-                        <Typography gutterBottom variant="h5" component="div">
-                            Toothbrush
-                        </Typography>
+                            </Stack>
+                            <Typography color="text.secondary" variant="body2">
+                                {
+                                    item.introduction
+                                }
+                            </Typography>
+                        </Box>
 
-                    </Stack>
-                    <Typography color="text.secondary" variant="body2">
-                        Pinstriped cornflower blue cotton blouse takes you on a walk to the park or
-                        just down the hall.
-                    </Typography>
-                </Box>
+                    </Card>
+                </ListItemButton>)
 
-            </Card>
-        </ListItemButton>
-        <Card variant="outlined" sx={{ maxWidth: 360 }}>
-            <Box sx={{ p: 2 }}>
 
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography gutterBottom variant="h6" component="div">
-                        #3
-                    </Typography>
-                    <Typography gutterBottom variant="h5" component="div">
-                        Toothbrush
-                    </Typography>
 
-                </Stack>
-                <Typography color="text.secondary" variant="body2">
-                    Pinstriped cornflower blue cotton blouse takes you on a walk to the park or
-                    just down the hall.
-                </Typography>
-            </Box>
 
-        </Card>
-        <ListItem>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography gutterBottom variant="h6" component="div">
-                    #4 
-                </Typography>
-                <Typography gutterBottom variant="h7" component="div">
-                    Toothbrush
-                </Typography>
-
-            </Stack>
-        </ListItem>
-        <Divider component="li" />
-        <ListItem>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography gutterBottom variant="h6" component="div">
-                    #5
-                </Typography>
-                <Typography gutterBottom variant="h7" component="div">
-                    Toothbrush
-                </Typography>
-            </Stack>
-        </ListItem>
+            }) 
+        }
 
     </List>)
 

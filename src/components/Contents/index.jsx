@@ -33,7 +33,7 @@ import LongVideoIntroduction from "./Introductions/LongVideoIntroduction"
 import localforage from "localforage"
 import { useLayoutEffect } from "react"
 import Trends from "./Trends"
-import { Download } from "@mui/icons-material"
+import Downloads from "./Downloads"
 const defaultTheme = createTheme();
 
 export default function Contents(props) {
@@ -124,6 +124,7 @@ export default function Contents(props) {
                 })
             }
 
+
             //update messageList
 
 
@@ -168,7 +169,7 @@ export default function Contents(props) {
                                         <Route path="/friendInfomation"  element={<FriendIntroductionCentered ></FriendIntroductionCentered>}></Route>
                                         <Route path="/videoIntroduction"  element={<LongVideoIntroduction></LongVideoIntroduction>}> </Route>
                                         <Route path="/trending" element={<Trends></Trends>}> </Route>
-                                        <Route path="/download" element={<Download></Download>}></Route>
+                                        <Route path="/download" element={<Downloads></Downloads>}></Route>
                                         
                                         <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
