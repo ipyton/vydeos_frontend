@@ -36,14 +36,14 @@ export default function UserInfo(props) {
   const [receive, setReceive] = useState(false)
   const [selected, setSelected] = useState(false)
   const { login, setLogin } = props.status
-  const [avatar, setAvatar] = useState(null)
+  const [avatar, setAvatar] = useState("")
   const [gender, setGender] = useState(0)
   const [date, setDate] = useState(dayjs('2022-04-17'))
   const [picToUpload, setPicToUpload] = useState(null)
   const [detail, setDetail] = useState({})
-  React.useEffect(()=> {
-    AccountUtil.getOwnerInfo(detail, setDetail)
-  }, [])
+  // React.useEffect(()=> {
+  //   AccountUtil.getOwnerInfo(detail, setDetail)
+  // }, [])
   const handleChange = (event) => {
     setGender(event.target.value);
   };
@@ -70,6 +70,7 @@ export default function UserInfo(props) {
 
   const picUploadHandler = (event) => {
     setAvatar(URL.createObjectURL(event.target.files[0]))
+    console.log(avatar)
     PictureUtil.uploadAvatar(event.target.files[0])
   }
 
@@ -107,22 +108,6 @@ export default function UserInfo(props) {
     }
   };
 
-  let getAvatar = () => {
-    let mid = <Avatar id="avatar" src={avatar} sx={{ bgcolor: deepOrange[500] }}>N</Avatar>
-    if (null !== localStorage.getItem("avatar")) {
-      mid = <Avatar alt="Travis Howard" src={avatar} />
-    }
-    return (
-      <div>
-        <input id="uploadPic" type="file" onChange={picUploadHandler} value="text" hidden></input>
-        <label htmlFor="uploadPic">
-          <IconButton component="span">
-            {mid}
-          </IconButton>
-        </label>
-      </div>
-    )
-  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -136,7 +121,14 @@ export default function UserInfo(props) {
             alignItems: 'center',
           }}
         >
-          {getAvatar()}
+          <div>
+            <input id="uploadPic" type="file" onChange={picUploadHandler}  hidden></input>
+            <label htmlFor="uploadPic">
+              <IconButton component="span">
+                <Avatar id="avatar" src={avatar} sx={{ bgcolor: deepOrange[500] }}>N</Avatar>
+              </IconButton>
+            </label>
+          </div>
           <Typography component="h1" variant="h5">
             User Information
           </Typography>

@@ -1,6 +1,6 @@
 import Article from "./Article";
-import React, {useEffect, useState} from "react";
-import { useNavigate ,Navigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, Navigate } from "react-router-dom";
 import IOUtil from "../../../util/ioUtil";
 import { Box } from "@mui/material";
 import { List } from "@mui/material";
@@ -36,11 +36,31 @@ import IconButton from '@mui/material/IconButton';
 import CommentIcon from '@mui/icons-material/Comment';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-
+import Fingerprint from '@mui/icons-material/Fingerprint';
+import { createSvgIcon } from '@mui/material/utils';
+import PostUtil from "../../../util/io_utils/PostUtil";
+import ButtonGroup from '@mui/material/ButtonGroup';
+import EditIcon from '@mui/icons-material/Edit';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import NavigationIcon from '@mui/icons-material/Navigation';
+const PlusIcon = createSvgIcon(
+  // credit: plus icon from https://heroicons.com/
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+  </svg>,
+  'Plus',
+);
 function Item(props) {
-  const [articles, setArticles] = React.useState([1,2,3,4,5]);
+  const [articles, setArticles] = React.useState([1, 2, 3, 4, 5]);
   const [count, setCount] = React.useState(99);
-  let {login, setLogin} = props
+  const [content, setContent] = React.useState("")
+  let { login, setLogin } = props
   const [expanded, setExpanded] = React.useState(false)
   const [atList, setAtList] = React.useState([
     { key: 0, label: 'Angular' },
@@ -48,7 +68,14 @@ function Item(props) {
     { key: 2, label: 'Polymer' },
     { key: 3, label: 'React' },
     { key: 4, label: 'Vue.js' }])
+  
   const [checked, setChecked] = React.useState([0]);
+  const [picsUrl, setPicsUrl] = useState([])
+  const [postPics, setPostPics] = useState([])
+  const [notice, setNotice] = useState([])
+  const [who_can_see, set_who_can_see] = useState([])
+  const [location,setLocation] = useState({})
+
 
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
@@ -65,14 +92,50 @@ function Item(props) {
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
-  
+
+  const handleEditChange = (event) => {
+
+  }
+
   const handleDelete = () => {
     // setAtList((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
   };
 
-  const handleSend = ()=> {
-    
+  const handleSend = () => {
+    PostUtil.sendPost(content, picsUrl, notice, who_can_see, location, articles, setArticles)
   }
+
+  const handlePicUpload = (event) => {
+    console.log(event.target.files[0])
+    let file = event.target.files[0]
+    let reader = new FileReader();
+
+    reader.onloadend = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        setPostPics([...postPics, { pic: URL.createObjectURL(event.target.files[0]), width: img.width, height: img.height }])
+      };
+      PostUtil.uploadPicture(file, picsUrl, setPicsUrl)
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+
+  }
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+    height: 1
+  });
 
   const AntSwitch = styled(Switch)(({ theme }) => ({
     width: 28,
@@ -139,21 +202,23 @@ function Item(props) {
   };
 
   const handleClose = () => {
+    setPostPics([])
+    setPicsUrl([])
     setOpen(false);
   };
 
-  useEffect(() =>{init()},[]);
-  let RequestData = function()  {
+  useEffect(() => { init() }, []);
+  let RequestData = function () {
     console.log("loading")
   }
   if (null === login) return <div></div>
   if (login !== true && localStorage.getItem("token") !== null) {
     console.log("both none")
-    IOUtil.verifyTokens(setLogin) 
-    .catch(err=>{
-      props.setBarState({...props.barState, message:"please login first" + err, open:true})
-    })
-      }
+    IOUtil.verifyTokens(setLogin)
+      .catch(err => {
+        props.setBarState({ ...props.barState, message: "please login first" + err, open: true })
+      })
+  }
   const itemData = [
     {
       img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
@@ -183,26 +248,17 @@ function Item(props) {
       img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
       title: 'Basketball',
     },
-    {
-      img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
-      title: 'Fern',
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
-      title: 'Mushrooms',
-    },
 
   ];
- 
-  if(login !== true || localStorage.getItem("token") === null ) 
-  {
+
+  if (login !== true || localStorage.getItem("token") === null) {
     console.log(localStorage.getItem("token"))
-    return <Navigate to="/login" replace/>
+    return <Navigate to="/login" replace />
   }
- 
-if (articles.length === 0) {
-  RequestData()
-}
+
+  if (articles.length === 0) {
+    RequestData()
+  }
   const style = {
     margin: 0,
     top: 'auto',
@@ -249,21 +305,42 @@ if (articles.length === 0) {
             label="Say Something"
             multiline
             rows={4}
-            defaultValue="Default Value"
+            value={content}
+            onChange={(event)=>{
+              setContent(event.target.value)
+            }}
             variant="filled"
             sx={{width:"100%"}}
           />
-          <ImageList sx={{ width: "100%", height: 500 }} cols={3} rowHeight={164} display="flex" justifyContent="center">
-            {itemData.map((item) => (
-              <ImageListItem key={item.img} sx={{padding:0}}>
-                <img
-                  srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                  src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                  alt={item.title}
-                  loading="lazy"
+          <ImageList sx={{ width: 500}} cols={3} rowHeight={164}  >
+            {postPics.map((item) => (
+              <ImageListItem sx={{ overflow: 'hidden',padding:0}}>
+
+                <Box
+                  component="img"
+                  sx={{
+                    width: '100%',   
+                    height: '100%', 
+                    objectFit: 'cover', 
+                    padding:0
+                  }}
+
+                  src={item.pic} 
                 />
+
+
               </ImageListItem>
             ))}
+
+            {postPics.length < 9 ? <ImageListItem><Button
+              component="label"
+              variant="contained"
+              sx={{ width: 1, height: 1 }}
+
+            >
+              <PlusIcon />
+              <VisuallyHiddenInput type="file" onChange={handlePicUpload}/>
+            </Button> </ImageListItem>:<div></div>}
           </ImageList>
 
         </DialogContent>
@@ -426,9 +503,19 @@ if (articles.length === 0) {
         </DialogActions>
       </Dialog>
       <Fab color="primary" style={style} onClick={handleClickOpen}  aria-label="add">
-        <AddIcon />
       </Fab>
-    </Box>
+      <Fab color="secondary" aria-label="edit">
+        <EditIcon />
+      </Fab>
+      <Fab variant="extended">
+        <NavigationIcon sx={{ mr: 1 }} />
+        My Posts
+      </Fab>
+      <Fab disabled aria-label="like">
+        <FavoriteIcon />
+        Recommendations
+      </Fab>
+    </Box >
 
 
   )
