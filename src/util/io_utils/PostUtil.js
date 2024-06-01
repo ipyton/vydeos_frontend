@@ -28,11 +28,13 @@ export default class PostUtil {
     }
 
     static sendPost(content, pics, notice, who_can_see, location, list, setList) {
-        let data = { images: pics, content: content, notice: notice, users: who_can_see, location: location, accessRules: [], }
+        let data = { images: pics, content: content, authorName: "author", notice: [], users: who_can_see, location: location, voices: [], videos: [], comments: [] }
+        
+        console.log(data)
         axios({
             url: this.getUrlBase() + "/upload",
             method: 'post',
-            data: { images: pics, content: content, authorName: "author", notice: [], users: who_can_see, location: location, voices: [], videos: [], comments: [] },
+            data: data,
             headers: {
                 token: localStorage.getItem("token"),
                 'Content-Type': 'application/json'
@@ -46,31 +48,51 @@ export default class PostUtil {
         })
     }
 
+
+    
     static getPostsById(id, list,setList) {
-
-    }
-
-
-    static getPosts(list, setList) {
         axios({
-            url: this.getUrlBase() + "/get",
+            url: this.getUrlBase() + "/get_by_user_id",
             method: 'post',
-            data: {},
+            data: {userID: localStorage.getItem("userId")},
             transformRequest: [function (data) {
                 return Qs.stringify(data)
-            }], transformResponse: [function (data) {
-                return Qs.parse(data)
             }],
             headers: {
                 token: localStorage.getItem("token"),
             }
         }).catch(exception => {
-
+            console.log(exception)
         }).then(response => {
-            if (!response || !response.data) {
+            console.log(response)
+            if (!response || !response.data || ! response.data.posts) {
                 console.log("connection error")
+                return 
             }
-            setList([...list, ...response.data.body])
+            setList([...list, ...response.data.posts])
+        })
+    }
+
+    static getFriendPosts(list, setList) {
+        axios({
+            url: this.getUrlBase() + "/get_friends_posts",
+            method: 'post',
+            data: {},
+            transformRequest: [function (data) {
+                return Qs.stringify(data)
+            }],
+            headers: {
+                token: localStorage.getItem("token"),
+            }
+        }).catch(exception => {
+            console.log(exception)
+        }).then(response => {
+            console.log(response)
+            if (!response || !response.data || !response.data.posts) {
+                console.log("connection error")
+                return 
+            }
+            setList([...list, ...response.data.posts])
         })
     }
 

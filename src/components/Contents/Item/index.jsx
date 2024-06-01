@@ -74,7 +74,20 @@ function Item(props) {
   const [postPics, setPostPics] = useState([])
   const [notice, setNotice] = useState([])
   const [who_can_see, set_who_can_see] = useState([])
-  const [location,setLocation] = useState({})
+  const [location,setLocation] = useState("")
+  
+
+  const [page,setPage] = useState("friend")
+
+
+  useEffect(()=> {
+    if (page === "friend") {
+      PostUtil.getFriendPosts(articles, setArticles)
+    }
+    else if (page === "my") {
+      PostUtil.getPostsById(localStorage.getItem("userId"), articles, setArticles)
+    }
+  },[page])
 
 
   const handleToggle = (value) => () => {
@@ -92,7 +105,7 @@ function Item(props) {
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
-
+  
   const handleEditChange = (event) => {
 
   }
@@ -260,7 +273,7 @@ function Item(props) {
     RequestData()
   }
   const style = {
-    margin: 0,
+    margin: 1,
     top: 'auto',
     right: 40,
     bottom: 40,
@@ -275,12 +288,30 @@ function Item(props) {
   //       console.log("trigger when loading")
   //     }
   //   })
+
+  const handleFriends = ()=>{
+    if (page === "friend") {
+      return 
+    }
+    else {
+      setPage("friend")
+    }
+
+  }
+  const handleMy = () => {
+    if (page === "my") {
+      return
+    }
+    else {
+      setPage("my")
+    }
+  }
   return (
 
-    <Box display="flex" justifyContent="center">
-      <List>
-      {articles&&articles.map(x=>{
-        return (<ListItem key={x}><Article></Article></ListItem>)
+    <Box  justifyContent="center">
+      <List sx={{ width: "80%", marginLeft: "10%" }}>
+      {articles&&articles.map((x,idx)=>{
+        return (<ListItem key={idx} ><Article></Article></ListItem>)
       })}    
       </List>
       <Dialog
@@ -313,8 +344,8 @@ function Item(props) {
             sx={{width:"100%"}}
           />
           <ImageList sx={{ width: 500}} cols={3} rowHeight={164}  >
-            {postPics.map((item) => (
-              <ImageListItem sx={{ overflow: 'hidden',padding:0}}>
+            {postPics.map((item,idx) => (
+              <ImageListItem key={idx} sx={{ overflow: 'hidden',padding:0}}>
 
                 <Box
                   component="img"
@@ -332,7 +363,7 @@ function Item(props) {
               </ImageListItem>
             ))}
 
-            {postPics.length < 9 ? <ImageListItem><Button
+            {postPics.length < 9 ? <ImageListItem key={30}><Button
               component="label"
               variant="contained"
               sx={{ width: 1, height: 1 }}
@@ -374,7 +405,7 @@ function Item(props) {
             <Typography sx={{ width: '33%', flexShrink: 0 }}>Notice Someone.</Typography>
             <Typography sx={{ color: 'text.secondary' }}>
               <List style={{ display: 'flex', flexDirection: 'row', padding: 0, overflow:"auto" }}>
-                <ListItem style={{ padding: 0 }}> 
+                <ListItem key={1} style={{ padding: 0 }}> 
                   <Chip
                     avatar={<Avatar alt="Natacha" src="/static/images/avatar/1.jpg" />}
                     label="Avatar"
@@ -383,7 +414,7 @@ function Item(props) {
                   />
                 
                 </ListItem>
-                <ListItem style={{ padding: 0 }}>
+                <ListItem key={2} style={{ padding: 0 }}>
                   <Chip
                     avatar={<Avatar alt="Natacha" src="/static/images/avatar/1.jpg" />}
                     label="Avatar"
@@ -403,41 +434,19 @@ function Item(props) {
                 label="Search People"
               />
               <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper',overflow:"auto"}}>
-
-                <ListItem >
-                  <ListItemAvatar>
-                    <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="小明"
-                  />
-                </ListItem>
-                <Divider variant="inset" component="li" />
-                <ListItem >
-                  <ListItemAvatar>
-                    <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="小明"
-                  />
-                </ListItem>
-                <Divider variant="inset" component="li" />
-                <ListItem >
-                  <ListItemAvatar>
-                    <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="小明"
-                  />
-                </ListItem>
-                <ListItem >
-                  <ListItemAvatar>
-                    <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="小明"
-                  />
-                </ListItem>
+                {
+                  articles.map((item, idx) => {
+                    return (
+                      <ListItem key={1} >
+                        <ListItemAvatar>
+                          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary="小明"
+                        />
+                      </ListItem>)
+                  })
+                }
               </List>
 
             </Typography>
@@ -464,12 +473,12 @@ function Item(props) {
                 <Typography>Include</Typography>
               </Stack>
               <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                {[0, 1, 2, 3].map((value) => {
+                {[0, 1, 2, 3].map((value, idx) => {
                   const labelId = `checkbox-list-label-${value}`;
 
                   return (
                     <ListItem
-                      key={value}
+                      key={idx}
                       secondaryAction={
                         <IconButton edge="end" aria-label="comments">
                           <CommentIcon />
@@ -502,19 +511,21 @@ function Item(props) {
           <Button onClick={handleSend} type="submit">Send</Button>
         </DialogActions>
       </Dialog>
-      <Fab color="primary" style={style} onClick={handleClickOpen}  aria-label="add">
-      </Fab>
-      <Fab color="secondary" aria-label="edit">
-        <EditIcon />
-      </Fab>
-      <Fab variant="extended">
-        <NavigationIcon sx={{ mr: 1 }} />
-        My Posts
-      </Fab>
-      <Fab disabled aria-label="like">
-        <FavoriteIcon />
-        Recommendations
-      </Fab>
+      <Box style={style}>
+        <Fab color="primary" sx={{margin:1}} onClick={handleClickOpen} aria-label="add">
+          <AddIcon />
+        </Fab>
+        <Fab variant="extended" sx={{ margin: 1 }} onClick={handleFriends} color="secondary"  aria-label="edit">
+          <EditIcon />
+          Friends'
+        </Fab>
+        <Fab sx={{  margin: 1 }} onClick={handleMy} variant="extended">
+          <NavigationIcon  />
+          My
+        </Fab>
+
+      </Box>
+      
     </Box >
 
 

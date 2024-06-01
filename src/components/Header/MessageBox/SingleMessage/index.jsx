@@ -12,7 +12,7 @@ export function SingleMessage(props) {
         navigate("/chat")
     } 
     return (
-        <MenuItem alignItems="flex-start" onClick={handleMessageJump}>
+        <MenuItem onClick={handleMessageJump}>
         <ListItemAvatar>
           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
         </ListItemAvatar>

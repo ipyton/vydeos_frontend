@@ -22,8 +22,8 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 export default function (props) {
     let { setCategory, setCategorySelected, categorySelected } = props
     let handleClick = (idx) => {
-        setCategory(true)
         return () => {
+            setCategory(true)
             const newCategorySelected = categorySelected.map((c, i) => {
                 if (i === idx) {
                     return true
@@ -37,13 +37,13 @@ export default function (props) {
     }
     let clear = () => {
         setCategory(true)
-        setCategorySelected([false, false, false,false, false])
+        setCategorySelected([false, false, false, false, false])
     }
 
     return (
         <Stack direction="row">
-            <Checkbox {...label} id="category" icon={<PermContactCalendarOutlinedIcon />} 
-            checkedIcon={<PermContactCalendarIcon />} onChange={handleClick(0)} checked={categorySelected[0]} />
+            <Checkbox {...label} id="category" icon={<PermContactCalendarOutlinedIcon />}
+                checkedIcon={<PermContactCalendarIcon />} onChange={handleClick(0)} checked={categorySelected[0]} />
             <Checkbox
                 id="category"
                 {...label}
@@ -84,7 +84,7 @@ export default function (props) {
                 checked={categorySelected[4]} />
 
             <IconButton id="category"
-            onClick={clear}
+                onClick={clear}
             >
                 <NotInterestedIcon id="category" />
             </IconButton>
