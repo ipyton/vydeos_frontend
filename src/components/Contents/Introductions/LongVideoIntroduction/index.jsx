@@ -64,7 +64,6 @@ export default function (props) {
     const [open, setOpen] = React.useState(false);
     let position = "center";
     const location = useLocation()
-
     position = (!props.position ? position : props.position)
     const [checked, setChecked] = React.useState(['wifi']);
 
@@ -73,21 +72,6 @@ export default function (props) {
     const [sources, setSources] = React.useState([{ videoId: videoId, source: "xxxx1", status: "init" }, { videoId: videoId, source: "xxxx2", status: "downloading" }, { videoId: videoId, source: "xxxx3", status: "paused" }, { videoId: videoId, source: "xxxx4", status: "cancelled" }])
 
     const [input, setInput] = React.useState("")
-
-    // React.useEffect(() => {
-    //     VideoUtil.get_download_source(videoId, setSources)
-    // }, [])
-
-
-
-    // React.useEffect(() => {
-    //     const timer = setInterval(() => {
-    //         setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
-    //     }, 800);
-    //     return () => {
-    //         clearInterval(timer);
-    //     };
-    // }, []);
 
     const handleToggle = (value) => () => {
         const currentIndex = checked.indexOf(value);
@@ -101,10 +85,15 @@ export default function (props) {
 
         setChecked(newChecked);
     };
-
+    const handleStar = () => {
+        VideoUtil.star(videoId,details, setDetails)
+    }
+    const handleRemove = () => {
+        VideoUtil.removeStar(videoId,details, setDetails)
+    }
     const handleClickOpen = () => {
         setOpen(true);
-        VideoUtil.get_download_source(videoId, setSources)
+        VideoUtil.get_download_source(videoId, setDetails)
     };
 
     const handleInput = (event) => {
@@ -150,7 +139,6 @@ export default function (props) {
     }
 
     const recommendData = []
-
     if (!details) {
         return <div>loading</div>
     }
@@ -192,7 +180,7 @@ export default function (props) {
                             </ListItem>
 
                             <ButtonGroup sx={{ marginTop: "3%", height: "50%", marginRight: "2%" }} aria-label="Basic button group" >
-                                {<Button > Star</Button>}
+                                {(!details.stared) ? <Button onClick={handleStar} > Star</Button> : <Button onClick={handleRemove} > Remove</Button>}
                                 {<Button onClick={handleClickOpen}>request</Button>}
                             </ButtonGroup>
                         </Stack>

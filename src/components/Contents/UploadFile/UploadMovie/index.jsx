@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2';
-import VideoUtil from '../../../../util/VideoUtil';
+import VideoUtil from '../../../../util/io_utils/VideoUtil';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',

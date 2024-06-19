@@ -24,36 +24,45 @@ import TextField from '@mui/material/TextField';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-
+const theme = createTheme({
+  typography: {
+    subtitle1: {
+      fontSize: 12,
+    },
+    body1: {
+      fontWeight: 500,
+    },
+    button: {
+      fontStyle: 'italic',
+    },
+  },
+});
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
 })(({ theme, expand }) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-  marginLeft: 'auto',
+  marginLeft: "auto",
   transition: theme.transitions.create('transform', {
     duration: theme.transitions.duration.shortest,
   }),
 }));
 
 export default function Article(props) {
+  console.log(props.content)
   const [expanded, setExpanded] = React.useState(false);
-  const [avatar, setAvatar] = React.useState("")
-  const [userName, setUserName] = React.useState("")
-  const [dateAndTime, setDateAndTime] = React.useState()
-  const [images, setImages] = React.useState([])
-  const [content, setContent] = React.useState()
-  const [likes, setLikes] = React.useState()
-  const [comments, setComments] = React.useState()
+  const [likes, setLikes] = React.useState(props.content.likes)
+  const [comments, setComments] = React.useState(props.content.comments)
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
 
   return (
-    <Card >
+    <Card sx={{width:"100%"}}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
@@ -64,14 +73,12 @@ export default function Article(props) {
             <MoreVertIcon />
           </IconButton>
         }
-        title="Shrimp and Chorizo Paella"
-        subheader="September 14, 2016"
+        title={props.content.authorName}
+        subheader={props.content.lastModified}
       />
       <CardContent>
-        <Typography variant="body2" color="text.secondary">
-          This impressive paella is a perfect party dish and a fun meal to cook
-          together with your guests. Add 1 cup of frozen peas along with the mussels,
-          if you like.
+        <Typography color="text.secondary">
+          {props.content.content}
         </Typography>
       </CardContent>
       <CardMedia
@@ -83,6 +90,7 @@ export default function Article(props) {
 
       <CardActions disableSpacing>
         <IconButton aria-label="add to favorites">
+          {likes}
           <FavoriteIcon />
         </IconButton>
         <IconButton aria-label="share">
@@ -113,48 +121,25 @@ export default function Article(props) {
                     </InputAdornment>
                   }
                 />
-              </FormControl>
-              
-            </Stack>
 
-            <List sx={{ width: "80%" }} >
-                {[1, 2, 3, 4, 5].map((item, index) => {
-                  return (<Card sx={{marginTop:1}} >
-                    <CardHeader
-                      avatar={
-                        <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                        </Avatar>
-                      }
-                      action={
-                        <IconButton aria-label="settings">
-                          <MoreVertIcon />
-                        </IconButton>
-                      }
-                      title="Shrimp and Chorizo Paella"
-                      subheader="September 14, 2016"
-                    />
-                    <CardContent>
-                      <Box sx={{ width: '100%', maxWidth: 500 }}>
-                        
-                        <Typography variant="body2" gutterBottom>
-                          body2. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-                          blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur,
-                          neque doloribus, cupiditate numquam dignissimos laborum fugiat deleniti? Eum
-                          quasi quidem quibusdam.
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                    <CardMedia
-                      component="img"
-                      height="194"
-                      image="/static/images/cards/paella.jpg"
-                      alt="Paella dish"
-                    />
-                  </Card>)
+              </FormControl>
+              <Button variant="outlined">Send</Button>
+            </Stack>
+              <List sx={{width:"80%"}} >
+                {comments.map((item, index) => {
+                  return (
+                      <Typography >
+                        body2. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qublanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur,
+                        neque doloribus, cupiditate numquam dignissimos laborum fugiat deleniti? Eum
+                        quasi quidem quibusdam.
+                      </Typography>
+                   )
                 })}
 
 
               </List>
+
+            
 
           </Stack>
           

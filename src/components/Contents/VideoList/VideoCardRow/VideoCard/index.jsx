@@ -4,24 +4,34 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { CardActionArea } from '@mui/material';
+import VideoUtil from '../../../../../util/io_utils/VideoUtil';
+import { useNavigate } from 'react-router-dom';
 
-export default function() {
+export default function(props) {
+  const {movieId, title, intro, actors, poster} = props
+  const navigate = useNavigate()
+  const handleClick = () => {
+    navigate("videoIntroduction", { state: movieId })
+  }
+
   return (
   <Card sx={{ maxWidth: 345 }}>
-      <CardActionArea>
+      <CardActionArea onClick={handleClick}>
         <CardMedia
           component="img"
           height="140"
-          image="/static/images/cards/contemplative-reptile.jpg"
-          alt="green iguana"
+          image={poster}
+          alt="poster"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            Lizard
+            {title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Lizards are a widespread group of squamate reptiles, with over 6,000
-            species, ranging across all continents except Antarctica
+            {intro}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {actors}
           </Typography>
         </CardContent>
       </CardActionArea>

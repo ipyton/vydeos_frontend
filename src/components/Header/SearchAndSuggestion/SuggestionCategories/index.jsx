@@ -22,8 +22,9 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 export default function (props) {
     let { setCategory, setCategorySelected, categorySelected } = props
     let handleClick = (idx) => {
+        setCategory(true)
+
         return () => {
-            setCategory(true)
             const newCategorySelected = categorySelected.map((c, i) => {
                 if (i === idx) {
                     return true
@@ -51,14 +52,6 @@ export default function (props) {
                 checkedIcon={<SpeakerNotesIcon />}
                 onChange={handleClick(1)}
                 checked={categorySelected[1]} />
-            {/* <Checkbox
-                id="category"
-                {...label}
-                icon={<NotInterestedIcon />}
-                //checkedIcon={<NotInterestedIcon />}
-                onChange={handleClick(99)}
-                // checked={}
-            /> */}
             <Checkbox
                 id="category"
                 {...label}

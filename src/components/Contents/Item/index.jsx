@@ -57,7 +57,7 @@ const PlusIcon = createSvgIcon(
   'Plus',
 );
 function Item(props) {
-  const [articles, setArticles] = React.useState([1, 2, 3, 4, 5]);
+  const [articles, setArticles] = React.useState([]);
   const [count, setCount] = React.useState(99);
   const [content, setContent] = React.useState("")
   let { login, setLogin } = props
@@ -294,6 +294,7 @@ function Item(props) {
       return 
     }
     else {
+      setArticles([])
       setPage("friend")
     }
 
@@ -303,15 +304,16 @@ function Item(props) {
       return
     }
     else {
+      setArticles([])
       setPage("my")
     }
   }
   return (
 
-    <Box  justifyContent="center">
-      <List sx={{ width: "80%", marginLeft: "10%" }}>
+    <Box sx={{ width: "80%", marginLeft: "10%" }} >
+      <List >
       {articles&&articles.map((x,idx)=>{
-        return (<ListItem key={idx} ><Article></Article></ListItem>)
+        return (<ListItem key={idx} ><Article content={x}></Article></ListItem>)
       })}    
       </List>
       <Dialog

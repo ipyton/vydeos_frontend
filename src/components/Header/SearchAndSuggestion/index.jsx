@@ -14,12 +14,12 @@ export default function (props) {
         overflow: "scroll"
     }}>
 
-        <SuggestionCatagories  setCategory={setCategory} setCategorySelected={setCategorySelected} categorySelected={categorySelected}></SuggestionCatagories>
-        {
+        <SuggestionCatagories id="category" setCategory={setCategory} setCategorySelected={setCategorySelected} categorySelected={categorySelected}></SuggestionCatagories>
+        {/* {
             searchResult.length === 0 ? "input your results here" : searchResult.map((item, index) => {
-                return (<SuggestionItem key={index} searchResult={item} setSuggestionOpen={setSuggestionOpen} ></SuggestionItem>)
+                return (<SuggestionItem  searchResult={item} setSuggestionOpen={setSuggestionOpen} ></SuggestionItem>)
             })
-        }
+        } */}
     </List>
 
 

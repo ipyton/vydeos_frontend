@@ -15,7 +15,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function() {
     return (
-    <Stack>
+    <Stack sx={{marginTop:2}}>
+            <Item><VideoCardRow></VideoCardRow></Item>
             <Item><VideoCardRow></VideoCardRow></Item>
             <Item><VideoCardRow></VideoCardRow></Item>
     </Stack>

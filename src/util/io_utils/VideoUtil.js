@@ -1,7 +1,87 @@
 import Qs from 'qs'
 import axios from "axios"
-
+import CryptoJS from "crypto-js";
 export default class VideoUtil {
+    static uploadVideos(title, introduction, value, setUploadState) {
+
+        let sliceLength = 1024 * 1024 * 128
+        let start = 0;
+        let length = value.length
+        let failed_count = 0;
+
+        axios.interceptors.response.use(null, (err) => {
+            if (err.data) {
+                console.log("error")
+            }
+            if (err.request) {
+                if (err.request.tries > 0) {
+                    err.request.tries--
+                    axios(err.request)
+                }
+                else {
+                    console.log("error")
+                }
+            }
+        })
+
+        let wholeHashCode = CryptoJS.SHA256(value)
+        axios({
+            url: "http://localhost:8080/video/negotiation",
+            method: 'post',
+            data: { userEmail: localStorage.get("userEmail"), title: title, introduction: introduction, token: localStorage.getItem("token"), tires: 10, wholeHashCode: wholeHashCode },
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }],
+        }).err((err) => {
+            console.log(err)
+        }).then(
+            (response) => {
+                console.log("response");
+                if (response.code === 1) {
+                    let threads = 2;
+                    console.log("uploading")
+                    for (let i = 0; i < length / sliceLength - 1; i++) {
+                        let chunk = value.slice(i * sliceLength, (i + 1) * sliceLength);
+                        if (threads != 0) {
+
+                            axios({
+                                url: "http://localhost:8080/video/upload",
+                                method: 'post',
+                                data: {
+                                    wholeHashCode: wholeHashCode,
+                                    hashCode: CryptoJS.SHA256(chunk),
+                                    data: chunk,
+                                    tries: 10,
+                                    token: localStorage.getItem("token"),
+                                    index: i
+                                }, transformRequest: [function (data) {
+                                    // 对 data 进行任意转换处理
+                                    return Qs.stringify(data)
+                                }]
+                            }).catch(err => {
+                                console.log("upload error")
+
+                            }).then(response => {
+                                if (response.code == 1) {
+
+                                } else {
+                                    console.log("upload error")
+                                }
+                            })
+                        }
+                    }
+                }
+                else {
+                    setUploadState.state = "unknownError"
+                }
+            }
+        ).catch((err) => {
+            console.log("check your input")
+        })
+
+
+    }
 
     static getUrlBase() {
         return "http://192.168.23.129:5000"
@@ -17,7 +97,7 @@ export default class VideoUtil {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
             }], headers: {
-                token: localStorage.getItem("token"),
+                "token": localStorage.getItem("token"),
             }
         }).catch(error => {
 
@@ -95,12 +175,100 @@ export default class VideoUtil {
         })
     }
 
+    static getGallery(setState) {
+        const userId = localStorage.getItem("userId")
+        const size = 4
+        setState([])
+        axios({
+            url: "http://localhost:8000" + "/gallery/get",
+            method: 'get',
+            params: { userId: localStorage.get("userId") },
+            headers: {
+                token: localStorage.getItem("token"),
+            }
+        }).catch(error => {
+
+        }).then(function (response) {
+            if (!response) {
+                console.log("error")
+                return
+            }
+            console.log(response)
+            const rows = []
+            const body = JSON.parse(response.data)
+            for (const i = 0; i < Math.floor(body.length / size) + 1; i++) {
+                const row = []
+                for (const col = 0; col < size; col++) {
+                    row.push(body[i * size + col])
+                }
+                rows.push(row)
+            }
+            setState(rows)
+        })
+    }
+    static star(videoId, details, setDetails) {
+        console.log(details)
+        axios({
+            url: "http://localhost:8000" + "/gallery/collect",
+            method: 'post',
+            data: { "videoId": details.movieId },
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }],
+            headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch(error => {
+
+        }).then(function (response) {
+            if (!response) {
+                console.log("error")
+                return
+            }
+            console.log(response)
+            if (response.data === "success") {
+                details.stared = true
+                setDetails({...details})
+                console.log(details)
+            }
+        })
+
+    }
+
+    static removeStar(videoId, details, setDetails) {
+        axios({
+            url: "http://localhost:8000" + "/gallery/remove",
+            method: 'post',
+            data: { "videoId": details.movieId },
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }],
+            headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch(error => {
+
+        }).then(function (response) {
+            if (!response) {
+                console.log("error")
+                return
+            }
+            if (response.data === "success") {
+                details.stared = false
+                setDetails({...details})
+            }
+
+        })
+    }
+
     static getVideoInformation(movie_id, setState) {
         setState(null)
         axios({
             url: "http://localhost:5000" + "/movie/get_meta",
             method: 'get',
-            params: { detail_address: movie_id },
+            params: { detail_address: movie_id, userId: localStorage.getItem("userId") },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)

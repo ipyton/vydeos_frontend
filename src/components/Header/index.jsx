@@ -103,6 +103,9 @@ export default function Header(props) {
 
 
   function onClick(event){ 
+    console.log(event)
+    console.log(categorySelected)
+
     if (event.target.id!=="category") {
       setSuggestionAnchorEl(false)
     }
@@ -420,7 +423,7 @@ export default function Header(props) {
   );
 
   return (
-    <Box>
+    <div>
       <AppBar position="fixed" open={open}>
         <Toolbar>
         <IconButton
@@ -521,6 +524,6 @@ export default function Header(props) {
       {renderLanguageMenu}
       {renderMessageMenu}
       <FunctionDrawer setOpen={setOpen} open={open}></FunctionDrawer>
-    </Box>
+    </div>
   );
 }
