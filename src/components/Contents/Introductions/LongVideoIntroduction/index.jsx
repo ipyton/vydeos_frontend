@@ -9,10 +9,6 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { useSelector, useDispatch } from "react-redux";
-import { update, clear } from "../../../redux/UserDetails"
-import SocialMediaUtil from "../../../../util/io_utils/SocialMediaUtil";
-import localforage from "localforage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
@@ -34,12 +30,7 @@ import Rating from '@mui/material/Rating';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Switch from '@mui/material/Switch';
-import WifiIcon from '@mui/icons-material/Wifi';
-import BluetoothIcon from '@mui/icons-material/Bluetooth';
-import PropTypes from 'prop-types';
-import CircularProgress from '@mui/material/CircularProgress';
+
 
 function Item(props) {
     return (
@@ -60,14 +51,23 @@ function Item(props) {
 
 export default function (props) {
     const [details, setDetails] = useState(null)
-    const { videoId } = props
+    const [videoId,setVideoId] = useState(null)
+
     const [open, setOpen] = React.useState(false);
     let position = "center";
     const location = useLocation()
+    console.log(location)
     position = (!props.position ? position : props.position)
     const [checked, setChecked] = React.useState(['wifi']);
 
-
+    React.useEffect(() => {
+        if (location.state){
+            setVideoId(location.state)
+        }
+        if (props.videoId) {
+            setVideoId(props.videoId)
+        }
+    }, [])
     //const [progress, setProgress] = React.useState([0,0,0,0]);
     const [sources, setSources] = React.useState([{ videoId: videoId, source: "xxxx1", status: "init" }, { videoId: videoId, source: "xxxx2", status: "downloading" }, { videoId: videoId, source: "xxxx3", status: "paused" }, { videoId: videoId, source: "xxxx4", status: "cancelled" }])
 
@@ -82,7 +82,6 @@ export default function (props) {
         } else {
             newChecked.splice(currentIndex, 1);
         }
-
         setChecked(newChecked);
     };
     const handleStar = () => {
@@ -143,7 +142,9 @@ export default function (props) {
         return <div>loading</div>
     }
     console.log(sources)
-    if (position === "right") {
+    const handlePlay = ()=> {
+        navigate("/longvideos", { state: movieId })
+    }
         return (<div>
             <Stack direction="column"
                 //justifyContent="center"
@@ -182,6 +183,9 @@ export default function (props) {
                             <ButtonGroup sx={{ marginTop: "3%", height: "50%", marginRight: "2%" }} aria-label="Basic button group" >
                                 {(!details.stared) ? <Button onClick={handleStar} > Star</Button> : <Button onClick={handleRemove} > Remove</Button>}
                                 {<Button onClick={handleClickOpen}>request</Button>}
+                                {
+                                    <Button onClick={handlePlay}>play</Button>
+                                }
                             </ButtonGroup>
                         </Stack>
                         <Stack sx={{ width: "100%", }}>
@@ -331,10 +335,6 @@ export default function (props) {
             </Dialog>
         </div>
         )
-    } else {
-
-
-    }
 
 
 

@@ -182,27 +182,31 @@ export default class VideoUtil {
         axios({
             url: "http://localhost:8000" + "/gallery/get",
             method: 'get',
-            params: { userId: localStorage.get("userId") },
+            params: { userId: localStorage.getItem("userId") },
             headers: {
                 token: localStorage.getItem("token"),
             }
         }).catch(error => {
-
+            console.log(error)
+            return
         }).then(function (response) {
             if (!response) {
                 console.log("error")
                 return
             }
             console.log(response)
-            const rows = []
-            const body = JSON.parse(response.data)
-            for (const i = 0; i < Math.floor(body.length / size) + 1; i++) {
-                const row = []
-                for (const col = 0; col < size; col++) {
+            let rows = []
+            const body = response.data
+            console.log(Math.floor(body.length / size) + 1)
+            for (let i = 0; i < Math.floor(body.length / size) + 1; i++) {
+                let row = []
+                for (let col = 0; col < size && i *size +col < body.length; col++) {
                     row.push(body[i * size + col])
                 }
+                console.log(row)
                 rows.push(row)
             }
+            console.log(rows)
             setState(rows)
         })
     }
@@ -509,6 +513,42 @@ export default class VideoUtil {
             //props.setBarState({...props.barState, message:responseData.message, open:true})
             let data = response.data
             setRecord(response.data)
+
+        })
+    }
+
+    static getPlayInformation(movieId,setOption) {
+        axios({
+            url: VideoUtil.getUrlBase() + "/movie/getPlayInformation",
+            method: 'get',
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }], headers: {
+                token: localStorage.getItem("token"),
+            }
+        }).catch(error => {
+
+        }).then(function (response) {
+            if (response === undefined || !response.data) {
+                console.log("errror")
+                return
+            }
+            console.log(response)
+            //props.setBarState({...props.barState, message:responseData.message, open:true})
+            let data = response.data
+            setOption({
+                autoplay: true,
+                controls: true,
+                responsive: true,
+                fluid: true,
+                fill: true,
+                sources: [{
+                    src: data.src,
+                    type: "application/x-mpegURL"
+                }]
+                , playbackRates: [1, 2, 3]
+            })
 
         })
     }

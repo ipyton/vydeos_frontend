@@ -8,30 +8,27 @@ import VideoUtil from '../../../../../util/io_utils/VideoUtil';
 import { useNavigate } from 'react-router-dom';
 
 export default function(props) {
-  const {movieId, title, intro, actors, poster} = props
+  const {movieId, movie_name, release_year,poster} = props
+  console.log(props)
   const navigate = useNavigate()
   const handleClick = () => {
-    navigate("videoIntroduction", { state: movieId })
+    navigate("/videoIntroduction", { state: movieId })
   }
 
   return (
-  <Card sx={{ maxWidth: 345 }}>
+  <Card sx={{ width:"25%",height:"auto" }}>
       <CardActionArea onClick={handleClick}>
         <CardMedia
           component="img"
-          height="140"
           image={poster}
           alt="poster"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {title}
+            {movie_name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {intro}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {actors}
+            {release_year}
           </Typography>
         </CardContent>
       </CardActionArea>

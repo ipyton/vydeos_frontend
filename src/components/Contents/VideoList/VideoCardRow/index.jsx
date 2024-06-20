@@ -15,15 +15,11 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
   
-export default function() {
-  const [rows,setRows] = React.useState([])
-  React.useEffect(()=>{
-    VideoUtil.getGallery(setRows)
-  },[]) 
+export default function(props) {
 
     return (<Stack direction="row" spacing={2} sx={{marginLeft:"10%",width:"80%"}}>
-      {rows.map((item,idx)=>{
-        return (<VideoCard movieId={item.movieId} title={item.title} intro={item.intro} actors={item.actors} poster={item.poster}></VideoCard>)
+      {props.row.map((item,idx)=>{
+        return (<VideoCard movieId={item.movieId} movie_name={item.movie_name} release_year={item.release_year} poster={item.poster}></VideoCard>)
       })}
 
 
