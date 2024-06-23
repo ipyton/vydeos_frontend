@@ -31,13 +31,10 @@ export default function LongVideos(props) {
   React.useEffect(() => {
     if (location.state) {
       VideoUtil.getPlayInformation(location.state, setOption)
-  
     }
 
   }, [])
-    if (!option) {
-      return <div>loading</div>
-    }
+
     let a =[1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,324,543,52,34]
     const playerRef = React.useRef(null);
     videojs.Vhs.xhr.beforeRequest = function (options) {
@@ -64,7 +61,9 @@ export default function LongVideos(props) {
     }
 
     let playList = false
-
+  if (!option) {
+    return <div>loading</div>
+  }
   return (
     <div >
       <Stack sx={{marginLeft:"10%",width:"80%"}}>

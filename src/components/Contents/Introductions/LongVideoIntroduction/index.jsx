@@ -5,14 +5,12 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import Carousel from 'react-material-ui-carousel'
 import { Paper, Button } from '@mui/material'
 import Box from "@mui/material/Box";
 import Dialog from '@mui/material/Dialog';
@@ -26,9 +24,6 @@ import ListSubheader from '@mui/material/ListSubheader';
 import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
 import VideoUtil from "../../../../util/io_utils/VideoUtil";
-import Rating from '@mui/material/Rating';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 
 
@@ -51,23 +46,25 @@ function Item(props) {
 
 export default function (props) {
     const [details, setDetails] = useState(null)
-    const [videoId,setVideoId] = useState(null)
+    const [videoId, setVideoId] = useState(null)
 
     const [open, setOpen] = React.useState(false);
     let position = "center";
     const location = useLocation()
-    console.log(location)
     position = (!props.position ? position : props.position)
     const [checked, setChecked] = React.useState(['wifi']);
-
+    const navigate = useNavigate()
+    console.log(videoId)
     React.useEffect(() => {
-        if (location.state){
+        if (location.state) {
+            console.log("location" + location.state)
             setVideoId(location.state)
         }
         if (props.videoId) {
+            console.log("props" + props.videoId)
             setVideoId(props.videoId)
         }
-    }, [])
+    }, [props.videoId, location.state])
     //const [progress, setProgress] = React.useState([0,0,0,0]);
     const [sources, setSources] = React.useState([{ videoId: videoId, source: "xxxx1", status: "init" }, { videoId: videoId, source: "xxxx2", status: "downloading" }, { videoId: videoId, source: "xxxx3", status: "paused" }, { videoId: videoId, source: "xxxx4", status: "cancelled" }])
 
@@ -85,14 +82,14 @@ export default function (props) {
         setChecked(newChecked);
     };
     const handleStar = () => {
-        VideoUtil.star(videoId,details, setDetails)
+        VideoUtil.star(videoId, details, setDetails)
     }
     const handleRemove = () => {
-        VideoUtil.removeStar(videoId,details, setDetails)
+        VideoUtil.removeStar(videoId, details, setDetails)
     }
     const handleClickOpen = () => {
         setOpen(true);
-        VideoUtil.get_download_source(videoId, setDetails)
+        VideoUtil.get_download_source(videoId, setSources)
     };
 
     const handleInput = (event) => {
@@ -101,7 +98,7 @@ export default function (props) {
     }
 
     const handleDownload = (source) => () => {
-        VideoUtil.start_download(videoId, source, sources, setSources)
+        VideoUtil.start_download(videoId, source, details.movie_name,sources, setSources)
     }
 
     const handleSubmit = () => {
@@ -109,7 +106,7 @@ export default function (props) {
         if (!input || input.length == 0) {
             return
         }
-        VideoUtil.add_download_source(videoId, input, sources, setSources)
+        VideoUtil.add_download_source(videoId, input, details.movie_name, sources, setSources)
         setInput("")
     }
 
@@ -125,7 +122,7 @@ export default function (props) {
 
 
     React.useEffect(() => {
-        VideoUtil.getVideoInformation(videoId, setDetails)
+        if (videoId) VideoUtil.getVideoInformation(videoId, setDetails)
     }, [videoId])
 
     let genresList = ""
@@ -142,199 +139,200 @@ export default function (props) {
         return <div>loading</div>
     }
     console.log(sources)
-    const handlePlay = ()=> {
-        navigate("/longvideos", { state: movieId })
+    const handlePlay = (resource) => {
+
+        return () => { navigate("/longvideos", { state: { videoId: videoId, resource: resource } }) }
     }
-        return (<div>
-            <Stack direction="column"
-                //justifyContent="center"
-                sx={{ width: "100%", overflow: "scroll" }}>
-                <Stack direction="row"
-                    spacing={0.5} sx={{ width: "100%", boxShadow: 1 }}>
-                    <Stack sx={{ width: "30%" }}>
-                        <Box>
-                            <Item item={{ original: details.poster }}></Item>
-                        </Box>
-                    </Stack>
-                    <Stack
-                        direction="column"
-                        sx={{ width: "60%" }}
-                    >
-                        <Stack direction="row" justifyContent="end" sx={{ width: "100%" }}>
-                            <ListItem alignItems="flex-start" >
-                                <ListItemText
-                                    primary={details.movie_name}
-                                    secondary={
-                                        <React.Fragment>
-                                            <Typography
-                                                sx={{ display: 'inline' }}
-                                                component="span"
-                                                variant="body2"
-                                                color="text.primary"
-                                            >
-                                            </Typography>
-                                            {details.tag}
-                                        </React.Fragment>
-                                    }
-                                />
-
-                            </ListItem>
-
-                            <ButtonGroup sx={{ marginTop: "3%", height: "50%", marginRight: "2%" }} aria-label="Basic button group" >
-                                {(!details.stared) ? <Button onClick={handleStar} > Star</Button> : <Button onClick={handleRemove} > Remove</Button>}
-                                {<Button onClick={handleClickOpen}>request</Button>}
-                                {
-                                    <Button onClick={handlePlay}>play</Button>
-                                }
-                            </ButtonGroup>
-                        </Stack>
-                        <Stack sx={{ width: "100%", }}>
-
-                            <React.Fragment>
-                                <CardContent>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                        Release Year
-                                    </Typography>
-                                    <Typography variant="h7" component="div">
-                                        {details.release_year}
-                                    </Typography>
-                                </CardContent>
-                                <CardContent>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                        Type
-                                    </Typography>
-                                    <Typography variant="h7" component="div">
-                                        {genresList}
-                                    </Typography>
-                                </CardContent>
-                                <CardContent>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                        Introduction
-                                    </Typography>
-                                    <Typography variant="h7" component="div">
-                                        {details.introduction}
-                                    </Typography>
-                                </CardContent>
-                                {
-                                    Object.keys(details.makerList).forEach(element => {
-                                        return <CardContent>
-                                            <Typography variant="h7" component="div">
-                                                {element}
-                                            </Typography>
-                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                {details.makerList[element]}
-                                            </Typography>
-
-                                        </CardContent>
-                                    })
-
-                                }
-                            </React.Fragment>
-                        </Stack>
-                    </Stack>
+    return (<div>
+        <Stack direction="column"
+            //justifyContent="center"
+            sx={{ width: "100%", overflow: "scroll" }}>
+            <Stack direction="row"
+                spacing={0.5} sx={{ width: "100%", boxShadow: 1 }}>
+                <Stack sx={{ width: "30%" }}>
+                    <Box>
+                        <Item item={{ original: details.poster }}></Item>
+                    </Box>
                 </Stack>
-                Stars
-                <Stack>
-                    <ImageList
-                        sx={{
-                            gridAutoFlow: "column",
-                            gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr)) !important",
-                            gridAutoColumns: "minmax(200px, 1fr)",
-                            width: "100%",
-                            height: "100%",
-                            // overflow: "scroll",
-                            boxShadow: 0,
-                        }}
-                    >
+                <Stack
+                    direction="column"
+                    sx={{ width: "60%" }}
+                >
+                    <Stack direction="row" justifyContent="end" sx={{ width: "100%" }}>
+                        <ListItem alignItems="flex-start" >
+                            <ListItemText
+                                primary={details.movie_name}
+                                secondary={
+                                    <React.Fragment>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                        </Typography>
+                                        {details.tag}
+                                    </React.Fragment>
+                                }
+                            />
 
-                        {details.actressList.map((item) => {
-
-                            return (
-                                <ImageListItem key={item.avatar} sx={{
-                                    display: 'flex', flexDirection: 'row',
-                                    // width: undefined,
-                                    // Without height undefined it won't work
-                                    // height: "100%", aspectRatio: 135 / 76
-                                }} >
-                                    <Item item={{ original: item.avatar }}></Item>
-                                    <ImageListItemBar
-                                        title={item.name}
-                                        subtitle={"Character:" + item.character}
-                                        actionIcon={
-                                            <IconButton
-                                                sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                                aria-label={`info about ${item.title}`}
-                                            >
-                                                <InfoIcon />
-                                            </IconButton>
-                                        }
-                                    />
-                                </ImageListItem>
-
-                            )
-                        })}
-                    </ImageList>
-                </Stack>
-            </Stack>
-            <Dialog
-                sx={{ width: "100%" }}
-                open={open}
-                onClose={handleClose}
-            //sx={{width:"50%"}}
-
-            >
-                <DialogTitle>Sources</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Edit the resouces for the movie to download.
-                    </DialogContentText>
-                    <List
-                        sx={{ width: '100%', bgcolor: 'background.paper' }}
-                    >
-
-                        {
-                            sources.map(item => {
-                                console.log(item)
-                                return (<ListItem sx={{ width: "100%" }}>
-                                    <Stack direction="row" spacing={1} sx={{ width: "100%" }} >
-                                        <ListItemText
-                                            primary={item.source}
-                                            sx={{ width: "80%" }}
-                                        />
-
-                                        <Button variant="contained" onClick={handleDelete(item.source)} >Del</Button>
-                                        {
-                                            (item.gid !== "" || !item.gid)
-                                                ? (<Button variant="contained" onClick={handleDownload(item.source)} >Pull</Button>) : <div></div>}
-                                    </Stack>
-                                </ListItem>)
-                            })
-
-
-                        }
-                        <ListItem sx={{ width: "100%" }}>
-
-                            <Stack direction="row" spacing={1} >
-                                <TextField
-                                    hiddenLabel
-                                    id="filled-hidden-label-small"
-                                    variant="filled"
-                                    size="small"
-                                    onChange={handleInput}
-                                    value={input}
-                                />
-                                <Button variant="contained" onClick={handleSubmit}>Add</Button>
-                            </Stack>
                         </ListItem>
 
-                    </List>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Ok</Button>
-                </DialogActions>
-            </Dialog>
-        </div>
-        )
+                        <ButtonGroup sx={{ marginTop: "3%", height: "50%", marginRight: "2%" }} aria-label="Basic button group" >
+                            {(!details.stared) ? <Button onClick={handleStar} > Star</Button> : <Button onClick={handleRemove} > Remove</Button>}
+                            {<Button onClick={handleClickOpen}>request</Button>}
+
+                        </ButtonGroup>
+                    </Stack>
+                    <Stack sx={{ width: "100%", }}>
+
+                        <React.Fragment>
+                            <CardContent>
+                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                    Release Year
+                                </Typography>
+                                <Typography variant="h7" component="div">
+                                    {details.release_year}
+                                </Typography>
+                            </CardContent>
+                            <CardContent>
+                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                    Type
+                                </Typography>
+                                <Typography variant="h7" component="div">
+                                    {genresList}
+                                </Typography>
+                            </CardContent>
+                            <CardContent>
+                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                    Introduction
+                                </Typography>
+                                <Typography variant="h7" component="div">
+                                    {details.introduction}
+                                </Typography>
+                            </CardContent>
+                            {
+                                Object.keys(details.makerList).forEach(element => {
+                                    return <CardContent>
+                                        <Typography variant="h7" component="div">
+                                            {element}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                            {details.makerList[element]}
+                                        </Typography>
+
+                                    </CardContent>
+                                })
+
+                            }
+                        </React.Fragment>
+                    </Stack>
+                </Stack>
+            </Stack>
+            Stars
+            <Stack>
+                <ImageList
+                    sx={{
+                        gridAutoFlow: "column",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr)) !important",
+                        gridAutoColumns: "minmax(200px, 1fr)",
+                        width: "100%",
+                        height: "100%",
+                        // overflow: "scroll",
+                        boxShadow: 0,
+                    }}
+                >
+
+                    {details.actressList.map((item) => {
+
+                        return (
+                            <ImageListItem key={item.avatar} sx={{
+                                display: 'flex', flexDirection: 'row',
+                                // width: undefined,
+                                // Without height undefined it won't work
+                                // height: "100%", aspectRatio: 135 / 76
+                            }} >
+                                <Item item={{ original: item.avatar }}></Item>
+                                <ImageListItemBar
+                                    title={item.name}
+                                    subtitle={"Character:" + item.character}
+                                    actionIcon={
+                                        <IconButton
+                                            sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                            aria-label={`info about ${item.title}`}
+                                        >
+                                            <InfoIcon />
+                                        </IconButton>
+                                    }
+                                />
+                            </ImageListItem>
+
+                        )
+                    })}
+                </ImageList>
+            </Stack>
+        </Stack>
+        <Dialog
+            sx={{ width: "100%" }}
+            open={open}
+            onClose={handleClose}
+        //sx={{width:"50%"}}
+
+        >
+            <DialogTitle>Sources</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    Edit the resouces for the movie to download.
+                </DialogContentText>
+                <List
+                    sx={{ width: '100%', bgcolor: 'background.paper' }}
+                >
+
+                    {
+                        sources.map(item => {
+                            return (<ListItem sx={{ width: "100%" }}>
+                                <Stack direction="row" spacing={1} sx={{ width: "100%" }} >
+                                    <ListItemText
+                                        primary={item.source}
+                                        sx={{ width: "80%" }}
+                                    />
+
+                                    <Button variant="contained" onClick={handleDelete(item.source)} >Del</Button>
+                                    {
+                                        item.status && item.status === "finished" ? <Button variant="contained" onClick={handlePlay(item.source)} >play</Button> : <div></div>
+                                    }
+                                    {
+                                        (item.gid !== "" || !item.gid)
+                                            ? (<Button variant="contained" onClick={handleDownload(item.source)} >Pull</Button>) : <div></div>}
+                                </Stack>
+                            </ListItem>)
+                        })
+
+
+                    }
+                    <ListItem sx={{ width: "100%" }}>
+
+                        <Stack direction="row" spacing={1} >
+                            <TextField
+                                hiddenLabel
+                                id="filled-hidden-label-small"
+                                variant="filled"
+                                size="small"
+                                onChange={handleInput}
+                                value={input}
+                            />
+                            <Button variant="contained" onClick={handleSubmit}>Add</Button>
+                        </Stack>
+                    </ListItem>
+
+                </List>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>Ok</Button>
+            </DialogActions>
+        </Dialog>
+    </div>
+    )
 
 
 

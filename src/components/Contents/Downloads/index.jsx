@@ -92,7 +92,7 @@ export default function Downloads() {
 
 
                             <Box sx={{ position: 'relative', display: 'inline-flex', }}>
-                                <CircularProgress variant="determinate" value={value.total_size === 0 ? 0 : value.complete_size / value.total_size} />
+                                <CircularProgress variant="determinate" value={value.total_size === 0 ? 0 : value.complete_size / value.total_size * 100} />
                                 <Box
                                     sx={{
                                         top: 0,
@@ -106,12 +106,12 @@ export default function Downloads() {
                                     }}
                                 >
                                     <Typography variant="caption" component="div" color="text.secondary">
-                                        {`${Math.round(value.total_size === 0 ? 0 : value.complete_size / value.total_size)}%`}
+                                        {`${Math.round(value.total_size === 0 ? 0 : value.complete_size / value.total_size * 100)}%`}
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            <ListItemText id={labelId} primary={value.name} sx={{ paddingLeft: 2 }} secondary={value.speed + "kbps   " + value.complete_size + "k/" + value.total_size + "k" + "      " + value.status} />
+                            <ListItemText id={labelId} primary={value.name} sx={{ paddingLeft: 2 }} secondary={value.speed/1000 + "kbps   " + value.complete_size/1000000 + "MB/" + value.total_size/1000000 + "MB" + "      " + value.status} />
 
                         </ListItem>
                     );
