@@ -25,6 +25,7 @@ import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
 import VideoUtil from "../../../../util/io_utils/VideoUtil";
 import CardContent from '@mui/material/CardContent';
+import Checkbox from '@mui/material/Checkbox';
 
 
 function Item(props) {
@@ -54,6 +55,11 @@ export default function (props) {
     position = (!props.position ? position : props.position)
     const [checked, setChecked] = React.useState(['wifi']);
     const navigate = useNavigate()
+    const [checkedNumber,setCheckedNumber] = React.useState(null)
+    const [selectOpen, setSelectOpen] = React.useState(false)
+    const [selections,setSelections] = React.useState([])
+    const [tmpGid,setTmpGid] = React.useState("")
+    const [tmpSource,setTmpSource] = React.useState("")
     console.log(videoId)
     React.useEffect(() => {
         if (location.state) {
@@ -82,6 +88,7 @@ export default function (props) {
         setChecked(newChecked);
     };
     const handleStar = () => {
+        console.log(videoId)
         VideoUtil.star(videoId, details, setDetails)
     }
     const handleRemove = () => {
@@ -98,7 +105,9 @@ export default function (props) {
     }
 
     const handleDownload = (source) => () => {
-        VideoUtil.start_download(videoId, source, details.movie_name,sources, setSources)
+        VideoUtil.start_download(videoId, source, details.movie_name,sources, setSources,setOpen,setSelections,setSelectOpen,setTmpGid)
+        setTmpSource(source)
+
     }
 
     const handleSubmit = () => {
@@ -117,6 +126,15 @@ export default function (props) {
     const handleDelete = (source) => {
         return () => {
             VideoUtil.remove_download_source(videoId, source, sources, setSources)
+        }
+    }
+
+    const handleSelection = (idx) => {
+        return ()=>{
+            setCheckedNumber(null)
+            if (checkedNumber!==idx) {
+                setCheckedNumber(idx)
+            }
         }
     }
 
@@ -143,6 +161,16 @@ export default function (props) {
 
         return () => { navigate("/longvideos", { state: { videoId: videoId, resource: resource } }) }
     }
+    const select = ()=> {
+        if (!tmpGid|| checkedNumber===null  || !tmpSource) {
+            setSelectOpen(false)
+            return
+        }
+        VideoUtil.select(details.movieId, tmpSource, tmpGid,checkedNumber+1,setSelectOpen )
+    }
+
+
+
     return (<div>
         <Stack direction="column"
             //justifyContent="center"
@@ -329,6 +357,46 @@ export default function (props) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Ok</Button>
+            </DialogActions>
+        </Dialog>
+        <Dialog
+            sx={{ width: "100%" }}
+            open={selectOpen}
+            onClose={select}
+        //sx={{width:"50%"}}
+
+        >
+            <DialogTitle>Select</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    You use a p2p resouce, select only 1 exact file you want to download.
+                </DialogContentText>
+                <List
+                    sx={{ width: '100%', bgcolor: 'background.paper' }}
+                >
+
+                    {
+                        selections.map((item,idx) => {
+                            return (<ListItem sx={{ width: "100%" }}>
+                                <Stack direction="row" spacing={1} sx={{ width: "100%" }} >
+                                    <ListItemText
+                                        primary={item.path}
+                                        sx={{ width: "80%" }}
+                                        secondary={item.size/1000000 + "MB"}
+                                    />
+
+                                    <Checkbox checked={checkedNumber===idx} onChange={handleSelection(idx)} />
+
+                                </Stack>
+                            </ListItem>)
+                        })
+
+
+                    }
+                </List>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={select}>Ok</Button>
             </DialogActions>
         </Dialog>
     </div>

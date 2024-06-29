@@ -1,6 +1,7 @@
 import Qs from 'qs'
 import axios from "axios"
 import CryptoJS from "crypto-js";
+import { LegendToggleTwoTone } from '@mui/icons-material';
 export default class VideoUtil {
     static uploadVideos(title, introduction, value, setUploadState) {
 
@@ -143,7 +144,7 @@ export default class VideoUtil {
 
     static batchContinue(movies, downloadRecords, setDownloadRecords) {
         axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/batch_continue",
+            url: VideoUtil.getDownloadUrlBase() + "/movie/batch_resume",
             method: 'post',
             data: { downloads: movies }, headers: {
                 token: localStorage.getItem("token"),
@@ -219,7 +220,7 @@ export default class VideoUtil {
         axios({
             url: "http://localhost:8000" + "/gallery/collect",
             method: 'post',
-            data: { "videoId": details.movieId },
+            data: { "videoId": videoId },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -304,11 +305,11 @@ export default class VideoUtil {
         })
     }
 
-    static add_download_source(movie_id, source,name, sources, setSources) {
+    static add_download_source(movie_id, source, name, sources, setSources) {
         axios({
             url: VideoUtil.getDownloadUrlBase() + "/movie/add_source",
             method: 'post',
-            data: { movieId: movie_id, source: source, name,},
+            data: { movieId: movie_id, source: source, name, },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -343,7 +344,8 @@ export default class VideoUtil {
                 token: localStorage.getItem("token"),
             }
         }).catch(error => {
-
+            console.log(error)
+            return
         }).then(function (response) {
             if (response === undefined) {
                 console.log("errror")
@@ -375,6 +377,7 @@ export default class VideoUtil {
             }
         }).catch(error => {
             console.log(error)
+            return
         }).then(function (response) {
             if (response === undefined) {
                 console.log("errror")
@@ -391,44 +394,61 @@ export default class VideoUtil {
 
     }
 
-    static get_file_list(meta_gid,setState,setPrevOpen,setSelectOpen) {
-        axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/get_files",
-            method: 'post',
-            data: { gid: meta_gid },
-            transformRequest: [function (data) {
-                // 对 data 进行任意转换处理
-                return Qs.stringify(data)
-            }], headers: {
-                token: localStorage.getItem("token"),
-            }
-        }).catch(error => {
-            console.log(error)
-        }).then(function (response) {
-            if (!response || !response.data) {
-                console.log("errror")
-                return
-            }
-            console.log(response)
-            if (response.data === "exist!") {
-                return
-            }
-            console.log(response)
+    static get_file_list(meta_gid, movie_id, source_id, sources, setSources, setState, setPrevOpen, setSelectOpen, setTmpGid) {
+        let retrytimes = 10
+        let interval = 1000
+        const intervalId = setInterval(async () => {
+            try {
+                console.log("trying")
+                if (retrytimes === 0) clearInterval(intervalId);
+                axios({
+                    url: VideoUtil.getDownloadUrlBase() + "/movie/get_files",
+                    method: 'post',
+                    data: { gid: meta_gid, movieId: movie_id, resource: source_id },
+                    transformRequest: [function (data) {
+                        // 对 data 进行任意转换处理
+                        return Qs.stringify(data)
+                    }], headers: {
+                        token: localStorage.getItem("token"),
+                    }
+                }).catch(error => {
+                    console.log(error)
+                    return
+                }).then(function (response) {
+                    console.log(response)
+                    if (!response || !response.data) {
+                        console.log("errror")
+                        return
+                    }
+                    console.log(response)
+                    if (response.data.status === "getting") {
+                        return
+                    }
 
-            setState([...response.data])
-            setPrevOpen(false)
-            setSelectOpen(true)
-            //props.setBarState({...props.barState, message:responseData.message, open:true})
-        })
+                    clearInterval(intervalId);
+                    setState([...response.data.files])
+                    setTmpGid(response.data.gid)
+                    setPrevOpen(false)
+                    setSelectOpen(true)
+                    retrytimes = 0
+                    //props.setBarState({...props.barState, message:responseData.message, open:true})
+                })
+            } catch (error) {
+                console.error('Error:', error);
+                retrytimes--;
+            }
+        }, interval);
+
+
 
     }
 
 
-    static select(movie_id,source_id,meta_gid, place,setSelectOpen){
+    static select(movie_id, source_id, gid, place, setSelectOpen) {
         axios({
             url: VideoUtil.getDownloadUrlBase() + "/movie/select",
             method: 'post',
-            data: { gid: meta_gid,movie_id:movie_id,source_id:source_id,place:place },
+            data: { gid: gid, movieId: movie_id, resource: source_id, place: place },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -453,11 +473,11 @@ export default class VideoUtil {
         })
     }
 
-    static start_download(movie_id, source_id,name, sources, setSources) {
+    static start_download(movie_id, source_id, name, sources, setSources, setOpen, setSelections, setSelectOpen, setTmpGid) {
         axios({
             url: VideoUtil.getDownloadUrlBase() + "/movie/start",
             method: 'post',
-            data: { movieId: movie_id, source: source_id, name:name },
+            data: { movieId: movie_id, source: source_id, name: name },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -483,6 +503,7 @@ export default class VideoUtil {
                 }
             }
             setSources([...sources])
+            VideoUtil.get_file_list(response.data, movie_id, source_id, sources, setSources, setSelections, setOpen, setSelectOpen, setTmpGid)
             //props.setBarState({...props.barState, message:responseData.message, open:true})
         })
     }
@@ -581,42 +602,53 @@ export default class VideoUtil {
 
         })
     }
+    static get_and_processM3u8(location, setOption) {
+        const prefix = "http://192.168.23.129:8848/videos/" + encodeURIComponent(location.videoId + "/" + location.resource + "/");
+        const m3u8Url = prefix + encodeURIComponent("index.m3u8");
 
-    static getPlayInformation(movieId, setOption) {
-        axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/getPlayInformation",
-            method: 'get',
-            transformRequest: [function (data) {
-                // 对 data 进行任意转换处理
-                return Qs.stringify(data)
-            }], headers: {
-                token: localStorage.getItem("token"),
-            }
-        }).catch(error => {
+        console.log("Fetching M3U8 from:", m3u8Url);
 
-        }).then(function (response) {
-            if (response === undefined || !response.data) {
-                console.log("errror")
-                return
-            }
-            console.log(response)
-            //props.setBarState({...props.barState, message:responseData.message, open:true})
-            let data = response.data
-            setOption({
-                autoplay: true,
-                controls: true,
-                responsive: true,
-                fluid: true,
-                fill: true,
-                sources: [{
-                    src: data.src,
-                    type: "application/x-mpegURL"
-                }]
-                , playbackRates: [1, 2, 3]
+        fetch(m3u8Url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.text();
             })
+            .then(content => {
+                console.log("Original M3U8 content:\n", content);
 
-        })
+                const lines = content.split("\n");
+                const processedLines = lines.map(line => {
+                    if (line.endsWith('.ts')) {
+                        return prefix + line;
+                    }
+                    return line;
+                });
+
+                const modifiedData = processedLines.join('\n');
+                console.log("Modified M3U8 content:\n", modifiedData);
+
+                const blob = new Blob([modifiedData], { type: 'application/x-mpegURL' });
+                const url = URL.createObjectURL(blob);
+                console.log("Generated Blob URL:", url);
+
+                setOption({
+                    autoplay: true,
+                    controls: true,
+                    responsive: true,
+                    fluid: true,
+                    fill: true,
+                    sources: [{
+                        src: url,
+                        type: "application/x-mpegURL"
+                    }],
+                    playbackRates: [1, 2, 3]
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching or processing M3U8:', error);
+            });
     }
-
 
 }

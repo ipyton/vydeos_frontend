@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 export default function Downloads() {
     const [checked, setChecked] = React.useState([]);
-    const [downloadsRecords, setDownloadsRecords] = React.useState([1, 2, 3, 4, 5, 6])
+    const [downloadsRecords, setDownloadsRecords] = React.useState([])
 
     // React.useEffect(() => {
     //     VideoUtil.check_current_download_status(setDownloadsRecords)

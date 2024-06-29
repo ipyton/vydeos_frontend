@@ -30,23 +30,26 @@ export default function LongVideos(props) {
   
   React.useEffect(() => {
     if (location.state) {
-      VideoUtil.getPlayInformation(location.state, setOption)
-    }
+      console.log(location.state)
+      // Video get comments:ondemand 加载
+    VideoUtil.getVideoInformation(location.state.videoId,setMeta)
+    VideoUtil.get_and_processM3u8(location.state, setOption)
 
-  }, [])
+  }
+  }, [location.state])
 
     let a =[1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,324,543,52,34]
     const playerRef = React.useRef(null);
-    videojs.Vhs.xhr.beforeRequest = function (options) {
-      let headers = options.headers || {};
-      headers["token"] = "J2LqH1mnoXE0ZL5typ3VT3n4fe7RFYAO";
+    // videojs.Vhs.xhr.beforeRequest = function (options) {
+    //   let headers = options.headers || {};
+    //   headers["token"] = "J2LqH1mnoXE0ZL5typ3VT3n4fe7RFYAO";
     
-      options.headers = headers;
+    //   options.headers = headers;
     
-      console.log("options", options);
+    //   console.log("options", options);
     
-      return options;
-    }
+    //   return options;
+    // }
     const handlePlayerReady = (player) => {
       playerRef.current = player;
 

@@ -35,7 +35,7 @@ export default class MessageUtil {
     static getMessageById(userId, receiverId) {
         axios(
             {
-                url: MessageUtil.getUrlBase() + "/getChatRecordsByUserId",
+                url: MessageUtil.getUrlBase() + "/chat/getChatRecordsByUserId",
                 method: "post",
                 data: { token: localStorage.getItem("token") },
                 transformRequest: [function (data) {
