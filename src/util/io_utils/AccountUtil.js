@@ -5,7 +5,6 @@ import EncryptionUtil from "./EncryptionUtil"
 import { update } from "../../components/redux/UserDetails"
 import { useDispatch } from "react-redux"
 import localforage from "localforage"
-import { decode } from "babel-standalone"
 import { BiSolidCommentDetail } from "react-icons/bi"
 
 export default class AccountUtil {

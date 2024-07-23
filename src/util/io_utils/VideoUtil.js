@@ -175,7 +175,13 @@ export default class VideoUtil {
                 console.log("errror")
                 return
             }
-
+            const result = []
+            const newChecked = [...downloadRecords];
+            movies.map((item) => {
+                const currentIndex = downloadRecords.indexOf(item);
+                newChecked.splice(currentIndex, 1);
+            })
+            setDownloadRecords(newChecked);
 
         })
     }

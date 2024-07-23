@@ -22,8 +22,13 @@ export default function Downloads() {
     // })
 
     React.useEffect(() => {
-        VideoUtil.check_current_download_status(setDownloadsRecords)
-    }, [])
+        const intervalId = setInterval(() => {
+            console.log("checking interval")
+            VideoUtil.check_current_download_status(setDownloadsRecords)
+        }, 1000)
+        return () => clearInterval(intervalId);
+
+    }, [])  
 
 
     const handleToggle = (value) => () => {
@@ -38,6 +43,7 @@ export default function Downloads() {
 
         setChecked(newChecked);
     };
+
     const handleStop = () => {
         VideoUtil.batchStop(checked, downloadsRecords, setDownloadsRecords)
         console.log(checked)
@@ -111,7 +117,7 @@ export default function Downloads() {
                                 </Box>
                             </Box>
 
-                            <ListItemText id={labelId} primary={value.name} sx={{ paddingLeft: 2 }} secondary={value.speed/1000 + "kbps   " + value.complete_size/1000000 + "MB/" + value.total_size/1000000 + "MB" + "      " + value.status} />
+                            <ListItemText id={labelId} primary={value.name} sx={{ paddingLeft: 2 }} secondary={value.speed / 1000 + "kbps   " + value.complete_size / 1000000 + "MB/" + value.total_size / 1000000 + "MB" + "      " + value.status} />
 
                         </ListItem>
                     );

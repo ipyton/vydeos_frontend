@@ -35,6 +35,7 @@ import { useLayoutEffect } from "react"
 import Trends from "./Trends"
 import Downloads from "./Downloads"
 import About from "./About"
+import BotChat from "./BotChat"
 const defaultTheme = createTheme();
 
 export default function Contents(props) {
@@ -172,6 +173,7 @@ export default function Contents(props) {
                                         <Route path="/trending" element={<Trends></Trends>}> </Route>
                                         <Route path="/download" element={<Downloads></Downloads>}></Route>
                                         <Route path="/about" element={<About> </About>}> </Route>
+                                        <Route path="/qa" element={<BotChat></BotChat>}></Route>
                                         <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
                                     </Routes>

@@ -12,20 +12,7 @@ import localforage from 'localforage';
 // import { useIsFocused } from '@react-navigation/native';
 import { useLocation } from 'react-router-dom';
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-  overflow: "scroll"
-}));
 
-const Div = styled('div')(({ theme }) => ({
-  ...theme.typography.button,
-  backgroundColor: theme.palette.background.paper,
-  padding: theme.spacing(1),
-}));
 
 
 export default function Chat(props) {

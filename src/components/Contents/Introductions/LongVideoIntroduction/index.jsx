@@ -330,8 +330,8 @@ export default function (props) {
                                         item.status && item.status === "finished" ? <Button variant="contained" onClick={handlePlay(item.source)} >play</Button> : <div></div>
                                     }
                                     {
-                                        (item.gid !== "" || !item.gid)
-                                            ? (<Button variant="contained" onClick={handleDownload(item.source)} >Pull</Button>) : <div></div>}
+                                        (item.status  && item.status === "finished")
+                                            ?<div></div>: (<Button variant="contained" onClick={handleDownload(item.source)} >Pull</Button>) }
                                 </Stack>
                             </ListItem>)
                         })
