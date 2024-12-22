@@ -4,7 +4,7 @@ import { add, clear, batchAdd } from "../../components/redux/searchResult"
 
 export default class SearchUtil {
   static getBaseUrl() {
-    return "http://localhost:8000";
+    return "http://localhost:8080";
   }
 
   static stateSetter(list, dispatch) {

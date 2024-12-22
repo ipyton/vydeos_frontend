@@ -10,7 +10,7 @@ import { BiSolidCommentDetail } from "react-icons/bi"
 export default class AccountUtil {
 
   static getUrlBase() {
-    return "http://localhost:8000"
+    return "http://localhost:8080"
   }
 
   dispatch = useDispatch()
@@ -135,7 +135,7 @@ export default class AccountUtil {
         return Qs.stringify(data)
       }],
     }).catch((err) => {
-      console.log("Connection error")
+      console.log(err)
       return
     }).then(
       (response) => {
@@ -155,7 +155,7 @@ export default class AccountUtil {
     setStep(activeStep + 1)
   }
 
-  static registerStep3(activeStep, setStep, password, token) {
+  static registerStep3(activeStep, setStep, password, token,barState, setBarState) {
     axios({
       url: AccountUtil.getUrlBase() + "/account/registerStep3",
       method: 'post',
@@ -169,21 +169,45 @@ export default class AccountUtil {
       return
     }).then(
       (response) => {
+        console.log(response)
         if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
           setStep(activeStep + 1)
         }
         else {
           console.log("Please check your input")
+          console.log(response.data.message)
+          setBarState({ ...barState, open: true, message:response.data.message})
+
         }
       }
     )
 
   }
 
+  static uploadAvatar(data) {
+    async function upload() {
+      let response = await axios({
+        url: "http://localhost:8080/account/uploadAvatar",
+        method: 'post',
+        data: { avatar: data },
+        headers: {
+          token: localStorage.getItem("token"),
+          'Content-Type': 'multipart/form-data',
+        }
+      })
+      let responseData = response.data
+      console.log("-------------------")
+      console.log(responseData)
+      return responseData.code === 1
+    }
+    return upload()
+  }
+
   // This is about get userInfo
   static getOwnerInfo(userinfo, setUserInfo) {
 
     localforage.getItem("userId").then(res => {
+      console.log(res)
       axios({
         url: AccountUtil.getUrlBase() + "/account/getinfo",
         method: 'post',
@@ -195,9 +219,8 @@ export default class AccountUtil {
           token: localStorage.getItem("token"),
         }
       }).catch(err => {
-
+        console.log(err)
       }).then(response => {
-        console.log(response)
         if (!response || !response.data) {
           return
         }
@@ -206,10 +229,10 @@ export default class AccountUtil {
           return
         }
         let content = response.data.message
-        console.log(content)
         let decoded = JSON.parse(content)
         // localforage.setItem();
         setUserInfo(decoded)
+        console.log(decoded)
       })
     })
 
@@ -218,7 +241,14 @@ export default class AccountUtil {
 
   static updateUserInfo(introduction, nickName, location, pictures, birthdate, gender) {
     if (!pictures) pictures = []
-
+    console.log({
+      introduction: introduction,
+      userName: nickName,
+      location: location,
+      pictures: pictures,
+      dateOfBirth: birthdate,
+      gender: gender
+    })
     localforage.getItem("userId").then(res => {
       axios({
         url: AccountUtil.getUrlBase() + "/account/setinfo",
@@ -244,6 +274,28 @@ export default class AccountUtil {
         console.log(response)
       })
     })
+  }
+  static async getAvatar(avatar, setAvatar) {
+    try {
+      axios({
+        url: AccountUtil.getUrlBase() + "/account/getAvatar",
+        method: 'get',
+        transformRequest: [function (data) {
+          return Qs.stringify(data)
+        }],
+        headers: {
+          token: localStorage.getItem("token"),
+        }
+      }).catch(err => {
+
+      }).then(response => {
+        console.log(response)
+        setAvatar(response.data)
+      })
+
+    } catch (error) {
+      console.error('Error fetching avatar:', error);
+    }
   }
 
 

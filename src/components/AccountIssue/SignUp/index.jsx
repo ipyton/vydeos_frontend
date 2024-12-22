@@ -18,6 +18,7 @@ import StepLabel from '@mui/material/StepLabel';
 import { Stack } from '@mui/material';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
 import { useEffect } from 'react';
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 
 function Copyright(props) {
   return (
@@ -44,8 +45,15 @@ export default function SignUp(props) {
   const [validatepw, setValidatepw] = useState("")
   let [activeStep, setActiveStep] = useState(0);
   let navigate = useNavigate()
+  const [barState, setBarState] = React.useState({
+    open: false,
+    vertical: 'top',
+    horizontal: 'center',
+    message: ""
+  });
+  const { vertical, horizontal, open,message } = barState;
+
   const { loginState, setLoginState } = props
-  const { setBarState } = props
   const [transactionNumber, setTransactionNumber] = useState("000000")
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -105,11 +113,17 @@ export default function SignUp(props) {
   const step3 = (event) => {
     event.preventDefault()
     if (password == validatepw) {
-      AccountUtil.registerStep3(activeStep, setActiveStep, password, email)
+      AccountUtil.registerStep3(activeStep, setActiveStep, password, email,barState, setBarState)
     }
     else return
   }
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
+    setBarState({...barState, open:false});
+  };
   const handlePasswordChange = (event) => {
     setPassword(event.currentTarget.value)
   }
@@ -284,6 +298,16 @@ export default function SignUp(props) {
 
 
   return (<Box sx={{ width: '60%', marginLeft: "20%", marginTop: "5%" }}>
+    <Snackbar
+      anchorOrigin={{ vertical, horizontal }}
+      open={open}
+      message={message}
+      key={vertical + horizontal}
+      autoHideDuration={5000}
+      onClose={handleClose}
+
+    />
+
     <Stepper activeStep={activeStep}>
       {steps.map((label, index) => {
         const stepProps = {};

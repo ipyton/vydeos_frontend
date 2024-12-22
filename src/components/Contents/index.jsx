@@ -81,7 +81,7 @@ export default function Contents(props) {
             setUserRecords(res)
         }
         ).then(() => {
-            setWorker(new Worker("./webworkers/NotificationReceiver.js"))
+            // setWorker(new Worker(`${process.env.PUBLIC_URL}/webworkers/NotificationReceiver.js`))
         })
     }
 
@@ -147,7 +147,7 @@ export default function Contents(props) {
 
                 <Box sx={{ display: 'flex' }}>
                     <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setBadgeContent={setNotifications}></Header>
-                    <Box width="100%" justifyContent="center" alignItems="center" sx={{ marginTop: window.innerHeight * 0.01 }}>
+                    <Box width="100%" justifyContent="center" alignItems="center" marginTop="64px">
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <div>
                                 <div>

@@ -7,7 +7,7 @@ import { ReceiptRounded } from "@mui/icons-material"
 export default class MessageUtil {
 
     static getUrlBase() {
-        return "http://localhost:8000"
+        return "http://localhost:8080"
     }
 
     static initialize() {

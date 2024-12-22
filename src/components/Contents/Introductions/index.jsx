@@ -6,6 +6,9 @@ import InvitationIntroduction from "./InvitationIntroduction"
 export default function (props) {
     const { selector } = props
     console.log(selector)
+    if (!selector.type) {
+        return (<div>select an option to view</div>)
+    }
     if ("movie" === selector.type) {
         return (<LongVideoIntroduction videoId={selector.videoId} position={"right"}></LongVideoIntroduction>)
     } else if ("contact" === selector.type) {

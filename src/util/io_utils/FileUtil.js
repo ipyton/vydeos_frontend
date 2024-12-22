@@ -3,25 +3,7 @@ import { responsiveFontSizes } from "@mui/material"
 import axios from "axios"
 import Qs from 'qs'
 export default class PictureUtil {
-    static uploadAvatar(data) {
-        async function upload() {
-            let response = await axios({
-                url: "http://localhost:8080/account/uploadAvatar",
-                method: 'post',
-                data: { avatar: data },
-                headers: {
-                    token: localStorage.getItem("token"),
-                    'Content-Type': 'multipart/form-data',
-                    'userEmail': "1838169994@qq.com"
-                }
-            })
-            let responseData = response.data
-            console.log("-------------------")
-            console.log(responseData)
-            return responseData.code === 1
-        }
-        return upload()
-    }
+
     static uploadArticlePics(data) {
         let response = axios({
             url: "http://localhost:8080/article/upload_pic",

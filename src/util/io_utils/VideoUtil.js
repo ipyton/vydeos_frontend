@@ -3,6 +3,11 @@ import axios from "axios"
 import CryptoJS from "crypto-js";
 import { LegendToggleTwoTone } from '@mui/icons-material';
 export default class VideoUtil {
+
+    static getUrlBase() {
+        return ""
+    }
+
     static uploadVideos(title, introduction, value, setUploadState) {
 
         let sliceLength = 1024 * 1024 * 128

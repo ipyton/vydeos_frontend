@@ -26,7 +26,7 @@ export default function Friends(props) {
   },[])
   let [index, setIndex] = React.useState(0)
   return (
-    <Stack sx={{ marginLeft: '15%', width: '70%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
+    <Stack sx={{ marginLeft: '10%', width: '80%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
       <Friend setSelector={setSelector}></Friend>
       <Introductions selector={selector} position={"right"}></Introductions>
     </Stack>

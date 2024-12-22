@@ -1,113 +1,78 @@
 import * as React from 'react';
-import { useState } from "react"
+import { useState, useEffect } from "react";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import axios from 'axios';
-import Qs from 'qs'
-import { Navigate } from 'react-router-dom';
-import { deepOrange, deepPurple } from '@mui/material/colors';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { IconButton } from '@mui/material';
+import { deepOrange } from '@mui/material/colors';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import PictureUtil from '../../../util/io_utils/FileUtil';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import dayjs from 'dayjs';
-
-var advancedFormat = require('dayjs/plugin/advancedFormat')
-dayjs.extend(advancedFormat)
 
 const defaultTheme = createTheme();
 
 export default function UserInfo(props) {
+  const { login, setLogin } = props.status;
 
-  const [receive, setReceive] = useState(false)
-  const [selected, setSelected] = useState(false)
-  const { login, setLogin } = props.status
-  const [avatar, setAvatar] = useState("")
-  const [gender, setGender] = useState(0)
-  const [date, setDate] = useState(dayjs('2022-04-17'))
-  const [picToUpload, setPicToUpload] = useState(null)
-  const [detail, setDetail] = useState({})
-  // React.useEffect(()=> {
-  //   AccountUtil.getOwnerInfo(detail, setDetail)
-  // }, [])
+  // Consolidated userInfo state
+  const [userInfo, setUserInfo] = useState({
+    avatar: "",
+    gender: false, // false = Female, true = Male, null = Not to tell
+    dateOfBirth: '2022-04-10',
+    userName: "",
+    location: "",
+    introduction: "",
+  });
+
+  const [avatar, setAvatar] = useState()
+  useEffect(() => {
+    // Fetch initial user info from API or local data
+    AccountUtil.getOwnerInfo(userInfo, setUserInfo);
+    AccountUtil.getAvatar(avatar, setAvatar)
+  }, []);
+
   const handleChange = (event) => {
-    setGender(event.target.value);
+    const { name, value } = event.target;
+    setUserInfo((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
-  if (false === login) {
-    return <Navigate to="/login" replace />
-  }
+  const handleDateChange = (newDate) => {
+    setUserInfo((prevState) => ({
+      ...prevState,
+      dateOfBirth: newDate,
+    }));
+  };
 
-  const getUserInformation = () => {
+  const handleAvatarUpload = (event) => {
+    const file = event.target.files[0];
+    const avatarUrl = URL.createObjectURL(file);
 
-  }
-
-  const validate = (nickname, username, password) => {
-    return true
-  }
-
-  function encryption(password) {
-    return password;
-  }
-
-  const handleReceive = (event) => {
-    setReceive(!receive)
-  }
-
-  const picUploadHandler = (event) => {
-    setAvatar(URL.createObjectURL(event.target.files[0]))
-    console.log(avatar)
-    PictureUtil.uploadAvatar(event.target.files[0])
-  }
+    setAvatar(avatarUrl)
+    AccountUtil.uploadAvatar(file);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log(data)
-    if (!validate(data.get('nickname'), data.get('username'), data.get('password'))) {
-      props.setBarState({ ...props.barState, message: "please check your input", open: true })
-    }
-    else {
-      // axios({
-      //   url: "http://localhost:8080/account/getinfo",
-      //   method: 'post',
-      //   data: { userEmail: data.get('email'), password: encryption(data.get('password')), userName: data.get("nickname"), promotion: selected },
-      //   transformRequest: [function (data) {
-      //     return Qs.stringify(data)
-      //   }],
-      // }).then(
-      //   (response) => {
-      //     console.log("response");
-      //     if (response.code === 1) {
 
-      //     }
-      //     else {
-
-      //     }
-      //   }
-      // ).catch((err) => {
-      //   console.log("check your input")
-      // })
-      console.log(data.get("intro"), data.get("nickname"), data.get("region"), data.get("pictures"), date.format('YYYY-MM-DD'), gender)
-      AccountUtil.updateUserInfo(data.get("intro"), data.get("nickname"), data.get("region"), data.get("pictures"), date.format('YYYY-MM-DD'), gender)
-
-    }
+    // Validation and submission logic here
+    console.log(data.get("intro"), data.get("nickname"), data.get("region"), data.get("pictures"), dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender);
+    AccountUtil.updateUserInfo(userInfo.introduction, userInfo.userName, userInfo.location, null, dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender);
   };
-
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -122,7 +87,7 @@ export default function UserInfo(props) {
           }}
         >
           <div>
-            <input id="uploadPic" type="file" onChange={picUploadHandler}  hidden></input>
+            <input id="uploadPic" type="file" onChange={handleAvatarUpload} hidden />
             <label htmlFor="uploadPic">
               <IconButton component="span">
                 <Avatar id="avatar" src={avatar} sx={{ bgcolor: deepOrange[500] }}>N</Avatar>
@@ -134,33 +99,40 @@ export default function UserInfo(props) {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} >
+              <Grid item xs={12}>
                 <TextField
-                  name="nickname"
-                  required
+                  name="userName"
+                  focused
                   fullWidth
-                  id="nickname"
+                  id="outlined-nickname"
                   label="Nickname"
-                  autoFocus
+                  value={userInfo.userName}
+                  onChange={handleChange}
+                  variant="filled" color="success"
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
                   fullWidth
-                  id="region"
+                  id="outlined-region"
                   label="Region"
-                  name="region"
+                  name="location"
+                  value={userInfo.location}
+                  onChange={handleChange}
+                  variant="filled" color="success"
+                  focused
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
                   fullWidth
-                  name="intro"
-                  label="intro"
-                  type="intro"
-                  id="intro"
+                  focused
+                  name="introduction"
+                  label="Introduction"
+                  id="outlined-required"
+                  value={userInfo.introduction}
+                  onChange={handleChange}
+                  variant="filled" color="success"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -169,26 +141,22 @@ export default function UserInfo(props) {
                   <Select
                     labelId="gender-select-label"
                     id="gender"
-                    value={gender}
-                    label="gender"
+                    name="gender"
+                    value={userInfo.gender}
                     onChange={handleChange}
                   >
                     <MenuItem value={true}>Male</MenuItem>
                     <MenuItem value={false}>Female</MenuItem>
-                    <MenuItem value={null}>Not to tell</MenuItem>
+                    <MenuItem value={null}>Prefer not to say</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
-              
               <Grid item xs={12}>
-                <DatePicker value={date} onChange={(newDate) => setDate(newDate)}/>
-              </Grid>
-              {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox onClick={handleReceive} value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
+                <DatePicker
+                  value={dayjs(userInfo.dateOfBirth)}
+                  onChange={handleDateChange}
                 />
-              </Grid> */}
+              </Grid>
             </Grid>
             <Button
               type="submit"
