@@ -13,13 +13,18 @@ import SearchItem from './SideBar/SearchItem';
 import Introductions from '../Introductions';
 import SideBar from './SideBar';
 import { Stack } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 
 
 export default function BasicList() {
   const searchResult = useSelector((state) => state.searchResult.value)
   // [{name:"james",pics:"siehru", intro:"sus", type:"contact"}, {name:"time",pics:"zdxf", intro:"sfs", type:"video"}]
   //pics here means avatar.
+  const location = useLocation();
+
   let [selector, setSelector] = React.useState({ type: "", objectId: "null" })
+  console.log(selector)
+ // const { searchResult,type  } = location.state || {}; // 获取 state 参数
   let height = window.innerHeight * 0.8
   return (
     <Stack sx={{ marginLeft: '10%', width: '80%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>

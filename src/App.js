@@ -62,7 +62,7 @@ function App() {
   if (login === true)
     return (
   <BrowserRouter>
-      <Contents ></Contents>
+      <Contents setLogin={setLogin}></Contents>
       </BrowserRouter>
     );
   return <div> loading</div>

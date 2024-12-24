@@ -17,24 +17,16 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Avatar, Fab, ListItemButton } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
-import IOUtil from '../../util/ioUtil';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Divider from '@mui/material/Divider';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
+
 import FunctionDrawer from './FunctionDrawer';
 import MuiAppBar from '@mui/material/AppBar';
 
 import SearchAndSuggestion from './SearchAndSuggestion';
-import SearchUtil from '../../util/io_utils/SearchUtil';
 import { useDispatch } from 'react-redux';
-import {clear} from "../../components/redux/searchResult"
 import localforage from 'localforage';
 import { useState } from 'react';
 import MessageBox from './MessageBox';
-import MessageUtil from '../../util/io_utils/MessageUtil';
-import MusicUtil from '../../util/io_utils/MusicUtil';
+
 import {set} from "../redux/Search"
 
 const Search = styled('div')(({ theme }) => ({
@@ -93,9 +85,9 @@ export default function Header(props) {
   const languageMenuOpen = Boolean(languageAnchorEl)
   const notificationsOpen = Boolean(notificationsAnchorEl)
   const dispatch = useDispatch()
-  const {notifications, setNotifications} = props
+  const {notifications, setNotifications, setLogin} = props
 
-  
+  let [changed, setChanged] = useState(false)
   const navigate = useNavigate();
   const renderBadge = () => {
 
@@ -116,7 +108,7 @@ export default function Header(props) {
     return ()=>{
       window.removeEventListener("click", onClick)
     }
-  },[])
+  }, [categorySelected])
   
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -133,8 +125,6 @@ export default function Header(props) {
   };
 
   const handleMobileMenuOpen = (event) => {
-    console.log("mobile")
-    console.log(event.currentTarget)
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
@@ -156,8 +146,9 @@ export default function Header(props) {
     } else {
       console.log("good day")
     }
-    dispatch(set({search:search, type:index}))
-    navigate("searchresult" )
+    dispatch(set({search:search, type:index,changed:changed}))
+    setChanged(!changed)
+    navigate("searchresult")
   }
 
   const handleSearchChange = (event) => {
@@ -174,7 +165,7 @@ export default function Header(props) {
   const handleLogout = (event) => {
     localStorage.clear()
     localforage.clear()
-    props.setLogin(false)
+    setLogin(false)
     props.setBadgeContent(null)
     navigate("/login")
   }
@@ -276,85 +267,6 @@ export default function Header(props) {
   )
   
   
-
-  // const notifications = (
-  //   <List hidden={!notificationsOpen} sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', zIndex:9999, position: 'absolute', left: '50%',
-  //   transform: 'translate(-50%, 0)'}}>
-  //   <ListItemButton onMouseDown={handleNotificationOpen}>
-  //     <ListItem alignItems="flex-start">
-  //       <ListItemAvatar>
-  //         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-  //       </ListItemAvatar>
-  //       <ListItemText
-  //         primary="Brunch this weekend?"
-  //         secondary={
-  //           <React.Fragment>
-  //             <Typography
-  //                variant="body2"
-  //               color="text.primary"
-  //             >
-  //               Ali Connors
-  //             </Typography>
-  //             {" message1"}
-  //           </React.Fragment>
-  //         }
-  //       />
-  //     </ListItem>  
-  //     </ListItemButton>
-      
-  //     <Divider variant="inset" component="li" />
-  //     <ListItemButton onMouseDown={handleNotificationOpen}>
-  //     <ListItem alignItems="flex-start">
-  //       <ListItemAvatar>
-  //         <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-  //       </ListItemAvatar>
-  //       <ListItemText
-  //         primary="Summer BBQ"
-  //         secondary={
-  //           <React.Fragment>
-  //             <Typography
-  //               sx={{ display: 'inline' }}
-  //               component="span"
-  //               variant="body2"
-  //               color="text.primary"
-  //             >
-  //               to Scott, Alex, Jennifer
-  //             </Typography>
-  //             {" — message 2"}
-  //           </React.Fragment>
-  //         } />
-  //     </ListItem>
-  //     </ListItemButton>
-    
-  //     <Divider variant="inset" component="li" />
-
-  //     <ListItemButton onMouseDown={handleNotificationOpen}>
-  //     <ListItem alignItems="flex-start">
-  //       <ListItemAvatar>
-  //         <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-  //       </ListItemAvatar>
-  //       <ListItemText
-  //         primary="Oui Oui"
-  //         secondary={
-  //           <React.Fragment>
-  //             <Typography
-  //               sx={{ display: 'inline' }}
-  //               component="span"
-  //               variant="body2"
-  //               color="text.primary"
-  //             >
-  //               Sandra Adams
-  //             </Typography>
-  //             {' — message3'}
-  //           </React.Fragment>
-  //         }
-  //       />
-  //     </ListItem>
-  //     </ListItemButton>
-  //   </List>
-
-
-  // )
 
     let mockData = [{title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}, {title:"Helloworld", introduction:"introduction", pic:"", type:"movie"}]
     const suggestionBar = (

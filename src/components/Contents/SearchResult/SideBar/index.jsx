@@ -61,8 +61,10 @@ export default function (props) {
     const { setSelector } = props
     const search = useSelector((state) => state.search.search)
     const searchType = useSelector((state) => state.search.searchType)
+    const changed = useSelector((state) => state.search.changed)
     const [states, setState] = React.useState([[], [], [], [], []])
-
+    console.log(changed)
+    console.log(search)
     React.useEffect(() => {
         states[value] = list
         setState(states)
@@ -88,7 +90,7 @@ export default function (props) {
         }
         //setValue(searchType)
 
-    }, [search])
+    }, [changed])
 
 
     React.useEffect(() => {

@@ -1,9 +1,7 @@
 import { ImageList, ImageListItem, Avatar } from "@mui/material";
 import Stack from '@mui/material/Stack';
 import * as React from 'react';
-import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Typography from '@mui/material/Typography';
@@ -11,14 +9,14 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { useSelector, useDispatch } from "react-redux";
-import { update, clear } from "../../../redux/UserDetails"
 import SocialMediaUtil from "../../../../util/io_utils/SocialMediaUtil";
 import localforage from "localforage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 import MessageUtil from "../../../../util/io_utils/MessageUtil";
-
+import axios from "axios";
+import Qs from "qs";
+import AccountUtil from "../../../../util/io_utils/AccountUtil";
 //this is used to show the user information.
 export default function (props) {
     const [details, setDetails] = useState({})
@@ -36,13 +34,29 @@ export default function (props) {
 
 
     let navigate = useNavigate()
-    React.useEffect(() => {
+    // React.useEffect(() => {
+    //     axios({
+    //         url: AccountUtil.getUrlBase() + "/friends/getUserIntro?userIdToFollow=" + userId,
+    //         method: 'get'
+    //         , 
+    //         headers: {
+    //             token: localStorage.getItem("token"),
+    //         }
+    //     }).then(res=>{
+    //         if (res.status === 200) {
+    //             setDetails(res.data)
+    //         }
+    //     })
 
-        if (!details || details.relationship== null || details.relationship == undefined) {
+
+
+    // }, [userId])
+
+    React.useEffect(()=>{
+        if (!details || details.relationship == null || details.relationship == undefined) {
             console.log("updating")
 
         } else {
-
             if (details.relationship === 0) {
                 setFollowButtonText("Follow")
                 setExtraInformation("")
@@ -51,7 +65,7 @@ export default function (props) {
                 setFollowButtonText("Follow")
                 setExtraInformation("He follows you.")
             } else if (details.relationship === 10) {
-                setContactButtonText("Request")
+                setContactButtonText("Contact")
                 setFollowButtonText("Unfollow")
             } else if (details.relationship === 11) {
                 setExtraInformation("He follows you.")
@@ -64,8 +78,10 @@ export default function (props) {
                 setExtraInformation("This is yourself")
             }
         }
+    }, [details])
 
-    }, [details.relationship, details.userId, userID])
+
+
     console.log(extraInformation)
     React.useEffect(() => {
         console.log("changing")
@@ -83,9 +99,8 @@ export default function (props) {
 
         // })
     }, [userId])
-    console.log(details, userID)
 
-
+    console.log(details.gender)
 
     if (!details) {
         return <div>loading</div>
@@ -193,18 +208,19 @@ export default function (props) {
                     <TextField
                         id="outlined-required"
                         label="Gender"
-                        defaultValue={details.gender}
+                        defaultValue={details.gender ? "female": "male"}
                         variant="standard"
+                        focused
                         InputProps={{
                             readOnly: true,
                         }}
                     />
                     <TextField
                         id="outlined-required"
-                        label="Age"
+                        label="Birthdate"
                         defaultValue={details.birthdate}
                         variant="standard"
-
+                        focused
                         InputProps={{
                             readOnly: true,
                         }}
@@ -214,6 +230,7 @@ export default function (props) {
                         label="Location"
                         defaultValue={details.location}
                         variant="standard"
+                        focused
                         InputProps={{
                             readOnly: true,
                         }}

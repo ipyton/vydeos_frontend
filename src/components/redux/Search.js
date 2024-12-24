@@ -4,10 +4,12 @@ export const Search = createSlice({
     name: 'search',
     initialState: {
         search: "",
-        searchType: -1
+        searchType: -1,
+        changed:false
     },
     reducers: {
         set: (state, searchContent) => {
+            state.changed = searchContent.payload.changed
             state.search = searchContent.payload.search
             state.searchType = searchContent.payload.type
         },

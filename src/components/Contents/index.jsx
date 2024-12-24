@@ -36,6 +36,9 @@ import Trends from "./Trends"
 import Downloads from "./Downloads"
 import About from "./About"
 import BotChat from "./BotChat"
+import ResetPassword from "./ResetPassword"
+import RolePermissionPage from "./RolePermissionPage"
+import UserManagementPage from "./UserManagementService"
 const defaultTheme = createTheme();
 
 export default function Contents(props) {
@@ -46,6 +49,9 @@ export default function Contents(props) {
         horizontal: 'center',
         message: "helloworld"
     });
+
+    console.log(props)
+    const {setLogin} = props
 
     const [avatar, setAvatar] = useState(null)
     const [badgeContent, setBadgeContent] = useState([])
@@ -146,7 +152,7 @@ export default function Contents(props) {
         < ThemeProvider theme={defaultTheme} >
 
                 <Box sx={{ display: 'flex' }}>
-                    <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setBadgeContent={setNotifications}></Header>
+                    <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setLogin={setLogin} setBadgeContent={setNotifications}></Header>
                     <Box width="100%" justifyContent="center" alignItems="center" marginTop="64px">
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <div>
@@ -174,6 +180,10 @@ export default function Contents(props) {
                                         <Route path="/download" element={<Downloads></Downloads>}></Route>
                                         <Route path="/about" element={<About> </About>}> </Route>
                                         <Route path="/qa" element={<BotChat></BotChat>}></Route>
+                                        <Route path="/reset" element={<ResetPassword></ResetPassword>}></Route>
+                                        <Route path="/role" element={<RolePermissionPage></RolePermissionPage>}></Route>
+                                        <Route path="/userManage" element={<UserManagementPage></UserManagementPage>}></Route>
+
                                         <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
                                     </Routes>

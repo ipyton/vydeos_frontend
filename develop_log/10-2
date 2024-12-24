@@ -1,0 +1,17 @@
+### Date: October 2, 2024
+
+#### Development Progress:
+- Completed the implementation of user registration and login functionality.
+- Finished the basic functionality of displaying a list of therapists using the PrimeVue DataView component.
+- Fixed issues related to assigning custom roles.
+
+#### Issues Encountered:
+- validate the integrity of the user information
+- Found the user data can be put into the indexdb
+- Found serveral bugs about the messaging system.
+- Change userid from String to long.
+
+
+#### Plans for Tomorrow:
+- Continue improving the search and filter functionality for the therapist list.
+- Start implementing the user comments feature.

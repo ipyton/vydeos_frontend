@@ -9,7 +9,7 @@ import { SettingsSystemDaydreamTwoTone } from "@mui/icons-material"
 export default class SocialMediaUtil {
 
     static getUrlBase() {
-        return "http://localhost:8000"
+        return "http://localhost:8080"
     }
 
 
@@ -31,20 +31,20 @@ export default class SocialMediaUtil {
             console.log(error)
         }).then(response => {
             if (response.data.code === 1) {
-                localforage.getItem("userIntro").then((res) => {
-                    //res is a userIntro
-                    res.relationship = res.relationship % 10 + 10
-                    details.relationship = res.relationship % 10 + 10
-                    localforage.setItem("userIntro", res)
-                    details.relationship = res.relationship % 10 + 10
-                    setDetails({...details})                    
-                    if (details.relationship !== 11) return
-                    localforage.getItem("friendList").then(async res => {
-                        if (!res) res = {}
-                        res[details.userId] = { userId: details.userId, name: details.name, avatar: details.avatar }
-                        await localforage.setItem("friendList", res)
-                    })
-                })
+                // localforage.getItem("userIntro").then((res) => {
+                //     //res is a userIntro
+                //     res.relationship = res.relationship % 10 + 10
+                //     details.relationship = res.relationship % 10 + 10
+                //     localforage.setItem("userIntro", res)
+                //     details.relationship = res.relationship % 10 + 10
+                //     setDetails({ ...details })
+                //     if (details.relationship !== 11) return
+                //     localforage.getItem("friendList").then(async res => {
+                //         if (!res) res = {}
+                //         res[details.userId] = { userId: details.userId, name: details.name, avatar: details.avatar }
+                //         await localforage.setItem("friendList", res)
+                //     })
+                // })
             }
             else {
                 console.log("state set error!!!")
@@ -79,7 +79,7 @@ export default class SocialMediaUtil {
                     res.relationship = res.relationship % 10
                     details.relationship = res.relationship
                     localforage.setItem("userIntro", res)
-                    setDetails({...details})
+                    setDetails({ ...details })
                     if (details.relationship === 11) return
                     localforage.getItem("friendList").then(async res => {
                         if (!res) res = {}
@@ -125,9 +125,9 @@ export default class SocialMediaUtil {
     }
 
 
-    static getRelationships(idx,setValue,setList) {
-        
-        let requestName= null;
+    static getRelationships(idx, setValue, setList) {
+
+        let requestName = null;
         if (0 === idx) {
             // get friends
             requestName = "get_friends"
@@ -155,18 +155,18 @@ export default class SocialMediaUtil {
         axios({
             url: SocialMediaUtil.getUrlBase() + "/friends/" + requestName,
             method: "post",
-            data: { },
+            data: {},
             transformRequest: [function (data) {
                 return qs.stringify(data)
             }],
             headers: {
                 "token": localStorage.getItem("token"),
             }
-        }).catch( err => {
+        }).catch(err => {
             console.log(err)
-        }).then((response)=> {
+        }).then((response) => {
             console.log(response)
-            if (!response || ! response.data) {
+            if (!response || !response.data) {
                 console.log("Internal Error")
                 return
             }
