@@ -14,6 +14,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import SocialMediaUtil from '../../../../util/io_utils/SocialMediaUtil';
 
+import { useEffect, useState } from 'react';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -53,20 +54,34 @@ export default function (props) {
     const theme = useTheme();
 
     const [value, setValue] = React.useState(0)
-    const [list, setList] = React.useState([])
+    const [list, setList] = React.useState([1,2,3,4,5,6,7,8,9,10,1,2,3,4,56,7])
     const {setSelector} = props
 
-    React.useEffect(()=>{
-        SocialMediaUtil.getRelationships(value, setValue, setList)
+
+    const [windowHeight, setWindowHeight] = useState(window.innerHeight);  // 存储窗口的高度
+
+    useEffect(() => {
+        // 在窗口大小改变时更新窗口高度
+        const handleResize = () => setWindowHeight(window.innerHeight);
+
+        // 监听窗口大小变化
+        window.addEventListener('resize', handleResize);
+
+        // 清理事件监听
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // React.useEffect(()=>{
+    //     SocialMediaUtil.getRelationships(value, setValue, setList)
     
-    },[])
+    // },[])
     const handleChange = (event, newValue) => {
         SocialMediaUtil.getRelationships(newValue, setValue, setList)
     };
     const handleChangeIndex = (index) => {
         setValue(index);
     };
-    return (<Stack sx={{ width: "30%", boxShadow: 1, borderRadius: 2 }} spacing={2}>
+    return (<Stack sx={{ boxShadow: 1, borderRadius: 2, maxHeight: '100%', }} spacing={2}>
         <Box sx={{ bgcolor: 'background.paper' }}>
             <AppBar position="static">
                 <Tabs
@@ -74,7 +89,6 @@ export default function (props) {
                     onChange={handleChange}
                     indicatorColor="secondary"
                     textColor="inherit"
-                    aria-label="full width tabs example"
                     variant="scrollable"
                     scrollButtons="auto"
                 >
@@ -91,57 +105,91 @@ export default function (props) {
                 index={value}
                 onChangeIndex={handleChangeIndex}
             >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                    <List>
-                        {list.map((res, idx) => {
-                            return (<FriendItem setSelector={setSelector} content={res} idx={0}></FriendItem>)
-                        })}
-                    </List>
-
+                <TabPanel value={value} index={0} dir={theme.direction} >
+                    <Box sx={{
+                        height: windowHeight * 0.6, // Set a fixed height for the Box to trigger scroll
+                        overflowY: 'auto', // Enable vertical scroll
+                    }}>
+                        <List >
+                            {list.map((res, idx) => {
+                                return (<FriendItem setSelector={setSelector} content={res} idx={0}></FriendItem>)
+                            })}
+                        </List>
+                    </Box>
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
+                    <Box sx={{
+                        height: windowHeight * 0.6, // Set a fixed height for the Box to trigger scroll
+                        overflowY: 'auto', // Enable vertical scroll
+                    }}>
                     <List>
                         {list.map((res, idx) => {
                             return (<FriendItem setSelector={setSelector} content={res} idx={1}></FriendItem>)
                         })}
 
                     </List>
+                    </Box>
+
 
                 </TabPanel>
                 <TabPanel value={value} index={2} dir={theme.direction}>
+                    <Box sx={{
+                        height: windowHeight * 0.6, // Set a fixed height for the Box to trigger scroll
+                        overflowY: 'auto', // Enable vertical scroll
+                    }}>
                     <List>
                         {list.map((res, idx) => {
                             return (<FriendItem setSelector={setSelector} content={res} idx={2}></FriendItem>)
                         })}
 
                     </List>
+                    </Box>
+
 
                 </TabPanel>
                 <TabPanel value={value} index={3} dir={theme.direction}>
+                    <Box sx={{
+                        height: windowHeight * 0.6, // Set a fixed height for the Box to trigger scroll
+                        overflowY: 'auto', // Enable vertical scroll
+                    }}>
                     <List>
                         {list.map((res, idx) => {
                             return (<FriendItem setSelector={setSelector} content={res} idx={3}></FriendItem>)
                         })}
 
                     </List>
+                    </Box>
+
 
                 </TabPanel>
                 <TabPanel value={value} index={4} dir={theme.direction}>
+                    <Box sx={{
+                        height: windowHeight * 0.6, // Set a fixed height for the Box to trigger scroll
+                        overflowY: 'auto', // Enable vertical scroll
+                    }}>
                     <List>
                         {list.map((res, idx) => {
                             return (<FriendItem setSelector={setSelector} content={res} idx={4}></FriendItem>)
                         })}
 
                     </List>
+                    </Box>
+
 
                 </TabPanel>
                 <TabPanel value={value} index={5} dir={theme.direction}>
+                    <Box sx={{
+                        height: windowHeight * 0.6, // Set a fixed height for the Box to trigger scroll
+                        overflowY: 'auto', // Enable vertical scroll
+                    }}>
                     <List>
                         {list.map((res, idx) => {
                             return (<FriendItem setSelector={setSelector} content={res} idx={5}></FriendItem>)
                         })}
 
                     </List>
+                    </Box>
+
 
                 </TabPanel>
             </SwipeableViews>

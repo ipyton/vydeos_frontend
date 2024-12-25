@@ -128,6 +128,8 @@ export default class SocialMediaUtil {
     static getRelationships(idx, setValue, setList) {
 
         let requestName = null;
+        let domain = "/friends/"
+
         if (0 === idx) {
             // get friends
             requestName = "get_friends"
@@ -143,6 +145,7 @@ export default class SocialMediaUtil {
         else if (3 === idx) {
             //get current group
             requestName = "get_groups"
+            domain = "/group_chat/"
         }
         else if (4 === idx) {
             // get invitations

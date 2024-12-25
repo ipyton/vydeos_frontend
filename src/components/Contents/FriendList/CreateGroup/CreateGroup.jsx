@@ -1,5 +1,9 @@
-export default function() {
+import { useEffect } from "react"
 
+export default function() {
+    useEffect(()=>{
+        
+    }, [])
     
     return (<Dialog open={openDialog} onClose={() => { setOpenDialog(false) }}>
         <DialogTitle>Select Friends to Create Group</DialogTitle>
@@ -22,6 +26,8 @@ export default function() {
                 ))}
             </List>
         </DialogContent>
+
+
         <DialogActions>
             <Button onClick={onClose} color="primary">
                 Cancel

@@ -11,10 +11,13 @@ import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import FriendIntro from './FriendIntro';
 import { useEffect } from 'react';
+import axios from "axios";
+import TextField from "@mui/material/TextField";
 //import FriendIntroductionCentered from '../Introductions/FriendIntroductionCentered';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Checkbox, FormControlLabel } from "@mui/material";
 
 import Introductions from "../Introductions"
+import AccountUtil from "../../../util/io_utils/AccountUtil";
 export default function Friends(props) {
   let list = [12, 12, 312, 4, 13, 4123, 5, 345, 34]
   let height = window.innerHeight * 0.8
@@ -22,12 +25,30 @@ export default function Friends(props) {
   const position = "right"
   const [openDialog, setOpenDialog] = useState(false);
 
+  const [selectedGroupUser, setSelectedGroupUser] = useState([])
+  const [dialogList, setDialogList] = useState([])
+  const [groupName, setGroupName] = useState("")
+
   useEffect(()=>{
     return ()=>{
       console.log("deregister")
       setSelector(null)
     }
   },[])
+  useEffect(() => {
+    if (openDialog) {
+      axios({
+        url: AccountUtil.getUrlBase() + "/friends/get_friends",
+        method: "post",
+        data: {},
+        headers: {
+          "token": localStorage.getItem("token"),
+        }
+      }).then((res)=>{
+        console.log(res)
+      })
+    }
+  }, [openDialog])
   let [index, setIndex] = React.useState(0)
   const [selectedFriends, setSelectedFriends] = useState([]);
 
@@ -41,12 +62,23 @@ export default function Friends(props) {
 
   const handleCreateGroup = () => {
     if (selectedFriends.length > 0) {
-      //onCreateGroup(selectedFriends);
-      //onClose(); // Close the dialog after creating the group
+      axios({
+        url: AccountUtil.getUrlBase() + "/group_chat/create",
+        method: "post",
+        data: {
+          group:{
+            name: groupName,
+            members: selectedFriends
+          }
+        },
+        headers: {
+          "token": localStorage.getItem("token"),
+        }
+      })
     }
   };
   const onClose = () => {
-
+    setOpenDialog(false)
   }
   const friends = [
     { id: 1, name: "Alice" },
@@ -56,7 +88,6 @@ export default function Friends(props) {
   ];
   return (
     <Stack sx={{ marginLeft: '10%', width: '80%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
-      <Button variant="contained" onClick={()=>{setOpenDialog(true)}}>Create A Group</Button>
 
       <Dialog open={openDialog} onClose={()=>{setOpenDialog(false)}}>
         <DialogTitle>Select Friends to Create Group</DialogTitle>
@@ -78,6 +109,10 @@ export default function Friends(props) {
               </ListItem>
             ))}
           </List>
+          <TextField id="outlined-basic" onChange={(res)=>{
+           setGroupName(res.target.value)
+          }} label="group name" variant="outlined" />
+
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} color="primary">
@@ -88,7 +123,11 @@ export default function Friends(props) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Friend setSelector={setSelector}></Friend>
+      <Stack  sx={{width:"40%", height:"100%"}}>
+        <Button variant="contained" onClick={() => { setOpenDialog(true) }}>Create A Group</Button>
+        <Friend setSelector={setSelector}></Friend>
+      </Stack>
+
       <Introductions selector={selector} position={"right"}></Introductions>
     </Stack>
 
