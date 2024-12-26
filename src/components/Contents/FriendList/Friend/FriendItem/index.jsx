@@ -12,15 +12,16 @@ export default function(props){
     let { content, idx , setSelector} = props
 
     let handleClick = (idx) => {
+        console.log(idx)
         return ()=> {
             if (1 === idx || 0 === idx || 2 === idx) {
-                setSelector({ type: "contact", userId: content.friend_id })
+                setSelector({ type: "contact", userId: content.friendId })
             } else if (3 === idx) {
-                setSelector({ type: "groupId", content: content.group_id })
+                setSelector({ type: "groupId", content: content.groupId })
             } else if (4 === idx) {
-                setSelector({ type: "invitationId", content: content.invitation_id })
+                setSelector({ type: "invitationId", content: content.invitationId })
             } else if (5 === idx) {
-                setSelector({ type: "userId", content: content.friend_id })
+                setSelector({ type: "userId", content: content.friendId })
 
             }
 
@@ -36,7 +37,7 @@ export default function(props){
                         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
                     </ListItemAvatar>
                     <ListItemText
-                        primary={content.friend_id}
+                        primary={content.friendId}
                     />
                 </ListItem>
             </ListItemButton>
@@ -52,7 +53,7 @@ export default function(props){
                         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
                     </ListItemAvatar>
                     <ListItemText
-                        primary="Tim"
+                        primary={content.groupName}
                     />
                 </ListItem>
             </ListItemButton>

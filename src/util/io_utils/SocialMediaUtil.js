@@ -36,8 +36,8 @@ export default class SocialMediaUtil {
                 //     res.relationship = res.relationship % 10 + 10
                 //     details.relationship = res.relationship % 10 + 10
                 //     localforage.setItem("userIntro", res)
-                //     details.relationship = res.relationship % 10 + 10
-                //     setDetails({ ...details })
+                    details.relationship = details.relationship % 10 + 10
+                    setDetails({ ...details })
                 //     if (details.relationship !== 11) return
                 //     localforage.getItem("friendList").then(async res => {
                 //         if (!res) res = {}
@@ -75,18 +75,18 @@ export default class SocialMediaUtil {
             console.log(error)
         }).then(response => {
             if (response.data.code === 1) {
-                localforage.getItem("userIntro").then((res) => {
-                    res.relationship = res.relationship % 10
-                    details.relationship = res.relationship
-                    localforage.setItem("userIntro", res)
-                    setDetails({ ...details })
-                    if (details.relationship === 11) return
-                    localforage.getItem("friendList").then(async res => {
-                        if (!res) res = {}
-                        res[details.userId] = null
-                        await localforage.setItem("friendList", res)
-                    })
-                })
+                // localforage.getItem("userIntro").then((res) => {
+                //     res.relationship = res.relationship % 10
+                    details.relationship = details.relationship % 10
+                //     localforage.setItem("userIntro", res)
+                     setDetails({ ...details })
+                //     if (details.relationship === 11) return
+                //     localforage.getItem("friendList").then(async res => {
+                //         if (!res) res = {}
+                //         res[details.userId] = null
+                //         await localforage.setItem("friendList", res)
+                //     })
+                // })
             }
             else {
                 console.log("state set error!!!")
@@ -156,8 +156,8 @@ export default class SocialMediaUtil {
         }
 
         axios({
-            url: SocialMediaUtil.getUrlBase() + "/friends/" + requestName,
-            method: "post",
+            url: SocialMediaUtil.getUrlBase() + domain + requestName,
+            method: "get",
             data: {},
             transformRequest: [function (data) {
                 return qs.stringify(data)
@@ -176,6 +176,7 @@ export default class SocialMediaUtil {
             let list = JSON.parse(response.data.message)
             setValue(idx)
             setList(list)
+            console.log(list)
         })
     }
 }

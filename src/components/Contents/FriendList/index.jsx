@@ -45,7 +45,8 @@ export default function Friends(props) {
           "token": localStorage.getItem("token"),
         }
       }).then((res)=>{
-        console.log(res)
+        console.log(JSON.parse(res.data.message))
+        setDialogList(JSON.parse(res.data.message))
       })
     }
   }, [openDialog])
@@ -61,31 +62,28 @@ export default function Friends(props) {
   };
 
   const handleCreateGroup = () => {
-    if (selectedFriends.length > 0) {
+    if (selectedFriends.length > 0 && groupName.length !== 0) {
       axios({
         url: AccountUtil.getUrlBase() + "/group_chat/create",
         method: "post",
         data: {
-          group:{
-            name: groupName,
+            groupName: groupName,
             members: selectedFriends
-          }
         },
         headers: {
           "token": localStorage.getItem("token"),
         }
+      }).then((res)=>{
+        setOpenDialog(false)
+        setGroupName("")
+        setSelectedFriends([])
       })
     }
   };
   const onClose = () => {
     setOpenDialog(false)
   }
-  const friends = [
-    { id: 1, name: "Alice" },
-    { id: 2, name: "Bob" },
-    { id: 3, name: "Charlie" },
-    { id: 4, name: "David" },
-  ];
+
   return (
     <Stack sx={{ marginLeft: '10%', width: '80%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
 
@@ -93,18 +91,18 @@ export default function Friends(props) {
         <DialogTitle>Select Friends to Create Group</DialogTitle>
         <DialogContent>
           <List>
-            {friends.map((friend) => (
+            {dialogList.map((friend) => (
               <ListItem key={friend.id}>
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={selectedFriends.includes(friend.id)}
-                      onChange={() => handleToggleFriend(friend.id)}
+                      checked={selectedFriends.includes(friend.friendId)}
+                      onChange={() => handleToggleFriend(friend.friendId)}
                       name={friend.name}
                       color="primary"
                     />
                   }
-                  label={friend.name}
+                  label={friend.friendId}
                 />
               </ListItem>
             ))}

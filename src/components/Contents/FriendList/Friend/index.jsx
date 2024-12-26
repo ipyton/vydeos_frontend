@@ -54,11 +54,12 @@ export default function (props) {
     const theme = useTheme();
 
     const [value, setValue] = React.useState(0)
-    const [list, setList] = React.useState([1,2,3,4,5,6,7,8,9,10,1,2,3,4,56,7])
+    const [list, setList] = React.useState([])
     const {setSelector} = props
 
 
     const [windowHeight, setWindowHeight] = useState(window.innerHeight);  // 存储窗口的高度
+
 
     useEffect(() => {
         // 在窗口大小改变时更新窗口高度
@@ -71,10 +72,10 @@ export default function (props) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // React.useEffect(()=>{
-    //     SocialMediaUtil.getRelationships(value, setValue, setList)
+    React.useEffect(()=>{
+        SocialMediaUtil.getRelationships(value, setValue, setList)
     
-    // },[])
+    },[])
     const handleChange = (event, newValue) => {
         SocialMediaUtil.getRelationships(newValue, setValue, setList)
     };
