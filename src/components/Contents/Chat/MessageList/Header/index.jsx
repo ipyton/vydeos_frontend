@@ -9,14 +9,19 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 
 export default function Header(props) {
-  let userId = props.selected
+  let contact = props.selected
+  console.log(contact)
+  let name = ""
+  if (contact.type === "groupId") {
+    name = contact.groupId
+  }
     return (
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>
 
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                  {userId}
+                  {name}
               </Typography>
               <IconButton
                 size="large"

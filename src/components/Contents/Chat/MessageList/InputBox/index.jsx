@@ -42,7 +42,8 @@ export default function (props) {
       return
     }
     localforage.getItem("userId").then(res=> {
-      MessageUtil.sendMessage(res, select, text, "text", chatRecords, setChatRecords, "single")
+
+      MessageUtil.sendMessage(res, select, text, "text", chatRecords, setChatRecords)
     }).then(() => {
         setText("")
     })

@@ -166,7 +166,7 @@ export default function (props) {
             setSelectOpen(false)
             return
         }
-        VideoUtil.select(details.movieId, tmpSource, tmpGid,checkedNumber+1,setSelectOpen )
+        VideoUtil.select(details.movieId, tmpSource, tmpGid,checkedNumber + 1,setSelectOpen )
     }
 
 

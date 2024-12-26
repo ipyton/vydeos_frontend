@@ -67,8 +67,6 @@ export default class MessageUtil {
 
     static searchLocalRecords(keywords, dispatch) {
 
-
-
     }
 
     static getNewestMessages(friendId, setSelect) {
@@ -182,8 +180,21 @@ export default class MessageUtil {
         })
     }
 
-    static sendMessage(userId, sendTo, content, messageType, chatRecords, setChatRecords, type) {
-        let data = { userId: userId, receiverId: sendTo, content: content, messageType: messageType, type: type }
+    static sendMessage(userId, sendTo, content, messageType, chatRecords, setChatRecords) {
+        let data = { userId: userId, content: content, messageType: messageType }
+        console.log(sendTo)
+        if (sendTo.type === "userId") {
+            data.userId = sendTo.userId
+            data.type = "single"
+
+        }
+        else if (sendTo.type === "groupId") {
+            data.groupId = sendTo.groupId
+            data.type = "group"
+        }
+        else {
+            return
+        }
         console.log(data)
         axios(
             {

@@ -27,13 +27,14 @@ export default function (props) {
     ];
 
     const [details, setDetails] = useState({
-        groupName:"",
+        groupName: "",
     })
     const [members, setMembers] = useState([])
-    const handleChat = (event)=>{
-        console.log(event)
+    const handleChat = (event) => {
+        console.log(details)
+        navigate("/chat", { state: details })
     }
-    useEffect(()=>{
+    useEffect(() => {
         axios({
             url: AccountUtil.getUrlBase() + "/group_chat/getDetail?groupId=" + props.groupId,
             method: 'get',
@@ -47,7 +48,7 @@ export default function (props) {
         }).catch(err => {
             console.log(err)
         }).then(
-             response => {
+            response => {
                 if (response === undefined || response.data === undefined) {
                     console.log("login error")
                     return
@@ -63,23 +64,21 @@ export default function (props) {
                     headers: {
                         token: localStorage.getItem("token"),
                     }
-                }).catch(err=>{
+                }).catch(err => {
                     console.log(err)
-                }).then((res)=>{
-                    
+                }).then((res) => {
+
                     let object = JSON.parse(res.data.message)
                     setMembers(object)
                 })
-                
+
             }
         )
     }, [props.groupId])
 
     let navigate = useNavigate()
 
-    const chat = () => {
-        navigate("")
-    }
+
 
     return (
         <Stack

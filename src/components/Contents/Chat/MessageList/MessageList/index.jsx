@@ -54,7 +54,7 @@ export default function (props) {
       }
     )
 
-  }, [select])
+  }, [select.groupId, select.userId])
 
   useEffect(()=> {
     if (!messagesEndRef || !messagesEndRef.current) return
