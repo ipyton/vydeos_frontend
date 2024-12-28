@@ -30,31 +30,32 @@ export default function (props) {
   console.log(chatRecords)
   const messagesEndRef = useRef(null)
   
-  useEffect(() => {
-    //MessageUtil.getNewestMessages(select)
-    localforage.getItem("send_to_" + select).then(
-      send_to => {
-        localforage.getItem("send_from_" + select).then(
-          async receive_from => {
-            if (!send_to) {
-              send_to = []
-              await localforage.setItem("send_to_" + select, send_to)
-            }
-            if (!receive_from) {
-              receive_from = []
-              await localforage.setItem("send_from_" + select, receive_from)
-            }
-            let result = [...send_to, ...receive_from]
-            result.sort((a, b) => {
-              return a.sendTime - b.sendTime
-            })
-            setChatRecords(result)
-          }
-        )
-      }
-    )
+  // useEffect(() => {
+  //   console.log("messageList")
+  //   //MessageUtil.getNewestMessages(select)
+  //   // localforage.getItem("send_to_" + select).then(
+  //   //   send_to => {
+  //   //     localforage.getItem("send_from_" + select).then(
+  //   //       async receive_from => {
+  //   //         if (!send_to) {
+  //   //           send_to = []
+  //   //           await localforage.setItem("send_to_" + select, send_to)
+  //   //         }
+  //   //         if (!receive_from) {
+  //   //           receive_from = []
+  //   //           await localforage.setItem("send_from_" + select, receive_from)
+  //   //         }
+  //   //         let result = [...send_to, ...receive_from]
+  //   //         result.sort((a, b) => {
+  //   //           return a.sendTime - b.sendTime
+  //   //         })
+  //   //         setChatRecords(result)
+  //   //       }
+  //   //     )
+  //   //   }
+  //   // )
 
-  }, [select.groupId, select.userId])
+  // }, [select.groupId, select.userId])
 
   useEffect(()=> {
     if (!messagesEndRef || !messagesEndRef.current) return
@@ -65,18 +66,20 @@ export default function (props) {
     return <div>Start to chat</div>
   }
 
-
+  console.log(chatRecords)
   return (
     <Stack sx={{ borderRadius: 2, overflow: 'scroll' }} >
-      <div className="messagesWrapper" >
+      <div className="messagesWrapper" style={{ display: 'flex', flexDirection: 'column-reverse' }} >
+
+        <div style={{ float: "left", clear: "both" }}
+          ref={messagesEndRef} />
         {
           chatRecords.map((x, idx) => {
+            console.log(x)
             return (<SingleMessage content={x} select = {select}></SingleMessage>)
           })
         }
 
-      <div style={{ float: "left", clear: "both" }}
-        ref={messagesEndRef} />
 
     </div>
 

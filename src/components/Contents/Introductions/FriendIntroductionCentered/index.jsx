@@ -17,6 +17,9 @@ import MessageUtil from "../../../../util/io_utils/MessageUtil";
 import axios from "axios";
 import Qs from "qs";
 import AccountUtil from "../../../../util/io_utils/AccountUtil";
+import DatabaseManipulator from "../../../../util/io_utils/DatabaseManipulator";
+import { update } from '../../../redux/refresh';
+
 //this is used to show the user information.
 export default function (props) {
     const [details, setDetails] = useState({})
@@ -34,6 +37,8 @@ export default function (props) {
 
 
     let navigate = useNavigate()
+    let dispatch = useDispatch()
+
     // React.useEffect(() => {
     //     axios({
     //         url: AccountUtil.getUrlBase() + "/friends/getUserIntro?userIdToFollow=" + userId,
@@ -100,7 +105,7 @@ export default function (props) {
         // })
     }, [userId])
 
-    console.log(details.gender)
+    console.log(details)
 
     if (!details) {
         return <div>loading</div>
@@ -115,9 +120,14 @@ export default function (props) {
         if (details.userId === await localforage.getItem("userId")) {
             return
         }
-        localforage.setItem("contactCursor", details.userId).then(() => {
-            navigate("/chat", { state: details })
-        })
+        let contact = { type: "single", userId: userId, name: details.userName }
+            
+        DatabaseManipulator.addRecentContact(contact).then(
+            ()=>{
+                navigate("/chat", { ...contact })
+                dispatch(update())
+            }
+        )
 
 
     }

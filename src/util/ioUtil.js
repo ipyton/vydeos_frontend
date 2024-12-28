@@ -2,7 +2,7 @@ import axios from "axios"
 import Qs from 'qs'
 
 export default class IOUtil {
-    static url_base = "http://localhost:8000"
+    static url_base = "http://localhost:8080"
 
     static getSearchResult(keyword) {
         async function post() {

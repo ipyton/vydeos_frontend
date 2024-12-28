@@ -1,8 +1,8 @@
 import localforage from "localforage";
 
 export default class DatabaseManipulator {
-    async addRecentContact(contact) {
-        const res = await localforage.getItem("recent_contacts");
+    static async addRecentContact(contact) {
+        let res = await localforage.getItem("recent_contacts");
         if (!res) res = [];
         for (let i = 0; i < res.length; i++) {
             let ele = res[i];
@@ -20,6 +20,7 @@ export default class DatabaseManipulator {
         // do not exist: add it to the first place.
         // and add user empty chat records
         if (contact.type === "group") {
+            console.log(contact)
             res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "group" }, ...res];
             localforage.setItem("group_" + contact.userId, []);
         } else if (contact.type === "single") {
@@ -34,8 +35,8 @@ export default class DatabaseManipulator {
         return res;
     }
 
-    async contactComeFirst(type, id) {
-        const res = await localforage.getItem("recent_contacts");
+    static async contactComeFirst(type, id) {
+        let res = await localforage.getItem("recent_contacts");
         if (!res) res = [];
         for (let i = 0; i < res.length; i++) {
             let ele = res[i];
@@ -53,22 +54,36 @@ export default class DatabaseManipulator {
         return res;
     }
 
-    getRecentContact(type, id) {
-        return localforage.get("recent_contacts")
+    static getRecentContact() {
+        return localforage.getItem("recent_contacts")
     }
 
-    addContactHistory(message) {
-        return localforage.get(message.type + "_" + message.receverId).then(res => {
-            localforage.setItem(message.type + "_" + message.receiver, [message, ...res])
-            contactComeFirst(message.type, message.receverId)
+    static addContactHistory(message) {
+        console.log(message)
+        return localforage.getItem(message.type + "_" + message.receiverId).then(res => {
+            res = [message, ...res]
+            localforage.setItem(message.type + "_" + message.receiverId, res)
+            this.contactComeFirst(message.type, message.receiverId)
             return res
         })
     }
 
-    getContactHistory(type, receiverId) {
-        return localforage.get(type + "_" + receiverId).then(res => {
+    static getContactHistory(type, receiverId) {
+        return localforage.getItem(type + "_" + receiverId).then(res => {
             return res
         })
+    }
+
+    static addMailbox(message) {
+        
+    }
+
+    static getMailbox() {
+
+    }
+
+    static deleteMailbox() {
+
     }
 
 

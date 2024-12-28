@@ -13,6 +13,8 @@ import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import localforage from "localforage"
 import MessageUtil from "../../../../util/io_utils/MessageUtil"
+import DatabaseManipulator from "../../../../util/io_utils/DatabaseManipulator"
+import { useLocation } from "react-router-dom"
 
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -25,9 +27,23 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 export default function (props) {
-	let messages = [{ from_nickName: "xxx", to_nickName: "xxx", content: "xxx", time: "xxx", position: "right", from_username: "", to_username: "", type: "" },]
-	const { select, setChatRecords, chatRecords } = props
+	const { select,setSelect } = props
+	const [chatRecords, setChatRecords] = useState([])
+	console.log(select)
+	let location = useLocation()
+	console.log(location)
+	useEffect(() => {
+		if (select.type === "" || select.userId === "") return
+		DatabaseManipulator.getContactHistory(select.type, select.userId).then((res) => {
+			setChatRecords(res)
+		})
+	}, [select.type, select.userId])
 
+	// useEffect(() => {
+	// 	DatabaseManipulator.getContactHistory(select.type, select.userId).then((res) => {
+	// 		setChatRecords(res)
+	// 	})
+	// }, [location.state.type, location.state.userId])
 
 	if (!select) {
 		return <div> Start/Select a conversation first!</div>
@@ -38,7 +54,7 @@ export default function (props) {
 	return (<Stack sx={{ width: "70%", boxShadow: 1 }}>
 
 		<Header selected={select}></Header>
-		<Message chatRecords={chatRecords}  setChatRecords={setChatRecords} select = {select}> </Message>
+		<Message chatRecords={chatRecords} setChatRecords={setChatRecords} select={select}> </Message>
 		<InputBox chatRecords={chatRecords} setChatRecords={setChatRecords} select={select}></InputBox>
 	</Stack>)
 }

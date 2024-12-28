@@ -16,7 +16,8 @@ import axios from "axios"
 import AccountUtil from "../../../../util/io_utils/AccountUtil";
 import Qs from "qs"
 import { List, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
-
+import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
+import { update } from '../../../redux/refresh';
 
 export default function (props) {
     console.log(props)
@@ -25,14 +26,21 @@ export default function (props) {
         { name: 'Jane Smith', avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg' },
         { name: 'Mark Johnson', avatarUrl: 'https://randomuser.me/api/portraits/men/2.jpg' },
     ];
-
+    let dispatch = useDispatch()
     const [details, setDetails] = useState({
         groupName: "",
     })
     const [members, setMembers] = useState([])
     const handleChat = (event) => {
         console.log(details)
-        navigate("/chat", { state: details })
+        let contact = { type: "group", userId: details.groupId, name: details.groupName }
+        DatabaseManipulator.addRecentContact(contact).then(
+            ()=>{
+                navigate("/chat", { ...contact })
+                dispatch(update())
+            }
+        )
+
     }
     useEffect(() => {
         axios({

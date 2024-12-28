@@ -15,25 +15,25 @@ export default function Header(props) {
   if (contact.type === "groupId") {
     name = contact.groupId
   }
-    return (
-        <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static">
-            <Toolbar>
+  return (
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static">
+          <Toolbar>
 
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                  {name}
-              </Typography>
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                sx={{ mr: 2 }}
-              >
-                <MenuIcon />
-              </IconButton>
-            </Toolbar>
-          </AppBar>
-        </Box>
-      );
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                {contact.name}
+            </Typography>
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+            >
+              {/* <MenuIcon /> */}
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      </Box>
+    );
 }

@@ -67,16 +67,16 @@ export default function Contents(props) {
     const [notifications, setNotifications] = useState([])
     const [chatRecords, setChatRecords] = useState([])
     const [userRecords, setUserRecords] = useState([])
-    const [sideBarSelector, setSideBarSelector] = useState("")
+    const [sideBarSelector, setSideBarSelector] = useState({type:"",userId:""})
     const [worker, setWorker] = useState(null)
     const location = useLocation()
 
-    useEffect(()=>{
-        if (!location.pathname.startsWith("/chat")) {
-            setSideBarSelector(null)
-        }
+    // useEffect(()=>{
+    //     if (!location.pathname.startsWith("/chat")) {
+    //         setSideBarSelector(null)
+    //     }
 
-    },[location])
+    // },[location])
 
     const register = async () => {
         await localforage.getItem(
@@ -146,7 +146,7 @@ export default function Contents(props) {
         }
     },[worker, sideBarSelector, chatRecords, notifications])
 
-
+    console.log(sideBarSelector)
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
     return (
         < ThemeProvider theme={defaultTheme} >
@@ -163,7 +163,7 @@ export default function Contents(props) {
                                         <Route path="/userinfo"  element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
                                         <Route path="/editor"  element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
                                         <Route path="/videos"  element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
-                                        <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} chatRecords={chatRecords} setChatRecords={setChatRecords} setUserRecords={setUserRecords} userRecords={userRecords}></Chat>}></Route>
+                                        <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} ></Chat>}></Route>
                                         <Route path="/settings"  element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                                         <Route path="/notfound"  element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
                                         <Route path="/friends"  element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>

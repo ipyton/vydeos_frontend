@@ -92,111 +92,111 @@ export default class MessageUtil {
             ).then(
                 async (response) => {
                     //MessageUtil.updateMessage(response)
-                    //console.log(response)
+                    // //console.log(response)
 
-                    if (!response) {
-                        return
-                    }
-                    if (!response.data) {
-                        console.log("error")
-                        return
-                    }
+                    // if (!response) {
+                    //     return
+                    // }
+                    // if (!response.data) {
+                    //     console.log("error")
+                    //     return
+                    // }
 
-                    if (response.data.code !== 1) {
-                        console.log("logic error")
-                        return
-                    }
-                    const messages = JSON.parse(response.data.message)
-                    let records_map = {}
+                    // if (response.data.code !== 1) {
+                    //     console.log("logic error")
+                    //     return
+                    // }
+                    // const messages = JSON.parse(response.data.message)
+                    // let records_map = {}
 
-                    //dispatch messages to their sender in a map. 
-                    let maxTimestamp = timestamp
-                    for (let i = 0; i < messages.length; i++) {
-                        let userId = messages[i].userId;
-                        if (records_map[userId]) {
-                            records_map[userId].push(messages[i])
-                        } else {
-                            records_map[userId] = [messages[i]]
-                        }
-                        maxTimestamp = Math.max(messages[i].sendTime, maxTimestamp)
-                    }
-                    await localforage.setItem(checkKey, maxTimestamp)
+                    // //dispatch messages to their sender in a map. 
+                    // let maxTimestamp = timestamp
+                    // for (let i = 0; i < messages.length; i++) {
+                    //     let userId = messages[i].userId;
+                    //     if (records_map[userId]) {
+                    //         records_map[userId].push(messages[i])
+                    //     } else {
+                    //         records_map[userId] = [messages[i]]
+                    //     }
+                    //     maxTimestamp = Math.max(messages[i].sendTime, maxTimestamp)
+                    // }
+                    // await localforage.setItem(checkKey, maxTimestamp)
 
-                    //write to the database
-                    for (let key in records_map) {
-                        let value = records_map[key]
-                        let result = await localforage.getItem(key + "_records")
-                        if (!result) {
-                            result = { count: value.size, chats: value }
-                        }
-                        else {
-                            result.count++
-                            result.chats = [result.chats, ...value]
-                        }
-                        await localforage.setItem("send_from_" + friendId, result.chats)
-                    }
+                    // //write to the database
+                    // for (let key in records_map) {
+                    //     let value = records_map[key]
+                    //     let result = await localforage.getItem(key + "_records")
+                    //     if (!result) {
+                    //         result = { count: value.size, chats: value }
+                    //     }
+                    //     else {
+                    //         result.count++
+                    //         result.chats = [result.chats, ...value]
+                    //     }
+                    //     await localforage.setItem("send_from_" + friendId, result.chats)
+                    // }
 
                     // get chat record contacts lists
-                    await localforage.getItem("contactCursor").then((userId) => {
-                        if (!userId) {
-                            localforage.getItem("contactRecordList").then((result) => {
+                    // await localforage.getItem("contactCursor").then((userId) => {
+                    //     if (!userId) {
+                    //         localforage.getItem("contactRecordList").then((result) => {
 
-                            })
-                            return
-                        }
-                        localforage.getItem("contactRecordList").catch(() => {
-                        }).then(async (result) => {
-                            if (!result) {
-                                return
-                            }
-                            let contains = -1
-                            for (let i = 0; i < result.length; i++) {
-                                if (result[i].userId === userId) {
-                                    contains = i;
-                                }
-                            }
-                            // contactDetails
-                            // contactRecordList [{userId:userId, avatar:avatar, userName}, xxx, xxx]
-                            let detail = await localforage.getItem(userId + "_detail")
-                            if (contains === -1) {//query from localforage and set information
-                                if (!detail) {
-                                    console.log("he is not your friend!!!!")
-                                    return
-                                }
-                                result = [...result, { userName: detail.userName, avatar: detail.avatar, userId: detail.userId }]
-                                localforage.setItem("contactRecordList", result)
-                            }
-                            else {
-                                result = [...result, { userName: detail.userName, avatar: detail.avatar, userId: detail.userId }]
-                                localforage.setItem("contactRecordList", result)
-                            }
-                        }
-                        )
-                    })
+                    //         })
+                    //         return
+                    //     }
+                    //     localforage.getItem("contactRecordList").catch(() => {
+                    //     }).then(async (result) => {
+                    //         if (!result) {
+                    //             return
+                    //         }
+                    //         let contains = -1
+                    //         for (let i = 0; i < result.length; i++) {
+                    //             if (result[i].userId === userId) {
+                    //                 contains = i;
+                    //             }
+                    //         }
+                    //         // contactDetails
+                    //         // contactRecordList [{userId:userId, avatar:avatar, userName}, xxx, xxx]
+                    //         let detail = await localforage.getItem(userId + "_detail")
+                    //         if (contains === -1) {//query from localforage and set information
+                    //             if (!detail) {
+                    //                 console.log("he is not your friend!!!!")
+                    //                 return
+                    //             }
+                    //             result = [...result, { userName: detail.userName, avatar: detail.avatar, userId: detail.userId }]
+                    //             localforage.setItem("contactRecordList", result)
+                    //         }
+                    //         else {
+                    //             result = [...result, { userName: detail.userName, avatar: detail.avatar, userId: detail.userId }]
+                    //             localforage.setItem("contactRecordList", result)
+                    //         }
+                    //     }
+                    //     )
+                    // })
                 }
             ).then(() => {
-                setSelect(friendId)
+                //setSelect(friendId)
             })
         })
     }
 
-    static sendMessage(userId, sendTo, content, messageType, chatRecords, setChatRecords) {
+    static sendMessage(userId, sendTo, content, messageType) {
         let data = { userId: userId, content: content, messageType: messageType }
         console.log(sendTo)
-        if (sendTo.type === "userId") {
-            data.userId = sendTo.userId
+        if (sendTo.type === "single") {
+            data.receiverId = sendTo.userId
             data.type = "single"
 
         }
-        else if (sendTo.type === "groupId") {
-            data.groupId = sendTo.groupId
+        else if (sendTo.type === "group") {
+            data.groupId = sendTo.userId
             data.type = "group"
         }
         else {
             return
         }
         console.log(data)
-        axios(
+        return axios(
             {
                 url: MessageUtil.getUrlBase() + "/chat/sendMessage",
                 method: "post",
@@ -209,27 +209,7 @@ export default class MessageUtil {
                     token: localStorage.getItem("token"),
                 }
             }
-        ).catch(err => {
-            console.log("requestNewMessageError")
-        }).then(
-            response => {
-                if (!response || response.data.code !== 1) {
-                    console.log("internal errors ")
-                }
-                let message = JSON.parse(response.data.message)
-                localforage.getItem("send_to_" + sendTo).then(res => {
-                    data["messageId"] = message.messageId
-                    data["sendTime"] = message.timestamp
-                    localforage.setItem("send_to_" + sendTo, [...res, data]).then(
-                        setChatRecords([...chatRecords, data])
-                    )
-
-                })
-
-            }
-        ).catch(err => {
-            console.log("parse Error")
-        })
+        )
     }
 
     // this is used for show friend details.

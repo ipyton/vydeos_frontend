@@ -23,8 +23,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function (props) {
   let select = props.select;
-
-  if (props.content.userId === select) {
+  console.log(props)
+  if (props.content.userId === select.userId) {
     return (
       <Stack direction="row"  >
         <Stack>
@@ -45,7 +45,7 @@ export default function (props) {
         <Stack>
           <MessageBox
             position={'left'}
-            type={props.content.messageType}
+            type={"text"}
             text={props.content.content}
             data={{
               uri: 'https://facebook.github.io/react/img/logo.svg',
@@ -65,7 +65,7 @@ export default function (props) {
         <Item sx={{ boxShadow: 0 }}>
           <MessageBox
             position={'right'}
-            type={props.content.messageType}
+            type={"text"}
             text={props.content.content}
             data={{
               uri: 'https://facebook.github.io/react/img/logo.svg',

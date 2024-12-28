@@ -13,6 +13,8 @@ import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import IconButton from '@mui/material/IconButton';
 import localforage from 'localforage';
+import DatabaseManipulator from '../../../../../util/io_utils/DatabaseManipulator';
+import { resolvePath } from 'react-router-dom';
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -42,12 +44,22 @@ export default function (props) {
       return
     }
     localforage.getItem("userId").then(res=> {
+      console.log(select)
+      MessageUtil.sendMessage(res, select, text, "text",).then((req_res)=>{
+        console.log(req_res.data)
+        if (req_res.data.result === true) {
+          let message = {userId: res, receiverId: select.userId, content:text, type:select.type }
+          DatabaseManipulator.addContactHistory(message).then((records)=>{
+            console.log(records)
+            setChatRecords(records)
+          })
+        } 
 
-      MessageUtil.sendMessage(res, select, text, "text", chatRecords, setChatRecords)
+      })
     }).then(() => {
         setText("")
     })
-    }
+  }
   const picUploadHandler = () => {
     setText("{attachment}")
   }
