@@ -21,10 +21,13 @@ export default class DatabaseManipulator {
         // and add user empty chat records
         if (contact.type === "group") {
             console.log(contact)
-            res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "group" }, ...res];
+            res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "group", "remain":0,"timestamp": Date.now()}, ...res];
+            console.log(res)
             localforage.setItem("group_" + contact.userId, []);
         } else if (contact.type === "single") {
-            res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "single" }, ...res];
+            res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "single", "remain":0,"timestamp": Date.now()}, ...res];
+            console.log(res)
+
             localforage.setItem("single_" + contact.userId, []);
         } else {
             return null;
@@ -54,37 +57,135 @@ export default class DatabaseManipulator {
         return res;
     }
 
+    static addRemain(type, id, count) {
+        return localforage.getItem("recent_contacts").then(res => {
+            for (let i = 0; i < res.length; i++) {
+                if (res[i].userId === id && res[i].type === type) {
+                    res[i].remain += count
+                }
+            }
+            localforage.setItem("recent_contacts", res)
+            return res
+        })
+    }
+
+    static setRemain(type, id, count) {
+        return localforage.getItem("recent_contacts").then(res => {
+            for (let i = 0; i < res.length; i++) {
+                if (res[i].userId === id && res[i].type === type) {
+                    res[i].remain = count
+                }
+            }
+            localforage.setItem("recent_contacts", res)
+            return res
+        })
+    }
+    static getRemain(type, id){
+        return localforage.getItem("recent_contacts").then(res => {
+            for (let i = 0; i < res.length; i++) {
+                if (res[i].userId === id && res[i].type === type) {
+                    return res[i].remain
+                }
+            }
+            return -1
+        })
+    }
+
+    static getTotalRemain() {
+        return localforage.getItem("recent_contacts").then(res => {
+            let total = 0
+            for (let i = 0; i < res.length; i++) {
+                total += res[i].remain
+            }
+            return total
+        })
+    }
+
+    static getRecentContactByTypeAndId(type, id) {
+        return localforage.getItem("recent_contacts").then(res => {
+            for (let i = 0; i < res.length; i++) {
+                if (res[i].userId === id && res[i].type === type) {
+                    return res[i]
+                }
+            }
+            return null
+        })
+    }
+
     static getRecentContact() {
         return localforage.getItem("recent_contacts")
     }
+
+    static batchAddContactHistory(messages) {
+        for (let i = 0; i < messages.length; i++) {
+            this.addContactHistory(messages[i])
+        }
+    }
+
 
     static addContactHistory(message) {
         console.log(message)
         return localforage.getItem(message.type + "_" + message.receiverId).then(res => {
             res = [message, ...res]
+            this.getRecentContactByTypeAndId(message.type, message.receiverId).then(recent_contact => {
+                if (recent_contact) {
+                    recent_contact.timestamp = Math.max(message.timestamp,recent_contact.timestamp)
+                    this.setRecentContact(recent_contact)
+                }
+            })
             localforage.setItem(message.type + "_" + message.receiverId, res)
+            this.addRemain(message.type, message.receiverId,1)
             this.contactComeFirst(message.type, message.receiverId)
             return res
         })
     }
-
+    static setRecentContact(recent_contact) {
+        return localforage.getItem("recent_contacts").then(res => {
+            for (let i = 0; i < res.length; i++) {
+                if (res[i].userId === recent_contact.userId && res[i].type === recent_contact.type) {
+                    res[i].timestamp = recent_contact.timestamp
+                    res[i].remain = recent_contact.remain
+                }
+            }
+            localforage.setItem("recent_contacts", res)
+            return res
+        })
+    }
     static getContactHistory(type, receiverId) {
         return localforage.getItem(type + "_" + receiverId).then(res => {
-            return res
+            return res||[]
         })
     }
 
     static addMailbox(message) {
-        
+        return localforage.getItem("mailbox" + "_" + message.type + "_" + message.receiverId).then(res => {
+            res = [message, ...res]
+            localforage.setItem("mailbox" + message.type + "_" + message.receiverId, res)
+            return res
+        })
     }
 
-    static getMailbox() {
-
+    static getMailbox(type, receiverId) {
+        return localforage.getItem("mailbox" + "_" + type + "_" + receiverId).then(res => {
+            return res
+        })
     }
 
-    static deleteMailbox() {
-
+    static deleteMailbox(messageId, type, receiverId) {
+        const mailboxKey = `mailbox_${type}_${receiverId}`;
+        return localforage.getItem(mailboxKey).then(res => {
+            if (res) {
+                // 过滤掉与 messageId 匹配的消息
+                const updatedMailbox = res.filter(message => message.id !== messageId);
+                // 更新存储
+                return localforage.setItem(mailboxKey, updatedMailbox).then(() => updatedMailbox);
+            }
+            return [];
+        });
     }
 
-
+    static addMessage(message) {
+        this.addContactHistory(message)
+        this.addMailbox(message)
+    }
 }

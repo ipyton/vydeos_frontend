@@ -15,6 +15,7 @@ import localforage from "localforage"
 import MessageUtil from "../../../../util/io_utils/MessageUtil"
 import DatabaseManipulator from "../../../../util/io_utils/DatabaseManipulator"
 import { useLocation } from "react-router-dom"
+import { selectAll } from "@testing-library/user-event/dist/cjs/event/index.js"
 
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -30,11 +31,18 @@ export default function (props) {
 	const { select,setSelect } = props
 	const [chatRecords, setChatRecords] = useState([])
 	console.log(select)
+	console.log("-=-=-========")
+	console.log(chatRecords)
 	let location = useLocation()
 	console.log(location)
 	useEffect(() => {
-		if (select.type === "" || select.userId === "") return
+		if (!select || !select.type || !select.userId || select.type ===""|| select.userId === "") return
+		console.log(select)
+		MessageUtil.getMessageById(select.type, select.userId).then((res) => {
+			console.log(res)
+		})
 		DatabaseManipulator.getContactHistory(select.type, select.userId).then((res) => {
+			console.log("初始化")
 			setChatRecords(res)
 		})
 	}, [select.type, select.userId])

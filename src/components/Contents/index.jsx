@@ -39,6 +39,7 @@ import BotChat from "./BotChat"
 import ResetPassword from "./ResetPassword"
 import RolePermissionPage from "./RolePermissionPage"
 import UserManagementPage from "./UserManagementService"
+
 const defaultTheme = createTheme();
 
 export default function Contents(props) {
@@ -51,7 +52,7 @@ export default function Contents(props) {
     });
 
     console.log(props)
-    const {setLogin} = props
+    const { setLogin } = props
 
     const [avatar, setAvatar] = useState(null)
     const [badgeContent, setBadgeContent] = useState([])
@@ -65,10 +66,9 @@ export default function Contents(props) {
 
     const [refresh, setRefresh] = useState(false)
     const [notifications, setNotifications] = useState([])
-    const [chatRecords, setChatRecords] = useState([])
+    //const [chatRecords, setChatRecords] = useState([])
     const [userRecords, setUserRecords] = useState([])
-    const [sideBarSelector, setSideBarSelector] = useState({type:"",userId:""})
-    const [worker, setWorker] = useState(null)
+    const [sideBarSelector, setSideBarSelector] = useState({ type: "", userId: "" })
     const location = useLocation()
 
     // useEffect(()=>{
@@ -96,112 +96,135 @@ export default function Contents(props) {
         register()
     }, [])
 
-    useEffect(()=>{
-        if (! worker ) return 
-        worker.onmessage = (e) => {
-            //setRefresh(!refresh)
-            //update userList
-            let flag = false
-            for (let i = 0; i < userRecords.length; i++) {
-                if (userRecords[i].userId === e.data.userId) {
-                    //in the list 
-                    flag = true
-                    if (sideBarSelector === e.data.userId) {
-                        //selected, no ops
-                        break
-                    }
-                    else {
-                        // not selected but in the list
-                        // todo :change the order to first
-                        userRecords[i].new = true
-                        setUserRecords([userRecords[i], ...userRecords.slice(0, i), ...userRecords.slice(i + 1)])
-                        break
-                    }
+    useEffect(() => {
+        const worker = new Worker("webworkers/NotificationReceiver.js");
 
-                }
-            }
-            if (!flag) {
-                //not in the list, not selcted, add to the first one 
-                localforage.getItem("friendList").then(list => {
-                    if (!list) return
-                    let contact = { "userId": list[e.data.userId].userId, "name": list[e.data.userId].name, "avatar": list[e.data.userId].avatar, new: true }
-                    localforage.setItem("recent_contacts", [contact, ...userRecords]).then(() => {
-                    }).then(() => {
-                        setUserRecords([contact, ...userRecords])
-                    })
-                })
-            }
-
-
-            //update messageList
-
-
-            if (sideBarSelector === e.data.userId) {
-                setChatRecords([...chatRecords, e.data])
-            }
-            if (sideBarSelector !== e.data.userId) {
-                setNotifications([e.data, ...notifications])
-            }
-            //update notificationList
+        // 主线程接收 Worker 消息
+        worker.onmessage = (event) => {
+            console.log("Main thread received:", event.data);
+            //setResult(event.data.result);
+        };
+        console.log("shshhshshshshshs")
+        worker.onerror = (event) => {
+            console.log(event)
         }
-    },[worker, sideBarSelector, chatRecords, notifications])
+
+        // 向 Worker 发送消息
+        //worker.postMessage({ num: 5 });
+
+        // 清理 Worker 实例
+        return () => worker.terminate();
+    }, [])
+
+    useEffect(() => {
+
+
+
+        // if (! worker ) return 
+        // worker.onmessage = (e) => {
+        //     //setRefresh(!refresh)
+        //     //update userList
+        //     let flag = false
+        //     for (let i = 0; i < userRecords.length; i++) {
+        //         if (userRecords[i].userId === e.data.userId) {
+        //             //in the list 
+        //             flag = true
+        //             if (sideBarSelector === e.data.userId) {
+        //                 //selected, no ops
+        //                 break
+        //             }
+        //             else {
+        //                 // not selected but in the list
+        //                 // todo :change the order to first
+        //                 userRecords[i].new = true
+        //                 setUserRecords([userRecords[i], ...userRecords.slice(0, i), ...userRecords.slice(i + 1)])
+        //                 break
+        //             }
+
+        //         }
+        //     }
+        //     if (!flag) {
+        //         //not in the list, not selcted, add to the first one 
+        //         localforage.getItem("friendList").then(list => {
+        //             if (!list) return
+        //             let contact = { "userId": list[e.data.userId].userId, "name": list[e.data.userId].name, "avatar": list[e.data.userId].avatar, new: true }
+        //             localforage.setItem("recent_contacts", [contact, ...userRecords]).then(() => {
+        //             }).then(() => {
+        //                 setUserRecords([contact, ...userRecords])
+        //             })
+        //         })
+        //     }
+
+
+        //     //update messageList
+
+
+        //     if (sideBarSelector === e.data.userId) {
+        //         setChatRecords([...chatRecords, e.data])
+        //     }
+        //     if (sideBarSelector !== e.data.userId) {
+        //         setNotifications([e.data, ...notifications])
+        //     }
+        //     //update notificationList
+        // }
+    }, [sideBarSelector, notifications])
 
     console.log(sideBarSelector)
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
     return (
         < ThemeProvider theme={defaultTheme} >
 
-                <Box sx={{ display: 'flex' }}>
-                    <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setLogin={setLogin} setBadgeContent={setNotifications}></Header>
-                    <Box width="100%" justifyContent="center" alignItems="center" marginTop="64px">
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box sx={{ display: 'flex' }}>
+                <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setLogin={setLogin} setBadgeContent={setNotifications}></Header>
+                <Box width="100%" justifyContent="center" alignItems="center" marginTop="64px">
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <div>
                             <div>
-                                <div>
-                                    <Routes>
-                                        <Route path="/" element={<Item barState={state} setBarState={setState} status={props} />}></Route>
-                                        {/* <Route path="/signup" element={<SignUp barState={state} setBarState={setState} status={props}/>}></Route> */}
-                                        <Route path="/userinfo"  element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
-                                        <Route path="/editor"  element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
-                                        <Route path="/videos"  element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
-                                        <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} ></Chat>}></Route>
-                                        <Route path="/settings"  element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
-                                        <Route path="/notfound"  element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
-                                        <Route path="/friends"  element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>
-                                        {/* <Route path="/contacts" element={<Contacts barState={state} setBarState={setState} status={props}></Contacts>}></Route> */}
-                                        <Route path="/error"  element={<NetworkError></NetworkError>}></Route>
-                                        <Route path="/appstore"  element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
-                                        <Route path="/longvideos"  element={<LongVideos setBarState={setState} status={props}></LongVideos>}></Route>
-                                        <Route path="/upload"  element={<UploadFile setBarState={setState} status={props}></UploadFile>}></Route>
-                                        <Route path="/videolist"  element={<VideoList setBarState={setState} status={props}></VideoList>}></Route>
-                                        <Route path="/searchresult"  element={<SearchResult> </SearchResult>}></Route>
-                                        <Route path="/friendInfomation"  element={<FriendIntroductionCentered ></FriendIntroductionCentered>}></Route>
-                                        <Route path="/videoIntroduction"  element={<LongVideoIntroduction></LongVideoIntroduction>}> </Route>
-                                        <Route path="/trending" element={<Trends></Trends>}> </Route>
-                                        <Route path="/download" element={<Downloads></Downloads>}></Route>
-                                        <Route path="/about" element={<About> </About>}> </Route>
-                                        <Route path="/qa" element={<BotChat></BotChat>}></Route>
-                                        <Route path="/reset" element={<ResetPassword></ResetPassword>}></Route>
-                                        <Route path="/role" element={<RolePermissionPage></RolePermissionPage>}></Route>
-                                        <Route path="/userManage" element={<UserManagementPage></UserManagementPage>}></Route>
+                                <Routes>
+                                    <Route path="/" element={<Item barState={state} setBarState={setState} status={props} />}></Route>
+                                    {/* <Route path="/signup" element={<SignUp barState={state} setBarState={setState} status={props}/>}></Route> */}
+                                    <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
+                                    <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
+                                    <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
+                                    <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} ></Chat>}></Route>
+                                    <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
+                                    <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
+                                    <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>
+                                    {/* <Route path="/contacts" element={<Contacts barState={state} setBarState={setState} status={props}></Contacts>}></Route> */}
+                                    <Route path="/error" element={<NetworkError></NetworkError>}></Route>
+                                    <Route path="/appstore" element={<AppStore barState={state} setBarState={setState} status={props}> </AppStore>}></Route>
+                                    <Route path="/longvideos" element={<LongVideos setBarState={setState} status={props}></LongVideos>}></Route>
+                                    <Route path="/upload" element={<UploadFile setBarState={setState} status={props}></UploadFile>}></Route>
+                                    <Route path="/videolist" element={<VideoList setBarState={setState} status={props}></VideoList>}></Route>
+                                    <Route path="/searchresult" element={<SearchResult> </SearchResult>}></Route>
+                                    <Route path="/friendInfomation" element={<FriendIntroductionCentered ></FriendIntroductionCentered>}></Route>
+                                    <Route path="/videoIntroduction" element={<LongVideoIntroduction></LongVideoIntroduction>}> </Route>
+                                    <Route path="/trending" element={<Trends></Trends>}> </Route>
+                                    <Route path="/download" element={<Downloads></Downloads>}></Route>
+                                    <Route path="/about" element={<About> </About>}> </Route>
+                                    <Route path="/qa" element={<BotChat></BotChat>}></Route>
+                                    <Route path="/reset" element={<ResetPassword></ResetPassword>}></Route>
+                                    <Route path="/role" element={<RolePermissionPage></RolePermissionPage>}></Route>
+                                    <Route path="/userManage" element={<UserManagementPage></UserManagementPage>}></Route>
 
-                                        <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
+                                    <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
-                                    </Routes>
-                                </div>
-                                <div>
-                                    <Snackbar
-                                        anchorOrigin={{ vertical, horizontal }}
-                                        open={open}
-                                        onClose={handleClose}
-                                        message={message}
-                                        key={vertical + horizontal}
-                                    />
-                                </div>
+                                </Routes>
                             </div>
-                        </LocalizationProvider>
-                        <Footer description='good' title='morning'></Footer>
-                    </Box>
+                            <div>
+                                <Snackbar
+                                    anchorOrigin={{ vertical, horizontal }}
+                                    open={open}
+                                    onClose={handleClose}
+                                    message={message}
+                                    key={vertical + horizontal}
+                                />
+                            </div>
+                        </div>
+                    </LocalizationProvider>
+                    <Footer description='good' title='morning'></Footer>
                 </Box>
+            </Box>
 
         </ThemeProvider >
 

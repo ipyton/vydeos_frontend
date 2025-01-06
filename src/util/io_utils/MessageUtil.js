@@ -2,8 +2,8 @@ import localforage from "localforage"
 import Qs from 'qs'
 import axios from "axios"
 import { update, clear, updateFollowState } from "../../components/redux/UserDetails"
-import { resolve } from "babel-standalone"
-import { ReceiptRounded } from "@mui/icons-material"
+
+import DatabaseManipulator from "./DatabaseManipulator"
 export default class MessageUtil {
 
     static getUrlBase() {
@@ -32,31 +32,48 @@ export default class MessageUtil {
         }
     }
 
-    static getMessageById(userId, receiverId) {
-        axios(
-            {
-                url: MessageUtil.getUrlBase() + "/chat/getChatRecordsByUserId",
-                method: "post",
-                data: { token: localStorage.getItem("token") },
-                transformRequest: [function (data) {
-                    return Qs.stringify(data)
-                }],
-                //synchronous: true,
-                header: {
-                    token: localStorage.getItem("token"),
+    static getMessageById(type,receiverId) {
+        return DatabaseManipulator.getRecentContactByTypeAndId(type, receiverId).then((res) => {
+            if (type === "group") {
+                return axios(
+                {
+                    url: MessageUtil.getUrlBase() + "/chat/get_messages",
+                    method: "post",
+                    data: { type:type,groupId:receiverId, timestamp:res.timestamp },
+                    transformRequest: [function (data) {
+                        return Qs.stringify(data)
+                    }],
+                    //synchronous: true,
+                    headers: {
+                        token: localStorage.getItem("token"),
+                    }
                 }
+                ).catch(error => {
+                    console.log(error)
+                })
             }
-        ).catch(error => {
-            console.log()
-        }).then(response => {
-            //MessageUtil.updateMessage(response)
+            else {
+                return axios(
+                {
+                    url: MessageUtil.getUrlBase() + "/chat/get_messages",
+                    method: "post",
+                    data: { type:type,receiverId:receiverId, timestamp:res.timestamp },
+                    transformRequest: [function (data) {
+                        return Qs.stringify(data)
+                    }],
+                    //synchronous: true,
+                    headers: {
+                        token: localStorage.getItem("token"),
+                    }
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
+ 
+        }).then((response) => {
             console.log(response)
-
-        }).catch(error => {
-            console.log("get message by Id error")
-        }).then(() => {
-            console.log("success!")
         })
+       
     }
 
     static setCheckTime(key) {
@@ -69,6 +86,31 @@ export default class MessageUtil {
 
     }
 
+    static registerEndPoint(endpoint, p256dh, auth) {
+        p256dh = btoa(String.fromCharCode.apply(null, new Uint8Array(p256dh)));
+        auth = btoa(String.fromCharCode.apply(null, new Uint8Array(auth)));
+        axios({
+            url: `${MessageUtil.getUrlBase()}/chat/registerWebPushEndpoints`, // 使用模板字符串
+            method: 'post',
+            data: {
+                endpoint: endpoint,
+                p256dh: p256dh,
+                auth: auth
+            }, // 使用 Qs 序列化请求数据
+            headers: {
+                token: localStorage.getItem('token'), // 添加 token 作为请求头
+            },
+        })
+            .then(response => {
+                // 成功回调处理
+                console.log('Response:', response);
+            })
+            .catch(error => {
+                // 错误回调处理
+                console.error('Error:', error);
+            });
+    }
+    
     static getNewestMessages(friendId, setSelect) {
         let checkKey = "chatLastUpdate"
         localforage.getItem(checkKey).then(async timestamp => {
