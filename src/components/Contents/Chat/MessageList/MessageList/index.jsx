@@ -62,7 +62,7 @@ export default function (props) {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [chatRecords])
   
-  if ( chatRecords.length === 0) {
+  if ( chatRecords && chatRecords.length === 0) {
     return <div>Start to chat</div>
   }
 

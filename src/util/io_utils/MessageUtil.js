@@ -34,44 +34,50 @@ export default class MessageUtil {
 
     static getMessageById(type,receiverId) {
         return DatabaseManipulator.getRecentContactByTypeAndId(type, receiverId).then((res) => {
-            if (type === "group") {
-                return axios(
-                {
-                    url: MessageUtil.getUrlBase() + "/chat/get_messages",
-                    method: "post",
-                    data: { type:type,groupId:receiverId, timestamp:res.timestamp },
-                    transformRequest: [function (data) {
-                        return Qs.stringify(data)
-                    }],
-                    //synchronous: true,
-                    headers: {
-                        token: localStorage.getItem("token"),
-                    }
+            return DatabaseManipulator.getTimestamp().then((timestamp) => {
+                if (!timestamp) {
+                    timestamp = 0
                 }
-                ).catch(error => {
-                    console.log(error)
-                })
-            }
-            else {
-                return axios(
-                {
-                    url: MessageUtil.getUrlBase() + "/chat/get_messages",
-                    method: "post",
-                    data: { type:type,receiverId:receiverId, timestamp:res.timestamp },
-                    transformRequest: [function (data) {
-                        return Qs.stringify(data)
-                    }],
-                    //synchronous: true,
-                    headers: {
-                        token: localStorage.getItem("token"),
-                    }
-                }).catch(error => {
-                    console.log(error)
-                })
-            }
+                if (type === "group") {
+                    return axios(
+                        {
+                            url: MessageUtil.getUrlBase() + "/chat/get_messages",
+                            method: "post",
+                            data: { type:type,groupId:receiverId, timestamp:timestamp },
+                            transformRequest: [function (data) {
+                                return Qs.stringify(data)
+                            }],
+                            //synchronous: true,
+                            headers: {
+                                token: localStorage.getItem("token"),
+                            }
+                        }
+                    ).catch(error => {
+                        console.log(error)
+                    })
+                }
+                else {
+                    return axios(
+                        {
+                            url: MessageUtil.getUrlBase() + "/chat/get_messages",
+                            method: "post",
+                            data: { type:type,receiverId:receiverId, timestamp:timestamp },
+                            transformRequest: [function (data) {
+                                return Qs.stringify(data)
+                            }],
+                            //synchronous: true,
+                            headers: {
+                                token: localStorage.getItem("token"),
+                            }
+                        }).catch(error => {
+                            console.log(error)
+                        })
+                }
+            }).then((response) => {
+                console.log(response)
+                return DatabaseManipulator.batchAddContactHistory(response.data)
+        })
  
-        }).then((response) => {
-            console.log(response)
         })
        
     }

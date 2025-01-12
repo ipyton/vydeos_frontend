@@ -49,6 +49,7 @@ export default function (props) {
         console.log(req_res.data)
         if (req_res.data.result === true) {
           let message = {userId: res, receiverId: select.userId, content:text, type:select.type }
+          message.timestamp = req_res.data.timestamp
           DatabaseManipulator.addContactHistory(message).then((records)=>{
             console.log(records)
             setChatRecords(records)

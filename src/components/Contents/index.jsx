@@ -101,6 +101,14 @@ export default function Contents(props) {
 
         // 主线程接收 Worker 消息
         worker.onmessage = (event) => {
+            const {action, key, value} = event.data
+            console.log(event.data)
+            if (action ==="setToken") {
+                const token = localStorage.getItem("token")
+                worker.postMessage({action:"setToken", key: "token", value: token})
+            } else if (action === "updateNotification") {
+
+            } 
             console.log("Main thread received:", event.data);
             //setResult(event.data.result);
         };

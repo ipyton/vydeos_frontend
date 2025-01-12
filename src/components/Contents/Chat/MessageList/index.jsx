@@ -37,14 +37,16 @@ export default function (props) {
 	console.log(location)
 	useEffect(() => {
 		if (!select || !select.type || !select.userId || select.type ===""|| select.userId === "") return
-		console.log(select)
-		MessageUtil.getMessageById(select.type, select.userId).then((res) => {
-			console.log(res)
-		})
-		DatabaseManipulator.getContactHistory(select.type, select.userId).then((res) => {
-			console.log("初始化")
-			setChatRecords(res)
-		})
+			DatabaseManipulator.getContactHistory(select.type, select.userId).then((res) => {
+				setChatRecords(res)	
+			})
+		// MessageUtil.getMessageById(select.type, select.userId).then((res) => {
+		// 	console.log("初始化")
+		// 	DatabaseManipulator.getContactHistory(select.type, select.userId).then((res) => {
+		// 		setChatRecords(res)	
+		// 	})
+		// })
+
 	}, [select.type, select.userId])
 
 	// useEffect(() => {

@@ -1,12 +1,14 @@
 //刚启动的时候
 importScripts('https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js');
+importScripts("/webworkers/DatabaseManipulator.js");
+importScripts('https://cdn.jsdelivr.net/npm/qs/dist/qs.min.js');
+
 
 let socket;
 
-
+let token;
 
 const connectWebSocket = (url) => {
-    console.log("asdasdasd------")
     console.log(url)
     if (!socket || socket.readyState !== WebSocket.OPEN) {
         socket = new WebSocket(url);
@@ -36,28 +38,59 @@ const connectWebSocket = (url) => {
 console.log("webworker start ----")
 
 function getNewestMessages() {
-    axios({
-        url: "localhost:5050" + "/chat/getAll",
+    DatabaseManipulator.getTimestamp().then((timestamp) => {
+        if (!timestamp) {
+            timestamp = -1
+        }
+        axios({
+        url: "http://localhost:8080" + "/chat/getNewestMessages",
         method: 'post',
-        data: { token: localStorage.getItem("token") },
-        transformRequest: [function (data) {
-            return Qs.stringify(data)
-        }],
-        headers: {
-            tokens: localStorage.getItem("token"),
+        data:{
+            timestamp: timestamp
+        },
+
+    headers: {
+            token: token,
+            'Content-Type': 'application/json',
+
         }
     }).catch(err => {
         console.log(err)
     }).then(
         async response => {
             if (response === undefined || response.data === undefined) {
-                console.log("login error")
+                console.log("error")
                 return
             }
-            let responseData = response.data
-            await localforage.setItem("userId", response.data.message)
-            setState(responseData.code === 1)
-            console.log(responseData.code === 1)
+            if (!response || !response.data || !response.data.message) {
+                console.log("error")
+                return
+            }
+            DatabaseManipulator.batchAddContactHistory(JSON.parse(response.data.message)).then(
+                ()=>{
+                }
+            )
+            //console.log(JSON.parse(response.data.message))
+            // await localforage.setItem("userId", response.data.message)
+            // setState(responseData.code === 1)
+            // console.log(responseData.code === 1)
         }
     )
+
+    })
+
 }
+onmessage = (event) => {
+    const {action, key, value} = event.data
+    console.log(event.data)
+    if (action === "setToken") {
+        token = value
+        getNewestMessages()
+
+    }
+}
+
+postMessage({action:"setToken", key:"key", value:"value"})
+
+//getNewestMessages()
+

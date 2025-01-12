@@ -24,7 +24,7 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function (props) {
   let select = props.select;
   console.log(props)
-  if (props.content.userId === select.userId) {
+  if (props.content.senderId === select.userId) {
     return (
       <Stack direction="row"  >
         <Stack>
