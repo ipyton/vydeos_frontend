@@ -16,7 +16,7 @@ import MessageUtil from "../../../../util/io_utils/MessageUtil"
 import DatabaseManipulator from "../../../../util/io_utils/DatabaseManipulator"
 import { useLocation } from "react-router-dom"
 import { selectAll } from "@testing-library/user-event/dist/cjs/event/index.js"
-
+import { useSelector } from "react-redux"
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
 	...theme.typography.body2,
@@ -35,7 +35,9 @@ export default function (props) {
 	console.log(chatRecords)
 	let location = useLocation()
 	console.log(location)
+	const refresh = useSelector((state) => state.refreshMessages.value.refresh)
 	useEffect(() => {
+		console.log("updating messageList")
 		if (!select || !select.type || !select.userId || select.type ===""|| select.userId === "") return
 			DatabaseManipulator.getContactHistory(select.type, select.userId).then((res) => {
 				setChatRecords(res)	
@@ -47,7 +49,7 @@ export default function (props) {
 		// 	})
 		// })
 
-	}, [select.type, select.userId])
+	}, [select.type, select.userId, refresh])
 
 	// useEffect(() => {
 	// 	DatabaseManipulator.getContactHistory(select.type, select.userId).then((res) => {

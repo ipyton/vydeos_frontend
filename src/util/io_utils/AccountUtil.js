@@ -23,9 +23,6 @@ export default class AccountUtil {
       url: AccountUtil.getUrlBase() + "/account/verifyToken",
       method: 'post',
       data: { token: localStorage.getItem("token") },
-      transformRequest: [function (data) {
-        return Qs.stringify(data)
-      }],
       headers: {
         tokens: localStorage.getItem("token"),
       }

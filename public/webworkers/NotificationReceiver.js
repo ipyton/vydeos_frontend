@@ -1,3 +1,4 @@
+
 //刚启动的时候
 importScripts('https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js');
 importScripts("/webworkers/DatabaseManipulator.js");
@@ -7,6 +8,8 @@ importScripts('https://cdn.jsdelivr.net/npm/qs/dist/qs.min.js');
 let socket;
 
 let token;
+
+let userId;
 
 const connectWebSocket = (url) => {
     console.log(url)
@@ -18,11 +21,15 @@ const connectWebSocket = (url) => {
         };
 
         socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log('接收到消息:', data);
-            // 将消息传递给 Service Worker
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage(data);
+            console.log('接收到消息:--------------', event);
+            if (event.data === "success") {
+                console.log("連接成功!")
+             }
+            else {
+
+                DatabaseManipulator.addContactHistory(JSON.parse(event.data)).then(()=>{
+                postMessage({action:"updateNotification"})
+                })
             }
         };
 
@@ -38,7 +45,7 @@ const connectWebSocket = (url) => {
 console.log("webworker start ----")
 
 function getNewestMessages() {
-    DatabaseManipulator.getTimestamp().then((timestamp) => {
+    return DatabaseManipulator.getTimestamp().then((timestamp) => {
         if (!timestamp) {
             timestamp = -1
         }
@@ -66,10 +73,7 @@ function getNewestMessages() {
                 console.log("error")
                 return
             }
-            DatabaseManipulator.batchAddContactHistory(JSON.parse(response.data.message)).then(
-                ()=>{
-                }
-            )
+            return DatabaseManipulator.batchAddContactHistory(JSON.parse(response.data.message))
             //console.log(JSON.parse(response.data.message))
             // await localforage.setItem("userId", response.data.message)
             // setState(responseData.code === 1)
@@ -85,7 +89,10 @@ onmessage = (event) => {
     console.log(event.data)
     if (action === "setToken") {
         token = value
-        getNewestMessages()
+        userId = key
+        getNewestMessages().then(()=>{
+            return connectWebSocket("ws://localhost:7910/notification/" + token)
+        })
 
     }
 }

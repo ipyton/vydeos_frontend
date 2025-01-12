@@ -23,8 +23,7 @@ import { useEffect, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import Footer from "../Footer"
-import { stepButtonClasses } from '@mui/material';
-import IOUtil from '../../util/ioUtil';
+import {update} from "../redux/refreshMessages"
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
@@ -39,6 +38,7 @@ import BotChat from "./BotChat"
 import ResetPassword from "./ResetPassword"
 import RolePermissionPage from "./RolePermissionPage"
 import UserManagementPage from "./UserManagementService"
+import { useDispatch } from "react-redux"
 
 const defaultTheme = createTheme();
 
@@ -95,7 +95,7 @@ export default function Contents(props) {
         UserInitializer.init()
         register()
     }, [])
-
+    const dispatcher = useDispatch()
     useEffect(() => {
         const worker = new Worker("webworkers/NotificationReceiver.js");
 
@@ -105,14 +105,15 @@ export default function Contents(props) {
             console.log(event.data)
             if (action ==="setToken") {
                 const token = localStorage.getItem("token")
-                worker.postMessage({action:"setToken", key: "token", value: token})
+                const userId = localStorage.getItem("userId")
+                worker.postMessage({action:"setToken", key: userId, value: token})
             } else if (action === "updateNotification") {
-
+                console.log("updating notification")
+                dispatcher(update())
             } 
             console.log("Main thread received:", event.data);
             //setResult(event.data.result);
         };
-        console.log("shshhshshshshshs")
         worker.onerror = (event) => {
             console.log(event)
         }
