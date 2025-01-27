@@ -6,31 +6,21 @@ import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { Paper, Button } from '@mui/material'
 import Box from "@mui/material/Box";
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 
 import ImageListItemBar from '@mui/material/ImageListItemBar';
-import ListSubheader from '@mui/material/ListSubheader';
 import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
 import VideoUtil from "../../../../util/io_utils/VideoUtil";
 import CardContent from '@mui/material/CardContent';
-import Checkbox from '@mui/material/Checkbox';
-
+import { isDisabled } from "@testing-library/user-event/dist/cjs/utils/index.js";
 
 function Item(props) {
-    return (
-        <Box
+    return (<Box
             component="img"
             sx={{
                 height: "auto",
@@ -38,109 +28,50 @@ function Item(props) {
                 loading: "lazy"
             }}
             alt={props.item.original}
-            src={props.item.original}
-
-        />
-    )
+            src={props.item.original} />)
 }
-
 
 export default function (props) {
     const [details, setDetails] = useState(null)
     const [videoId, setVideoId] = useState(null)
-
-    const [open, setOpen] = React.useState(false);
+    const [disabled, setIsDisabled] = useState(false)
     let position = "center";
     const location = useLocation()
-    position = (!props.position ? position : props.position)
-    const [checked, setChecked] = React.useState(['wifi']);
-    const navigate = useNavigate()
-    const [checkedNumber,setCheckedNumber] = React.useState(null)
-    const [selectOpen, setSelectOpen] = React.useState(false)
-    const [selections,setSelections] = React.useState([])
-    const [tmpGid,setTmpGid] = React.useState("")
-    const [tmpSource,setTmpSource] = React.useState("")
-    console.log(videoId)
+    position = ( !props.position ? position : props.position)
+
     React.useEffect(() => {
         if (location.state) {
             console.log("location" + location.state)
             setVideoId(location.state)
         }
+
         if (props.videoId) {
             console.log("props" + props.videoId)
             setVideoId(props.videoId)
         }
     }, [props.videoId, location.state])
-    //const [progress, setProgress] = React.useState([0,0,0,0]);
-    const [sources, setSources] = React.useState([{ videoId: videoId, source: "xxxx1", status: "init" }, { videoId: videoId, source: "xxxx2", status: "downloading" }, { videoId: videoId, source: "xxxx3", status: "paused" }, { videoId: videoId, source: "xxxx4", status: "cancelled" }])
 
-    const [input, setInput] = React.useState("")
-
-    const handleToggle = (value) => () => {
-        const currentIndex = checked.indexOf(value);
-        const newChecked = [...checked];
-
-        if (currentIndex === -1) {
-            newChecked.push(value);
-        } else {
-            newChecked.splice(currentIndex, 1);
-        }
-        setChecked(newChecked);
-    };
     const handleStar = () => {
-        console.log(videoId)
         VideoUtil.star(videoId, details, setDetails)
     }
+
     const handleRemove = () => {
         VideoUtil.removeStar(videoId, details, setDetails)
     }
-    const handleClickOpen = () => {
-        setOpen(true);
-        VideoUtil.get_download_source(videoId, setSources)
-    };
 
-    const handleInput = (event) => {
-        console.log(event)
-        setInput(event.target.value)
+    const sendRequest = () => {
+        VideoUtil.sendRequest(videoId).then(() => {
+            setIsDisabled(true)
+        })
     }
-
-    const handleDownload = (source) => () => {
-        VideoUtil.start_download(videoId, source, details.movie_name,sources, setSources,setOpen,setSelections,setSelectOpen,setTmpGid)
-        setTmpSource(source)
-
-    }
-
-    const handleSubmit = () => {
-        console.log(input)
-        if (!input || input.length == 0) {
-            return
-        }
-        VideoUtil.add_download_source(videoId, input, details.movie_name, sources, setSources)
-        setInput("")
-    }
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleDelete = (source) => {
-        return () => {
-            VideoUtil.remove_download_source(videoId, source, sources, setSources)
-        }
-    }
-
-    const handleSelection = (idx) => {
-        return ()=>{
-            setCheckedNumber(null)
-            if (checkedNumber!==idx) {
-                setCheckedNumber(idx)
-            }
-        }
-    }
-
 
     React.useEffect(() => {
-        if (videoId) VideoUtil.getVideoInformation(videoId, setDetails)
+        if (videoId) VideoUtil.getVideoInformation(videoId, setDetails).then(() => {
+            VideoUtil.isRequested(videoId).then((res) => {
+                console.log(res)
+                setIsDisabled(res)
+            })
+        })
     }, [videoId])
 
     let genresList = ""
@@ -152,23 +83,9 @@ export default function (props) {
         genresList.substring(0, -2)
     }
 
-    const recommendData = []
     if (!details) {
         return <div>loading</div>
     }
-    console.log(sources)
-    const handlePlay = (resource) => {
-
-        return () => { navigate("/longvideos", { state: { videoId: videoId, resource: resource } }) }
-    }
-    const select = ()=> {
-        if (!tmpGid|| checkedNumber===null  || !tmpSource) {
-            setSelectOpen(false)
-            return
-        }
-        VideoUtil.select(details.movieId, tmpSource, tmpGid,checkedNumber + 1,setSelectOpen )
-    }
-
 
 
     return (<div>
@@ -196,19 +113,16 @@ export default function (props) {
                                             sx={{ display: 'inline' }}
                                             component="span"
                                             variant="body2"
-                                            color="text.primary"
-                                        >
+                                            color="text.primary">
                                         </Typography>
                                         {details.tag}
                                     </React.Fragment>
-                                }
-                            />
-
+                                }/>
                         </ListItem>
 
                         <ButtonGroup sx={{ marginTop: "3%", height: "50%", marginRight: "2%" }} aria-label="Basic button group" >
                             {(!details.stared) ? <Button onClick={handleStar} > Star</Button> : <Button onClick={handleRemove} > Remove</Button>}
-                            {<Button onClick={handleClickOpen}>request</Button>}
+                            {<Button onClick={sendRequest} disabled = {disabled}>Request</Button>}
 
                         </ButtonGroup>
                     </Stack>
@@ -251,7 +165,6 @@ export default function (props) {
 
                                     </CardContent>
                                 })
-
                             }
                         </React.Fragment>
                     </Stack>
@@ -272,7 +185,6 @@ export default function (props) {
                 >
 
                     {details.actressList.map((item) => {
-
                         return (
                             <ImageListItem key={item.avatar} sx={{
                                 display: 'flex', flexDirection: 'row',
@@ -294,111 +206,12 @@ export default function (props) {
                                     }
                                 />
                             </ImageListItem>
-
                         )
                     })}
                 </ImageList>
             </Stack>
         </Stack>
-        <Dialog
-            sx={{ width: "100%" }}
-            open={open}
-            onClose={handleClose}
-        //sx={{width:"50%"}}
-
-        >
-            <DialogTitle>Sources</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    Edit the resouces for the movie to download.
-                </DialogContentText>
-                <List
-                    sx={{ width: '100%', bgcolor: 'background.paper' }}
-                >
-
-                    {
-                        sources.map(item => {
-                            return (<ListItem sx={{ width: "100%" }}>
-                                <Stack direction="row" spacing={1} sx={{ width: "100%" }} >
-                                    <ListItemText
-                                        primary={item.source}
-                                        sx={{ width: "80%" }}
-                                    />
-
-                                    <Button variant="contained" onClick={handleDelete(item.source)} >Del</Button>
-                                    {
-                                        item.status && item.status === "finished" ? <Button variant="contained" onClick={handlePlay(item.source)} >play</Button> : <div></div>
-                                    }
-                                    {
-                                        (item.status  && item.status === "finished")
-                                            ?<div></div>: (<Button variant="contained" onClick={handleDownload(item.source)} >Pull</Button>) }
-                                </Stack>
-                            </ListItem>)
-                        })
-
-
-                    }
-                    <ListItem sx={{ width: "100%" }}>
-
-                        <Stack direction="row" spacing={1} >
-                            <TextField
-                                hiddenLabel
-                                id="filled-hidden-label-small"
-                                variant="filled"
-                                size="small"
-                                onChange={handleInput}
-                                value={input}
-                            />
-                            <Button variant="contained" onClick={handleSubmit}>Add</Button>
-                        </Stack>
-                    </ListItem>
-
-                </List>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose}>Ok</Button>
-            </DialogActions>
-        </Dialog>
-        <Dialog
-            sx={{ width: "100%" }}
-            open={selectOpen}
-            onClose={select}
-        //sx={{width:"50%"}}
-
-        >
-            <DialogTitle>Select</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    You use a p2p resouce, select only 1 exact file you want to download.
-                </DialogContentText>
-                <List
-                    sx={{ width: '100%', bgcolor: 'background.paper' }}
-                >
-
-                    {
-                        selections.map((item,idx) => {
-                            return (<ListItem sx={{ width: "100%" }}>
-                                <Stack direction="row" spacing={1} sx={{ width: "100%" }} >
-                                    <ListItemText
-                                        primary={item.path}
-                                        sx={{ width: "80%" }}
-                                        secondary={item.size/1000000 + "MB"}
-                                    />
-
-                                    <Checkbox checked={checkedNumber===idx} onChange={handleSelection(idx)} />
-
-                                </Stack>
-                            </ListItem>)
-                        })
-
-
-                    }
-                </List>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={select}>Ok</Button>
-            </DialogActions>
-        </Dialog>
+       
     </div>
     )
 

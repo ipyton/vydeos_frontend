@@ -39,6 +39,8 @@ import ResetPassword from "./ResetPassword"
 import RolePermissionPage from "./RolePermissionPage"
 import UserManagementPage from "./UserManagementService"
 import { useDispatch } from "react-redux"
+import ApproveMovieRequest from "./DownloadRequestManager"
+import DownloadRequestManager from "./DownloadRequestManager"
 
 const defaultTheme = createTheme();
 
@@ -127,8 +129,6 @@ export default function Contents(props) {
 
     useEffect(() => {
 
-
-
         // if (! worker ) return 
         // worker.onmessage = (e) => {
         //     //setRefresh(!refresh)
@@ -215,7 +215,7 @@ export default function Contents(props) {
                                     <Route path="/reset" element={<ResetPassword></ResetPassword>}></Route>
                                     <Route path="/role" element={<RolePermissionPage></RolePermissionPage>}></Route>
                                     <Route path="/userManage" element={<UserManagementPage></UserManagementPage>}></Route>
-
+                                    <Route path="/downloadRequestsManager" element={<DownloadRequestManager></DownloadRequestManager>} ></Route>
                                     <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
                                 </Routes>

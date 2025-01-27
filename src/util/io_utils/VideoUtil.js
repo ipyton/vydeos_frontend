@@ -8,8 +8,61 @@ export default class VideoUtil {
         return ""
     }
 
-    static uploadVideos(title, introduction, value, setUploadState) {
 
+    static sendRequest(videoId) {
+        return axios({
+            url: "http://localhost:8080/movie/sendRequest",
+            method: 'post',
+            data: {videoId: videoId },
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }],
+             headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+
+    }
+
+    static isRequested() {
+        return axios({
+            url: "http://localhost:8080/movie/isRequested",
+            method: 'post',
+            data: {  token: localStorage.getItem("token") },
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }],
+             headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
+    
+    static getRequests() {
+        return axios({
+            url: "http://localhost:8080/movie/getRequests",
+            method: 'get',
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }], headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+        return ""
+    }
+
+
+    static uploadVideos(title, introduction, value, setUploadState) {
         let sliceLength = 1024 * 1024 * 128
         let start = 0;
         let length = value.length
@@ -30,11 +83,14 @@ export default class VideoUtil {
             }
         })
 
-        let wholeHashCode = CryptoJS.SHA256(value)
+        let wholeHashCode = CryptoJS.MD5(value)
         axios({
             url: "http://localhost:8080/video/negotiation",
             method: 'post',
             data: { userEmail: localStorage.get("userEmail"), title: title, introduction: introduction, token: localStorage.getItem("token"), tires: 10, wholeHashCode: wholeHashCode },
+            headers: {
+                "token": localStorage.getItem("token"),
+            },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -61,7 +117,8 @@ export default class VideoUtil {
                                     tries: 10,
                                     token: localStorage.getItem("token"),
                                     index: i
-                                }, transformRequest: [function (data) {
+                                }, headers: {
+                "token": localStorage.getItem("token"),}, transformRequest: [function (data) {
                                     // 对 data 进行任意转换处理
                                     return Qs.stringify(data)
                                 }]
@@ -94,7 +151,7 @@ export default class VideoUtil {
     }
 
     static getDownloadUrlBase() {
-        return "http://192.168.23.129:5001"
+        return "http://192.168.1.11:5001"
     }
 
 
@@ -207,7 +264,11 @@ export default class VideoUtil {
             return
         }).then(function (response) {
             if (!response) {
-                console.log("error")
+                console.log(response)
+                return
+            }
+            if (!response.data) {
+                console.log(response)
                 return
             }
             console.log(response)
@@ -226,6 +287,7 @@ export default class VideoUtil {
             setState(rows)
         })
     }
+
     static star(videoId, details, setDetails) {
         console.log(details)
         axios({
@@ -285,8 +347,8 @@ export default class VideoUtil {
 
     static getVideoInformation(movie_id, setState) {
         setState(null)
-        axios({
-            url: "http://localhost:5000" + "/movie/get_meta",
+        return axios({
+            url: "http://192.168.1.11:5000" + "/movie/get_meta",
             method: 'get',
             params: { detail_address: movie_id, userId: localStorage.getItem("userId") },
             transformRequest: [function (data) {
@@ -330,9 +392,10 @@ export default class VideoUtil {
         }).catch(error => {
             console.log(error)
         }).then(function (response) {
-            if (response === undefined) {
+            if (response === undefined || !response.data) {
                 console.log("errror")
             }
+            
             console.log(response)
             //props.setBarState({...props.barState, message:responseData.message, open:true})
             let data = response.data

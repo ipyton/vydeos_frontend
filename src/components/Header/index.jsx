@@ -195,19 +195,16 @@ export default function Header(props) {
     setNotificationsAnchorEl(event.currentTarget)
   }
 
-
-
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
   const handleTextBlur = () => {
     if (category == true) {
       setCategory(false)
     } else {
       setSuggestionAnchorEl(null)
     }
-
-
   }
 
 
@@ -238,8 +235,7 @@ export default function Header(props) {
 
 
   const renderLanguageMenu = (
-    <Menu
-    anchorEl={languageAnchorEl}
+    <Menu anchorEl={languageAnchorEl}
     anchorOrigin={{
       vertical: 'top',
       horizontal: 'right',
@@ -271,7 +267,6 @@ export default function Header(props) {
     let mockData = [{title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}, {title:"Helloworld", introduction:"introduction", pic:"", type:"movie"}]
     const suggestionBar = (
       <SearchAndSuggestion categorySelected={categorySelected} setCategorySelected ={setCategorySelected} searchResult={mockData} searchSuggestionOpen={searchSuggestionOpen} setSuggestionOpen={setSuggestionAnchorEl} left={open} setCategory={setCategory}>
-
        </SearchAndSuggestion>
     )
 
