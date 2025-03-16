@@ -109,7 +109,7 @@ export default class SearchUtil {
   static searchVideos(keyword, setList) {
     setList([])
     axios({
-      url: "http://192.168.1.11:5000/movie/search",
+      url: "http://192.168.20.60:5000/movie/search",
       method: 'get',
       params: { "keyword": keyword, page_number:1 },
       transformRequest: [function (data) {

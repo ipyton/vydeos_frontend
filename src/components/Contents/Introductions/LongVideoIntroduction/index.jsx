@@ -67,9 +67,12 @@ export default function (props) {
 
     React.useEffect(() => {
         if (videoId) VideoUtil.getVideoInformation(videoId, setDetails).then(() => {
+            setIsDisabled(false)
             VideoUtil.isRequested(videoId).then((res) => {
                 console.log(res)
-                setIsDisabled(res)
+                if (res.data === true ){
+                    setIsDisabled(true)
+                }
             })
         })
     }, [videoId])

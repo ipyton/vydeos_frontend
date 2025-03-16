@@ -1,5 +1,3 @@
-
-//刚启动的时候
 importScripts('https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js');
 importScripts("/webworkers/DatabaseManipulator.js");
 importScripts('https://cdn.jsdelivr.net/npm/qs/dist/qs.min.js');

@@ -22,15 +22,16 @@ export default class VideoUtil {
                 "token": localStorage.getItem("token"),
             }
         }).catch((err) => {
+
             console.log(err)
         })
 
     }
 
-    static isRequested() {
+    static isRequested(videoId) {
         return axios({
-            url: "http://localhost:8080/movie/isRequested",
-            method: 'post',
+            url: "http://localhost:8080/movie/isRequested?videoId=" + videoId,
+            method: 'get',
             data: {  token: localStorage.getItem("token") },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
@@ -62,32 +63,24 @@ export default class VideoUtil {
     }
 
 
-    static uploadVideos(title, introduction, value, setUploadState) {
-        let sliceLength = 1024 * 1024 * 128
+    static uploadVideos(title, resourceId, value, setUploadState, resourceName) {
+        let sliceLength = 1024 * 1024 * 8
         let start = 0;
-        let length = value.length
+        let length = value.size
         let failed_count = 0;
 
-        axios.interceptors.response.use(null, (err) => {
-            if (err.data) {
-                console.log("error")
-            }
-            if (err.request) {
-                if (err.request.tries > 0) {
-                    err.request.tries--
-                    axios(err.request)
-                }
-                else {
-                    console.log("error")
-                }
-            }
-        })
-
-        let wholeHashCode = CryptoJS.MD5(value)
-        axios({
-            url: "http://localhost:8080/video/negotiation",
+        console.log(value)
+        const totalSlice = Math.floor(length / sliceLength) +  1
+        let wholeHashCode = CryptoJS.MD5(value).toString()
+        console.log(resourceId)
+        console.log(title)
+        console.log(resourceName)
+        return axios({
+            url: "http://localhost:8080/file/negotiationStep1",
             method: 'post',
-            data: { userEmail: localStorage.get("userEmail"), title: title, introduction: introduction, token: localStorage.getItem("token"), tires: 10, wholeHashCode: wholeHashCode },
+            data: { userEmail: localStorage.getItem("userId"), token: localStorage.getItem("token"),  
+                wholeHashCode: wholeHashCode, resourceId : resourceId, resourceType: "movie", format: value.type, 
+                fileName:value.name,size:value.size,quality:1, totalSlice: totalSlice, },
             headers: {
                 "token": localStorage.getItem("token"),
             },
@@ -95,44 +88,39 @@ export default class VideoUtil {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
             }],
-        }).err((err) => {
+        }).catch((err) => {
             console.log(err)
         }).then(
-            (response) => {
-                console.log("response");
-                if (response.code === 1) {
+           async (response) => {
+                console.log(response)
+                if (response.data.code === 1 || response.data.code === 2) {
                     let threads = 2;
-                    console.log("uploading")
-                    for (let i = 0; i < length / sliceLength - 1; i++) {
+                    console.log(totalSlice)
+                    for (let i = 0; i < totalSlice; i ++) {
+                        console.log(i + 1 + "/" + totalSlice)
                         let chunk = value.slice(i * sliceLength, (i + 1) * sliceLength);
-                        if (threads != 0) {
+                        console.log(chunk.size)
+                        let formData = new FormData();
+                        formData.append("wholeHashCode", wholeHashCode);
+                        formData.append("hashCode", CryptoJS.SHA256(chunk).toString());
+                        formData.append("currentSlice", i);
+                        formData.append("resourceId", resourceId);
+                        formData.append("type", "movie");
+                        formData.append("file", new Blob([chunk]), `chunk_${i}.bin`);
+                    
+                        await axios.post(VideoUtil.getUploadUrlBase() + "/file/uploadFile", formData, {
+                            headers: {
+                                "Content-Type": "multipart/form-data",
+                                // "Content-Length": chunk.size, // Explicitly setting Content-Length
+                                "token": localStorage.getItem("token")
+                            }
+                        }).then(response => {
+                            console.log(`Chunk ${i} uploaded successfully`);
+                        }).catch(error => {
+                            console.error(`Chunk ${i} upload failed`, error);
+                        });
 
-                            axios({
-                                url: "http://localhost:8080/video/upload",
-                                method: 'post',
-                                data: {
-                                    wholeHashCode: wholeHashCode,
-                                    hashCode: CryptoJS.SHA256(chunk),
-                                    data: chunk,
-                                    tries: 10,
-                                    token: localStorage.getItem("token"),
-                                    index: i
-                                }, headers: {
-                "token": localStorage.getItem("token"),}, transformRequest: [function (data) {
-                                    // 对 data 进行任意转换处理
-                                    return Qs.stringify(data)
-                                }]
-                            }).catch(err => {
-                                console.log("upload error")
-
-                            }).then(response => {
-                                if (response.code == 1) {
-
-                                } else {
-                                    console.log("upload error")
-                                }
-                            })
-                        }
+                        
                     }
                 }
                 else {
@@ -149,9 +137,12 @@ export default class VideoUtil {
     static getUrlBase() {
         return "http://192.168.23.129:5000"
     }
+    static getUploadUrlBase() {
+        return "http://localhost:8080"
+    }
 
     static getDownloadUrlBase() {
-        return "http://192.168.1.11:5001"
+        return "192.168.20.60:5000"
     }
 
 
@@ -291,7 +282,7 @@ export default class VideoUtil {
     static star(videoId, details, setDetails) {
         console.log(details)
         axios({
-            url: "http://localhost:8000" + "/gallery/collect",
+            url: "http://localhost:8080" + "/gallery/collect",
             method: 'post',
             data: { "videoId": videoId },
             transformRequest: [function (data) {
@@ -348,7 +339,7 @@ export default class VideoUtil {
     static getVideoInformation(movie_id, setState) {
         setState(null)
         return axios({
-            url: "http://192.168.1.11:5000" + "/movie/get_meta",
+            url: "http://192.168.20.60:5000" + "/movie/get_meta",
             method: 'get',
             params: { detail_address: movie_id, userId: localStorage.getItem("userId") },
             transformRequest: [function (data) {
@@ -676,6 +667,29 @@ export default class VideoUtil {
 
         })
     }
+
+
+    // static uploadVideos(formData, videoId) {
+    //     axios.post({
+    //         url:VideoUtil.getDownloadUrlBase() + "/movie/negotiateStep1",
+    //         method: 'post',
+    //         headers:{
+    //             token: localStorage.getItem("token")
+    //         }
+    //     }).catch(err => {
+    //         console.log(err)
+    //     }).then((response) => {
+    //         axios('http://localhost:8080/movie/uploadFile', {  // 假设你有一个 '/upload' 的 API
+    //             method: 'POST',
+    //             body: formData,
+    //             headers:{
+    //                 "Authorization": localStorage.getItem("token")
+    //             }
+    //         });
+    //     })
+    //     return 
+    // }
+
     static get_and_processM3u8(location, setOption) {
         const prefix = "http://192.168.23.129:8848/videos/" + encodeURIComponent(location.videoId + "/" + location.resource + "/");
         const m3u8Url = prefix + encodeURIComponent("index.m3u8");

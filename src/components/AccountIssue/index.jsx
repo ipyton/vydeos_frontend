@@ -4,13 +4,14 @@ import Login from "./Login";
 import Box from '@mui/material/Box';
 import NotFound from "../Errors/NotFoundError";
 import {Route, Routes, useNavigate, Navigate, redirect, BrowserRouter,} from 'react-router-dom'
-
+import Iridescence from "../../Animations/Iridescence/Iridescence"
 
 
 export default function(props) {
     return (
     <BrowserRouter>
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', position: 'relative', width: '100vw', height: '100vh' }}>
+                <Iridescence color={[1, 1, 1]} mouseReact={false} amplitude={0.1} speed={1.0}/>
         <Routes>
                 <Route path="forget" element={<Forget />}></Route>
                 <Route path="login" element={<Login login={props.loginState} setLogin={props.setLoginState} />}></Route>

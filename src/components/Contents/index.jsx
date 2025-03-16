@@ -41,6 +41,7 @@ import UserManagementPage from "./UserManagementService"
 import { useDispatch } from "react-redux"
 import ApproveMovieRequest from "./DownloadRequestManager"
 import DownloadRequestManager from "./DownloadRequestManager"
+import Iridescence from "../../Animations/Iridescence/Iridescence"
 
 const defaultTheme = createTheme();
 
@@ -182,7 +183,6 @@ export default function Contents(props) {
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
     return (
         < ThemeProvider theme={defaultTheme} >
-
             <Box sx={{ display: 'flex' }}>
                 <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setLogin={setLogin} setBadgeContent={setNotifications}></Header>
                 <Box width="100%" justifyContent="center" alignItems="center" marginTop="64px">

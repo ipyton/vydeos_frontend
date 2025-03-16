@@ -20,6 +20,7 @@ import EndpointNotAvailableError from './components/Errors/EndpointNotAvailableE
 import AccountIssue from './components/AccountIssue';
 import AccountUtil from './util/io_utils/AccountUtil';
 import localforage from 'localforage';
+import { StrictMode } from 'react';
 
 
 const defaultTheme = createTheme();
@@ -57,7 +58,8 @@ function App() {
   }
 
   if (login === false) {
-    return (<AccountIssue loginState={login} setLoginState={setLogin}></AccountIssue>)
+    return (
+    <StrictMode> <AccountIssue loginState={login} setLoginState={setLogin}></AccountIssue></StrictMode> )
   }
   if (login === true)
     return (
