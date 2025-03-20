@@ -1,0 +1,8 @@
+.iridescence-container {
+  /* position: fixed;  */
+
+  width: 70%;
+  height: 100%;
+  z-index: -1; 
+  /* background-color: #f0f0f0;    */
+}

@@ -2,6 +2,9 @@ import Qs from 'qs'
 import axios from "axios"
 import CryptoJS from "crypto-js";
 import { LegendToggleTwoTone } from '@mui/icons-material';
+
+import SparkMD5 from "spark-md5";
+ 
 export default class VideoUtil {
 
     static getUrlBase() {
@@ -63,19 +66,70 @@ export default class VideoUtil {
     }
 
 
-    static uploadVideos(title, resourceId, value, setUploadState, resourceName) {
-        let sliceLength = 1024 * 1024 * 8
-        let start = 0;
-        let length = value.size
-        let failed_count = 0;
+    static computeMD5(file) {
+        return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = function (event) {
+            let wordArray = CryptoJS.lib.WordArray.create(new Uint8Array(event.target.result));
+            let hash = CryptoJS.MD5(wordArray).toString(); // Ensure it's MD5 like Java
+            resolve(hash);
+        };
+        reader.onerror = function (err) {
+            reject(err);
+        };
+        });
+    }
 
-        console.log(value)
+
+    static async uploadVideos(resourceId, value, setUploadState, resourceName) {
+        let sliceLength = 1024 * 1024 * 8
+        let length = value.size
+
         const totalSlice = Math.floor(length / sliceLength) +  1
-        let wholeHashCode = CryptoJS.MD5(value).toString()
-        console.log(resourceId)
-        console.log(title)
-        console.log(resourceName)
+        async function computeChunkMD5(chunk) {
+          const buffer = await chunk.arrayBuffer();
+            const wordArray = CryptoJS.lib.WordArray.create(new Uint8Array(buffer));
+            const md5Hash = CryptoJS.MD5(wordArray).toString();
+            return md5Hash;
+        }
+
+    async function computeFileMD5(file, chunkSize = 4 * 1024 * 1024) { // Default: 4MB per chunk
+    const chunks = Math.ceil(file.size / chunkSize);
+    const spark = new SparkMD5.ArrayBuffer();
+    const fileReader = new FileReader();
+
+    let currentChunk = 0;
+
+    return new Promise((resolve, reject) => {
+        fileReader.onload = (event) => {
+            spark.append(event.target.result);
+            currentChunk++;
+
+            if (currentChunk < chunks) {
+                loadNextChunk();
+            } else {
+                resolve(spark.end()); // Final MD5 hash
+            }
+        };
+
+        fileReader.onerror = (error) => reject(error);
+
+        function loadNextChunk() {
+            const start = currentChunk * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            fileReader.readAsArrayBuffer(file.slice(start, end));
+        }
+
+        loadNextChunk();
+    });
+}
+
+
+        let wholeHashCode = await computeFileMD5(value)
+        console.log("wholeHashCode:" + wholeHashCode)
         return axios({
+
             url: "http://localhost:8080/file/negotiationStep1",
             method: 'post',
             data: { userEmail: localStorage.getItem("userId"), token: localStorage.getItem("token"),  
@@ -86,7 +140,7 @@ export default class VideoUtil {
             },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
-                return Qs.stringify(data)
+                return Qs.stringify(data) 
             }],
         }).catch((err) => {
             console.log(err)
@@ -96,13 +150,17 @@ export default class VideoUtil {
                 if (response.data.code === 1 || response.data.code === 2) {
                     let threads = 2;
                     console.log(totalSlice)
-                    for (let i = 0; i < totalSlice; i ++) {
+                    let continueUpload = true;
+                    for (let i = 0; i < totalSlice && continueUpload; i ++) {
+                        setUploadState(i/totalSlice)
                         console.log(i + 1 + "/" + totalSlice)
                         let chunk = value.slice(i * sliceLength, (i + 1) * sliceLength);
                         console.log(chunk.size)
                         let formData = new FormData();
                         formData.append("wholeHashCode", wholeHashCode);
-                        formData.append("hashCode", CryptoJS.SHA256(chunk).toString());
+                        let chunkMD5 = await computeChunkMD5(chunk); // Compute MD5 correctly
+
+                        formData.append("hashCode", chunkMD5);
                         formData.append("currentSlice", i);
                         formData.append("resourceId", resourceId);
                         formData.append("type", "movie");
@@ -115,6 +173,12 @@ export default class VideoUtil {
                                 "token": localStorage.getItem("token")
                             }
                         }).then(response => {
+                            if (response.data.code === 0) {
+                                console.log( response.data.message);
+                            } else {
+                                console.log(response.data.message)
+                                continueUpload = false
+                            }
                             console.log(`Chunk ${i} uploaded successfully`);
                         }).catch(error => {
                             console.error(`Chunk ${i} upload failed`, error);
@@ -167,8 +231,6 @@ export default class VideoUtil {
             //props.setBarState({...props.barState, message:responseData.message, open:true})
 
             let list = []
-
-
 
         })
 
