@@ -80,6 +80,7 @@ export default function UserInfo(props) {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+    console.log(name +  value)
     setUserInfo((prevState) => ({
       ...prevState,
       [name]: value,
@@ -107,7 +108,7 @@ export default function UserInfo(props) {
 
     // Validation and submission logic here
     console.log(data.get("intro"), data.get("nickname"), data.get("region"), data.get("pictures"), dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender);
-    AccountUtil.updateUserInfo(userInfo.introduction, userInfo.userName, userInfo.location, null, dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender, userInfo.language);
+    AccountUtil.updateUserInfo(userInfo.introduction, userInfo.userName, userInfo.location, null, dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender, userInfo.language, userInfo.country);
   };
 
   return (
@@ -203,7 +204,7 @@ export default function UserInfo(props) {
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={userInfo.language}
-          label="Age"
+          name='language'
           onChange={handleChange}
         >
           {languages.map((language) => (
@@ -219,7 +220,7 @@ export default function UserInfo(props) {
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={userInfo.country}
-          label="Age"
+          name='country'
           onChange={handleChange}
         >
           {countries.map((country) => (

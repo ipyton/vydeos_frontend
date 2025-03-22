@@ -259,7 +259,7 @@ export default class AccountUtil {
 
   }
 
-  static updateUserInfo(introduction, nickName, location, pictures, birthdate, gender) {
+  static updateUserInfo(introduction, nickName, location, pictures, birthdate, gender, language, country) {
     if (!pictures) pictures = []
     console.log({
       introduction: introduction,
@@ -267,7 +267,9 @@ export default class AccountUtil {
       location: location,
       pictures: pictures,
       dateOfBirth: birthdate,
-      gender: gender
+      gender: gender,
+      language: language,
+      country: country
     })
     localforage.getItem("userId").then(res => {
       axios({
@@ -280,7 +282,9 @@ export default class AccountUtil {
           location: location,
           pictures: pictures,
           dateOfBirth: birthdate,
-          gender: gender
+          gender: gender,
+          language: language,
+          country: country
         },
         transformRequest: [function (data) {
           return Qs.stringify(data)
