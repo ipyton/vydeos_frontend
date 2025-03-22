@@ -46,7 +46,7 @@ export default class UserInitializer {
                 return Qs.stringify(data)
             }],
             headers: {
-                tokens: localStorage.getItem("token"),
+                token: localStorage.getItem("token"),
             }
         })
 

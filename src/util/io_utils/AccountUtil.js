@@ -15,6 +15,31 @@ export default class AccountUtil {
 
   dispatch = useDispatch()
 
+  static getLanguages(setLanguages) {
+    axios({
+      url: AccountUtil.getUrlBase() + "/i18n/getLanguages",
+      method: 'get',
+      headers: {
+        token: localStorage.getItem("token"),
+      }
+    }).catch(err => {
+      console.log(err)
+    }).then(response => {
+      if (!response || !response.data) {
+        return
+      }
+      if (response.data.code === -1) {
+        console.log(response.data.message)
+        return
+      }
+      let content = response.data
+      console.log(content)
+      // localforage.setItem();
+      setLanguages(content)
+    })
+  }
+
+
   static verifyTokens(setState) {
     if (localStorage.getItem("token") === null) {
       return
@@ -24,7 +49,7 @@ export default class AccountUtil {
       method: 'post',
       data: { token: localStorage.getItem("token") },
       headers: {
-        tokens: localStorage.getItem("token"),
+        token: localStorage.getItem("token"),
       }
     }).catch(err => {
       console.log(err)
@@ -193,8 +218,6 @@ export default class AccountUtil {
         }
       })
       let responseData = response.data
-      console.log("-------------------")
-      console.log(responseData)
       return responseData.code === 1
     }
     return upload()

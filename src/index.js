@@ -8,10 +8,13 @@ import store from './components/redux/store';
 import { Provider } from 'react-redux'
 import axios from 'axios';
 import MessageUtil from './util/io_utils/MessageUtil';
+import { NotificationProvider } from './Providers/NotificationProvider';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <Provider store={store}>
+        <NotificationProvider>
         <App />
+        </NotificationProvider>
     </Provider>
 
 );

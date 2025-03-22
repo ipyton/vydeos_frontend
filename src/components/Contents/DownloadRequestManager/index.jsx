@@ -31,6 +31,8 @@ import LinearProgress from '@mui/material/LinearProgress';
 import VideoUtil from "../../../util/io_utils/VideoUtil";
 import Checkbox from '@mui/material/Checkbox';
 import PropTypes from 'prop-types';
+import { useNotification } from "../../../Providers/NotificationProvider";
+
 
 
 
@@ -73,6 +75,8 @@ export default function (props) {
     const [file, setFile] = useState(null);
     const [movieName, setMovieName] = useState(null);
     const [uploadProgress,  setUploadProgress] = useState(0);
+    console.log(useNotification())
+    const { showNotification } = useNotification()
 
     const navigate = useNavigate()
 
@@ -146,7 +150,15 @@ export default function (props) {
     useEffect(()=>{
         console.log("Download Requests Manager")
         VideoUtil.getRequests().then(res=>{
-            setSources(res.data)
+            console.log(res)
+            if (res.data.code !== 0) {
+                showNotification("Network Error", "error")
+                return
+            }
+            console.log("-----------")
+            if (res.data.code === 0) {
+                setSources(res.data.res)
+            }
         })
     },[])
 
@@ -165,7 +177,7 @@ export default function (props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {sources.map((row) => (
+          {sources == null? "none" :sources.map((row) => (
             <TableRow
               key={row.name}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

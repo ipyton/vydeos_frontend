@@ -4,7 +4,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -19,11 +18,39 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import PictureUtil from '../../../util/io_utils/FileUtil';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
 import dayjs from 'dayjs';
+import FormControl from '@mui/material/FormControl';
+
 
 const defaultTheme = createTheme();
 
 export default function UserInfo(props) {
   const { login, setLogin } = props.status;
+
+  const countries = [
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua & Deps", "Argentina", "Armenia", "Australia", 
+    "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", 
+    "Bhutan", "Bolivia", "Bosnia Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina", "Burundi", 
+    "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Rep", "Chad", "Chile", "China", "Colombia", 
+    "Comoros", "Congo", "Congo {Democratic Rep}", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", 
+    "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", 
+    "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", 
+    "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", 
+    "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland {Republic}", "Israel", "Italy", "Ivory Coast", 
+    "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea North", "Korea South", "Kosovo", "Kuwait", 
+    "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", 
+    "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", 
+    "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", 
+    "Myanmar, {Burma}", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", 
+    "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", 
+    "Portugal", "Qatar", "Romania", "Russian Federation", "Rwanda", "St Kitts & Nevis", "St Lucia", 
+    "Saint Vincent & the Grenadines", "Samoa", "San Marino", "Sao Tome & Principe", "Saudi Arabia", "Senegal", "Serbia", 
+    "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", 
+    "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", 
+    "Tajikistan", "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad & Tobago", "Tunisia", "Turkey", "Turkmenistan", 
+    "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", 
+    "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+  ];
+
 
   // Consolidated userInfo state
   const [userInfo, setUserInfo] = useState({
@@ -33,13 +60,22 @@ export default function UserInfo(props) {
     userName: "",
     location: "",
     introduction: "",
+    language:"",
+    country:""
   });
 
   const [avatar, setAvatar] = useState()
+
+  const[ languages, setLanguages] = useState([])
+
+
+
   useEffect(() => {
     // Fetch initial user info from API or local data
     AccountUtil.getOwnerInfo(userInfo, setUserInfo);
     AccountUtil.getAvatar(avatar, setAvatar)
+    console.log("good day")
+    AccountUtil.getLanguages(setLanguages)
   }, []);
 
   const handleChange = (event) => {
@@ -71,7 +107,7 @@ export default function UserInfo(props) {
 
     // Validation and submission logic here
     console.log(data.get("intro"), data.get("nickname"), data.get("region"), data.get("pictures"), dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender);
-    AccountUtil.updateUserInfo(userInfo.introduction, userInfo.userName, userInfo.location, null, dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender);
+    AccountUtil.updateUserInfo(userInfo.introduction, userInfo.userName, userInfo.location, null, dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender, userInfo.language);
   };
 
   return (
@@ -156,6 +192,43 @@ export default function UserInfo(props) {
                   value={dayjs(userInfo.dateOfBirth)}
                   onChange={handleDateChange}
                 />
+              </Grid>
+              <Grid item xs={12}>
+              <Box sx={{ minWidth: 120 }}>
+              <Grid item xs={12}>
+
+      <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label">language</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={userInfo.language}
+          label="Age"
+          onChange={handleChange}
+        >
+          {languages.map((language) => (
+            (<MenuItem value={language.language}>{language.language}/{language.country}</MenuItem>)
+          ))}
+          
+        </Select>
+      </FormControl>
+      </Grid>
+      <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label">country/region</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={userInfo.country}
+          label="Age"
+          onChange={handleChange}
+        >
+          {countries.map((country) => (
+            <MenuItem value={country}>{country}</MenuItem>
+          ))}
+          
+        </Select>
+      </FormControl>
+    </Box>
               </Grid>
             </Grid>
             <Button

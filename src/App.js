@@ -21,6 +21,7 @@ import AccountIssue from './components/AccountIssue';
 import AccountUtil from './util/io_utils/AccountUtil';
 import localforage from 'localforage';
 import { StrictMode } from 'react';
+import { NotificationProvider } from './Providers/NotificationProvider';
 
 
 const defaultTheme = createTheme();
@@ -63,9 +64,9 @@ function App() {
   }
   if (login === true)
     return (
-  <BrowserRouter>
-      <Contents setLogin={setLogin}></Contents>
-      </BrowserRouter>
+    <BrowserRouter>
+        <Contents setLogin={setLogin}></Contents>
+    </BrowserRouter>
     );
   return <div> loading</div>
 }
