@@ -10,7 +10,7 @@ export default function (props) {
         return (<div>select an option to view</div>)
     }
     if ("movie" === selector.type) {
-        return (<LongVideoIntroduction videoId={selector.videoId} position={"right"}></LongVideoIntroduction>)
+        return (<LongVideoIntroduction content={selector} position={"right"}></LongVideoIntroduction>)
     } else if ("contact" === selector.type) {
         return <FriendIntroductionCentered userId={selector.userId} position={"right"}></FriendIntroductionCentered>
     } else if ("groupId" === selector.type) {

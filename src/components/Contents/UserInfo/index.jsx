@@ -72,9 +72,20 @@ export default function UserInfo(props) {
 
   useEffect(() => {
     // Fetch initial user info from API or local data
-    AccountUtil.getOwnerInfo(userInfo, setUserInfo);
+    AccountUtil.getOwnerInfo(userInfo, setUserInfo).then(response => {
+      if (!response || !response.data) {
+        return
+      }
+      if (response.data.code === -1) {
+        console.log(response.data.message)
+        return
+      }
+      let content = response.data.message
+      let decoded = JSON.parse(content)
+      setUserInfo(decoded)
+      localStorage.setItem("userInfo", JSON.stringify(decoded))
+    })
     AccountUtil.getAvatar(avatar, setAvatar)
-    console.log("good day")
     AccountUtil.getLanguages(setLanguages)
   }, []);
 
@@ -105,9 +116,7 @@ export default function UserInfo(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-
-    // Validation and submission logic here
-    console.log(data.get("intro"), data.get("nickname"), data.get("region"), data.get("pictures"), dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender);
+    localStorage.setItem("userInfo", JSON.stringify(userInfo))
     AccountUtil.updateUserInfo(userInfo.introduction, userInfo.userName, userInfo.location, null, dayjs(userInfo.dateOfBirth).format('YYYY-MM-DD'), userInfo.gender, userInfo.language, userInfo.country);
   };
 

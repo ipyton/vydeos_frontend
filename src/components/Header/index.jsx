@@ -89,17 +89,16 @@ export default function Header(props) {
 
   let [changed, setChanged] = useState(false)
   const navigate = useNavigate();
-  const renderBadge = () => {
-
-  }
 
 
   function onClick(event){ 
     console.log(event)
     console.log(categorySelected)
 
-    if (event.target.id!=="category") {
-      setSuggestionAnchorEl(false)
+    if (event.target.id!=="category" && event.target.id !== "searchInput") {
+      document.getElementById("searchInput").blur();
+      setSuggestionAnchorEl(null)
+
     }
   }
 
@@ -117,6 +116,11 @@ export default function Header(props) {
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
+  const handleFocus = (event) => {
+    setSuggestionAnchorEl(event.currentTarget)
+    event.currentTarget.focus()
+
+  }
 
   const handleMenuClose = () => {
     console.log("close")
@@ -157,11 +161,6 @@ export default function Header(props) {
     event.currentTarget.focus()
   }
 
-  const handleLanguageMenuOpen =(event) => {
-    setLanguageAnchorEl(event.currentTarget)
-    console.log("language changed")
-  }
-
   const handleLogout = (event) => {
     localStorage.clear()
     localforage.clear()
@@ -180,11 +179,8 @@ export default function Header(props) {
 
   const handleChange = (event) => {
     navigate("/")
+  }
 
-  }
-  const handleSearchSuggestionClose = (event) => {
-    setSuggestionAnchorEl(null)
-  }
 
   const handleLanguageMenuClose = (event) => {
     setLanguageAnchorEl(null)
@@ -203,7 +199,7 @@ export default function Header(props) {
     if (category == true) {
       setCategory(false)
     } else {
-      setSuggestionAnchorEl(null)
+      setTimeout(() => setSuggestionAnchorEl(null), 100);
     }
   }
 
@@ -266,6 +262,7 @@ export default function Header(props) {
 
     let mockData = [{title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}, {title:"Helloworld", introduction:"introduction", pic:"", type:"movie"}]
     const suggestionBar = (
+
       <SearchAndSuggestion categorySelected={categorySelected} setCategorySelected ={setCategorySelected} searchResult={mockData} searchSuggestionOpen={searchSuggestionOpen} setSuggestionOpen={setSuggestionAnchorEl} left={open} setCategory={setCategory}>
        </SearchAndSuggestion>
     )
@@ -298,19 +295,6 @@ export default function Header(props) {
           </Badge>
         </IconButton>
         <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleLanguageMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="language"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-        {/* <AccountCircle /> */}
-        <LanguageIcon/>
-       </IconButton>
-        <p>Languages</p>
       </MenuItem>
 
       <MenuItem onClick={handleProfileMenuOpen}>
@@ -358,11 +342,13 @@ export default function Header(props) {
           <Box display="flex" justifyContent="center" alignItems="center">
             <Search >
               <InputBase
+              id = "searchInput"
                 sx={{ ml: 1, flex: 1 }}
                 placeholder="search"
                 inputProps={{ 'aria-label': 'search' }}
                 onChange={handleSearchChange}
                 onBlur={handleTextBlur}
+                onFocus={handleFocus}
               />
               <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch} >
                 <SearchIcon />
@@ -381,18 +367,6 @@ export default function Header(props) {
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
-
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="language"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleLanguageMenuOpen}
-              color="inherit"
-            >
-              <LanguageIcon />
             </IconButton>
 
 
@@ -427,7 +401,10 @@ export default function Header(props) {
 
       {renderMobileMenu}
       {renderMenu}
+      <div onMouseDown={(e) => e.preventDefault()}>
       {suggestionBar}
+</div>
+
       {renderLanguageMenu}
       {renderMessageMenu}
       <FunctionDrawer setOpen={setOpen} open={open}></FunctionDrawer>

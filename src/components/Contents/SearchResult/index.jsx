@@ -19,6 +19,8 @@ import { useLocation } from 'react-router-dom';
 export default function BasicList() {
   const searchResult = useSelector((state) => state.searchResult.value)
   // [{name:"james",pics:"siehru", intro:"sus", type:"contact"}, {name:"time",pics:"zdxf", intro:"sfs", type:"video"}]
+  console.log(searchResult)
+  console.log("searchResult")
   //pics here means avatar.
   const location = useLocation();
 

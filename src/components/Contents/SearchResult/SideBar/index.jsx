@@ -63,8 +63,8 @@ export default function (props) {
     const searchType = useSelector((state) => state.search.searchType)
     const changed = useSelector((state) => state.search.changed)
     const [states, setState] = React.useState([[], [], [], [], []])
-    console.log(changed)
-    console.log(search)
+
+
     React.useEffect(() => {
         states[value] = list
         setState(states)
@@ -91,6 +91,8 @@ export default function (props) {
         //setValue(searchType)
 
     }, [changed])
+    console.log("list")
+    console.log(list)
 
 
     React.useEffect(() => {
@@ -172,7 +174,7 @@ export default function (props) {
                 <TabPanel value={value} index={2} dir={theme.direction}  >
                     <List overflow="scroll" sx={{ maxHeight: '100%', overflow: 'auto', width: "100%" }}>
                         {list.map((res, idx) => {
-                            return (<SearchItem setSelector={setSelector} content={res} type={"movie"} idx={2}></SearchItem>)
+                            return (<SearchItem setSelector={setSelector} content={res} type={res.type}  idx={2}></SearchItem>)
                         })}
 
                     </List>

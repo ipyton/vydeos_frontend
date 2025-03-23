@@ -1,6 +1,7 @@
 import Qs from 'qs'
 import axios from "axios"
 import { add, clear, batchAdd } from "../../components/redux/searchResult"
+import { Language } from '@mui/icons-material';
 
 export default class SearchUtil {
   static getBaseUrl() {
@@ -108,8 +109,16 @@ export default class SearchUtil {
 
   static searchVideos(keyword, setList) {
     setList([])
-    axios({
-      url: "http://192.168.20.60:5000/movie/search",
+    
+    let userInfo = localStorage.getItem("userInfo")
+    let language = null
+    if (userInfo === null) { 
+      language = "en-US"
+    }
+    language = JSON.parse(userInfo).language
+    console.log(language)
+    return axios({
+      url: "http://127.0.0.1:5000/movie/search",
       method: 'get',
       params: { "keyword": keyword, page_number:1 },
       transformRequest: [function (data) {
@@ -117,9 +126,8 @@ export default class SearchUtil {
         return Qs.stringify(data)
       }], headers: {
         token: localStorage.getItem("token"),
+        "Accept-Language": language
       }
-    }).catch(error => {
-      console.log(error)
     }).then(function (response) {
       console.log(response)
       if (response === undefined) {

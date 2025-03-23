@@ -33,49 +33,49 @@ function Item(props) {
 
 export default function (props) {
     const [details, setDetails] = useState(null)
-    const [videoId, setVideoId] = useState(null)
+    const [videoIdentifier, setVideoIdentifier] = useState(null)
     const [disabled, setIsDisabled] = useState(false)
     let position = "center";
     const location = useLocation()
     position = ( !props.position ? position : props.position)
-
     React.useEffect(() => {
+        //navigate from outside.
         if (location.state) {
             console.log("location" + location.state)
-            setVideoId(location.state)
+            setVideoIdentifier(location.state)
         }
-
-        if (props.videoId) {
-            console.log("props" + props.videoId)
-            setVideoId(props.videoId)
+        // from outside.
+        if (props.content) {
+            console.log("props" + props.content)
+            setVideoIdentifier(props.content)
         }
-    }, [props.videoId, location.state])
+    }, [props.content, location.state])
 
     const handleStar = () => {
-        VideoUtil.star(videoId, details, setDetails)
+        VideoUtil.star(videoIdentifier, details, setDetails)
     }
 
     const handleRemove = () => {
-        VideoUtil.removeStar(videoId, details, setDetails)
+        VideoUtil.removeStar(videoIdentifier, details, setDetails)
     }
 
     const sendRequest = () => {
-        VideoUtil.sendRequest(videoId).then(() => {
+        VideoUtil.sendRequest(videoIdentifier).then(() => {
             setIsDisabled(true)
         })
     }
 
     React.useEffect(() => {
-        if (videoId) VideoUtil.getVideoInformation(videoId, setDetails).then(() => {
+        if (videoIdentifier) VideoUtil.getVideoInformation(videoIdentifier, setDetails).then(() => {
             setIsDisabled(false)
-            VideoUtil.isRequested(videoId).then((res) => {
+            VideoUtil.isRequested(videoIdentifier).then((res) => {
                 console.log(res)
                 if (res.data === true ){
                     setIsDisabled(true)
                 }
             })
         })
-    }, [videoId])
+    }, [videoIdentifier])
 
     let genresList = ""
     if (details) {

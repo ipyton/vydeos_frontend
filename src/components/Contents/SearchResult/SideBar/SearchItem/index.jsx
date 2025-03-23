@@ -20,22 +20,26 @@ import Typography from '@mui/material/Typography';
 
 export default function (props) {
     let { title, introduction, pics, type, setSelector } = props
+    console.log("props")
+    console.log(props)
+
     let navigate = useNavigate()
     let avatar = useState(null)
     let miniture = (<div></div>)
     const handleClick = (event) => {
         if (props.content.type === "contact") {
-            setSelector({ userId: props.content.userId, type: props.content.type })
+            setSelector({ ...props.content, type:"contact" })
         }
-        else if (type === "movie") {
-            setSelector({ videoId: props.content.detail_address, type: "movie" })
+        else if (props.content.type === "movie") {
+            console.log(props)
+            setSelector({ ...props.content})
         }
-        else if (type === "music") {
+        else if (props.content.type === "music") {
         }
-        else if (type === "chatRecords") {
+        else if (props.content.type === "chatRecords") {
 
         }
-        else if (type === "posts") {
+        else if (props.content.type === "posts") {
 
         }
     }
@@ -53,7 +57,7 @@ export default function (props) {
             </ListItem>
         </ListItemButton>)
 
-    } else if (type === "movie") {
+    } else if (props.content.type === "movie") {
         return (
             <ListItemButton onClick={handleClick} sx={{ width: "100%" }}>
                 <ListItem alignItems="flex-start">

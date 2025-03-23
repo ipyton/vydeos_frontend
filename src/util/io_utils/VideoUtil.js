@@ -1,20 +1,19 @@
 import Qs from 'qs'
 import axios from "axios"
 import CryptoJS from "crypto-js";
-import { LegendToggleTwoTone } from '@mui/icons-material';
 
 import SparkMD5 from "spark-md5";
  
 export default class VideoUtil {
 
     static getUrlBase() {
-        return ""
+        return "http://localhost:8080"
     }
 
 
     static sendRequest(videoId) {
         return axios({
-            url: "http://localhost:8080/movie/sendRequest",
+            url: VideoUtil.getUrlBase() + "/movie/sendRequest",
             method: 'post',
             data: {videoId: videoId },
             transformRequest: [function (data) {
@@ -33,7 +32,7 @@ export default class VideoUtil {
 
     static isRequested(videoId) {
         return axios({
-            url: "http://localhost:8080/movie/isRequested?videoId=" + videoId,
+            url: VideoUtil.getUrlBase() + "/movie/isRequested?videoId=" + videoId,
             method: 'get',
             data: {  token: localStorage.getItem("token") },
             transformRequest: [function (data) {
@@ -51,7 +50,7 @@ export default class VideoUtil {
     
     static getRequests() {
         return axios({
-            url: "http://localhost:8080/movie/getRequests",
+            url: VideoUtil.getUrlBase() + "/movie/getRequests",
             method: 'get',
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
@@ -130,7 +129,7 @@ export default class VideoUtil {
         console.log("wholeHashCode:" + wholeHashCode)
         return axios({
 
-            url: "http://localhost:8080/file/negotiationStep1",
+            url: VideoUtil.getUrlBase() + "/file/negotiationStep1",
             method: 'post',
             data: { userEmail: localStorage.getItem("userId"), token: localStorage.getItem("token"),  
                 wholeHashCode: wholeHashCode, resourceId : resourceId, resourceType: "movie", format: value.type, 
@@ -199,14 +198,14 @@ export default class VideoUtil {
     }
 
     static getUrlBase() {
-        return "http://192.168.23.129:5000"
+        return "http://127.0.0.1:5000"
     }
     static getUploadUrlBase() {
         return "http://localhost:8080"
     }
 
     static getDownloadUrlBase() {
-        return "192.168.20.60:5000"
+        return "localhost:5000"
     }
 
 
@@ -306,7 +305,7 @@ export default class VideoUtil {
         const size = 4
         setState([])
         axios({
-            url: "http://localhost:8000" + "/gallery/get",
+            url: VideoUtil.getUrlBase() + "/gallery/get",
             method: 'get',
             params: { userId: localStorage.getItem("userId") },
             headers: {
@@ -344,7 +343,7 @@ export default class VideoUtil {
     static star(videoId, details, setDetails) {
         console.log(details)
         axios({
-            url: "http://localhost:8080" + "/gallery/collect",
+            url: VideoUtil.getUrlBase() + "/gallery/collect",
             method: 'post',
             data: { "videoId": videoId },
             transformRequest: [function (data) {
@@ -373,7 +372,7 @@ export default class VideoUtil {
 
     static removeStar(videoId, details, setDetails) {
         axios({
-            url: "http://localhost:8000" + "/gallery/remove",
+            url: + "/gallery/remove",
             method: 'post',
             data: { "videoId": details.movieId },
             transformRequest: [function (data) {
@@ -398,12 +397,15 @@ export default class VideoUtil {
         })
     }
 
-    static getVideoInformation(movie_id, setState) {
+    static getVideoInformation(movieIdentifier, setState) {
         setState(null)
+
+        let language = JSON.parse(localStorage.getItem("userInfo")).language
+
         return axios({
-            url: "http://192.168.20.60:5000" + "/movie/get_meta",
+            url: "http://127.0.0.1:5000" + "/movie/get_meta",
             method: 'get',
-            params: { detail_address: movie_id, userId: localStorage.getItem("userId") },
+            params: { id:movieIdentifier.id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language":language },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -753,7 +755,7 @@ export default class VideoUtil {
     // }
 
     static get_and_processM3u8(location, setOption) {
-        const prefix = "http://192.168.23.129:8848/videos/" + encodeURIComponent(location.videoId + "/" + location.resource + "/");
+        const prefix = "http://127.0.0.1:8848/videos/" + encodeURIComponent(location.videoId + "/" + location.resource + "/");
         const m3u8Url = prefix + encodeURIComponent("index.m3u8");
 
         console.log("Fetching M3U8 from:", m3u8Url);

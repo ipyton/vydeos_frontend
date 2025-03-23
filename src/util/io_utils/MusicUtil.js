@@ -4,7 +4,7 @@ import axios from "axios"
 export default class MusicUtil {
     static getMusicInformation(movie_id, setState) {
         axios({
-            url: "http://localhost:5000" + "/movie/get_meta",
+            url: "http://127.0.0.1:5000" + "/movie/get_meta",
             method: 'get',
             params: { detail_address: movie_id },
             transformRequest: [function (data) {

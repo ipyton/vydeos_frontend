@@ -57,7 +57,7 @@ export default function (props) {
 	// 	})
 	// }, [location.state.type, location.state.userId])
 
-	if (!select) {
+	if (!select || !select.type || !select.userId) {
 		return <div> Start/Select a conversation first!</div>
 	}
 

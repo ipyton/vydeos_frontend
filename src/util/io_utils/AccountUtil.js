@@ -226,9 +226,8 @@ export default class AccountUtil {
   // This is about get userInfo
   static getOwnerInfo(userinfo, setUserInfo) {
 
-    localforage.getItem("userId").then(res => {
-      console.log(res)
-      axios({
+    return localforage.getItem("userId").then(res => {
+      return axios({
         url: AccountUtil.getUrlBase() + "/account/getinfo",
         method: 'post',
         data: { userId: res },
@@ -238,21 +237,6 @@ export default class AccountUtil {
         headers: {
           token: localStorage.getItem("token"),
         }
-      }).catch(err => {
-        console.log(err)
-      }).then(response => {
-        if (!response || !response.data) {
-          return
-        }
-        if (response.data.code === -1) {
-          console.log(response.data.message)
-          return
-        }
-        let content = response.data.message
-        let decoded = JSON.parse(content)
-        // localforage.setItem();
-        setUserInfo(decoded)
-        console.log(decoded)
       })
     })
 
