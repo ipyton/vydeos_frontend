@@ -1,37 +1,77 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-import { useDispatch, useSelector } from 'react-redux';
-import SearchItem from './SideBar/SearchItem';
-import Introductions from '../Introductions';
-import SideBar from './SideBar';
-import { Stack } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { Stack, Box, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { useLocation } from 'react-router-dom';
+import SearchSidebar from './SideBar';
+import Introductions from '../Introductions';
 
-
-export default function BasicList() {
-  const searchResult = useSelector((state) => state.searchResult.value)
-  // [{name:"james",pics:"siehru", intro:"sus", type:"contact"}, {name:"time",pics:"zdxf", intro:"sfs", type:"video"}]
-  console.log(searchResult)
-  console.log("searchResult")
-  //pics here means avatar.
+export default function SearchResults() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
+  const searchResult = useSelector((state) => state.searchResult.value);
+  
+  const [selector, setSelector] = useState({ type: "", objectId: null });
+  const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.8);
+  
+  // Update height on window resize for responsive layout
+  useEffect(() => {
+    const handleResize = () => {
+      setViewHeight(window.innerHeight * 0.8);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  let [selector, setSelector] = React.useState({ type: "", objectId: "null" })
-  console.log(selector)
- // const { searchResult,type  } = location.state || {}; // 获取 state 参数
-  let height = window.innerHeight * 0.8
+  // Responsive layout handling
+  const containerStyles = isMobile 
+    ? { width: '95%', marginLeft: '2.5%', flexDirection: 'column' }
+    : { width: '80%', marginLeft: '10%', flexDirection: 'row' };
+
   return (
-    <Stack sx={{ marginLeft: '10%', width: '80%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
-      <SideBar setSelector={setSelector}></SideBar>
-      <Stack sx={{overflow:"scroll",width:"70%", height:"100%", boxShadow: 1, borderRadius: 2 }} ><Introductions selector={selector} position={"right"}></Introductions> </Stack>
+    <Stack 
+      sx={{ 
+        ...containerStyles,
+        marginTop: 3, 
+        height: viewHeight,
+        gap: 2
+      }} 
+      direction={isMobile ? 'column' : 'row'} 
+      justifyContent="center"
+      spacing={0}
+    >
+      <SearchSidebar setSelector={setSelector} />
+      
+      <Stack 
+        sx={{
+          width: isMobile ? '100%' : '70%',
+          height: isMobile ? `calc(${viewHeight}px - 350px)` : '100%',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          borderRadius: 2,
+          overflow: 'auto',
+          bgcolor: 'background.paper'
+        }}
+      >
+        {selector.type ? (
+          <Introductions selector={selector} position="right" />
+        ) : (
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              height: '100%', 
+              p: 3 
+            }}
+          >
+            <Typography variant="body1" color="text.secondary">
+              Select an item from the sidebar to view details
+            </Typography>
+          </Box>
+        )}
+      </Stack>
     </Stack>
   );
 }

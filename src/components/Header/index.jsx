@@ -1,34 +1,44 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { styled, alpha } from '@mui/material/styles';
-// import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
-import Badge from '@mui/material/Badge';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
+import {
+  Box,
+  Toolbar,
+  IconButton,
+  Typography,
+  InputBase,
+  Badge,
+  MenuItem,
+  Menu,
+  Avatar,
+  Fab,
+  ListItemButton
+} from '@mui/material';
+import MuiAppBar from '@mui/material/AppBar';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import localforage from 'localforage';
+
+// Icons
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import LanguageIcon from '@mui/icons-material/Language';
-import { Avatar, Fab, ListItemButton } from '@mui/material';
-import { Navigate, useNavigate } from 'react-router-dom';
 
+// Components
 import FunctionDrawer from './FunctionDrawer';
-import MuiAppBar from '@mui/material/AppBar';
-
 import SearchAndSuggestion from './SearchAndSuggestion';
-import { useDispatch } from 'react-redux';
-import localforage from 'localforage';
-import { useState } from 'react';
 import MessageBox from './MessageBox';
 
-import {set} from "../redux/Search"
+// Redux actions
+import { set } from "../redux/Search";
 
+// Constants
+const DRAWER_WIDTH = 240;
+
+// Styled components
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -43,9 +53,26 @@ const Search = styled('div')(({ theme }) => ({
     marginLeft: theme.spacing(3),
     width: 'auto',
   },
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0.5, 1),
+  transition: 'all 0.3s ease',
 }));
 
-const drawerWidth = 240;
+const SearchInput = styled(InputBase)(({ theme }) => ({
+  flex: 1,
+  padding: theme.spacing(1, 1, 1, 0),
+  paddingLeft: theme.spacing(2),
+  transition: theme.transitions.create('width'),
+  width: '100%',
+  [theme.breakpoints.up('md')]: {
+    width: '30ch',
+  },
+  '&:focus': {
+    width: '35ch',
+  },
+}));
+
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
@@ -54,9 +81,12 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
+  backdropFilter: 'blur(8px)',
+  backgroundColor: alpha(theme.palette.primary.main, 0.95),
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
   ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: DRAWER_WIDTH,
+    width: `calc(100% - ${DRAWER_WIDTH}px)`,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -64,50 +94,96 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  '& .MuiBadge-badge': {
+    backgroundColor: '#ff4444',
+    color: '#ffffff',
+    fontWeight: 'bold',
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    '&::after': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      borderRadius: '50%',
+      animation: 'ripple 1.2s infinite ease-in-out',
+      border: '1px solid currentColor',
+      content: '""',
+    },
+  },
+  '@keyframes ripple': {
+    '0%': {
+      transform: 'scale(.8)',
+      opacity: 1,
+    },
+    '100%': {
+      transform: 'scale(2.4)',
+      opacity: 0,
+    },
+  },
+}));
 
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: 40,
+  height: 40,
+  border: `2px solid ${theme.palette.background.paper}`,
+  boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+  transition: 'transform 0.2s ease',
+  '&:hover': {
+    transform: 'scale(1.1)',
+  }
+}));
+
+const AppTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  letterSpacing: '0.5px',
+  color: theme.palette.common.white,
+  background: 'linear-gradient(45deg, #FFF 30%, #E0E0E0 90%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+}));
 
 export default function Header(props) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-  const [suggestionAnchorEl, setSuggestionAnchorEl] = React.useState(null);
-  const [languageAnchorEl, setLanguageAnchorEl] = React.useState(null);  
-  const [search, setSearch] = React.useState(null);
-  const [notificationsAnchorEl, setNotificationsAnchorEl] = React.useState(null)
-  const [open, setOpen] = React.useState(false);
-  const [category, setCategory] = React.useState(false)
-  let [categorySelected, setCategorySelected] = React.useState([false, false, false, false, false])
-  const [notificationList, setNotificationList] = useState([])
+  // State variables
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [suggestionAnchorEl, setSuggestionAnchorEl] = useState(null);
+  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);  
+  const [search, setSearch] = useState('');
+  const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [category, setCategory] = useState(false);
+  const [categorySelected, setCategorySelected] = useState([false, false, false, false, false]);
+  const [notificationList, setNotificationList] = useState([]);
+  const [changed, setChanged] = useState(false);
 
-
+  // UI state booleans
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-  const searchSuggestionOpen = !Boolean(suggestionAnchorEl)
-  const languageMenuOpen = Boolean(languageAnchorEl)
-  const notificationsOpen = Boolean(notificationsAnchorEl)
-  const dispatch = useDispatch()
-  const {notifications, setNotifications, setLogin} = props
-
-  let [changed, setChanged] = useState(false)
+  const searchSuggestionOpen = !Boolean(suggestionAnchorEl);
+  const languageMenuOpen = Boolean(languageAnchorEl);
+  const notificationsOpen = Boolean(notificationsAnchorEl);
+  
+  // Hooks
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { notifications, setNotifications, setLogin, avatar, setBadgeContent } = props;
 
-
-  function onClick(event){ 
-    console.log(event)
-    console.log(categorySelected)
-
-    if (event.target.id!=="category" && event.target.id !== "searchInput") {
-      document.getElementById("searchInput").blur();
-      setSuggestionAnchorEl(null)
-
+  // Event handlers
+  function handleDocumentClick(event) {
+    if (event.target.id !== "category" && event.target.id !== "searchInput") {
+      document.getElementById("searchInput")?.blur();
+      setSuggestionAnchorEl(null);
     }
   }
 
-  React.useEffect(()=>{
-    window.addEventListener("click",onClick)
-    return ()=>{
-      window.removeEventListener("click", onClick)
-    }
-  }, [categorySelected])
+  useEffect(() => {
+    window.addEventListener("click", handleDocumentClick);
+    return () => {
+      window.removeEventListener("click", handleDocumentClick);
+    };
+  }, [categorySelected]);
   
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -116,14 +192,13 @@ export default function Header(props) {
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
-  const handleFocus = (event) => {
-    setSuggestionAnchorEl(event.currentTarget)
-    event.currentTarget.focus()
 
-  }
+  const handleFocus = (event) => {
+    setSuggestionAnchorEl(event.currentTarget);
+    event.currentTarget.focus();
+  };
 
   const handleMenuClose = () => {
-    console.log("close")
     setAnchorEl(null);
     handleMobileMenuClose();
   };
@@ -132,79 +207,64 @@ export default function Header(props) {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-
-  const handleSearch = (event) => {
-    //dispatch()
-    let index = -1
-    if (categorySelected[0]===true) {
-      index = 0
-    } else if (categorySelected[1] === true) {
-      // find local chat records.
-      index = 1
-    } else if (categorySelected[2] === true) {
-      index = 2
-    } else if (categorySelected[3] === true) {
-      index = 3
-    } else if (categorySelected[4] === true) {
-      index = 4
-    } else {
-      console.log("good day")
-    }
-    dispatch(set({search:search, type:index,changed:changed}))
-    setChanged(!changed)
-    navigate("searchresult")
-  }
+  const handleSearch = () => {
+    let index = categorySelected.findIndex(category => category === true);
+    dispatch(set({ search, type: index, changed }));
+    setChanged(!changed);
+    navigate("searchresult");
+  };
 
   const handleSearchChange = (event) => {
-    setSearch(event.currentTarget.value)
-    setSuggestionAnchorEl(event.currentTarget)
-    event.currentTarget.focus()
-  }
+    setSearch(event.currentTarget.value);
+    setSuggestionAnchorEl(event.currentTarget);
+    event.currentTarget.focus();
+  };
 
-  const handleLogout = (event) => {
-    localStorage.clear()
-    localforage.clear()
-    setLogin(false)
-    props.setBadgeContent(null)
-    navigate("/login")
-  }
+  const handleLogout = () => {
+    localStorage.clear();
+    localforage.clear();
+    setLogin(false);
+    setBadgeContent?.(null);
+    navigate("/login");
+  };
 
-  const handleInfomation = (event) => {
-    navigate("/userinfo")
-  }
+  const handleInfomation = () => {
+    navigate("/userinfo");
+  };
 
-  const handleSettings = (event) => {
-    navigate("/settings")
-  }
+  const handleSettings = () => {
+    navigate("/settings");
+  };
 
-  const handleChange = (event) => {
-    navigate("/")
-  }
-
-
-  const handleLanguageMenuClose = (event) => {
-    setLanguageAnchorEl(null)
-  }
-
-  
   const handleNotificationOpen = (event) => {
-    setNotificationsAnchorEl(event.currentTarget)
-  }
+    setNotificationsAnchorEl(event.currentTarget);
+  };
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   const handleTextBlur = () => {
-    if (category == true) {
-      setCategory(false)
+    if (category) {
+      setCategory(false);
     } else {
       setTimeout(() => setSuggestionAnchorEl(null), 100);
     }
-  }
+  };
 
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
+  // Mock data for suggestions
+  const mockData = [
+    { title: "Helloworld", introduction: "introduction", pic: "", type: "contact" }, 
+    { title: "Helloworld", introduction: "introduction", pic: "", type: "movie" }
+  ];
 
+  // Component rendering
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -221,51 +281,81 @@ export default function Header(props) {
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
+      PaperProps={{
+        elevation: 3,
+        sx: {
+          overflow: 'visible',
+          filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.2))',
+          mt: 1.5,
+          '&:before': {
+            content: '""',
+            display: 'block',
+            position: 'absolute',
+            top: 0,
+            right: 14,
+            width: 10,
+            height: 10,
+            bgcolor: 'background.paper',
+            transform: 'translateY(-50%) rotate(45deg)',
+            zIndex: 0,
+          },
+        },
+      }}
     >
       <MenuItem onClick={handleInfomation}>Account Information</MenuItem>
-      {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
       <MenuItem onClick={handleSettings}>Settings</MenuItem>
       <MenuItem onClick={handleLogout}>Log Out</MenuItem>
     </Menu>
   );
 
-
   const renderLanguageMenu = (
-    <Menu anchorEl={languageAnchorEl}
-    anchorOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    id={menuId}
-    keepMounted
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    open={languageMenuOpen}
-    onClose={handleLanguageMenuClose}
-  >
-    <MenuItem onClick={handleMenuClose}>English</MenuItem>
-    {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
-    <MenuItem onClick={handleMenuClose}>Chinese</MenuItem>
-    <MenuItem onClick={handleMenuClose}>Japanese</MenuItem>
-  </Menu>
+    <Menu 
+      anchorEl={languageAnchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id="language-menu"
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={languageMenuOpen}
+      onClose={() => setLanguageAnchorEl(null)}
+      PaperProps={{
+        elevation: 3,
+        sx: { 
+          minWidth: 120,
+          mt: 1.5,
+        },
+      }}
+    >
+      <MenuItem onClick={handleMenuClose}>English</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Chinese</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Japanese</MenuItem>
+    </Menu>
+  );
 
-  )
-
-  // messages
   const renderMessageMenu = (
-      <MessageBox notificationsAnchorEl={notificationsAnchorEl} setNotificationsAnchorEl={setNotificationsAnchorEl} notificationsOpen={notificationsOpen}></MessageBox>
-  )
+    <MessageBox 
+      notificationsAnchorEl={notificationsAnchorEl} 
+      setNotificationsAnchorEl={setNotificationsAnchorEl} 
+      notificationsOpen={notificationsOpen}
+    />
+  );
   
-  
-
-    let mockData = [{title:"Helloworld", introduction:"introduction", pic:"", type:"contact"}, {title:"Helloworld", introduction:"introduction", pic:"", type:"movie"}]
-    const suggestionBar = (
-
-      <SearchAndSuggestion categorySelected={categorySelected} setCategorySelected ={setCategorySelected} searchResult={mockData} searchSuggestionOpen={searchSuggestionOpen} setSuggestionOpen={setSuggestionAnchorEl} left={open} setCategory={setCategory}>
-       </SearchAndSuggestion>
-    )
+  const suggestionBar = (
+    <SearchAndSuggestion 
+      categorySelected={categorySelected} 
+      setCategorySelected={setCategorySelected} 
+      searchResult={mockData} 
+      searchSuggestionOpen={searchSuggestionOpen} 
+      setSuggestionOpen={setSuggestionAnchorEl} 
+      left={open} 
+      setCategory={setCategory}
+    />
+  );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
@@ -284,15 +374,15 @@ export default function Header(props) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
+      <MenuItem onClick={handleNotificationOpen}>
         <IconButton
           size="large"
-          aria-label="show 17 new notifications"
+          aria-label="show new notifications"
           color="inherit"
         >
-          <Badge badgeContent={20} color="error">
+          <StyledBadge badgeContent={17} color="error">
             <NotificationsIcon />
-          </Badge>
+          </StyledBadge>
         </IconButton>
         <p>Notifications</p>
       </MenuItem>
@@ -305,9 +395,8 @@ export default function Header(props) {
           aria-haspopup="true"
           color="inherit"
         >
-        <Avatar alt="Travis Howard"  src={props.avatar} />
-       </IconButton>
-       
+          <StyledAvatar alt="User Avatar" src={avatar} />
+        </IconButton>
         <p>Account</p>
       </MenuItem>
     </Menu>
@@ -317,58 +406,83 @@ export default function Header(props) {
     <div>
       <AppBar position="fixed" open={open}>
         <Toolbar>
-        <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={toggleDrawer}
-              sx={{
-                marginRight: '0px',
-                ...(open && { display: 'none' }),
-              }}
-            >
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            onClick={toggleDrawer}
+            sx={{
+              marginRight: '0px',
+              ...(open && { display: 'none' }),
+              '&:hover': {
+                backgroundColor: alpha('#ffffff', 0.1),
+              }
+            }}
+          >
             <MenuIcon />
           </IconButton>
 
-          <Typography
+          <AppTitle
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { xs: 'none', sm: 'block' }, marginLeft:"2.5%" }}
+            sx={{ 
+              display: { xs: 'none', sm: 'block' }, 
+              marginLeft: "2.5%",
+              fontSize: '1.5rem'
+            }}
           >
             Everything  
-          </Typography>
-          <Box sx={{ flexGrow: 1 }}></Box>
+          </AppTitle>
+          
+          <Box sx={{ flexGrow: 1 }} />
+          
           <Box display="flex" justifyContent="center" alignItems="center">
-            <Search >
-              <InputBase
-              id = "searchInput"
-                sx={{ ml: 1, flex: 1 }}
-                placeholder="search"
+            <Search>
+              <SearchInput
+                id="searchInput"
+                placeholder="Search anything..."
                 inputProps={{ 'aria-label': 'search' }}
                 onChange={handleSearchChange}
                 onBlur={handleTextBlur}
                 onFocus={handleFocus}
+                onKeyPress={handleKeyPress}
               />
-              <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch} >
+              <IconButton 
+                type="button" 
+                sx={{ 
+                  p: '10px',
+                  '&:hover': {
+                    backgroundColor: alpha('#ffffff', 0.1),
+                  }
+                }} 
+                aria-label="search" 
+                onClick={handleSearch}
+              >
                 <SearchIcon />
               </IconButton>
-          </Search>
+            </Search>
           </Box>
 
-          <Box sx={{ flexGrow: 1 }}></Box>
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1 }} />
+          
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
             <IconButton
               size="large"
-              aria-label="show 17 new notifications"
+              aria-label="show notifications"
               color="inherit"
               onClick={handleNotificationOpen}
+              sx={{ 
+                mx: 1,
+                '&:hover': {
+                  backgroundColor: alpha('#ffffff', 0.1),
+                }
+              }}
             >
-              <Badge badgeContent={17} color="error">
+              <StyledBadge badgeContent={17} color="error">
                 <NotificationsIcon />
-              </Badge>
+              </StyledBadge>
             </IconButton>
-
 
             <IconButton
               size="large"
@@ -378,13 +492,13 @@ export default function Header(props) {
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
               color="inherit"
+              sx={{ ml: 1 }}
             >
-            <Avatar alt="Travis Howard"  src={props.avatar} />
+              <StyledAvatar alt="User Avatar" src={avatar} />
             </IconButton>
-
-
           </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' }, alignSelf:"right" }}>
+          
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
               aria-label="show more"
@@ -401,13 +515,14 @@ export default function Header(props) {
 
       {renderMobileMenu}
       {renderMenu}
+      
       <div onMouseDown={(e) => e.preventDefault()}>
-      {suggestionBar}
-</div>
+        {suggestionBar}
+      </div>
 
       {renderLanguageMenu}
       {renderMessageMenu}
-      <FunctionDrawer setOpen={setOpen} open={open}></FunctionDrawer>
+      <FunctionDrawer setOpen={setOpen} open={open} />
     </div>
   );
 }

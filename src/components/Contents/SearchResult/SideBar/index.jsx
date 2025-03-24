@@ -1,22 +1,11 @@
 import * as React from 'react';
-import List from '@mui/material/List';
-
-import Typography from '@mui/material/Typography';
-import SearchItem from './SearchItem';
-import { Box } from '@mui/material';
-import Stack from '@mui/material/Stack';
+import { Box, List, Typography, Stack, AppBar, Tabs, Tab } from '@mui/material';
 import SwipeableViews from 'react-swipeable-views';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
-
-import AppBar from '@mui/material/AppBar';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import SocialMediaUtil from '../../../../util/io_utils/SocialMediaUtil';
-import { useLocation } from 'react-router-dom';
-import { Search } from '@mui/icons-material';
-import SearchUtil from '../../../../util/io_utils/SearchUtil';
 import { useSelector } from 'react-redux';
+import SearchItem from './SearchItem';
+import SearchUtil from '../../../../util/io_utils/SearchUtil';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -25,13 +14,13 @@ function TabPanel(props) {
         <div
             role="tabpanel"
             hidden={value !== index}
-            id={`full-width-tabpanel-${index}`}
-            aria-labelledby={`full-width-tab-${index}`}
+            id={`search-tabpanel-${index}`}
+            aria-labelledby={`search-tab-${index}`}
             {...other}
         >
             {value === index && (
-                <Box sx={{ p: 3 }}>
-                    <Typography>{children}</Typography>
+                <Box sx={{ p: 2 }}>
+                    <Typography component="div">{children}</Typography>
                 </Box>
             )}
         </div>
@@ -46,101 +35,105 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
     return {
-        id: `full-width-tab-${index}`,
-        'aria-controls': `full-width-tabpanel-${index}`,
+        id: `search-tab-${index}`,
+        'aria-controls': `search-tabpanel-${index}`,
     };
 }
 
-
-export default function (props) {
-
+export default function SearchResults(props) {
     const theme = useTheme();
-
-    const [value, setValue] = React.useState(0)
-    const [list, setList] = React.useState([])
-    const { setSelector } = props
-    const search = useSelector((state) => state.search.search)
-    const searchType = useSelector((state) => state.search.searchType)
-    const changed = useSelector((state) => state.search.changed)
-    const [states, setState] = React.useState([[], [], [], [], []])
-
+    const { setSelector } = props;
+    
+    const [value, setValue] = React.useState(0);
+    const [list, setList] = React.useState([]);
+    const [states, setState] = React.useState([[], [], [], [], []]);
+    
+    const search = useSelector((state) => state.search.search);
+    const searchType = useSelector((state) => state.search.searchType);
+    const changed = useSelector((state) => state.search.changed);
 
     React.useEffect(() => {
-        states[value] = list
-        setState(states)
-    }, [list])
+        states[value] = list;
+        setState(states);
+    }, [list]);
 
-    React.useEffect(()=>{
-        setValue(searchType)
-    }, [searchType])
+    React.useEffect(() => {
+        setValue(searchType);
+    }, [searchType]);
 
     React.useEffect(() => {
         if (searchType === -1) {
-
+            // Do nothing
         } else if (searchType === 0) {
-            SearchUtil.searchChatContactById(search, setList)
+            SearchUtil.searchChatContactById(search, setList);
         } else if (searchType === 1) {
-            SearchUtil.searchLocalResult(search, setList)
+            SearchUtil.searchLocalResult(search, setList);
         } else if (searchType === 2) {
-            SearchUtil.searchVideos(search, setList)
+            SearchUtil.searchVideos(search, setList);
         } else if (searchType === 3) {
-            SearchUtil.searchMusics(search, setList)
+            SearchUtil.searchMusics(search, setList);
         } else if (searchType === 4) {
-            SearchUtil.searchPosts(search, setList)
+            SearchUtil.searchPosts(search, setList);
         }
-        //setValue(searchType)
-
-    }, [changed])
-    console.log("list")
-    console.log(list)
-
+    }, [changed]);
 
     React.useEffect(() => {
         if (states[value]) {
             if (states[value].length === 0) {
                 if (value === -1) {
-
+                    // Do nothing
                 } else if (value === 0) {
-                    SearchUtil.searchChatContactById(search, setList)
+                    SearchUtil.searchChatContactById(search, setList);
                 } else if (value === 1) {
-                    SearchUtil.searchLocalResult(search, setList)
+                    SearchUtil.searchLocalResult(search, setList);
                 } else if (value === 2) {
-                    SearchUtil.searchVideos(search, setList)
+                    SearchUtil.searchVideos(search, setList);
                 } else if (value === 3) {
-                    SearchUtil.searchMusics(search, setList)
+                    SearchUtil.searchMusics(search, setList);
                 } else if (value === 4) {
-                    SearchUtil.searchPosts(search, setList)
+                    SearchUtil.searchPosts(search, setList);
                 }
             } else {
-                setList(states[value])
+                setList(states[value]);
             }
         }
-
-    }, [value])
-
-
-
+    }, [value]);
 
     const handleChange = (event, idx) => {
-        setValue(idx)
-    }
+        setValue(idx);
+    };
 
-    const handleChangeIndex = (event, index) => {
-        console.log("errors")
-        setList(states[index])
+    const handleChangeIndex = (index) => {
+        setList(states[index]);
         setValue(index);
     };
 
-    return (<Stack sx={{ width: "30%", height: "100%", boxShadow: 1, borderRadius: 2 }} >
-            <AppBar position="static">
+    return (
+        <Stack 
+            sx={{ 
+                width: "30%", 
+                height: "100%", 
+                boxShadow: 3, 
+                borderRadius: 1,
+                overflow: 'hidden',
+                backgroundColor: theme.palette.background.paper
+            }}
+        >
+            <AppBar 
+                position="static" 
+                color="default" 
+                elevation={0}
+                sx={{ borderBottom: 1, borderColor: 'divider' }}
+            >
                 <Tabs
                     value={value}
                     onChange={handleChange}
-                    indicatorColor="secondary"
-                    textColor="inherit"
-                    aria-label="full width tabs example"
+                    indicatorColor="primary"
+                    textColor="primary"
                     variant="scrollable"
                     scrollButtons="auto"
+                    aria-label="search category tabs"
+                    sx={{ minHeight: 48 }}
                 >
                     <Tab label="Users" {...a11yProps(0)} />
                     <Tab label="Chats" {...a11yProps(1)} />
@@ -153,55 +146,73 @@ export default function (props) {
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
                 onChangeIndex={handleChangeIndex}
+                style={{ flexGrow: 1, display: 'flex' }}
+                containerStyle={{ height: '100%' }}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <List sx={{ maxHeight: '100%', overflow: 'auto',width:"100%"}}>
-                        {list.map((res, idx) => {
-                            return (<SearchItem setSelector={setSelector} content={res} type={"contact"} idx={0}></SearchItem>)
-                        })}
+                    <List sx={{ maxHeight: '100%', overflow: 'auto', width: "100%", padding: 0 }}>
+                        {list.map((res, idx) => (
+                            <SearchItem 
+                                key={idx}
+                                setSelector={setSelector} 
+                                content={res} 
+                                type={"contact"} 
+                                idx={0}
+                            />
+                        ))}
                     </List>
-
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    <List sx={{ maxHeight: '100%', overflow: 'auto',width: "100%" }}>
-                        {list.map((res, idx) => {
-                            return (<SearchItem setSelector={setSelector} content={res} type={"chatRecords"} idx={1}></SearchItem>)
-                        })}
-
+                    <List sx={{ maxHeight: '100%', overflow: 'auto', width: "100%", padding: 0 }}>
+                        {list.map((res, idx) => (
+                            <SearchItem 
+                                key={idx}
+                                setSelector={setSelector} 
+                                content={res} 
+                                idx={1}
+                            />
+                        ))}
                     </List>
-
                 </TabPanel>
-                <TabPanel value={value} index={2} dir={theme.direction}  >
-                    <List overflow="scroll" sx={{ maxHeight: '100%', overflow: 'auto', width: "100%" }}>
-                        {list.map((res, idx) => {
-                            return (<SearchItem setSelector={setSelector} content={res} type={res.type}  idx={2}></SearchItem>)
-                        })}
-
+                <TabPanel value={value} index={2} dir={theme.direction}>
+                    <List sx={{ maxHeight: '100%', overflow: 'auto', width: "100%", padding: 0 }}>
+                        {list.map((res, idx) => (
+                            <SearchItem 
+                                key={idx}
+                                setSelector={setSelector} 
+                                content={res} 
+                                idx={2}
+                            />
+                        ))}
                     </List>
-
                 </TabPanel>
                 <TabPanel value={value} index={3} dir={theme.direction}>
-                    <List sx={{ maxHeight: '100%', overflow: 'auto', width: "100%" }}>
-                        {list.map((res, idx) => {
-                            return (<SearchItem setSelector={setSelector} content={res} type={"music"} idx={3}></SearchItem>)
-                        })}
-
+                    <List sx={{ maxHeight: '100%', overflow: 'auto', width: "100%", padding: 0 }}>
+                        {list.map((res, idx) => (
+                            <SearchItem 
+                                key={idx}
+                                setSelector={setSelector} 
+                                content={res} 
+                                type={"music"} 
+                                idx={3}
+                            />
+                        ))}
                     </List>
-
                 </TabPanel>
                 <TabPanel value={value} index={4} dir={theme.direction}>
-                    <List sx={{ maxHeight: '100%', overflow: 'auto', width: "100%" }}>
-                        {list.map((res, idx) => {
-                            return (<SearchItem setSelector={setSelector} content={res} type={"posts"} idx={4}></SearchItem>)
-                        })}
-
+                    <List sx={{ maxHeight: '100%', overflow: 'auto', width: "100%", padding: 0 }}>
+                        {list.map((res, idx) => (
+                            <SearchItem 
+                                key={idx}
+                                setSelector={setSelector} 
+                                content={res} 
+                                type={"posts"} 
+                                idx={4}
+                            />
+                        ))}
                     </List>
-
                 </TabPanel>
             </SwipeableViews>
-
-
-
-    </Stack>)
-
+        </Stack>
+    );
 }

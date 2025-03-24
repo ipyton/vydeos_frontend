@@ -7,15 +7,25 @@ import SparkMD5 from "spark-md5";
 export default class VideoUtil {
 
     static getUrlBase() {
+        return "http://127.0.0.1:8080"
+    }
+
+    static getUploadUrlBase() {
         return "http://localhost:8080"
     }
 
+    static getDownloadUrlBase() {
+        return "localhost:5000"
+    }
 
-    static sendRequest(videoId) {
+
+    static sendRequest(videoIdentifier) {
+        let language = JSON.parse(localStorage.getItem("userInfo")).language
+        console.log(videoIdentifier)
         return axios({
             url: VideoUtil.getUrlBase() + "/movie/sendRequest",
             method: 'post',
-            data: {videoId: videoId },
+            data: {resourceId: videoIdentifier.id, type: videoIdentifier.type, language: language},
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -30,9 +40,10 @@ export default class VideoUtil {
 
     }
 
-    static isRequested(videoId) {
+    static isRequested(movieIdentifier) {
+        console.log(VideoUtil.getUrlBase())
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/isRequested?videoId=" + videoId,
+            url: VideoUtil.getUrlBase() + "/movie/isRequested?videoId=" + movieIdentifier.id + "&type=" + movieIdentifier.type,
             method: 'get',
             data: {  token: localStorage.getItem("token") },
             transformRequest: [function (data) {
@@ -123,12 +134,9 @@ export default class VideoUtil {
         loadNextChunk();
     });
 }
-
-
         let wholeHashCode = await computeFileMD5(value)
         console.log("wholeHashCode:" + wholeHashCode)
         return axios({
-
             url: VideoUtil.getUrlBase() + "/file/negotiationStep1",
             method: 'post',
             data: { userEmail: localStorage.getItem("userId"), token: localStorage.getItem("token"),  
@@ -197,16 +205,8 @@ export default class VideoUtil {
 
     }
 
-    static getUrlBase() {
-        return "http://127.0.0.1:5000"
-    }
-    static getUploadUrlBase() {
-        return "http://localhost:8080"
-    }
 
-    static getDownloadUrlBase() {
-        return "localhost:5000"
-    }
+
 
 
     static batchStop(movies, downloadRecords, setDownloadRecords) {
@@ -340,41 +340,28 @@ export default class VideoUtil {
         })
     }
 
-    static star(videoId, details, setDetails) {
-        console.log(details)
-        axios({
+    static star(movieIdentifier) {
+        let language = JSON.parse(localStorage.getItem("userInfo")).language
+        return axios({
             url: VideoUtil.getUrlBase() + "/gallery/collect",
             method: 'post',
-            data: { "videoId": videoId },
+            data: { "resourceId": movieIdentifier.id, "type": movieIdentifier.type,"language":language },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
             }],
             headers: {
                 "token": localStorage.getItem("token"),
-            }
-        }).catch(error => {
-
-        }).then(function (response) {
-            if (!response) {
-                console.log("error")
-                return
-            }
-            console.log(response)
-            if (response.data === "success") {
-                details.stared = true
-                setDetails({ ...details })
-                console.log(details)
             }
         })
 
     }
 
-    static removeStar(videoId, details, setDetails) {
-        axios({
-            url: + "/gallery/remove",
+    static removeStar(videoIdentifier) {
+        return axios({
+            url: VideoUtil.getUrlBase() + "/gallery/remove",
             method: 'post',
-            data: { "videoId": details.movieId },
+            data: { resourceId: videoIdentifier.id, type: videoIdentifier.type},
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -382,36 +369,30 @@ export default class VideoUtil {
             headers: {
                 "token": localStorage.getItem("token"),
             }
-        }).catch(error => {
-
-        }).then(function (response) {
-            if (!response) {
-                console.log("error")
-                return
-            }
-            if (response.data === "success") {
-                details.stared = false
-                setDetails({ ...details })
-            }
-
         })
+    }
+
+    static isStared(videoIdentifier) {
+        return axios({
+            url: VideoUtil.getUrlBase() + "/movie/isStared",
+            method: 'get', params: { resourceId: videoIdentifier.id, type: videoIdentifier.type },
+            headers: {
+                "token": localStorage.getItem("token"),
+            }
+        })   
     }
 
     static getVideoInformation(movieIdentifier, setState) {
         setState(null)
 
         let language = JSON.parse(localStorage.getItem("userInfo")).language
-
+        console.log(movieIdentifier)
         return axios({
             url: "http://127.0.0.1:5000" + "/movie/get_meta",
             method: 'get',
-            params: { id:movieIdentifier.id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language":language },
-            transformRequest: [function (data) {
-                // 对 data 进行任意转换处理
-                return Qs.stringify(data)
-            }], headers: {
-                token: localStorage.getItem("token"),
-            }
+            params: { id:movieIdentifier.id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language": language},
+            headers: {  
+                token: localStorage.getItem("token") }
         }).catch(error => {
             console.log(error)
         }).then(function (response) {

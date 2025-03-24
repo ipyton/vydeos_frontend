@@ -1,224 +1,365 @@
-import { ImageList, ImageListItem, Avatar } from "@mui/material";
-import Stack from '@mui/material/Stack';
-import * as React from 'react';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Divider from '@mui/material/Divider';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  ImageList,
+  ImageListItem,
+  ImageListItemBar,
+  Stack,
+  List,
+  ListItem,
+  Divider,
+  ListItemText,
+  Typography,
+  ButtonGroup,
+  Paper,
+  Button,
+  Box,
+  IconButton,
+  Card,
+  CardContent,
+  Chip,
+  Avatar,
+  CircularProgress,
+  Container,
+} from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import MovieIcon from "@mui/icons-material/Movie";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CategoryIcon from "@mui/icons-material/Category";
+import DescriptionIcon from "@mui/icons-material/Description";
 import { useLocation } from "react-router-dom";
-import { Paper, Button } from '@mui/material'
-import Box from "@mui/material/Box";
-
-import ImageListItemBar from '@mui/material/ImageListItemBar';
-import IconButton from '@mui/material/IconButton';
-import InfoIcon from '@mui/icons-material/Info';
 import VideoUtil from "../../../../util/io_utils/VideoUtil";
-import CardContent from '@mui/material/CardContent';
-import { isDisabled } from "@testing-library/user-event/dist/cjs/utils/index.js";
 
-function Item(props) {
-    return (<Box
-            component="img"
-            sx={{
-                height: "auto",
-                width: "100%",
-                loading: "lazy"
-            }}
-            alt={props.item.original}
-            src={props.item.original} />)
+// Image component with consistent styling
+function MovieImage({ src, alt }) {
+  return (
+    <Box
+      component="img"
+      sx={{
+        width: "100%",
+        height: "auto",
+        objectFit: "cover",
+        borderRadius: 1,
+        boxShadow: 2,
+        transition: "transform 0.3s",
+        "&:hover": {
+          transform: "scale(1.02)",
+        },
+      }}
+      alt={alt || "Movie image"}
+      src={src}
+      loading="lazy"
+    />
+  );
 }
 
-export default function (props) {
-    const [details, setDetails] = useState(null)
-    const [videoIdentifier, setVideoIdentifier] = useState(null)
-    const [disabled, setIsDisabled] = useState(false)
-    let position = "center";
-    const location = useLocation()
-    position = ( !props.position ? position : props.position)
-    React.useEffect(() => {
-        //navigate from outside.
-        if (location.state) {
-            console.log("location" + location.state)
-            setVideoIdentifier(location.state)
-        }
-        // from outside.
-        if (props.content) {
-            console.log("props" + props.content)
-            setVideoIdentifier(props.content)
-        }
-    }, [props.content, location.state])
+export default function MovieDetails(props) {
+  const [details, setDetails] = useState(null);
+  const [videoIdentifier, setVideoIdentifier] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isStared, setIsStared] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  const location = useLocation();
+  const position = props.position || "center";
 
-    const handleStar = () => {
-        VideoUtil.star(videoIdentifier, details, setDetails)
+  // Handle initialization from props or route state
+  useEffect(() => {
+    if (location.state) {
+      console.log("Location state:", location.state);
+      setVideoIdentifier(location.state);
     }
-
-    const handleRemove = () => {
-        VideoUtil.removeStar(videoIdentifier, details, setDetails)
+    
+    if (props.content) {
+      console.log("Props content:", props.content);
+      setVideoIdentifier(props.content);
     }
+  }, [props.content, location.state]);
 
-    const sendRequest = () => {
-        VideoUtil.sendRequest(videoIdentifier).then(() => {
-            setIsDisabled(true)
+  // Handle star/favorite action
+  const handleStar = () => {
+    VideoUtil.star(videoIdentifier).then(function (response) {
+      if (!response) {
+        console.log("Error starring movie");
+        return;
+      }
+      
+      if (response.data === "success") {
+        setIsStared(true);
+      }
+    });
+  };
+
+  // Handle remove from favorites action
+  const handleRemove = () => {
+    VideoUtil.removeStar(videoIdentifier).then(function (response) {
+      if (!response) {
+        console.log("Error removing star");
+        return;
+      }
+      
+      if (response.data === "success") {
+        setIsStared(false);
+      }
+    });
+  };
+
+  // Handle request movie action
+  const sendRequest = () => {
+    VideoUtil.sendRequest(videoIdentifier).then(() => {
+      setIsDisabled(true);
+    });
+  };
+
+  // Load movie data and status
+  useEffect(() => {
+    if (videoIdentifier) {
+      setLoading(true);
+      
+      VideoUtil.getVideoInformation(videoIdentifier, setDetails)
+        .then(() => {
+          setIsDisabled(false);
+          
+          // Check if already requested
+          VideoUtil.isRequested(videoIdentifier).then((res) => {
+            if (res.data === true) {
+              setIsDisabled(true);
+            }
+          });
+          
+          // Check if already starred
+          VideoUtil.isStared(videoIdentifier).then((res) => {
+            if (res.data.code === 0) {
+              setIsStared(true);
+            } else {
+              setIsStared(false);
+            }
+          });
+          
+          setLoading(false);
         })
+        .catch(error => {
+          console.error("Error loading movie details:", error);
+          setLoading(false);
+        });
     }
+  }, [videoIdentifier]);
 
-    React.useEffect(() => {
-        if (videoIdentifier) VideoUtil.getVideoInformation(videoIdentifier, setDetails).then(() => {
-            setIsDisabled(false)
-            VideoUtil.isRequested(videoIdentifier).then((res) => {
-                console.log(res)
-                if (res.data === true ){
-                    setIsDisabled(true)
-                }
-            })
-        })
-    }, [videoIdentifier])
+  // Process genres into readable string
+  const genresList = details?.genre_list?.join(", ") || "";
 
-    let genresList = ""
-    if (details) {
-        for (let i = 0; i < details.genre_list.length; i++) {
-            genresList += details.genre_list[i]
-            genresList += ","
-        }
-        genresList.substring(0, -2)
-    }
+  // Show loading state
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh" }}>
+        <CircularProgress />
+        <Typography sx={{ ml: 2 }}>Loading movie details...</Typography>
+      </Box>
+    );
+  }
 
-    if (!details) {
-        return <div>loading</div>
-    }
+  if (!details) {
+    return (
+      <Box sx={{ textAlign: "center", py: 4 }}>
+        <Typography variant="h6" color="text.secondary">
+          No movie details available
+        </Typography>
+      </Box>
+    );
+  }
 
-
-    return (<div>
-        <Stack direction="column"
-            //justifyContent="center"
-            sx={{ width: "100%", overflow: "scroll" }}>
-            <Stack direction="row"
-                spacing={0.5} sx={{ width: "100%", boxShadow: 1 }}>
-                <Stack sx={{ width: "30%" }}>
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Paper elevation={3} sx={{ borderRadius: 2, overflow: "hidden" }}>
+        {/* Movie Details Section */}
+        <Box sx={{ p: 3 }}>
+          <Stack 
+            direction={{ xs: "column", sm: "row" }}
+            spacing={4} 
+            sx={{ width: "100%" }}
+          >
+            {/* Movie Poster */}
+            <Box sx={{ width: { xs: "100%", sm: "30%" }, mb: { xs: 2, sm: 0 } }}>
+              <MovieImage src={details.poster} alt={details.movie_name} />
+              
+              {/* Action Buttons */}
+              <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
+                <ButtonGroup variant="contained" sx={{ boxShadow: 2 }}>
+                  <Button 
+                    color={isStared ? "warning" : "primary"}
+                    onClick={isStared ? handleRemove : handleStar}
+                    startIcon={isStared ? <StarIcon /> : <StarBorderIcon />}
+                  >
+                    {isStared ? "Unstar" : "Star"}
+                  </Button>
+                  <Button 
+                    color="secondary"
+                    onClick={sendRequest} 
+                    disabled={isDisabled}
+                    startIcon={<MovieIcon />}
+                  >
+                    Request
+                  </Button>
+                </ButtonGroup>
+              </Box>
+            </Box>
+            
+            {/* Movie Info */}
+            <Stack direction="column" spacing={2} sx={{ width: { xs: "100%", sm: "70%" } }}>
+              {/* Movie Title and Tags */}
+              <Box>
+                <Typography variant="h4" component="h1" gutterBottom>
+                  {details.movie_name}
+                </Typography>
+                
+                {details.tag && (
+                  <Chip 
+                    label={details.tag} 
+                    size="small" 
+                    color="primary" 
+                    sx={{ mr: 1 }} 
+                  />
+                )}
+              </Box>
+              
+              <Divider />
+              
+              {/* Movie Details */}
+              <Stack spacing={2}>
+                {/* Release Year */}
+                <Card variant="outlined" sx={{ bgcolor: "background.paper" }}>
+                  <CardContent sx={{ display: "flex", alignItems: "center", py: 1, "&:last-child": { pb: 1 } }}>
+                    <CalendarTodayIcon sx={{ mr: 1, color: "primary.main" }} />
+                    <Typography variant="subtitle1" fontWeight="medium">
+                      Release Year: {details.release_year}
+                    </Typography>
+                  </CardContent>
+                </Card>
+                
+                {/* Genre */}
+                <Card variant="outlined" sx={{ bgcolor: "background.paper" }}>
+                  <CardContent sx={{ display: "flex", alignItems: "flex-start", py: 1, "&:last-child": { pb: 1 } }}>
+                    <CategoryIcon sx={{ mr: 1, mt: 0.5, color: "primary.main" }} />
                     <Box>
-                        <Item item={{ original: details.poster }}></Item>
+                      <Typography variant="subtitle1" fontWeight="medium">
+                        Genres:
+                      </Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}>
+                        {details.genre_list.map((genre, index) => (
+                          <Chip 
+                            key={index} 
+                            label={genre} 
+                            size="small" 
+                            variant="outlined" 
+                          />
+                        ))}
+                      </Box>
                     </Box>
-                </Stack>
-                <Stack
-                    direction="column"
-                    sx={{ width: "60%" }}
-                >
-                    <Stack direction="row" justifyContent="end" sx={{ width: "100%" }}>
-                        <ListItem alignItems="flex-start" >
-                            <ListItemText
-                                primary={details.movie_name}
-                                secondary={
-                                    <React.Fragment>
-                                        <Typography
-                                            sx={{ display: 'inline' }}
-                                            component="span"
-                                            variant="body2"
-                                            color="text.primary">
-                                        </Typography>
-                                        {details.tag}
-                                    </React.Fragment>
-                                }/>
-                        </ListItem>
-
-                        <ButtonGroup sx={{ marginTop: "3%", height: "50%", marginRight: "2%" }} aria-label="Basic button group" >
-                            {(!details.stared) ? <Button onClick={handleStar} > Star</Button> : <Button onClick={handleRemove} > Remove</Button>}
-                            {<Button onClick={sendRequest} disabled = {disabled}>Request</Button>}
-
-                        </ButtonGroup>
-                    </Stack>
-                    <Stack sx={{ width: "100%", }}>
-
-                        <React.Fragment>
-                            <CardContent>
-                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    Release Year
-                                </Typography>
-                                <Typography variant="h7" component="div">
-                                    {details.release_year}
-                                </Typography>
-                            </CardContent>
-                            <CardContent>
-                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    Type
-                                </Typography>
-                                <Typography variant="h7" component="div">
-                                    {genresList}
-                                </Typography>
-                            </CardContent>
-                            <CardContent>
-                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    Introduction
-                                </Typography>
-                                <Typography variant="h7" component="div">
-                                    {details.introduction}
-                                </Typography>
-                            </CardContent>
-                            {
-                                Object.keys(details.makerList).forEach(element => {
-                                    return <CardContent>
-                                        <Typography variant="h7" component="div">
-                                            {element}
-                                        </Typography>
-                                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                            {details.makerList[element]}
-                                        </Typography>
-
-                                    </CardContent>
-                                })
-                            }
-                        </React.Fragment>
-                    </Stack>
-                </Stack>
+                  </CardContent>
+                </Card>
+                
+                {/* Introduction */}
+                <Card variant="outlined" sx={{ bgcolor: "background.paper" }}>
+                  <CardContent sx={{ py: 1, "&:last-child": { pb: 1 } }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
+                      <Typography variant="subtitle1" fontWeight="medium">
+                        Introduction
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" component="div" sx={{ pl: 3 }}>
+                      {details.introduction}
+                    </Typography>
+                  </CardContent>
+                </Card>
+                
+                {/* Creators/Makers List */}
+                {details.makerList && Object.keys(details.makerList).length > 0 && (
+                  <Card variant="outlined" sx={{ bgcolor: "background.paper" }}>
+                    <CardContent sx={{ py: 1, "&:last-child": { pb: 1 } }}>
+                      <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
+                        Production Team
+                      </Typography>
+                      <List dense>
+                        {Object.entries(details.makerList).map(([role, person], index) => (
+                          <ListItem key={index} sx={{ py: 0.5 }}>
+                            <Typography variant="body2" sx={{ fontWeight: "medium", width: "30%" }}>
+                              {role}:
+                            </Typography>
+                            <Typography variant="body2" sx={{ ml: 2 }}>
+                              {person}
+                            </Typography>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </CardContent>
+                  </Card>
+                )}
+              </Stack>
             </Stack>
-            Stars
-            <Stack>
-                <ImageList
-                    sx={{
-                        gridAutoFlow: "column",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr)) !important",
-                        gridAutoColumns: "minmax(200px, 1fr)",
-                        width: "100%",
-                        height: "100%",
-                        // overflow: "scroll",
-                        boxShadow: 0,
-                    }}
-                >
-
-                    {details.actressList.map((item) => {
-                        return (
-                            <ImageListItem key={item.avatar} sx={{
-                                display: 'flex', flexDirection: 'row',
-                                // width: undefined,
-                                // Without height undefined it won't work
-                                // height: "100%", aspectRatio: 135 / 76
-                            }} >
-                                <Item item={{ original: item.avatar }}></Item>
-                                <ImageListItemBar
-                                    title={item.name}
-                                    subtitle={"Character:" + item.character}
-                                    actionIcon={
-                                        <IconButton
-                                            sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                            aria-label={`info about ${item.title}`}
-                                        >
-                                            <InfoIcon />
-                                        </IconButton>
-                                    }
-                                />
-                            </ImageListItem>
-                        )
-                    })}
-                </ImageList>
-            </Stack>
-        </Stack>
-       
-    </div>
-    )
-
-
-
-
+          </Stack>
+        </Box>
+        
+        <Divider />
+        
+        {/* Cast Section */}
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h5" component="h2" gutterBottom sx={{ 
+            display: "flex", 
+            alignItems: "center",
+            mb: 3 
+          }}>
+            <StarIcon sx={{ mr: 1, color: "gold" }} />
+            Cast Members
+          </Typography>
+          
+          <ImageList
+            sx={{
+              gridTemplateColumns: {
+                xs: "repeat(auto-fill, minmax(140px, 1fr))",
+                sm: "repeat(auto-fill, minmax(200px, 1fr))",
+              },
+              gap: 2,
+            }}
+            cols={5}
+          >
+            {details.actressList.map((actor) => (
+              <ImageListItem 
+                key={actor.name} 
+                sx={{ 
+                  overflow: "hidden",
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: 4,
+                  }
+                }}
+              >
+                <MovieImage src={actor.avatar} alt={actor.name} />
+                <ImageListItemBar
+                  title={actor.name}
+                  subtitle={actor.character ? `Character: ${actor.character}` : ""}
+                  sx={{
+                    "& .MuiImageListItemBar-title": { fontWeight: "bold" },
+                    background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0) 100%)",
+                  }}
+                  actionIcon={
+                    <IconButton
+                      sx={{ color: "rgba(255, 255, 255, 0.8)" }}
+                      aria-label={`info about ${actor.name}`}
+                    >
+                      <InfoIcon />
+                    </IconButton>
+                  }
+                />
+              </ImageListItem>
+            ))}
+          </ImageList>
+        </Box>
+      </Paper>
+    </Container>
+  );
 }

@@ -120,13 +120,12 @@ export default class SearchUtil {
     return axios({
       url: "http://127.0.0.1:5000/movie/search",
       method: 'get',
-      params: { "keyword": keyword, page_number:1 },
+      params: { "keyword": keyword, page_number:1, "Accept-Language": language},
       transformRequest: [function (data) {
         // 对 data 进行任意转换处理
         return Qs.stringify(data)
       }], headers: {
         token: localStorage.getItem("token"),
-        "Accept-Language": language
       }
     }).then(function (response) {
       console.log(response)

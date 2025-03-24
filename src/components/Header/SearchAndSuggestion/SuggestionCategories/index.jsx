@@ -22,20 +22,10 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 export default function (props) {
     let { setCategory, setCategorySelected, categorySelected } = props
     let handleClick = (idx) => {
-        setCategory(true)
-
-        return () => {
-            const newCategorySelected = categorySelected.map((c, i) => {
-                if (i === idx) {
-                    return true
-                }
-                else {
-                    return false
-                }
-            })
-            setCategorySelected(newCategorySelected)
-        }
-    }
+        setCategory(true);
+        const newCategorySelected = categorySelected.map((c, i) => i === idx);
+        setCategorySelected(newCategorySelected);
+    };
     let clear = () => {
         setCategory(true)
         setCategorySelected([false, false, false, false, false])
@@ -44,20 +34,20 @@ export default function (props) {
     return (
         <Stack direction="row">
             <Checkbox {...label} id="category" icon={<PermContactCalendarOutlinedIcon />}
-                checkedIcon={<PermContactCalendarIcon />} onChange={handleClick(0)} checked={categorySelected[0]} />
+                checkedIcon={<PermContactCalendarIcon />} onChange={()=>{handleClick(0)}} checked={categorySelected[0]} />
             <Checkbox
                 id="category"
                 {...label}
                 icon={<SpeakerNotesOutlinedIcon />}
                 checkedIcon={<SpeakerNotesIcon />}
-                onChange={handleClick(1)}
+                onChange={()=>{handleClick(1)}}
                 checked={categorySelected[1]} />
             <Checkbox
                 id="category"
                 {...label}
                 icon={<MovieCreationOutlinedIcon />}
                 checkedIcon={<MovieIcon />}
-                onChange={handleClick(2)}
+                onChange={()=>{handleClick(2)}}
                 checked={categorySelected[2]} />
             {/* music */}
             <Checkbox
@@ -65,7 +55,7 @@ export default function (props) {
                 {...label}
                 icon={<MusicNoteOutlinedIcon />}
                 checkedIcon={<MusicNoteIcon />}
-                onChange={handleClick(3)}
+                onChange={()=>{handleClick(3)}}
                 checked={categorySelected[3]} />
             {/* posts */}
             <Checkbox
@@ -73,7 +63,7 @@ export default function (props) {
                 {...label}
                 icon={<NewspaperOutlinedIcon />}
                 checkedIcon={<NewspaperIcon />}
-                onChange={handleClick(4)}
+                onChange={()=>{handleClick(4)}}
                 checked={categorySelected[4]} />
 
             <IconButton id="category"
