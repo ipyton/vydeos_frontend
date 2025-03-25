@@ -61,6 +61,12 @@ export default function DownloadManager() {
   const [input, setInput] = useState("");
   const [selectOpen, setSelectOpen] = useState(false);
   const [selections, setSelections] = useState([]);
+  const [requests, setRequests] = useState([
+    { videoId: "videoId", source: "xxxx1", status: "init" },
+    { videoId: "videoId", source: "xxxx2", status: "downloading" },
+    { videoId: "videoId", source: "xxxx3", status: "paused" },
+    { videoId: "videoId", source: "xxxx4", status: "cancelled" },
+  ]);
   const [sources, setSources] = useState([
     { videoId: "videoId", source: "xxxx1", status: "init" },
     { videoId: "videoId", source: "xxxx2", status: "downloading" },
@@ -75,6 +81,7 @@ export default function DownloadManager() {
   const [uploadProgress, setUploadProgress] = useState(0);
   
   const { showNotification } = useNotification();
+  const [indicator, setIndicator] = useState("ready") 
   const navigate = useNavigate();
 
   // Handler functions
@@ -83,14 +90,16 @@ export default function DownloadManager() {
   };
 
   const select = () => {
+    //select file
     if (!tmpGid || checkedNumber === null || !tmpSource) {
       setSelectOpen(false);
       return;
     }
-    setVideoId(details.movieId);
+    setVideoId(details.movieId);//////!!!!!!
     setMovieName(details.movie_name);
     VideoUtil.select(
-      details.movieId,
+      details.resourceId,
+      details.type,
       tmpSource,
       tmpGid,
       checkedNumber + 1,
@@ -106,18 +115,45 @@ export default function DownloadManager() {
     if (!input || input.length === 0) {
       return;
     }
+    console.log(details)
     VideoUtil.add_download_source(
-      videoId,
+      details,
       input,
-      details.movie_name,
-      sources,
-      setSources
-    );
+    ).then(function (response) {
+      if (response === undefined || !response.data) {
+          console.log("errror")
+      }
+      
+      console.log(response)
+      //props.setBarState({...props.barState, message:responseData.message, open:true})
+      let data = response.data
+      if (data === "success") {
+          setSources([...sources, { id: details.id, source: input, status: "init" }])
+      }
+
+  })
     setInput("");
   };
 
   const handleDelete = (source) => () => {
-    VideoUtil.remove_download_source("videoId", source, sources, setSources);
+    VideoUtil.remove_download_source(details, source).then(function (response) {
+      if(!response) {
+        return
+      }
+      else if (response.data !== "success") {
+        return 
+      }
+      else {
+        for (let i = 0; i < sources.length; i++) {
+          if (sources[i].source === source) {
+            sources.splice(i, 1)
+            break
+          }
+        }
+        setSources([...sources])
+      }
+
+    })
   };
 
   const handleFileChange = (e) => {
@@ -129,7 +165,7 @@ export default function DownloadManager() {
       showNotification("Please select a file first", "warning");
       return;
     }
-    VideoUtil.uploadVideos(videoId, file, setUploadProgress, null);
+    VideoUtil.uploadVideos(videoId, file, setUploadProgress, null, setIndicator);
   };
 
   const handlePlay = (resource) => () => {
@@ -154,8 +190,27 @@ export default function DownloadManager() {
   const handleOpenDetails = (row) => {
     setOpen(true);
     setDetails(row);
-    setVideoId(row.movieId);
+    setVideoId(row.resourceId);
     setMovieName(row.movieName);
+    console.log(row)
+    VideoUtil.get_download_sources(row.resourceId, row.type).then(function (response) {
+        if (response === undefined) {
+            console.log("errror")
+            return
+        }
+        console.log(response)
+        //props.setBarState({...props.barState, message:responseData.message, open:true})
+        let data = response.data
+        setSources(data)
+
+        // for (let i = 0; i < sources.length; i++) {
+        //     if (sources[i].source === source) {
+        //         sources.splice(i, 1)
+        //         break
+        //     }
+        // }
+        // setSources([...sources])
+    })
   };
 
   // Load data on component mount
@@ -169,13 +224,14 @@ export default function DownloadManager() {
         }
         if (res.data.code === 0) {
           let requests = JSON.parse(res.data.message);
-          setSources(requests);
+          setRequests(requests);
         }
       })
       .catch(err => {
         showNotification("Failed to load requests", "error");
       });
   }, []);
+
 
   // Get status color based on status
   const getStatusColor = (status) => {
@@ -213,12 +269,12 @@ export default function DownloadManager() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sources == null ? (
+            {requests == null ? (
               <TableRow>
                 <TableCell colSpan={7} align="center">No data available</TableCell>
               </TableRow>
             ) : (
-              sources.map((row, index) => (
+              requests.map((row, index) => (
                 <TableRow
                   key={row.movieId || index}
                   sx={{ 
@@ -227,12 +283,12 @@ export default function DownloadManager() {
                     transition: "background-color 0.2s"
                   }}
                 >
-                  <TableCell>{row.movieId}</TableCell>
+                  <TableCell>{row.resourceId}</TableCell>
                   <TableCell>{row.movieName}</TableCell>
                   <TableCell>{row.actorList}</TableCell>
                   <TableCell>{row.release_year}</TableCell>
                   <TableCell>{row.userId}</TableCell>
-                  <TableCell>{row.timestamp}</TableCell>
+                  <TableCell>{new Date(row.timestamp).toLocaleDateString(JSON.parse(localStorage.getItem("userInfo")).language)}</TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
@@ -369,7 +425,7 @@ export default function DownloadManager() {
                     />
                   </Button>
                   <Typography variant="body2">
-                    {file ? file.name : "No file selected"}
+                    {file ? file.name + indicator: "No file selected"}
                   </Typography>
                 </Box>
                 

@@ -1,36 +1,31 @@
-import VideoCardRow from "./VideoCardRow"
+// VideoGallery.jsx
+import VideoCardRow from "./VideoCardRow";
 import * as React from 'react';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import VideoUtil from "../../../util/io_utils/VideoUtil";
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    alignContent: true,
-    color: theme.palette.primary.light,
-  boxShadow: 0
-  }));
+// Container for rows with consistent spacing
+const GalleryContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(3),
+  padding: theme.spacing(2, 0),
+  width: '100%'
+}));
 
-export default function() {
-
-  const [rows, setRows] = React.useState([])
+export default function VideoGallery() {
+  const [rows, setRows] = React.useState([]);
+  
   React.useEffect(() => {
-    VideoUtil.getGallery(setRows)
-  }, []) 
-    return (
-    <Stack sx={{marginTop:2}}>
-      {
-        rows.map((item, index)=>{
-          return <Item><VideoCardRow row={item}></VideoCardRow></Item>
-        })
-
-      }
-
-           
-    </Stack>
-    )
+    VideoUtil.getGallery(setRows);
+  }, []);
+  
+  return (
+    <GalleryContainer>
+      {rows.map((item, index) => (
+        <VideoCardRow key={index} row={item} />
+      ))}
+    </GalleryContainer>
+  );
 }

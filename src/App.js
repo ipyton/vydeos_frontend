@@ -1,16 +1,12 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import Header from './components/Header';
 import Contents from './components/Contents';
-import { useEffect, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import Footer from './components/Footer';
-import { stepButtonClasses } from '@mui/material';
 import IOUtil from './util/ioUtil';
 import PictureUtil from './util/io_utils/FileUtil';
-import { BrowserRouter } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
 import NetworkError from './components/Errors/NetworkError';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -23,52 +19,73 @@ import localforage from 'localforage';
 import { StrictMode } from 'react';
 import { NotificationProvider } from './Providers/NotificationProvider';
 
-
 const defaultTheme = createTheme();
 
 function checkNetworkStatus() {
-  return Navigator.onLine
+  return navigator.onLine;
 }
 
-function checkEndpointStauts() {
+function checkEndpointStatus() {
   return true;
 }
 
-
 function App() {
-  const [login, setLogin] = useState(false)
-  const [avatar, setAvatar] = useState(null)
-  const [badgeContent, setBadgeContent] = useState([])
-  const [networkStatus, setNetworkStatus] = useState(false)
-  // Notification.requestPermission().then((permission) => {
-  //   if (permission === "granted") {
-  //     const notification = new Notification("Welcome!");
-  //   }
-  // })
+  const [login, setLogin] = useState(() => {
+    // Initialize login state from localStorage to persist across refreshes
+    const storedLoginState = localStorage.getItem('isLoggedIn');
+    return storedLoginState === 'true';
+  });
+  const [avatar, setAvatar] = useState(null);
+  const [badgeContent, setBadgeContent] = useState([]);
+  const [networkStatus, setNetworkStatus] = useState(false);
+
+  useEffect(() => {
+    // Verify tokens only if not already logged in
+    if (!login) {
+      AccountUtil.verifyTokens((isAuthenticated) => {
+        setLogin(isAuthenticated);
+        // Update localStorage with the login state
+        localStorage.setItem('isLoggedIn', isAuthenticated.toString());
+      });
+    }
+  }, []); // Empty dependency array ensures this runs only once
 
   if (checkNetworkStatus() === false) {
-    return <NetworkError></NetworkError>
+    return <NetworkError />;
   }
 
-  if (checkEndpointStauts() === false) {
-    return <EndpointNotAvailableError></EndpointNotAvailableError>
-  }
-
-  if (login === false) {
-    AccountUtil.verifyTokens(setLogin)
+  if (checkEndpointStatus() === false) {
+    return <EndpointNotAvailableError />;
   }
 
   if (login === false) {
     return (
-    <StrictMode> <AccountIssue loginState={login} setLoginState={setLogin}></AccountIssue></StrictMode> )
-  }
-  if (login === true)
-    return (
-    <BrowserRouter>
-        <Contents setLogin={setLogin}></Contents>
-    </BrowserRouter>
+      <StrictMode>
+        <AccountIssue 
+          loginState={login} 
+          setLoginState={(newState) => {
+            setLogin(newState);
+            localStorage.setItem('isLoggedIn', newState.toString());
+          }} 
+        />
+      </StrictMode>
     );
-  return <div> loading</div>
+  }
+
+  if (login === true) {
+    return (
+      <BrowserRouter>
+        <Contents 
+          setLogin={(newState) => {
+            setLogin(newState);
+            localStorage.setItem('isLoggedIn', newState.toString());
+          }} 
+        />
+      </BrowserRouter>
+    );
+  }
+
+  return <div>loading</div>;
 }
 
 export default App;

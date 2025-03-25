@@ -3,7 +3,7 @@ import axios from "axios"
 import CryptoJS from "crypto-js";
 
 import SparkMD5 from "spark-md5";
- 
+
 export default class VideoUtil {
 
     static getUrlBase() {
@@ -15,7 +15,7 @@ export default class VideoUtil {
     }
 
     static getDownloadUrlBase() {
-        return "localhost:5000"
+        return "http://127.0.0.1:5001"
     }
 
 
@@ -92,7 +92,8 @@ export default class VideoUtil {
     }
 
 
-    static async uploadVideos(resourceId, value, setUploadState, resourceName) {
+    static async uploadVideos(resourceId, value, setUploadState, resourceName,setIndicator) {
+        setIndicator("-- preprocessing...")
         let sliceLength = 1024 * 1024 * 8
         let length = value.size
 
@@ -136,6 +137,7 @@ export default class VideoUtil {
 }
         let wholeHashCode = await computeFileMD5(value)
         console.log("wholeHashCode:" + wholeHashCode)
+        setIndicator("-- negotiating...")
         return axios({
             url: VideoUtil.getUrlBase() + "/file/negotiationStep1",
             method: 'post',
@@ -158,8 +160,10 @@ export default class VideoUtil {
                     let threads = 2;
                     console.log(totalSlice)
                     let continueUpload = true;
-                    for (let i = 0; i < totalSlice && continueUpload; i ++) {
-                        setUploadState(i/totalSlice)
+                    setIndicator("-- uploading...")
+                    let i = 0;
+                    for (; i < totalSlice && continueUpload; i ++) {
+                        setUploadState(i/totalSlice * 100)
                         console.log(i + 1 + "/" + totalSlice)
                         let chunk = value.slice(i * sliceLength, (i + 1) * sliceLength);
                         console.log(chunk.size)
@@ -193,6 +197,10 @@ export default class VideoUtil {
 
                         
                     }
+                    if (i == totalSlice) {
+                        setIndicator("-- encoding and decoding...")
+                    }
+
                 }
                 else {
                     setUploadState.state = "unknownError"
@@ -307,7 +315,7 @@ export default class VideoUtil {
         axios({
             url: VideoUtil.getUrlBase() + "/gallery/get",
             method: 'get',
-            params: { userId: localStorage.getItem("userId") },
+            params: { userId: localStorage.getItem("userId")},
             headers: {
                 token: localStorage.getItem("token"),
             }
@@ -414,94 +422,41 @@ export default class VideoUtil {
         })
     }
 
-    static add_download_source(movie_id, source, name, sources, setSources) {
-        axios({
+    static add_download_source(videoIdentifier, source) {
+        return axios({
             url: VideoUtil.getDownloadUrlBase() + "/movie/add_source",
             method: 'post',
-            data: { movieId: movie_id, source: source, name, },
-            transformRequest: [function (data) {
-                // 对 data 进行任意转换处理
-                return Qs.stringify(data)
-            }], headers: {
+            data: { resourceId: videoIdentifier.resourceId, type: videoIdentifier.type,  source: source, name:videoIdentifier.movieName},
+ headers: {
                 token: localStorage.getItem("token"),
-            }
-        }).catch(error => {
-            console.log(error)
-        }).then(function (response) {
-            if (response === undefined || !response.data) {
-                console.log("errror")
-            }
-            
-            console.log(response)
-            //props.setBarState({...props.barState, message:responseData.message, open:true})
-            let data = response.data
-            if (data === "success") {
-                setSources([...sources, { movie_id: movie_id, source: source, status: "init" }])
-            }
+                'Content-Type': 'application/json',  
 
+            }
         })
     }
 
-    static remove_download_source(movie_id, source, sources, setSources) {
-        axios({
+    static remove_download_source(detail, source) {
+        return axios({
             url: VideoUtil.getDownloadUrlBase() + "/movie/remove_source",
             method: 'post',
-            data: { movieId: movie_id, source: source },
-            transformRequest: [function (data) {
-                // 对 data 进行任意转换处理
-                return Qs.stringify(data)
-            }], headers: {
+            data: { resourceId: detail.resourceId, source: source, type: detail.type},
+             headers: {
                 token: localStorage.getItem("token"),
             }
-        }).catch(error => {
-            console.log(error)
-            return
-        }).then(function (response) {
-            if (response === undefined) {
-                console.log("errror")
-                return
-            }
-            console.log(response)
-            //props.setBarState({...props.barState, message:responseData.message, open:true})
-            let data = response.data
-            for (let i = 0; i < sources.length; i++) {
-                if (sources[i].source === source) {
-                    sources.splice(i, 1)
-                    break
-                }
-            }
-            setSources([...sources])
         })
     }
 
-    static get_download_source(movie_id, setSources) {
-        axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/get_source",
+    static get_download_sources(resource_id, type) {
+        return axios({
+            url: VideoUtil.getDownloadUrlBase() + "/movie/get_sources",
             method: 'post',
-            data: { movieId: movie_id },
-            transformRequest: [function (data) {
-                // 对 data 进行任意转换处理
-                return Qs.stringify(data)
-            }], headers: {
+            data: { resourceId: resource_id, type: type },
+            headers: {
                 token: localStorage.getItem("token"),
+                'Content-Type': 'application/json', // Set content type to JSON
+
             }
-        }).catch(error => {
-            console.log(error)
-            return
-        }).then(function (response) {
-            if (response === undefined) {
-                console.log("errror")
-                return
-            }
-            //props.setBarState({...props.barState, message:responseData.message, open:true})
-            let data = response.data
-            console.log(data)
-            setSources(data)
         })
-
-
-
-
     }
 
     static get_file_list(meta_gid, movie_id, source_id, sources, setSources, setState, setPrevOpen, setSelectOpen, setTmpGid) {
@@ -554,11 +509,11 @@ export default class VideoUtil {
     }
 
 
-    static select(movie_id, source_id, gid, place, setSelectOpen) {
+    static select(movie_id,type, source_id, gid, place, setSelectOpen) {
         axios({
             url: VideoUtil.getDownloadUrlBase() + "/movie/select",
             method: 'post',
-            data: { gid: gid, movieId: movie_id, resource: source_id, place: place },
+            data: { gid: gid, movieId: movie_id, resource: source_id, place: place, type: type },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
