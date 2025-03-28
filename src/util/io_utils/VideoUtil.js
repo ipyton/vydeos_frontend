@@ -25,7 +25,7 @@ export default class VideoUtil {
         return axios({
             url: VideoUtil.getUrlBase() + "/movie/sendRequest",
             method: 'post',
-            data: {resourceId: videoIdentifier.id, type: videoIdentifier.type, language: language},
+            data: {resourceId: videoIdentifier.resource_id, type: videoIdentifier.type, language: language},
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -40,10 +40,24 @@ export default class VideoUtil {
 
     }
 
+    static get_playables(movieIdentifier){
+        console.log(movieIdentifier)
+        return axios({
+            url: VideoUtil.getUrlBase() + "/movie/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
+            method: 'get',
+            data: {  token: localStorage.getItem("token") },
+            headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
     static isRequested(movieIdentifier) {
         console.log(VideoUtil.getUrlBase())
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/isRequested?videoId=" + movieIdentifier.id + "&type=" + movieIdentifier.type,
+            url: VideoUtil.getUrlBase() + "/movie/isRequested?videoId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
             method: 'get',
             data: {  token: localStorage.getItem("token") },
             transformRequest: [function (data) {
@@ -308,43 +322,15 @@ export default class VideoUtil {
         })
     }
 
-    static getGallery(setState) {
+    static getGallery() {
         const userId = localStorage.getItem("userId")
-        const size = 4
-        setState([])
-        axios({
+        return axios({
             url: VideoUtil.getUrlBase() + "/gallery/get",
             method: 'get',
             params: { userId: localStorage.getItem("userId")},
             headers: {
                 token: localStorage.getItem("token"),
             }
-        }).catch(error => {
-            console.log(error)
-            return
-        }).then(function (response) {
-            if (!response) {
-                console.log(response)
-                return
-            }
-            if (!response.data) {
-                console.log(response)
-                return
-            }
-            console.log(response)
-            let rows = []
-            const body = response.data
-            console.log(Math.floor(body.length / size) + 1)
-            for (let i = 0; i < Math.floor(body.length / size) + 1; i++) {
-                let row = []
-                for (let col = 0; col < size && i * size + col < body.length; col++) {
-                    row.push(body[i * size + col])
-                }
-                console.log(row)
-                rows.push(row)
-            }
-            console.log(rows)
-            setState(rows)
         })
     }
 
@@ -353,7 +339,7 @@ export default class VideoUtil {
         return axios({
             url: VideoUtil.getUrlBase() + "/gallery/collect",
             method: 'post',
-            data: { "resourceId": movieIdentifier.id, "type": movieIdentifier.type,"language":language },
+            data: { "resourceId": movieIdentifier.resource_id, "type": movieIdentifier.type,"language":language },
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -369,7 +355,7 @@ export default class VideoUtil {
         return axios({
             url: VideoUtil.getUrlBase() + "/gallery/remove",
             method: 'post',
-            data: { resourceId: videoIdentifier.id, type: videoIdentifier.type},
+            data: { resourceId: videoIdentifier.resource_id, type: videoIdentifier.type},
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
                 return Qs.stringify(data)
@@ -383,7 +369,7 @@ export default class VideoUtil {
     static isStared(videoIdentifier) {
         return axios({
             url: VideoUtil.getUrlBase() + "/movie/isStared",
-            method: 'get', params: { resourceId: videoIdentifier.id, type: videoIdentifier.type },
+            method: 'get', params: { resourceId: videoIdentifier.resource_id, type: videoIdentifier.type },
             headers: {
                 "token": localStorage.getItem("token"),
             }
@@ -398,7 +384,7 @@ export default class VideoUtil {
         return axios({
             url: "http://127.0.0.1:5000" + "/movie/get_meta",
             method: 'get',
-            params: { id:movieIdentifier.id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language": language},
+            params: { id:movieIdentifier.resource_id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language": language},
             headers: {  
                 token: localStorage.getItem("token") }
         }).catch(error => {

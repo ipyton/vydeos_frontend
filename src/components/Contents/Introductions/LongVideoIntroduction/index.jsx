@@ -21,6 +21,7 @@ import {
   CircularProgress,
   Container,
 } from "@mui/material";
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import InfoIcon from "@mui/icons-material/Info";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -61,6 +62,9 @@ export default function MovieDetails(props) {
   const [isStared, setIsStared] = useState(false);
   const [loading, setLoading] = useState(true);
   
+  const [playable, setPlayable] = useState(false);
+
+
   const location = useLocation();
   const position = props.position || "center";
 
@@ -68,14 +72,17 @@ export default function MovieDetails(props) {
   useEffect(() => {
     if (location.state) {
       console.log("Location state:", location.state);
-      setVideoIdentifier(location.state);
+      //resourceId: videoIdentifier.id, type: videoIdentifier.type
+      setVideoIdentifier({resource_id: location.state.resourceId, type: location.state.type});
     }
     
     if (props.content) {
       console.log("Props content:", props.content);
+
       setVideoIdentifier(props.content);
     }
   }, [props.content, location.state]);
+  console.log(videoIdentifier)
 
   // Handle star/favorite action
   const handleStar = () => {
@@ -136,6 +143,18 @@ export default function MovieDetails(props) {
               setIsStared(false);
             }
           });
+
+          VideoUtil.get_playables(videoIdentifier).then((res) => {
+            if (res.data.code === 0) {
+              let playables = JSON.parse(res.data.message)
+              if (playables.length > 0) {
+                setPlayable(true)
+              }
+              else {
+                setPlayable(false)
+              }
+          }
+        })
           
           setLoading(false);
         })
@@ -211,6 +230,9 @@ export default function MovieDetails(props) {
               <Box>
                 <Typography variant="h4" component="h1" gutterBottom>
                   {details.movie_name}
+                  <IconButton color="primary" aria-label="delete" size="large"         disabled={!playable}                  >
+                  <PlayCircleOutlineIcon/>
+</IconButton>
                 </Typography>
                 
                 {details.tag && (

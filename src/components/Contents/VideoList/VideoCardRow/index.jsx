@@ -23,10 +23,7 @@ export default function VideoCardRow(props) {
       {props.row.map((item, idx) => (
         <VideoCard 
           key={item.movieId || idx}
-          movieId={item.movieId} 
-          movie_name={item.movie_name} 
-          release_year={item.release_year} 
-          poster={item.poster}
+          content = {item}
         />
       ))}
     </RowContainer>

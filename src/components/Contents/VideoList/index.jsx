@@ -18,7 +18,31 @@ export default function VideoGallery() {
   const [rows, setRows] = React.useState([]);
   
   React.useEffect(() => {
-    VideoUtil.getGallery(setRows);
+    const size = 4
+    setRows([])
+    VideoUtil.getGallery().then(function (response) {
+      if (!response) {
+          console.log(response)
+          return
+      }
+      if (!response.data) {
+          console.log(response)
+          return
+      }
+      console.log(response)
+      let rows = []
+      const body = response.data
+      console.log(Math.floor(body.length / size) + 1)
+      for (let i = 0; i < Math.floor(body.length / size) + 1; i++) {
+          let row = []
+          for (let col = 0; col < size && i * size + col < body.length; col++) {
+              row.push(body[i * size + col])
+          }
+          console.log(row)
+          rows.push(row)
+      }
+      setRows(rows)
+  });
   }, []);
   
   return (

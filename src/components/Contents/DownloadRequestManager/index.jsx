@@ -23,7 +23,10 @@ import {
   Stack,
   Checkbox,
   Divider,
+  IconButton
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import VideoUtil from "../../../util/io_utils/VideoUtil";
@@ -55,12 +58,26 @@ LinearProgressWithLabel.propTypes = {
 
 export default function DownloadManager() {
   // State management
+  
   const [open, setOpen] = useState(false);
   const [tmpGid, setTmpGid] = useState("");
   const [tmpSource, setTmpSource] = useState("");
   const [input, setInput] = useState("");
   const [selectOpen, setSelectOpen] = useState(false);
   const [selections, setSelections] = useState([]);
+
+  const [playableData, setPlayableData] = useState([
+    { resource_id: "res1", type: "video", quality: 1080, bucket: "bucket1", path: "/path/to/resource1" },
+    { resource_id: "res2", type: "audio", quality: 320, bucket: "bucket2", path: "/path/to/resource2" },
+    { resource_id: "res3", type: "video", quality: 720, bucket: "bucket3", path: "/path/to/resource3" },
+  ]);
+
+  const handleFileDelete = (index) => {
+
+    setPlayableData(playableData.filter((_, i) => i !== index));
+  };
+
+  
   const [requests, setRequests] = useState([
     { videoId: "videoId", source: "xxxx1", status: "init" },
     { videoId: "videoId", source: "xxxx2", status: "downloading" },
@@ -98,7 +115,7 @@ export default function DownloadManager() {
     setVideoId(details.movieId);//////!!!!!!
     setMovieName(details.movie_name);
     VideoUtil.select(
-      details.resourceId,
+      details.resource_id,
       details.type,
       tmpSource,
       tmpGid,
@@ -186,14 +203,14 @@ export default function DownloadManager() {
     );
     setTmpSource(source);
   };
-
+  
   const handleOpenDetails = (row) => {
     setOpen(true);
     setDetails(row);
-    setVideoId(row.resourceId);
+    setVideoId(row.resource_id);
     setMovieName(row.movieName);
     console.log(row)
-    VideoUtil.get_download_sources(row.resourceId, row.type).then(function (response) {
+    VideoUtil.get_download_sources(row.resource_id, row.type).then(function (response) {
         if (response === undefined) {
             console.log("errror")
             return
@@ -224,13 +241,33 @@ export default function DownloadManager() {
         }
         if (res.data.code === 0) {
           let requests = JSON.parse(res.data.message);
+
+          requests = requests.map((item) => {
+            console.log(item)
+            return { ...item, resource_id: item.resourceId };
+          })
+
           setRequests(requests);
         }
       })
       .catch(err => {
         showNotification("Failed to load requests", "error");
       });
+
   }, []);
+  
+
+  useEffect(() => {
+    if (!details) return;
+    VideoUtil.get_playables(details).then(function (response) {
+      if (response.data && response.data.code === 0) {
+        setPlayableData(JSON.parse(response.data.message));
+      }
+      else {
+        console.log(response)
+      }
+    })
+  },[details])
 
 
   // Get status color based on status
@@ -283,7 +320,7 @@ export default function DownloadManager() {
                     transition: "background-color 0.2s"
                   }}
                 >
-                  <TableCell>{row.resourceId}</TableCell>
+                  <TableCell>{row.resource_id}</TableCell>
                   <TableCell>{row.movieName}</TableCell>
                   <TableCell>{row.actorList}</TableCell>
                   <TableCell>{row.release_year}</TableCell>
@@ -445,6 +482,26 @@ export default function DownloadManager() {
               </Stack>
             </Box>
           </List>
+
+      <div>
+      <Typography variant="h6" gutterBottom>
+        Playable Resources
+      </Typography>
+      <List>
+        {playableData.map((item, index) => (
+          <ListItem key={index} divider>
+            <ListItemText
+              primary={`Resource: ${item.resource_id}, Type: ${item.type}, Quality: ${item.quality}`}
+              secondary={`Bucket: ${item.bucket}, Path: ${item.path}`}
+            />
+            <IconButton edge="end" aria-label="delete" onClick={() => handleFileDelete(index)}>
+              <DeleteIcon />
+            </IconButton>
+          </ListItem>
+        ))}
+      </List>
+
+    </div>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={handleClose} variant="contained" sx={{ borderRadius: 2 }}>

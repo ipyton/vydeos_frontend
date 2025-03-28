@@ -7,11 +7,11 @@ import { CardActionArea } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 export default function(props) {
-  const {movieId, movie_name, release_year,poster} = props
   console.log(props)
+  const content = props.content
   const navigate = useNavigate()
   const handleClick = () => {
-    navigate("/videoIntroduction", { state: movieId })
+    navigate("/videoIntroduction", { state:content })
   }
 
   return (
@@ -19,15 +19,15 @@ export default function(props) {
       <CardActionArea onClick={handleClick}>
         <CardMedia
           component="img"
-          image={poster}
+          image={content.poster}
           alt="poster"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {movie_name}
+            {content.movieName}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {release_year}
+            {content.releaseYear}
           </Typography>
         </CardContent>
       </CardActionArea>
