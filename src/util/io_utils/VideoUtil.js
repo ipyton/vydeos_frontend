@@ -21,7 +21,6 @@ export default class VideoUtil {
 
     static sendRequest(videoIdentifier) {
         let language = JSON.parse(localStorage.getItem("userInfo")).language
-        console.log(videoIdentifier)
         return axios({
             url: VideoUtil.getUrlBase() + "/movie/sendRequest",
             method: 'post',
@@ -40,22 +39,33 @@ export default class VideoUtil {
 
     }
 
-    static get_playables(movieIdentifier){
-        console.log(movieIdentifier)
+
+    static get_comments(movieIdentifier) {
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
+            url: VideoUtil.getUrlBase() + "/comment/get?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
             method: 'get',
             data: {  token: localStorage.getItem("token") },
             headers: {
                 "token": localStorage.getItem("token"),
             }
-        }).catch((err) => {
-            console.log(err)
+        })
+    }
+    static send_comment(comment) {
+        return axios({
+            url: VideoUtil.getUrlBase() + "/comment/send",
+            method: 'post',
+            data: { ...comment },
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }],
+             headers: {
+                "token": localStorage.getItem("token"),
+            }
         })
     }
 
     static isRequested(movieIdentifier) {
-        console.log(VideoUtil.getUrlBase())
         return axios({
             url: VideoUtil.getUrlBase() + "/movie/isRequested?videoId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
             method: 'get',
@@ -169,18 +179,13 @@ export default class VideoUtil {
             console.log(err)
         }).then(
            async (response) => {
-                console.log(response)
                 if (response.data.code === 1 || response.data.code === 2) {
-                    let threads = 2;
-                    console.log(totalSlice)
                     let continueUpload = true;
                     setIndicator("-- uploading...")
                     let i = 0;
                     for (; i < totalSlice && continueUpload; i ++) {
                         setUploadState(i/totalSlice * 100)
-                        console.log(i + 1 + "/" + totalSlice)
                         let chunk = value.slice(i * sliceLength, (i + 1) * sliceLength);
-                        console.log(chunk.size)
                         let formData = new FormData();
                         formData.append("wholeHashCode", wholeHashCode);
                         let chunkMD5 = await computeChunkMD5(chunk); // Compute MD5 correctly
@@ -199,12 +204,12 @@ export default class VideoUtil {
                             }
                         }).then(response => {
                             if (response.data.code === 0) {
-                                console.log( response.data.message);
+                                console.log(`Chunk ${i} uploaded successfully`);
+
                             } else {
                                 console.log(response.data.message)
                                 continueUpload = false
                             }
-                            console.log(`Chunk ${i} uploaded successfully`);
                         }).catch(error => {
                             console.error(`Chunk ${i} upload failed`, error);
                         });
@@ -258,7 +263,6 @@ export default class VideoUtil {
     }
 
     static batchPause(movies, downloadRecords, setDownloadRecords) {
-        console.log(Qs.stringify({ downloads: movies }))
         axios({
             url: VideoUtil.getDownloadUrlBase() + "/movie/batch_pause",
             method: 'post',
@@ -376,11 +380,24 @@ export default class VideoUtil {
         })   
     }
 
+    static get_playables(movieIdentifier){
+        console.log(movieIdentifier)
+        return axios({
+            url: VideoUtil.getUrlBase() + "/movie/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
+            method: 'get',
+            data: {  token: localStorage.getItem("token") },
+            headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
     static getVideoInformation(movieIdentifier, setState) {
         setState(null)
 
         let language = JSON.parse(localStorage.getItem("userInfo")).language
-        console.log(movieIdentifier)
         return axios({
             url: "http://127.0.0.1:5000" + "/movie/get_meta",
             method: 'get',
@@ -400,7 +417,6 @@ export default class VideoUtil {
             data["type"] = "movie"
             data["actressList"].forEach(element => {
                 actresses.push(JSON.parse(element))
-                console.log(JSON.parse(element))
             });
             data["actressList"] = actresses
 
@@ -450,7 +466,6 @@ export default class VideoUtil {
         let interval = 1000
         const intervalId = setInterval(async () => {
             try {
-                console.log("trying")
                 if (retrytimes === 0) clearInterval(intervalId);
                 axios({
                     url: VideoUtil.getDownloadUrlBase() + "/movie/get_files",
@@ -654,30 +669,8 @@ export default class VideoUtil {
         })
     }
 
-
-    // static uploadVideos(formData, videoId) {
-    //     axios.post({
-    //         url:VideoUtil.getDownloadUrlBase() + "/movie/negotiateStep1",
-    //         method: 'post',
-    //         headers:{
-    //             token: localStorage.getItem("token")
-    //         }
-    //     }).catch(err => {
-    //         console.log(err)
-    //     }).then((response) => {
-    //         axios('http://localhost:8080/movie/uploadFile', {  // 假设你有一个 '/upload' 的 API
-    //             method: 'POST',
-    //             body: formData,
-    //             headers:{
-    //                 "Authorization": localStorage.getItem("token")
-    //             }
-    //         });
-    //     })
-    //     return 
-    // }
-
     static get_and_processM3u8(location, setOption) {
-        const prefix = "http://127.0.0.1:8848/videos/" + encodeURIComponent(location.videoId + "/" + location.resource + "/");
+        const prefix = "http://127.0.0.1:8848/videos/longvideos/" + encodeURIComponent(location.type+ "_" + location.resource_id + "/" );
         const m3u8Url = prefix + encodeURIComponent("index.m3u8");
 
         console.log("Fetching M3U8 from:", m3u8Url);
@@ -701,12 +694,10 @@ export default class VideoUtil {
                 });
 
                 const modifiedData = processedLines.join('\n');
-                console.log("Modified M3U8 content:\n", modifiedData);
 
                 const blob = new Blob([modifiedData], { type: 'application/x-mpegURL' });
                 const url = URL.createObjectURL(blob);
-                console.log("Generated Blob URL:", url);
-
+//
                 setOption({
                     autoplay: true,
                     controls: true,

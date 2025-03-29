@@ -1,54 +1,46 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 
-export default function LongVideo(props) {
+export default function LongVideo({ options, onReady }) {
+  const videoRef = useRef(null);
+  const playerRef = useRef(null);
 
-  const videoRef = React.useRef(null);
-  const playerRef = React.useRef(null);
-  const { options, onReady } = props;
-  
-  React.useEffect(() => {
-    // make sure Video.js player is only initialized once
-    if (!playerRef.current) {
-      const videoElement = videoRef.current;
-      if (!videoElement) return;
+  useEffect(() => {
+    // 初始化播放器
+    const timeoutId = setTimeout(() => {
+      if (!playerRef.current && options) {
+        const videoElement = videoRef.current;
+        if (!videoElement) {
+          console.error("Video element not found");
+          return;
+        }
+        
+        try {
+          const player = playerRef.current = videojs(videoElement, options, () => {
+            console.log("Player is ready");
+            if (onReady) {
+              onReady(player);
+            }
+          });
+        } catch (error) {
+          console.error("Error initializing video.js:", error);
+        }
+      }
+    }, 100); // 100ms 延迟
 
-      const player = playerRef.current = videojs(videoElement, options, () => {
-        console.log("player is ready");
-        onReady && onReady(player);
-      });
-    } else {
-      // you can update player here [update player through props]
-      // const player = playerRef.current;
-      // player.autoplay(options.autoplay);
-      // player.src(options.sources);
-    }
-  }, [options, videoRef]);
-
-  // Dispose the Video.js player when the functional component unmounts
-  React.useEffect(() => {
-    const player = playerRef.current;
-    
-
+    // 清除播放器
     return () => {
-      if (player) {
-        player.dispose();
-        player.responsive(true)
+      if (playerRef.current) {
+        playerRef.current.dispose();
         playerRef.current = null;
       }
     };
-  }, [playerRef]);
-
-  
+  }, [options, onReady]);
 
   return (
-    <p >
     <div data-vjs-player>
-        <video ref={videoRef} className="video-js vjs-big-play-centered" />
+      <video ref={videoRef} className="video-js vjs-big-play-centered" />
     </div>
-    </p>
-
-
   );
 }

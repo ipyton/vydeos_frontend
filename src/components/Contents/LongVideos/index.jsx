@@ -1,105 +1,176 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
-import LongVideo from "./LongVideo";
-
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import { styled } from '@mui/material/styles';
-import Comments from "./Comments";
 import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Box, Stack, Typography, Paper, useTheme } from "@mui/material";
+import LongVideo from "./LongVideo";
+import Comments from "./Comments";
 import VideoUtil from "../../../util/io_utils/VideoUtil";
+import CommentSendComponent from "../Util/CommentSendingComponent";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
+const VideoPage = () => {
+  const theme = useTheme();
+  const location = useLocation();
 
-}));
+  const [videoOption, setVideoOption] = useState(null);
+  const [videoMeta, setVideoMeta] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  console.log(location.state)
 
-
-export default function LongVideos(props) {
-  const location = useLocation()
-  const [option,setOption] = useState(null) 
-  const [meta, setMeta] = useState(null)
-  const [comment,setComments] = useState(null)
-  
-  React.useEffect(() => {
-    if (location.state) {
-      console.log(location.state)
-      // Video get comments:ondemand 加载
-    VideoUtil.getVideoInformation(location.state.videoId,setMeta)
-    VideoUtil.get_and_processM3u8(location.state, setOption)
-
-  }
-  }, [location.state])
-
-    let a =[1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,324,543,52,34]
-    const playerRef = React.useRef(null);
-    // videojs.Vhs.xhr.beforeRequest = function (options) {
-    //   let headers = options.headers || {};
-    //   headers["token"] = "J2LqH1mnoXE0ZL5typ3VT3n4fe7RFYAO";
-    
-    //   options.headers = headers;
-    
-    //   console.log("options", options);
-    
-    //   return options;
-    // }
-    const handlePlayerReady = (player) => {
-      playerRef.current = player;
-
-      // You can handle player events here, for example:
-      player.on('waiting', () => {
-        videojs.log('player is waiting');
-      });
-      
-      player.on('dispose', () => {
-        videojs.log('player will dispose');
-      });
+  useEffect(() => {
+    if (location.state?.resource_id && location.state?.type) {
+      setIsLoading(true);
+      Promise.all([
+        VideoUtil.getVideoInformation(location.state,setVideoMeta),
+        VideoUtil.get_and_processM3u8(location.state, setVideoOption),
+        VideoUtil.get_comments(location.state, setComments).then(response=>{
+          console.log(response)
+          if (response && response.data &&response.data.code === 0) {
+            setComments(JSON.parse(response.data.message));
+          }
+        }),
+      ]).finally(() => setIsLoading(false));
     }
+  }, [location.state]);
+  console.log(comments)
+  const handlePlayerReady = (player) => {
+    // playerRef.current = player;
 
-    let playList = false
-  if (!option) {
-    return <div>loading</div>
+    player.on('waiting', () => {
+      console.log('Player is waiting');
+    });
+
+    player.on('dispose', () => {
+      console.log('Player will dispose');
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <Typography variant="h6">Loading...</Typography>
+      </Box>
+    );
   }
+
   return (
-    <div >
-      <Stack sx={{marginLeft:"10%",width:"80%"}}>
-        <Item sx={{ boxShadow: 0 }}>
-          <Stack direction="row" spacing={2}>
-            <Item sx={{ width: "70%", height: "20%", boxShadow: 0 }}>
-            <Stack spacing={2}>
-                <Item sx={{ textAlign: "left", fontSize: 20, boxShadow: 0 }}>this is a title</Item>
-              <Item>
-                <LongVideo options={option} onReady={handlePlayerReady}></LongVideo>
-              </Item>
+    <Box sx={{
+      maxWidth: "1200px",
+      margin: "0 auto",
+      padding: theme.spacing(2)
+    }}>
+      <Stack spacing={3}>
+        {/* Video Section */}
+        <Paper
+          elevation={0}
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' }, // Responsive layout
+            gap: theme.spacing(2),
+            padding: theme.spacing(2),
+            backgroundColor: theme.palette.background.default
+          }}
+        >
+          {/* Main Video Content */}
+          <Box sx={{ 
+            flex: { md: 3 }, 
+            width: '100%' 
+          }}>
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{ 
+                fontWeight: 600, 
+                color: theme.palette.text.primary,
+                mb: 2 // Add some margin bottom
+              }}
+            >
+              {videoMeta?.movie_name + videoMeta.release_year || "Untitled Video"}
+            </Typography>
+
+            {/* Video Container with Responsive 16:9 Aspect Ratio */}
+            <Box sx={{
+              position: 'relative',
+              paddingTop: '56.25%', // 16:9 Aspect Ratio
+              width: '100%',
+              height: 0,
+              overflow: 'hidden'
+            }}>
+              {
+                videoOption && videoMeta ?               <Box sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%'
+                }}>
+                  <LongVideo
+                    options={videoOption}
+                    onReady={handlePlayerReady}
+                  />
+                </Box>: (<Typography>Loading</Typography>)
+              }
+
+            </Box>
+          </Box>
+
+          {/* Playlist Section */}
+          <Box
+            sx={{
+              flex: { md: 1 },
+              width: { xs: '100%', md: 'auto' },
+              backgroundColor: theme.palette.background.paper,
+              borderRadius: theme.shape.borderRadius,
+              padding: theme.spacing(2),
+              mt: { xs: 2, md: 0 } // Add top margin on mobile
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ color: theme.palette.text.secondary }}
+            >
+              Playlist
+            </Typography>
+            <Stack spacing={1}>
+              <Paper variant="outlined" sx={{ padding: theme.spacing(1) }}>
+                <Typography>Video 1</Typography>
+              </Paper>
+              <Paper variant="outlined" sx={{ padding: theme.spacing(1) }}>
+                <Typography>Video 2</Typography>
+              </Paper>
             </Stack>
+          </Box>
+        </Paper>
 
-          </Item>
-          <Item sx={{textAlign:"left", width:"30%"}}>
-            PlayList
-            <Stack>
-              <Item >sdif</Item>
-              <Item>afdis</Item>
-            </Stack>
-          </Item>
-          </Stack>
-        </Item>
-        <Item sx={{ textAlign: "left", boxShadow: 0 }}> 
-          Comments
-        </Item>
-        <Item sx={{ boxShadow: 0 }}>
-          <Comments commentList={[]}></Comments>
-        </Item>
-
-
+        {/* Comments Section */}
+        <Paper
+          elevation={0}
+          sx={{
+            padding: theme.spacing(2),
+            backgroundColor: theme.palette.background.default
+          }}
+        >
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+          >
+            Comments
+          </Typography>
+          <CommentSendComponent movieIdentifier = {location.state} comments = {comments} setComments={setComments}></CommentSendComponent>
+          <Comments comments={comments} movieIdentifier = {location.state}/>
+        </Paper>
       </Stack>
-    </div>
-
+    </Box>
   );
-}
+};
+
+export default VideoPage;

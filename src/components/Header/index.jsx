@@ -432,7 +432,7 @@ export default function Header(props) {
               fontSize: '1.5rem'
             }}
           >
-            Everything  
+            Vydeos  
           </AppTitle>
           
           <Box sx={{ flexGrow: 1 }} />

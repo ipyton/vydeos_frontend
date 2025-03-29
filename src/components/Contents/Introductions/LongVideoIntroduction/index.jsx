@@ -29,7 +29,7 @@ import MovieIcon from "@mui/icons-material/Movie";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CategoryIcon from "@mui/icons-material/Category";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import VideoUtil from "../../../../util/io_utils/VideoUtil";
 
 // Image component with consistent styling
@@ -63,9 +63,8 @@ export default function MovieDetails(props) {
   const [loading, setLoading] = useState(true);
   
   const [playable, setPlayable] = useState(false);
-
-
   const location = useLocation();
+  const navigate = useNavigate()
   const position = props.position || "center";
 
   // Handle initialization from props or route state
@@ -118,6 +117,10 @@ export default function MovieDetails(props) {
       setIsDisabled(true);
     });
   };
+
+  const handlePlay = () => {
+    navigate("/longvideos", { state: videoIdentifier });
+  }
 
   // Load movie data and status
   useEffect(() => {
@@ -230,7 +233,7 @@ export default function MovieDetails(props) {
               <Box>
                 <Typography variant="h4" component="h1" gutterBottom>
                   {details.movie_name}
-                  <IconButton color="primary" aria-label="delete" size="large"         disabled={!playable}                  >
+                  <IconButton color="primary" aria-label="delete" size="large" disabled={!playable}  onClick={handlePlay}>
                   <PlayCircleOutlineIcon/>
 </IconButton>
                 </Typography>

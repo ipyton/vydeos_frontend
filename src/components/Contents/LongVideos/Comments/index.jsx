@@ -15,11 +15,13 @@ const Item = styled(Paper)(({ theme }) => ({
   
 
 
-export default function Comments(commentList) {
-    commentList = [1,2,3,4,5]
+export default function Comments(props) {
+  console.log(props)
     return (<div>
-        {commentList.map(element => {
-            return <Comment avatar={element.avatar} name={element.name} content={element.content} likes={element.likes} subComments={element.subComments}></Comment>
+        {props.comments && props.comments.map(element => {
+          
+          console.log(element)
+            return <Comment avatar={element.avatar} name={element.userId} content={element.content} likes={element.likes} subComments={element.subComments}></Comment>
         })}
 
     </div>
