@@ -16,7 +16,7 @@ export default class AccountUtil {
   dispatch = useDispatch()
 
   static getLanguages(setLanguages) {
-    axios({
+    return axios({
       url: AccountUtil.getUrlBase() + "/i18n/getLanguages",
       method: 'get',
       headers: {
@@ -224,7 +224,7 @@ export default class AccountUtil {
   }
 
   // This is about get userInfo
-  static getOwnerInfo(userinfo, setUserInfo) {
+  static getOwnerInfo() {
 
     return localforage.getItem("userId").then(res => {
       return axios({

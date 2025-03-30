@@ -76,9 +76,15 @@ function App() {
     return (
       <BrowserRouter>
         <Contents 
-          setLogin={(newState) => {
+          setLogin={async (newState) => {
             setLogin(newState);
             localStorage.setItem('isLoggedIn', newState.toString());
+                    const userInfoResponse = await AccountUtil.getOwnerInfo();
+                    if (userInfoResponse && userInfoResponse.data && userInfoResponse.data.code !== -1) {
+                      const content = JSON.parse(userInfoResponse.data.message);
+                      localStorage.setItem("userInfo", JSON.stringify(content));
+                    }
+            
           }} 
         />
       </BrowserRouter>

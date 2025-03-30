@@ -232,7 +232,7 @@ export default function MovieDetails(props) {
               {/* Movie Title and Tags */}
               <Box>
                 <Typography variant="h4" component="h1" gutterBottom>
-                  {details.movie_name}
+                  {details.movie_name + "("+ details.type + ")"}
                   <IconButton color="primary" aria-label="delete" size="large" disabled={!playable}  onClick={handlePlay}>
                   <PlayCircleOutlineIcon/>
 </IconButton>

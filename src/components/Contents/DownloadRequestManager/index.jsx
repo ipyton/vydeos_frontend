@@ -296,14 +296,16 @@ export default function DownloadManager() {
         <Table aria-label="movie downloads table">
           <TableHead sx={{ backgroundColor: "primary.main" }}>
             <TableRow>
-              <TableCell sx={{ color: "white", fontWeight: "bold" }}>Movie ID</TableCell>
+              <TableCell sx={{ color: "white", fontWeight: "bold" }}>Resource ID</TableCell>
+              <TableCell sx={{ color: "white", fontWeight: "bold" }}>Type </TableCell>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Movie Name</TableCell>
-              <TableCell sx={{ color: "white", fontWeight: "bold" }}>Actors</TableCell>
+              {/* <TableCell sx={{ color: "white", fontWeight: "bold" }}>Actors</TableCell> */}
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Year</TableCell>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Advisor</TableCell>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Submitted</TableCell>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Actions</TableCell>
             </TableRow>
+            
           </TableHead>
           <TableBody>
             {requests == null ? (
@@ -321,8 +323,9 @@ export default function DownloadManager() {
                   }}
                 >
                   <TableCell>{row.resource_id}</TableCell>
+                  <TableCell>{row.type}</TableCell>
                   <TableCell>{row.movieName}</TableCell>
-                  <TableCell>{row.actorList}</TableCell>
+                  {/* <TableCell>{row.actorList}</TableCell> */}
                   <TableCell>{row.release_year}</TableCell>
                   <TableCell>{row.userId}</TableCell>
                   <TableCell>{new Date(row.timestamp).toLocaleDateString(JSON.parse(localStorage.getItem("userInfo")).language)}</TableCell>

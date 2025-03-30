@@ -1,129 +1,195 @@
 import TextField from '@mui/material/TextField';
 import * as React from 'react';
-import { Button } from '@mui/material';
-import Stack from '@mui/material/Stack';
+import { Button, IconButton, Menu, MenuItem, Paper, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Paper from '@mui/material/Paper';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
-import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/Send';
+import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 import localforage from 'localforage';
 import DatabaseManipulator from '../../../../../util/io_utils/DatabaseManipulator';
-import { resolvePath } from 'react-router-dom';
 
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
+// Styled components
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
   padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
+  borderRadius: 20,
+  boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+  width: '100%',
 }));
 
-export default function (props) {
+const StyledTextField = styled(TextField)({
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      border: 'none',
+    },
+    '&:hover fieldset': {
+      border: 'none',
+    },
+    '&.Mui-focused fieldset': {
+      border: 'none',
+    },
+  },
+  flexGrow: 1,
+});
+
+const SendButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: 'white',
+  '&:hover': {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  marginLeft: theme.spacing(1),
+}));
+
+export default function InputBox(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [text, setText] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const { select, setChatRecords } = props;
   const open = Boolean(anchorEl);
-  const [text, setText] = React.useState(null);
-  const {select, userRecords, setUserRecords, chatRecords, setChatRecords} = props
-  const handleClick = (event) => {
+  const inputRef = React.useRef(null);
+
+  const handleOpenAttachmentMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleCloseAttachmentMenu = () => {
     setAnchorEl(null);
-
   };
 
-  const handleSend = () => {
-    if ( !text ) {
-      return
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
     }
-    localforage.getItem("userId").then(res=> {
-      console.log(select)
-      MessageUtil.sendMessage(res, select, text, "text",).then((req_res)=>{
-        console.log(req_res.data)
-        if (req_res.data.result === true) {
-          let message = {userId: res, receiverId: select.userId, content:text, type:select.type }
-          message.timestamp = req_res.data.timestamp
-          DatabaseManipulator.addContactHistory(message).then((records)=>{
-            console.log(records)
-            setChatRecords(records)
-          })
-        } 
+  };
 
-      })
-    }).then(() => {
-        setText("")
-    })
-  }
-  const picUploadHandler = () => {
-    setText("{attachment}")
-  }
-  const voiUploadHandler = () => {
-    setText("{attachment}")
-  }
-  const vidUploadHandler = () => {
-    setText("{attachment}")
-  }
+  const handleSend = async () => {
+    if (!text.trim()) {
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const userId = await localforage.getItem("userId");
+      
+      if (!userId || !select) {
+        console.error("Missing user ID or selected contact");
+        return;
+      }
+      
+      const response = await MessageUtil.sendMessage(userId, select, text, "text");
+      
+      if (response.data.result === true) {
+        const message = {
+          userId: userId,
+          receiverId: select.userId,
+          content: text,
+          type: select.type,
+          timestamp: response.data.timestamp
+        };
+        
+        const records = await DatabaseManipulator.addContactHistory(message);
+        setChatRecords(records);
+        setText("");
+        
+        // Focus back on input
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      } else {
+        console.error("Failed to send message:", response.data);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  const handleFileUpload = (type) => {
+    setText(`{${type} attachment}`);
+    handleCloseAttachmentMenu();
+  };
 
   return (
-    <Stack direction="row" sx={{ width: "90%", marginLeft: 2, marginBottom: 2 }} spacing={2}>
-      <div>
-        {/* <Button
-          id="basic-button"
-          aria-controls={open ? 'basic-menu' : undefined}
+    <Stack direction="row" sx={{ width: "100%", padding: 2 }} alignItems="center" spacing={1}>
+      <StyledPaper elevation={0}>
+        <IconButton
+          color="primary"
+          aria-label="Attach files"
+          aria-controls={open ? 'attachment-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
-          onClick={handleClick}
+          onClick={handleOpenAttachmentMenu}
         >
-          Attachments
-        </Button> */}
-        <IconButton aria-label="Example"
-          aria-controls={open ? 'basic-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-          onClick={handleClick}>
-          <AttachFileIcon></AttachFileIcon>
+          <AttachFileIcon />
         </IconButton>
-        <Menu
-          id="basic-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          MenuListProps={{
-            'aria-labelledby': 'basic-button',
-          }}
+        
+        <StyledTextField
+          placeholder="Type a message..."
+          multiline
+          maxRows={4}
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={handleKeyPress}
+          inputRef={inputRef}
+          fullWidth
+        />
+        
+        <SendButton
+          onClick={handleSend}
+          disabled={isLoading || !text.trim()}
+          size="medium"
         >
+          <SendIcon />
+        </SendButton>
+      </StyledPaper>
 
-          <input id="uploadPic" type="file" onChange={picUploadHandler}  hidden></input>
-          <input id="uploadVid" type="file" onChange={vidUploadHandler}  hidden></input>
-          <input id="uploadVoi" type="file" onChange={voiUploadHandler}  hidden></input>
+      <Menu
+        id="attachment-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleCloseAttachmentMenu}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+      >
+        <input id="uploadPic" type="file" accept="image/*" onChange={() => handleFileUpload('picture')} hidden />
+        <input id="uploadVid" type="file" accept="video/*" onChange={() => handleFileUpload('video')} hidden />
+        <input id="uploadVoi" type="file" accept="audio/*" onChange={() => handleFileUpload('voice')} hidden />
 
-          <label htmlFor="uploadPic">
-            <MenuItem onClick={handleClose}><AddPhotoAlternateIcon></AddPhotoAlternateIcon>Pictures</MenuItem>
-          </label>
+        <label htmlFor="uploadPic">
+          <MenuItem>
+            <AddPhotoAlternateIcon color="primary" sx={{ mr: 1 }} />
+            Pictures
+          </MenuItem>
+        </label>
 
-          <label htmlFor="uploadVid">
-            <MenuItem onClick={handleClose}><YouTubeIcon></YouTubeIcon>Videos</MenuItem>
-          </label>
+        <label htmlFor="uploadVid">
+          <MenuItem>
+            <YouTubeIcon color="error" sx={{ mr: 1 }} />
+            Videos
+          </MenuItem>
+        </label>
 
-          <label htmlFor="uploadVoi">
-            <MenuItem onClick={handleClose}><KeyboardVoiceIcon></KeyboardVoiceIcon>Voices</MenuItem>
-          </label>
-
-        </Menu>
-      </div>
-      <TextField sx={{ width: "70%" }} onChange={(event) => {
-        setText(event.target.value);
-      }} value={text}/>
-      <Button sx={{ width: "20%" }} variant="outlined" onClick={handleSend}>Send</Button>
+        <label htmlFor="uploadVoi">
+          <MenuItem>
+            <KeyboardVoiceIcon color="success" sx={{ mr: 1 }} />
+            Voice Messages
+          </MenuItem>
+        </label>
+      </Menu>
     </Stack>
-
   );
 }
