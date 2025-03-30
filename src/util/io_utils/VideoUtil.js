@@ -3,6 +3,7 @@ import axios from "axios"
 import CryptoJS from "crypto-js";
 
 import SparkMD5 from "spark-md5";
+import xxhash from 'xxhash-wasm';
 
 export default class VideoUtil {
 
@@ -116,11 +117,35 @@ export default class VideoUtil {
     }
 
 
+
+
     static async uploadVideos(resourceId, value, setUploadState, resourceName,setIndicator) {
         setIndicator("-- preprocessing...")
         let sliceLength = 1024 * 1024 * 8
-        let length = value.size
-
+        let length = value.sizes
+        async function computexxHash(file) {
+            // 初始化 xxhash-wasm
+            const xxhashInstance = await xxhash();
+            const hasher = xxhashInstance.create64("990816");
+            
+            const reader = file.stream().getReader();
+            let totalBytes = 0;
+            
+            while (true) {
+              const { done, value } = await reader.read();
+              
+              if (done) {
+                break;
+              }
+              
+              hasher.update(value);
+              totalBytes += value.length;
+              console.log(`Processed: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
+            }
+            
+            return hasher.digest().toString(16);
+          }
+        
         const totalSlice = Math.floor(length / sliceLength) +  1
         async function computeChunkMD5(chunk) {
           const buffer = await chunk.arrayBuffer();
@@ -129,38 +154,41 @@ export default class VideoUtil {
             return md5Hash;
         }
 
-    async function computeFileMD5(file, chunkSize = 4 * 1024 * 1024) { // Default: 4MB per chunk
-    const chunks = Math.ceil(file.size / chunkSize);
-    const spark = new SparkMD5.ArrayBuffer();
-    const fileReader = new FileReader();
+    // async function compute(file, chunkSize = 64 * 1024 * 1024) { // Default: 4MB per chunk
+    // const chunks = Math.ceil(file.size / chunkSize);
+    // const spark = new SparkMD5.ArrayBuffer();
+    // const fileReader = new FileReader();
+    
+    // let currentChunk = 0;
 
-    let currentChunk = 0;
+    // return new Promise((resolve, reject) => {
+    //     fileReader.onload = (event) => {
+    //         spark.append(event.target.result);
+    //         currentChunk++;
 
-    return new Promise((resolve, reject) => {
-        fileReader.onload = (event) => {
-            spark.append(event.target.result);
-            currentChunk++;
+    //         if (currentChunk < chunks) {
+    //             loadNextChunk();
+    //         } else {
+    //             resolve(spark.end()); // Final MD5 hash
+    //         }
+    //     };
 
-            if (currentChunk < chunks) {
-                loadNextChunk();
-            } else {
-                resolve(spark.end()); // Final MD5 hash
-            }
-        };
+    //     fileReader.onerror = (error) => reject(error);
 
-        fileReader.onerror = (error) => reject(error);
+    //     function loadNextChunk() {
+    //         const start = currentChunk * chunkSize;
+    //         const end = Math.min(start + chunkSize, file.size);
+    //         fileReader.readAsArrayBuffer(file.slice(start, end));
+    //     }
 
-        function loadNextChunk() {
-            const start = currentChunk * chunkSize;
-            const end = Math.min(start + chunkSize, file.size);
-            fileReader.readAsArrayBuffer(file.slice(start, end));
-        }
-
-        loadNextChunk();
-    });
-}
-        let wholeHashCode = await computeFileMD5(value)
-        console.log("wholeHashCode:" + wholeHashCode)
+    //     loadNextChunk();
+    // });
+//}       
+        const startTime = Date.now();
+        let wholeHashCode = await computexxHash(value)
+        console.log("wholeHashCode:" + wholeHashCode);
+        console.log("MD5 computation took " + (Date.now() - startTime) + "ms");
+        
         setIndicator("-- negotiating...")
         return axios({
             url: VideoUtil.getUrlBase() + "/file/negotiationStep1",
@@ -188,9 +216,9 @@ export default class VideoUtil {
                         let chunk = value.slice(i * sliceLength, (i + 1) * sliceLength);
                         let formData = new FormData();
                         formData.append("wholeHashCode", wholeHashCode);
-                        let chunkMD5 = await computeChunkMD5(chunk); // Compute MD5 correctly
+                        let chunkxxHash = await computexxHash(chunk); // Compute MD5 correctly
 
-                        formData.append("hashCode", chunkMD5);
+                        formData.append("hashCode", chunkxxHash);
                         formData.append("currentSlice", i);
                         formData.append("resourceId", resourceId);
                         formData.append("type", "movie");

@@ -7,6 +7,9 @@ import LongVideo from "./LongVideo";
 import Comments from "./Comments";
 import VideoUtil from "../../../util/io_utils/VideoUtil";
 import CommentSendComponent from "../Util/CommentSendingComponent";
+import EpisodeSelector from "./EpisodeSelector";
+
+
 
 const VideoPage = () => {
   const theme = useTheme();
@@ -149,6 +152,7 @@ const VideoPage = () => {
             </Stack>
           </Box>
         </Paper>
+        <EpisodeSelector></EpisodeSelector>
 
         {/* Comments Section */}
         <Paper

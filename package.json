@@ -15,6 +15,7 @@
     "@react-three/fiber": "^9.1.0",
     "@react-three/postprocessing": "^3.0.4",
     "@reduxjs/toolkit": "^2.2.2",
+    "@silvermine/videojs-quality-selector": "^1.3.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "axios": "^1.6.1",
@@ -42,7 +43,8 @@
     "stompjs": "^2.3.3",
     "styled-components": "^6.1.0",
     "three": "^0.175.0",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xxhash-wasm": "^1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -2,6 +2,10 @@ import React, { useRef, useEffect } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 
+// The following registers the plugin with `videojs`
+require('@silvermine/videojs-quality-selector')(videojs);
+require('@silvermine/videojs-quality-selector/dist/css/quality-selector.css')
+
 export default function LongVideo({ options, onReady }) {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
@@ -30,17 +34,22 @@ export default function LongVideo({ options, onReady }) {
     }, 100); // 100ms 延迟
 
     // 清除播放器
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.dispose();
-        playerRef.current = null;
-      }
-    };
+    // return () => {
+    //   if (playerRef.current) {
+    //     playerRef.current.dispose();
+    //     playerRef.current = null;
+    //   }
+    // };
   }, [options, onReady]);
 
   return (
     <div data-vjs-player>
-      <video ref={videoRef} className="video-js vjs-big-play-centered" />
+      <video ref={videoRef} className="video-js vjs-big-play-centered" >
+      <source src="https://example.com/video_720.mp4" type="video/mp4" label="720P"/>
+   <source src="https://example.com/video_480.mp4" type="video/mp4" label="480P" selected="true"/>
+   <source src="https://example.com/video_360.mp4" type="video/mp4" label="360P"/>  
+      </video>
+
     </div>
   );
 }

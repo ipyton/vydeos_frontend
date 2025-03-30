@@ -108,6 +108,45 @@ export default function SearchItem({ content, type = '', setSelector, idx }) {
             />
           </>
         );
+      
+        case 'tv':
+        return (
+          <>
+            <ListItemAvatar>
+              <StyledAvatar 
+                variant="square"
+                src={content.image_address || '/static/images/movie-placeholder.jpg'} 
+                alt={content.translated_name || content.original_name || 'Video'}
+              />
+            </ListItemAvatar>
+            <ListItemText
+              primary={
+                <TruncatedText variant="subtitle1">
+                  {[content.translated_name, content.original_name].filter(Boolean).join(' - ')}
+                </TruncatedText>
+              }
+              secondary={
+                <Box sx={{ mt: 0.5 }}>
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                    sx={{ display: 'block' }}
+                  >
+                    {content.release_date}
+                  </Typography>
+                  <TruncatedText variant="body2" color="text.secondary">
+                    {content.introduction ? 
+                      (content.introduction.length > 80 ? 
+                        `${content.introduction.substring(0, 80)}...` : 
+                        content.introduction) : 
+                      'No description available'}
+                  </TruncatedText>
+                </Box>
+              }
+            />
+          </>
+        );
         
       case 'music':
         return (
