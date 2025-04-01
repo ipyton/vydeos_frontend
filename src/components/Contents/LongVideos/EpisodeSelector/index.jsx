@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Grid,
@@ -15,19 +15,36 @@ import {
 } from '@mui/material';
 import GridViewIcon from '@mui/icons-material/GridView';
 import ViewListIcon from '@mui/icons-material/ViewList';
+import VideoUtil from '../../../../util/io_utils/VideoUtil';
 
-const EpisodeSelector = () => {
+const EpisodeSelector = (props) => {
+  // props: give video information and season information, set episode.
+  const {seasonId, setSeasonId, episode, setEpisode, details} = props;
   const [selectedEpisode, setSelectedEpisode] = useState(14);
   const [selectedSeason, setSelectedSeason] = useState(1);
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState('grid');  
   const theme = useTheme();
   
+  useEffect(() => {
+    if (seasonId &&seasonId !== 0 ) {
+      VideoUtil.get_season_meta(details.resource_id, details.type, seasonId).then((res) => {})
+      .then()
+      .catch((error) => {
+        console.error('Error fetching season metadata:', error);
+      });
+    }
+  }, [seasonId])
+  
   // Season data
-  const seasons = [
-    { id: 1, episodes: 14, title: "Season 1" },
-    { id: 2, episodes: 12, title: "Season 2" },
-    { id: 3, episodes: 10, title: "Season 3" }
-  ];
+  const seasons = [];
+  for (let i = 1; i <= details.season_count; i++) {
+    seasons.push({
+      id: i,
+      title: `Season ${i}`,
+      episodes: details.episode_count[i - 1]
+    });
+  }
+  seasons.push({id:-1, title: '添加一季', episodes: details.special_count});
   
   const currentSeason = seasons.find(season => season.id === selectedSeason);
   const totalEpisodes = currentSeason ? currentSeason.episodes : 0;

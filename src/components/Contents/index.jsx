@@ -42,6 +42,7 @@ import { useDispatch } from "react-redux"
 import ApproveMovieRequest from "./DownloadRequestManager"
 import DownloadRequestManager from "./DownloadRequestManager"
 import Iridescence from "../../Animations/Iridescence/Iridescence"
+import UpdateLog from "./UpdateLog"
 
 const defaultTheme = createTheme();
 
@@ -217,6 +218,7 @@ export default function Contents(props) {
                                     <Route path="/userManage" element={<UserManagementPage></UserManagementPage>}></Route>
                                     <Route path="/role" element={<RolePermissionPage></RolePermissionPage>}></Route>
                                     <Route path="/downloadRequestsManager" element={<DownloadRequestManager></DownloadRequestManager>} ></Route>
+                                    <Route path="/logs" element={<UpdateLog></UpdateLog>} ></Route>
                                     <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
                                 </Routes>

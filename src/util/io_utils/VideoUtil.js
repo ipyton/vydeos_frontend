@@ -408,10 +408,14 @@ export default class VideoUtil {
         })   
     }
 
-    static get_playables(movieIdentifier){
+    static get_playables(movieIdentifier, seasonId, episode){
         console.log(movieIdentifier)
+        if (!movieIdentifier || !episode) {
+            return
+        }
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
+            url: VideoUtil.getUrlBase() + "/movie/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type + 
+            "&seasonId=" + seasonId + "&episode=" + episode,
             method: 'get',
             data: {  token: localStorage.getItem("token") },
             headers: {
@@ -419,6 +423,19 @@ export default class VideoUtil {
             }
         }).catch((err) => {
             console.log(err)
+        })
+    }
+
+    static get_season_meta(resource_id, type, season_id) {
+        return axios({
+            url: VideoUtil.getDownloadUrlBase() + "/movie/get_season_meta                      ",
+            method: 'post',
+            data: { resourceId: resource_id, type: type, seasonId:season_id},
+ headers: {
+                token: localStorage.getItem("token"),
+                'Content-Type': 'application/json',  
+
+            }
         })
     }
 
@@ -488,11 +505,11 @@ export default class VideoUtil {
         })
     }
 
-    static get_download_sources(resource_id, type) {
+    static get_download_sources(resource_id, type, seasonId, episode) {
         return axios({
             url: VideoUtil.getDownloadUrlBase() + "/movie/get_sources",
             method: 'post',
-            data: { resourceId: resource_id, type: type },
+            data: { resourceId: resource_id, type: type, seasonId:seasonId, episode:episode},
             headers: {
                 token: localStorage.getItem("token"),
                 'Content-Type': 'application/json', // Set content type to JSON

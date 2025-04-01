@@ -79,7 +79,8 @@ export default function DownloadManager() {
     setPlayableData(playableData.filter((_, i) => i !== index));
   };
 
-  
+  const [seasonId,setSeasonId] = useState(0)
+
   const [requests, setRequests] = useState([
     { videoId: "videoId", source: "xxxx1", status: "init" },
     { videoId: "videoId", source: "xxxx2", status: "downloading" },
@@ -99,6 +100,8 @@ export default function DownloadManager() {
   const [movieName, setMovieName] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   
+  const [episode, setEpisode] = useState(0)
+
   const { showNotification } = useNotification();
   const [indicator, setIndicator] = useState("ready") 
   const navigate = useNavigate();
@@ -123,7 +126,16 @@ export default function DownloadManager() {
       tmpGid,
       checkedNumber + 1,
       setSelectOpen
-    );
+    ).then(()=>{
+      if (details.type === "movie") {
+      setSeasonId(0)
+      setEpisode(0)
+    }
+      else {
+        setSeasonId(1)
+        setEpisode(1)
+      }
+    })
   };
 
   const handleClose = () => {
@@ -212,24 +224,7 @@ export default function DownloadManager() {
     setVideoId(row.resource_id);
     setMovieName(row.movieName);
     console.log(row)
-    VideoUtil.get_download_sources(row.resource_id, row.type).then(function (response) {
-        if (response === undefined) {
-            console.log("errror")
-            return
-        }
-        console.log(response)
-        //props.setBarState({...props.barState, message:responseData.message, open:true})
-        let data = response.data
-        setSources(data)
-
-        // for (let i = 0; i < sources.length; i++) {
-        //     if (sources[i].source === source) {
-        //         sources.splice(i, 1)
-        //         break
-        //     }
-        // }
-        // setSources([...sources])
-    })
+    
   };
 
   // Load data on component mount
@@ -261,7 +256,28 @@ export default function DownloadManager() {
 
   useEffect(() => {
     if (!details) return;
-    VideoUtil.get_playables(details).then(function (response) {
+    VideoUtil.get_download_sources(details.resource_id, details.type, seasonId,episode).then(function (response) {
+      if (response === undefined) {
+          console.log("errror")
+          return
+      }
+      console.log(response)
+      //props.setBarState({...props.barState, message:responseData.message, open:true})
+      let data = response.data
+      setSources(data)
+
+      // for (let i = 0; i < sources.length; i++) {
+      //     if (sources[i].source === source) {
+      //         sources.splice(i, 1)
+      //         break
+      //     }
+      // }
+      // setSources([...sources])
+  })
+
+
+
+    VideoUtil.get_playables(details, seasonId, episode).then(function (response) {
       if (response.data && response.data.code === 0) {
         setPlayableData(JSON.parse(response.data.message));
       }
@@ -270,9 +286,8 @@ export default function DownloadManager() {
       }
     }).catch(function (error) {
       showNotification(error.message, "warning");
-
     })
-  },[details])
+  },[details, seasonId, episode])
 
 
   // Get status color based on status
