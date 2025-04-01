@@ -5,7 +5,6 @@ import EncryptionUtil from "./EncryptionUtil"
 import { update } from "../../components/redux/UserDetails"
 import { useDispatch } from "react-redux"
 import localforage from "localforage"
-import { BiSolidCommentDetail } from "react-icons/bi"
 
 export default class AccountUtil {
 
@@ -78,12 +77,6 @@ export default class AccountUtil {
         return Qs.stringify(data)
       }],
 
-    }).catch(error => {
-      if ("Network Error" === error.message) {
-        //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
-        // setNetworkErr(true)
-        console.log("error")
-      }
     }).then(function (response) {
       console.log(response)
       if (response === undefined || response.data === undefined) {
@@ -97,8 +90,19 @@ export default class AccountUtil {
       else if (responseData.code === 1) {
         localStorage.setItem("token", responseData.message)
         localStorage.setItem("userId", data.get("email"))
-        localforage.setItem("userId", data.get("email")).then(
+        localforage.setItem("userId", data.get("email")).then( async ()=> {
+          const userInfoResponse = await AccountUtil.getOwnerInfo();
+          console.log("User Info Response: ")
+          console.log(localStorage.getItem("token"))
+          console.log(userInfoResponse)
+          
+          if (userInfoResponse && userInfoResponse.data && userInfoResponse.data.code !== -1) {
+            const content = JSON.parse(userInfoResponse.data.message);
+            localStorage.setItem("userInfo", JSON.stringify(content));
+          }
           setLogin(true)
+        }
+
         )
 
       }

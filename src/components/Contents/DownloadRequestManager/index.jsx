@@ -31,6 +31,8 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import VideoUtil from "../../../util/io_utils/VideoUtil";
 import { useNotification } from "../../../Providers/NotificationProvider";
+import EpisodeSelector from "../LongVideos/EpisodeSelector";
+
 
 // Progress bar with label component
 function LinearProgressWithLabel(props) {
@@ -266,6 +268,9 @@ export default function DownloadManager() {
       else {
         console.log(response)
       }
+    }).catch(function (error) {
+      showNotification(error.message, "warning");
+
     })
   },[details])
 
@@ -356,6 +361,7 @@ export default function DownloadManager() {
           <DialogContentText sx={{ mb: 2 }}>
             Manage download sources for this movie. Add, delete, or start downloads.
           </DialogContentText>
+          {details && details.type === "movie" ? <div></div>:<EpisodeSelector></EpisodeSelector>}
           
           <List sx={{ width: "100%" }}>
             {sources.map((item, index) => (
@@ -426,7 +432,7 @@ export default function DownloadManager() {
                 {index < sources.length - 1 && <Divider component="li" />}
               </React.Fragment>
             ))}
-            
+            deta
             <Box sx={{ mt: 3, p: 2, bgcolor: "background.paper", borderRadius: 2, boxShadow: 1 }}>
               <Typography variant="subtitle1" sx={{ mb: 2 }}>Add New Source</Typography>
               <Stack direction="row" spacing={2} sx={{ mb: 2 }}>

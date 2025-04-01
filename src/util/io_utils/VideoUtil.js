@@ -422,6 +422,18 @@ export default class VideoUtil {
         })
     }
 
+    static isPlayable(movieIdentifier) {
+        return axios({
+            url: VideoUtil.getUrlBase() + "/movie/isPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
+            method: 'get',
+            headers: {
+                "token": localStorage.getItem("token"),
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
     static getVideoInformation(movieIdentifier, setState) {
         setState(null)
 
@@ -442,7 +454,7 @@ export default class VideoUtil {
             //props.setBarState({...props.barState, message:responseData.message, open:true})
             let data = response.data
             let actresses = []
-            data["type"] = "movie"
+            data["type"] = movieIdentifier.type
             data["actressList"].forEach(element => {
                 actresses.push(JSON.parse(element))
             });

@@ -31,6 +31,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { useLocation, useNavigate } from "react-router-dom";
 import VideoUtil from "../../../../util/io_utils/VideoUtil";
+import { useNotification } from "../../../../Providers/NotificationProvider";
 
 // Image component with consistent styling
 function MovieImage({ src, alt }) {
@@ -61,7 +62,8 @@ export default function MovieDetails(props) {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isStared, setIsStared] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+  const { showNotification } = useNotification();
+
   const [playable, setPlayable] = useState(false);
   const location = useLocation();
   const navigate = useNavigate()
@@ -81,7 +83,7 @@ export default function MovieDetails(props) {
       setVideoIdentifier(props.content);
     }
   }, [props.content, location.state]);
-  console.log(videoIdentifier)
+  console.log(details)
 
   // Handle star/favorite action
   const handleStar = () => {
@@ -141,30 +143,42 @@ export default function MovieDetails(props) {
           // Check if already starred
           VideoUtil.isStared(videoIdentifier).then((res) => {
             if (res.data.code === 0) {
-              setIsStared(true);
+              if (res.data.message === "stared") {
+                setIsStared(true);
+
+              } else {
+                setIsStared(false);
+              }
             } else {
               setIsStared(false);
             }
           });
 
-          VideoUtil.get_playables(videoIdentifier).then((res) => {
-            if (res.data.code === 0) {
-              let playables = JSON.parse(res.data.message)
-              if (playables.length > 0) {
-                setPlayable(true)
-              }
-              else {
-                setPlayable(false)
-              }
-          }
+          VideoUtil.isPlayable(videoIdentifier).then((res) => {
+            try {
+              console.log(res.data)
+                if (res.data && res.data.code === 0) {
+                    if (res.data.message === "true") {
+                        setPlayable(true);
+                    } else {
+                        setPlayable(false);
+                    }
+                }
+            } catch (err) {
+                showNotification(`Error: ${err.message}`, "error");
+                setPlayable(false);
+            } finally {
+                setLoading(false);  // 无论成功或失败都执行
+            }
         })
+        .catch(error => {
+            showNotification("Internal Error", "warning");
+            setLoading(false);
+        });
           
           setLoading(false);
         })
-        .catch(error => {
-          console.error("Error loading movie details:", error);
-          setLoading(false);
-        });
+
     }
   }, [videoIdentifier]);
 
