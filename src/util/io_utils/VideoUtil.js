@@ -410,7 +410,7 @@ export default class VideoUtil {
 
     static get_playables(movieIdentifier, seasonId, episode){
         console.log(movieIdentifier)
-        if (!movieIdentifier || !episode) {
+        if (movieIdentifier ==undefined || movieIdentifier == null || episode == undefined || episode == null || seasonId === undefined || seasonId == null) {
             return
         }
         return axios({
@@ -428,7 +428,7 @@ export default class VideoUtil {
 
     static get_season_meta(resource_id, type, season_id) {
         return axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/get_season_meta                      ",
+            url: VideoUtil.getUploadUrlBase() + "/movie/get_season_meta                      ",
             method: 'post',
             data: { resourceId: resource_id, type: type, seasonId:season_id},
  headers: {
@@ -451,10 +451,10 @@ export default class VideoUtil {
         })
     }
 
-    static getVideoInformation(movieIdentifier, setState) {
-        setState(null)
+    static getVideoInformation(movieIdentifier, setState, language) {
+        if (setState) setState(null)
 
-        let language = JSON.parse(localStorage.getItem("userInfo")).language
+        if (!language) language = JSON.parse(localStorage.getItem("userInfo")).language
         return axios({
             url: "http://127.0.0.1:5000" + "/movie/get_meta",
             method: 'get',
@@ -477,7 +477,34 @@ export default class VideoUtil {
             });
             data["actressList"] = actresses
 
-            setState(data)
+            if (setState) setState(data)
+            return data
+        })
+    }
+
+    static add_season(resourceId, type ) {
+        return axios({
+            url: VideoUtil.getUploadUrlBase() + "/movie/add_season",
+            method: 'post',
+            data:{resourceId:resourceId, type:type},
+            headers: {
+                token: localStorage.getItem("token"),
+                'Content-Type': 'application/json',  
+
+            }
+        })
+    }
+
+    static add_episode(resourceId, type, seasonId) {
+        return axios({
+            url: VideoUtil.getUploadUrlBase() + "/movie/add_episode",
+            method: 'post',
+            data:{resourceId:resourceId, type:type, seasonId: seasonId},
+            headers: {
+                token: localStorage.getItem("token"),
+                'Content-Type': 'application/json',  
+
+            }
         })
     }
 

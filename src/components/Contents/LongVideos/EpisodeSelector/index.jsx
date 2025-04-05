@@ -19,16 +19,39 @@ import VideoUtil from '../../../../util/io_utils/VideoUtil';
 
 const EpisodeSelector = (props) => {
   // props: give video information and season information, set episode.
-  const {seasonId, setSeasonId, episode, setEpisode, details} = props;
-  const [selectedEpisode, setSelectedEpisode] = useState(14);
-  const [selectedSeason, setSelectedSeason] = useState(1);
+  console.log(props)
+  const {seasonId, setSeasonId, episode, setEpisode, details, totalSeason, setTotalSeason, position} = props;
+  //position is one of : manager, player
+  // which decide to show/hide the add button.
+  //const [selectedEpisode, setSelectedEpisode] = useState(1);
+  //const [selectedSeason, setSelectedSeason] = useState(1);
   const [viewMode, setViewMode] = useState('grid');  
   const theme = useTheme();
+  const [totalEpisodes, setTotalEpisodes] = useState(0);
+  const [episodes, setEpisodes] = useState([]);
   
+    // // Generate episodes array from newest to oldest
+
   useEffect(() => {
-    if (seasonId &&seasonId !== 0 ) {
-      VideoUtil.get_season_meta(details.resource_id, details.type, seasonId).then((res) => {})
-      .then()
+    if (seasonId && seasonId !== 0 ) {
+      VideoUtil.get_season_meta(details.resource_id, details.type, seasonId).then((res) => {
+        if (res.data.code === 0 && res.data.message !== "null") {
+          let result = JSON.parse(res.data.message)
+            const episodes = Array.from(
+              { length: result.totalEpisode }, 
+              (_, i) => result.totalEpisode - i
+            );
+          episodes.push("Add");
+          setEpisodes(episodes);
+          setTotalEpisodes(result.totalEpisode);
+        } else {
+          setEpisodes([]);
+          setTotalEpisodes(0);
+          setEpisode(0);
+        }
+
+      })
+
       .catch((error) => {
         console.error('Error fetching season metadata:', error);
       });
@@ -37,30 +60,73 @@ const EpisodeSelector = (props) => {
   
   // Season data
   const seasons = [];
-  for (let i = 1; i <= details.season_count; i++) {
+  for (let i = 1; i <= totalSeason; i++) {
     seasons.push({
       id: i,
       title: `Season ${i}`,
-      episodes: details.episode_count[i - 1]
+      episodes: 1
     });
   }
-  seasons.push({id:-1, title: '添加一季', episodes: details.special_count});
+  seasons.push({id:-1, title: 'Add', episodes: details.totalEpisodes});
   
-  const currentSeason = seasons.find(season => season.id === selectedSeason);
-  const totalEpisodes = currentSeason ? currentSeason.episodes : 0;
   
-  // Generate episodes array from newest to oldest
-  const episodes = Array.from(
-    { length: totalEpisodes }, 
-    (_, i) => totalEpisodes - i
-  );
+  const currentSeason = seasons.find(season => season.id === seasonId);
+  // const totalEpisodes = currentSeason ? currentSeason.episodes : 0;
+  
+
   
   const handleSeasonChange = (event) => {
     const newSeason = event.target.value;
-    setSelectedSeason(newSeason);
-    // Automatically select the latest episode of the new season
-    setSelectedEpisode(seasons.find(s => s.id === newSeason).episodes);
+    if (event.target.value === -1) {
+      //add is clicked
+      VideoUtil.add_season(details.resource_id, details.type).then((res) => {
+        if(!res || !res.data || res.data.code === -1) {
+          console.log("add season error")
+          return
+        } 
+        else {
+          setTotalSeason(totalSeason + 1);
+        }
+        console.log(res)
+      })
+    }
+    else {
+      setSeasonId(newSeason);
+      setEpisode(0);
+
+    }
   };
+
+  const handleEpisodeChange = (episode) => {
+    console.log(episode + "------------" + " episode selected");
+    if (episode === "Add") {
+      //add is clicked
+      VideoUtil.add_episode(details.resource_id, details.type, seasonId).then((res) => {
+        if(!res || !res.data || res.data.code === -1) {
+          console.log("add episode error")
+          return
+        } 
+        else {
+          let tmp = episodes.unshift(totalEpisodes + 1);
+          console.log("------------------" + totalEpisodes)
+          setEpisodes(episodes);
+          setTotalEpisodes(totalEpisodes + 1);
+        }
+        console.log(res)
+      })
+    }
+    else {
+      setEpisode(episode);
+    }
+
+  }
+  useEffect(() => {
+    if (details && seasonId) {
+
+    }
+
+  },[details, seasonId])
+
 
   return (
     <Container maxWidth="lg" sx={{ my: 4 }}>
@@ -110,7 +176,7 @@ const EpisodeSelector = (props) => {
               }}
             >
               <Select
-                value={selectedSeason}
+                value={seasonId}
                 onChange={handleSeasonChange}
                 displayEmpty
               >
@@ -132,7 +198,7 @@ const EpisodeSelector = (props) => {
                 variant="body1"
                 sx={{ ml: 1, color: 'rgba(255,255,255,0.9)' }}
               >
-                ({selectedEpisode}/{totalEpisodes})
+                ({episode}/{totalEpisodes})
               </Typography>
             </Box>
           </Box>
@@ -178,20 +244,20 @@ const EpisodeSelector = (props) => {
         {/* Episodes container */}
         {viewMode === 'grid' ? (
           <Grid container spacing={1}>
-            {episodes.map((episode) => (
-              <Grid item xs={3} sm={2} md={1.5} lg={1.2} key={episode}>
+            {episodes.map((item) => (
+              <Grid item xs={3} sm={2} md={1.5} lg={1.2} key={item}>
                 <Paper
                   elevation={2}
-                  onClick={() => setSelectedEpisode(episode)}
+                  onClick={() => handleEpisodeChange(item)}
                   sx={{
                     textAlign: 'center',
                     py: 1.5,
                     cursor: 'pointer',
-                    bgcolor: episode === selectedEpisode ? theme.palette.primary.main : 'background.paper',
-                    color: episode === selectedEpisode ? 'white' : 'text.primary',
+                    bgcolor: item === episode ? theme.palette.primary.main : 'background.paper',
+                    color: item === episode ? 'white' : 'text.primary',
                     transition: 'all 0.2s',
                     '&:hover': {
-                      bgcolor: episode === selectedEpisode
+                      bgcolor: item === episode
                         ? theme.palette.primary.dark
                         : theme.palette.action.hover,
                       transform: 'translateY(-2px)',
@@ -200,7 +266,7 @@ const EpisodeSelector = (props) => {
                   }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                    {episode}
+                    {item}
                   </Typography>
                 </Paper>
               </Grid>
@@ -208,22 +274,22 @@ const EpisodeSelector = (props) => {
           </Grid>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {episodes.map((episode) => (
+            {episodes.map((item) => (
               <Paper
-                key={episode}
+                key={item}
                 elevation={2}
-                onClick={() => setSelectedEpisode(episode)}
+                onClick={() => handleEpisodeChange(item)}
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   p: 2,
                   cursor: 'pointer',
-                  bgcolor: episode === selectedEpisode ? theme.palette.primary.main : 'background.paper',
-                  color: episode === selectedEpisode ? 'white' : 'text.primary',
+                  bgcolor: item === episode ? theme.palette.primary.main : 'background.paper',
+                  color: item === episode ? 'white' : 'text.primary',
                   transition: 'all 0.2s',
                   '&:hover': {
-                    bgcolor: episode === selectedEpisode
+                    bgcolor: item === episode
                       ? theme.palette.primary.dark
                       : theme.palette.action.hover
                   }
@@ -231,9 +297,9 @@ const EpisodeSelector = (props) => {
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                    Episode {episode}
+                    Episode {item}
                   </Typography>
-                  {episode === selectedEpisode && (
+                  {item === episode && (
                     <Box 
                       component="span" 
                       sx={{ 
@@ -249,7 +315,7 @@ const EpisodeSelector = (props) => {
                   )}
                 </Box>
                 <Typography variant="body2">
-                  {episode === selectedEpisode ? 'Selected' : 'Select'}
+                  {item === episode ? 'Selected' : 'Select'}
                 </Typography>
               </Paper>
             ))}

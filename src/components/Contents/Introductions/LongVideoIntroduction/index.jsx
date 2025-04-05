@@ -130,7 +130,8 @@ export default function MovieDetails(props) {
       setLoading(true);
       
       VideoUtil.getVideoInformation(videoIdentifier, setDetails)
-        .then(() => {
+        .then((res) => {
+          
           setIsDisabled(false);
           
           // Check if already requested

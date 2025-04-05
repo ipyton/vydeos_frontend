@@ -173,6 +173,9 @@ export default class SocialMediaUtil {
                 console.log("Internal Error")
                 return
             }
+            if (response.data && response.data.code === -1) {
+                return false
+            }
             let list = JSON.parse(response.data.message)
             setValue(idx)
             setList(list)

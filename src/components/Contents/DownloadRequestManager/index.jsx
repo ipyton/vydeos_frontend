@@ -75,7 +75,6 @@ export default function DownloadManager() {
   ]);
 
   const handleFileDelete = (index) => {
-
     setPlayableData(playableData.filter((_, i) => i !== index));
   };
 
@@ -99,6 +98,7 @@ export default function DownloadManager() {
   const [file, setFile] = useState(null);
   const [movieName, setMovieName] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [totalSeason, setTotalSeason] = useState(0);
   
   const [episode, setEpisode] = useState(0)
 
@@ -126,16 +126,7 @@ export default function DownloadManager() {
       tmpGid,
       checkedNumber + 1,
       setSelectOpen
-    ).then(()=>{
-      if (details.type === "movie") {
-      setSeasonId(0)
-      setEpisode(0)
-    }
-      else {
-        setSeasonId(1)
-        setEpisode(1)
-      }
-    })
+    )
   };
 
   const handleClose = () => {
@@ -219,10 +210,24 @@ export default function DownloadManager() {
   };
   
   const handleOpenDetails = (row) => {
+    VideoUtil.getVideoInformation(row,null,"en-US").then((res) => {
+      setTotalSeason(res.total_season)
+      console.log(res)
+    }).then(()=>{
+      if (row.type === "movie") {
+      setSeasonId(0)
+      setEpisode(0)
+      }
+      else {
+        setSeasonId(1)
+        setEpisode(1)
+      }
+    })
     setOpen(true);
     setDetails(row);
     setVideoId(row.resource_id);
     setMovieName(row.movieName);
+
     console.log(row)
     
   };
@@ -238,12 +243,10 @@ export default function DownloadManager() {
         }
         if (res.data.code === 0) {
           let requests = JSON.parse(res.data.message);
-
           requests = requests.map((item) => {
             console.log(item)
             return { ...item, resource_id: item.resourceId };
           })
-
           setRequests(requests);
         }
       })
@@ -256,7 +259,7 @@ export default function DownloadManager() {
 
   useEffect(() => {
     if (!details) return;
-    VideoUtil.get_download_sources(details.resource_id, details.type, seasonId,episode).then(function (response) {
+    VideoUtil.get_download_sources(details.resource_id, details.type, seasonId, episode).then(function (response) {
       if (response === undefined) {
           console.log("errror")
           return
@@ -276,7 +279,7 @@ export default function DownloadManager() {
   })
 
 
-
+  console.log(details, seasonId,episode )
     VideoUtil.get_playables(details, seasonId, episode).then(function (response) {
       if (response.data && response.data.code === 0) {
         setPlayableData(JSON.parse(response.data.message));
@@ -345,7 +348,6 @@ export default function DownloadManager() {
                   <TableCell>{row.resource_id}</TableCell>
                   <TableCell>{row.type}</TableCell>
                   <TableCell>{row.movieName}</TableCell>
-                  {/* <TableCell>{row.actorList}</TableCell> */}
                   <TableCell>{row.release_year}</TableCell>
                   <TableCell>{row.userId}</TableCell>
                   <TableCell>{new Date(row.timestamp).toLocaleDateString(JSON.parse(localStorage.getItem("userInfo")).language)}</TableCell>
@@ -376,7 +378,10 @@ export default function DownloadManager() {
           <DialogContentText sx={{ mb: 2 }}>
             Manage download sources for this movie. Add, delete, or start downloads.
           </DialogContentText>
-          {details && details.type === "movie" ? <div></div>:<EpisodeSelector></EpisodeSelector>}
+
+          {/*   const {seasonId, setSeasonId, episode, setEpisode, details, position} = props; */}
+          {details && details.type === "movie" ? <div></div>:<EpisodeSelector seasonId={seasonId} setSeasonId={setSeasonId}
+            episode={episode} setEpisode={setEpisode} totalSeason={totalSeason} setTotalSeason={setTotalSeason} details={details}></EpisodeSelector>}
           
           <List sx={{ width: "100%" }}>
             {sources.map((item, index) => (
@@ -447,7 +452,6 @@ export default function DownloadManager() {
                 {index < sources.length - 1 && <Divider component="li" />}
               </React.Fragment>
             ))}
-            deta
             <Box sx={{ mt: 3, p: 2, bgcolor: "background.paper", borderRadius: 2, boxShadow: 1 }}>
               <Typography variant="subtitle1" sx={{ mb: 2 }}>Add New Source</Typography>
               <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
