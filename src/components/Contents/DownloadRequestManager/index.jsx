@@ -103,7 +103,7 @@ export default function DownloadManager() {
   const [episode, setEpisode] = useState(0)
 
   const { showNotification } = useNotification();
-  const [indicator, setIndicator] = useState("ready") 
+  const [indicator, setIndicator] = useState(" ready") 
   const navigate = useNavigate();
 
   // Handler functions
@@ -187,7 +187,7 @@ export default function DownloadManager() {
       showNotification("Please select a file first", "warning");
       return;
     }
-    VideoUtil.uploadVideos(videoId, file, setUploadProgress, null, setIndicator);
+    VideoUtil.uploadVideos(videoId,details.type,file, setUploadProgress, null, setIndicator,seasonId, episode);
   };
 
   const handlePlay = (resource) => () => {

@@ -119,10 +119,10 @@ export default class VideoUtil {
 
 
 
-    static async uploadVideos(resourceId, value, setUploadState, resourceName,setIndicator) {
-        setIndicator("-- preprocessing...")
-        let sliceLength = 1024 * 1024 * 8
-        let length = value.sizes
+    static async uploadVideos(resourceId,type, value, setUploadState, resourceName,setIndicator,seasonId, episode) {
+        let sliceLength = 1024 * 1024 * 32
+        let length = value.size
+        console.log("value:" + value)
         async function computexxHash(file) {
             // 初始化 xxhash-wasm
             const xxhashInstance = await xxhash();
@@ -140,51 +140,14 @@ export default class VideoUtil {
               
               hasher.update(value);
               totalBytes += value.length;
-              console.log(`Processed: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
+            //   console.log(`Processed: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
             }
             
             return hasher.digest().toString(16);
           }
         
-        const totalSlice = Math.floor(length / sliceLength) +  1
-        async function computeChunkMD5(chunk) {
-          const buffer = await chunk.arrayBuffer();
-            const wordArray = CryptoJS.lib.WordArray.create(new Uint8Array(buffer));
-            const md5Hash = CryptoJS.MD5(wordArray).toString();
-            return md5Hash;
-        }
-
-    // async function compute(file, chunkSize = 64 * 1024 * 1024) { // Default: 4MB per chunk
-    // const chunks = Math.ceil(file.size / chunkSize);
-    // const spark = new SparkMD5.ArrayBuffer();
-    // const fileReader = new FileReader();
-    
-    // let currentChunk = 0;
-
-    // return new Promise((resolve, reject) => {
-    //     fileReader.onload = (event) => {
-    //         spark.append(event.target.result);
-    //         currentChunk++;
-
-    //         if (currentChunk < chunks) {
-    //             loadNextChunk();
-    //         } else {
-    //             resolve(spark.end()); // Final MD5 hash
-    //         }
-    //     };
-
-    //     fileReader.onerror = (error) => reject(error);
-
-    //     function loadNextChunk() {
-    //         const start = currentChunk * chunkSize;
-    //         const end = Math.min(start + chunkSize, file.size);
-    //         fileReader.readAsArrayBuffer(file.slice(start, end));
-    //     }
-
-    //     loadNextChunk();
-    // });
-//}       
-        const startTime = Date.now();
+          const totalSlice = Math.ceil(length / sliceLength);
+          const startTime = Date.now();
         let wholeHashCode = await computexxHash(value)
         console.log("wholeHashCode:" + wholeHashCode);
         console.log("MD5 computation took " + (Date.now() - startTime) + "ms");
@@ -194,8 +157,8 @@ export default class VideoUtil {
             url: VideoUtil.getUrlBase() + "/file/negotiationStep1",
             method: 'post',
             data: { userEmail: localStorage.getItem("userId"), token: localStorage.getItem("token"),  
-                wholeHashCode: wholeHashCode, resourceId : resourceId, resourceType: "movie", format: value.type, 
-                fileName:value.name,size:value.size,quality:1, totalSlice: totalSlice, },
+                wholeHashCode: wholeHashCode, resourceId : resourceId, resourceType: type, format: value.type, 
+                fileName:value.name,size:value.size,quality:1, totalSlice: totalSlice,seasonId:seasonId, episode:episode },
             headers: {
                 "token": localStorage.getItem("token"),
             },
@@ -212,18 +175,19 @@ export default class VideoUtil {
                     setIndicator("-- uploading...")
                     let i = 0;
                     for (; i < totalSlice && continueUpload; i ++) {
-                        setUploadState(i/totalSlice * 100)
+                        console.log("Uploading chunk " + (i + 1) + " of " + totalSlice);
+                        setUploadState((i + 1)/totalSlice * 100)
                         let chunk = value.slice(i * sliceLength, (i + 1) * sliceLength);
                         let formData = new FormData();
                         formData.append("wholeHashCode", wholeHashCode);
                         let chunkxxHash = await computexxHash(chunk); // Compute MD5 correctly
-
                         formData.append("hashCode", chunkxxHash);
                         formData.append("currentSlice", i);
                         formData.append("resourceId", resourceId);
-                        formData.append("type", "movie");
+                        formData.append("type", type);
                         formData.append("file", new Blob([chunk]), `chunk_${i}.bin`);
-                    
+                        formData.append("seasonId", seasonId);
+                        formData.append("episode", episode);
                         await axios.post(VideoUtil.getUploadUrlBase() + "/file/uploadFile", formData, {
                             headers: {
                                 "Content-Type": "multipart/form-data",
