@@ -21,41 +21,14 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 // Sample update log data
 const updateLogs = [
   {
-    version: "1.2.0",
-    date: "2025-04-01",
+    version: "0.0.0",
+    date: "2025-04-07",
     changes: [
-      { type: "new", content: "Added dark mode support that automatically switches based on system settings" },
-      { type: "improvement", content: "Refactored frontend performance, increasing page load speed by approximately 50%" },
-      { type: "fix", content: "Fixed an issue where the mobile menu couldn't be closed in certain situations" }
+      { type: "new", content: "Trying the application!" },
+
     ]
   },
-  {
-    version: "1.1.0",
-    date: "2025-03-15",
-    changes: [
-      { type: "new", content: "Launched user personal center with support for custom avatars and profiles" },
-      { type: "new", content: "Added notification system for receiving important updates in real-time" },
-      { type: "improvement", content: "Redesigned navigation menu for better user experience" }
-    ]
-  },
-  {
-    version: "1.0.1",
-    date: "2025-03-05",
-    changes: [
-      { type: "fix", content: "Fixed verification code issues during account registration" },
-      { type: "fix", content: "Resolved Safari browser compatibility issues" },
-      { type: "improvement", content: "Improved responsive layout display on tablet devices" }
-    ]
-  },
-  {
-    version: "1.0.0",
-    date: "2025-02-20",
-    changes: [
-      { type: "new", content: "Website officially launched! Thanks to all beta testers for their valuable feedback" },
-      { type: "new", content: "Completed core functionality development, including user registration, login, and basic content browsing" },
-      { type: "new", content: "Added support for multi-platform access, including PC, tablet, and mobile devices" }
-    ]
-  }
+  
 ];
 
 // Format date function
@@ -247,9 +220,6 @@ const UpdateLog = () => {
 
         {/* Footer */}
         <Box sx={{ textAlign: 'center', py: 3, mt: 4, borderTop: 1, borderColor: 'divider' }}>
-          <Typography variant="body2" color="text.secondary">
-            © 2025 Your Website Name. All rights reserved.
-          </Typography>
           <Box sx={{ mt: 1 }}>
             <Typography component="a" href="#" variant="body2" color="primary" sx={{ mx: 1, textDecoration: 'none' }}>
               Home

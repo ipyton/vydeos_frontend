@@ -31,7 +31,7 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import VideoUtil from "../../../util/io_utils/VideoUtil";
 import { useNotification } from "../../../Providers/NotificationProvider";
-import EpisodeSelector from "../LongVideos/EpisodeSelector";
+import EpisodeSelector from "./EpisodeSelector";
 
 
 // Progress bar with label component
@@ -39,9 +39,9 @@ function LinearProgressWithLabel(props) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
       <Box sx={{ width: "100%", mr: 1 }}>
-        <LinearProgress 
-          variant="determinate" 
-          {...props} 
+        <LinearProgress
+          variant="determinate"
+          {...props}
           sx={{ height: 10, borderRadius: 5 }}
         />
       </Box>
@@ -60,7 +60,7 @@ LinearProgressWithLabel.propTypes = {
 
 export default function DownloadManager() {
   // State management
-  
+
   const [open, setOpen] = useState(false);
   const [tmpGid, setTmpGid] = useState("");
   const [tmpSource, setTmpSource] = useState("");
@@ -78,7 +78,7 @@ export default function DownloadManager() {
     setPlayableData(playableData.filter((_, i) => i !== index));
   };
 
-  const [seasonId,setSeasonId] = useState(0)
+  const [seasonId, setSeasonId] = useState(0)
 
   const [requests, setRequests] = useState([
     { videoId: "videoId", source: "xxxx1", status: "init" },
@@ -99,11 +99,11 @@ export default function DownloadManager() {
   const [movieName, setMovieName] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [totalSeason, setTotalSeason] = useState(0);
-  
+
   const [episode, setEpisode] = useState(0)
 
   const { showNotification } = useNotification();
-  const [indicator, setIndicator] = useState(" ready") 
+  const [indicator, setIndicator] = useState(" ready")
   const navigate = useNavigate();
 
   // Handler functions
@@ -143,27 +143,27 @@ export default function DownloadManager() {
       input,
     ).then(function (response) {
       if (response === undefined || !response.data) {
-          console.log("errror")
+        console.log("errror")
       }
-      
+
       console.log(response)
       //props.setBarState({...props.barState, message:responseData.message, open:true})
       let data = response.data
       if (data === "success") {
-          setSources([...sources, { id: details.id, source: input, status: "init" }])
+        setSources([...sources, { id: details.id, source: input, status: "init" }])
       }
 
-  })
+    })
     setInput("");
   };
 
   const handleDelete = (source) => () => {
     VideoUtil.remove_download_source(details, source).then(function (response) {
-      if(!response) {
+      if (!response) {
         return
       }
       else if (response.data !== "success") {
-        return 
+        return
       }
       else {
         for (let i = 0; i < sources.length; i++) {
@@ -187,7 +187,7 @@ export default function DownloadManager() {
       showNotification("Please select a file first", "warning");
       return;
     }
-    VideoUtil.uploadVideos(videoId,details.type,file, setUploadProgress, null, setIndicator,seasonId, episode);
+    VideoUtil.uploadVideos(videoId, details.type, file, setUploadProgress, null, setIndicator, seasonId, episode);
   };
 
   const handlePlay = (resource) => () => {
@@ -208,15 +208,15 @@ export default function DownloadManager() {
     );
     setTmpSource(source);
   };
-  
+
   const handleOpenDetails = (row) => {
-    VideoUtil.getVideoInformation(row,null,"en-US").then((res) => {
+    VideoUtil.getVideoInformation(row, null, "en-US").then((res) => {
       setTotalSeason(res.total_season)
       console.log(res)
-    }).then(()=>{
+    }).then(() => {
       if (row.type === "movie") {
-      setSeasonId(0)
-      setEpisode(0)
+        setSeasonId(0)
+        setEpisode(0)
       }
       else {
         setSeasonId(1)
@@ -229,7 +229,7 @@ export default function DownloadManager() {
     setMovieName(row.movieName);
 
     console.log(row)
-    
+
   };
 
   // Load data on component mount
@@ -255,14 +255,14 @@ export default function DownloadManager() {
       });
 
   }, []);
-  
+
 
   useEffect(() => {
     if (!details) return;
     VideoUtil.get_download_sources(details.resource_id, details.type, seasonId, episode).then(function (response) {
       if (response === undefined) {
-          console.log("errror")
-          return
+        console.log("errror")
+        return
       }
       console.log(response)
       //props.setBarState({...props.barState, message:responseData.message, open:true})
@@ -276,10 +276,10 @@ export default function DownloadManager() {
       //     }
       // }
       // setSources([...sources])
-  })
+    })
 
 
-  console.log(details, seasonId,episode )
+    console.log(details, seasonId, episode)
     VideoUtil.get_playables(details, seasonId, episode).then(function (response) {
       if (response.data && response.data.code === 0) {
         setPlayableData(JSON.parse(response.data.message));
@@ -290,12 +290,12 @@ export default function DownloadManager() {
     }).catch(function (error) {
       showNotification(error.message, "warning");
     })
-  },[details, seasonId, episode])
+  }, [details, seasonId, episode])
 
 
   // Get status color based on status
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case "finished": return "success.main";
       case "downloading": return "info.main";
       case "paused": return "warning.main";
@@ -309,11 +309,11 @@ export default function DownloadManager() {
       <Typography variant="h4" sx={{ mb: 3 }}>
         Download Manager
       </Typography>
-      
+
       {/* Movie list table */}
-      <TableContainer 
-        component={Paper} 
-        elevation={3} 
+      <TableContainer
+        component={Paper}
+        elevation={3}
         sx={{ mb: 4, borderRadius: 2, overflow: "hidden" }}
       >
         <Table aria-label="movie downloads table">
@@ -328,7 +328,7 @@ export default function DownloadManager() {
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Submitted</TableCell>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Actions</TableCell>
             </TableRow>
-            
+
           </TableHead>
           <TableBody>
             {requests == null ? (
@@ -339,7 +339,7 @@ export default function DownloadManager() {
               requests.map((row, index) => (
                 <TableRow
                   key={row.movieId || index}
-                  sx={{ 
+                  sx={{
                     "&:nth-of-type(odd)": { backgroundColor: "action.hover" },
                     "&:hover": { backgroundColor: "action.selected" },
                     transition: "background-color 0.2s"
@@ -380,32 +380,32 @@ export default function DownloadManager() {
           </DialogContentText>
 
           {/*   const {seasonId, setSeasonId, episode, setEpisode, details, position} = props; */}
-          {details && details.type === "movie" ? <div></div>:<EpisodeSelector seasonId={seasonId} setSeasonId={setSeasonId}
+          {details && details.type === "movie" ? <div></div> : <EpisodeSelector seasonId={seasonId} setSeasonId={setSeasonId}
             episode={episode} setEpisode={setEpisode} totalSeason={totalSeason} setTotalSeason={setTotalSeason} details={details}></EpisodeSelector>}
-          
+
           <List sx={{ width: "100%" }}>
             {sources.map((item, index) => (
               <React.Fragment key={index}>
                 <ListItem>
-                  <Stack 
-                    direction="row" 
-                    spacing={2} 
-                    sx={{ 
-                      width: "100%", 
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                      width: "100%",
                       alignItems: "center",
                       bgcolor: index % 2 === 0 ? "action.hover" : "transparent",
                       borderRadius: 1,
                       padding: 1
                     }}
                   >
-                    <Box 
-                      sx={{ 
-                        width: 12, 
-                        height: 12, 
-                        borderRadius: "50%", 
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
                         bgcolor: getStatusColor(item.status),
                         boxShadow: 1
-                      }} 
+                      }}
                     />
                     <ListItemText
                       primary={item.source}
@@ -413,20 +413,20 @@ export default function DownloadManager() {
                       sx={{ flexGrow: 1 }}
                     />
                     <Stack direction="row" spacing={1}>
-                      <Button 
-                        variant="outlined" 
-                        color="error" 
+                      <Button
+                        variant="outlined"
+                        color="error"
                         size="small"
                         onClick={handleDelete(item.source)}
                         sx={{ minWidth: 0, borderRadius: 2 }}
                       >
                         Delete
                       </Button>
-                      
+
                       {item.status && item.status === "finished" ? (
-                        <Button 
-                          variant="contained" 
-                          color="success" 
+                        <Button
+                          variant="contained"
+                          color="success"
                           size="small"
                           onClick={handlePlay(item.source)}
                           sx={{ minWidth: 0, borderRadius: 2 }}
@@ -434,11 +434,11 @@ export default function DownloadManager() {
                           Play
                         </Button>
                       ) : null}
-                      
+
                       {item.status && item.status !== "finished" ? (
-                        <Button 
-                          variant="contained" 
-                          color="primary" 
+                        <Button
+                          variant="contained"
+                          color="primary"
                           size="small"
                           onClick={handleDownload(item.source)}
                           sx={{ minWidth: 0, borderRadius: 2 }}
@@ -463,17 +463,17 @@ export default function DownloadManager() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                 />
-                <Button 
-                  variant="contained" 
+                <Button
+                  variant="contained"
                   onClick={handleSubmit}
                   sx={{ borderRadius: 2 }}
                 >
                   Add
                 </Button>
               </Stack>
-              
+
               <Divider sx={{ my: 2 }} />
-              
+
               <Typography variant="subtitle1" sx={{ mb: 2 }}>Upload Video File</Typography>
               <Stack direction="column" spacing={2}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -490,17 +490,17 @@ export default function DownloadManager() {
                     />
                   </Button>
                   <Typography variant="body2">
-                    {file ? file.name + indicator: "No file selected"}
+                    {file ? file.name + indicator : "No file selected"}
                   </Typography>
                 </Box>
-                
+
                 <Box sx={{ width: "100%" }}>
                   <LinearProgressWithLabel value={uploadProgress} />
                 </Box>
-                
-                <Button 
-                  variant="contained" 
-                  color="secondary" 
+
+                <Button
+                  variant="contained"
+                  color="secondary"
                   onClick={handleUpload}
                   disabled={!file}
                   sx={{ alignSelf: "flex-start", borderRadius: 2 }}
@@ -511,25 +511,25 @@ export default function DownloadManager() {
             </Box>
           </List>
 
-      <div>
-      <Typography variant="h6" gutterBottom>
-        Playable Resources
-      </Typography>
-      <List>
-        {playableData.map((item, index) => (
-          <ListItem key={index} divider>
-            <ListItemText
-              primary={`Resource: ${item.resource_id}, Type: ${item.type}, Quality: ${item.quality}`}
-              secondary={`Bucket: ${item.bucket}, Path: ${item.path}`}
-            />
-            <IconButton edge="end" aria-label="delete" onClick={() => handleFileDelete(index)}>
-              <DeleteIcon />
-            </IconButton>
-          </ListItem>
-        ))}
-      </List>
+          <div>
+            <Typography variant="h6" gutterBottom>
+              Playable Resources
+            </Typography>
+            <List>
+              {playableData.map((item, index) => (
+                <ListItem key={index} divider>
+                  <ListItemText
+                    primary={`Resource: ${item.resource_id}, Type: ${item.type}, Quality: ${item.quality}`}
+                    secondary={`Bucket: ${item.bucket}, Path: ${item.path}`}
+                  />
+                  <IconButton edge="end" aria-label="delete" onClick={() => handleFileDelete(index)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </ListItem>
+              ))}
+            </List>
 
-    </div>
+          </div>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={handleClose} variant="contained" sx={{ borderRadius: 2 }}>
@@ -549,16 +549,16 @@ export default function DownloadManager() {
           </DialogContentText>
           <List sx={{ width: "100%" }}>
             {selections.map((item, idx) => (
-              <ListItem 
+              <ListItem
                 key={idx}
-                sx={{ 
+                sx={{
                   borderRadius: 1,
                   bgcolor: checkedNumber === idx ? "action.selected" : idx % 2 === 0 ? "action.hover" : "transparent",
                 }}
               >
                 <Stack direction="row" spacing={2} sx={{ width: "100%", alignItems: "center" }}>
-                  <Checkbox 
-                    checked={checkedNumber === idx} 
+                  <Checkbox
+                    checked={checkedNumber === idx}
                     onChange={handleSelection(idx)}
                     color="primary"
                   />
@@ -572,8 +572,8 @@ export default function DownloadManager() {
           </List>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button 
-            onClick={select} 
+          <Button
+            onClick={select}
             variant="contained"
             disabled={checkedNumber === null}
             sx={{ borderRadius: 2 }}

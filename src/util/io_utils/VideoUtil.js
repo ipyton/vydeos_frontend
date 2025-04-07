@@ -373,7 +373,6 @@ export default class VideoUtil {
     }
 
     static get_playables(movieIdentifier, seasonId, episode){
-        console.log(movieIdentifier)
         if (movieIdentifier ==undefined || movieIdentifier == null || episode == undefined || episode == null || seasonId === undefined || seasonId == null) {
             return
         }
@@ -417,12 +416,17 @@ export default class VideoUtil {
 
     static getVideoInformation(movieIdentifier, setState, language) {
         if (setState) setState(null)
-
         if (!language) language = JSON.parse(localStorage.getItem("userInfo")).language
+        let episode = 0;
+        let seasonId = 0;
+        if (movieIdentifier.type === "tv") {
+            episode = 1
+            seasonId = 1
+        }
         return axios({
             url: "http://127.0.0.1:5000" + "/movie/get_meta",
             method: 'get',
-            params: { id:movieIdentifier.resource_id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language": language},
+            params: {id:movieIdentifier.resource_id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language": language},
             headers: {  
                 token: localStorage.getItem("token") }
         }).catch(error => {
@@ -434,6 +438,7 @@ export default class VideoUtil {
             }
             //props.setBarState({...props.barState, message:responseData.message, open:true})
             let data = response.data
+            console.log(data)
             let actresses = []
             data["type"] = movieIdentifier.type
             data["actressList"].forEach(element => {
@@ -576,11 +581,9 @@ export default class VideoUtil {
                 console.log("errror")
                 return
             }
-            console.log(response)
             if (response.data === "exist!") {
                 return
             }
-            console.log(response)
 
             setSelectOpen(false)
             //props.setBarState({...props.barState, message:responseData.message, open:true})
@@ -605,11 +608,9 @@ export default class VideoUtil {
                 console.log("errror")
                 return
             }
-            console.log(response)
             if (response.data === "exist!") {
                 return
             }
-            console.log(response)
 
             for (let i = 0; i < sources.length; i++) {
                 if (sources[i].source === source_id) {
@@ -709,7 +710,6 @@ export default class VideoUtil {
                 console.log("errror")
                 return
             }
-            console.log(response)
             //props.setBarState({...props.barState, message:responseData.message, open:true})
             let data = response.data
             setRecord(response.data)
@@ -717,22 +717,34 @@ export default class VideoUtil {
         })
     }
 
-    static get_and_processM3u8(location, setOption) {
-        const prefix = "http://127.0.0.1:8848/videos/longvideos/" + encodeURIComponent(location.type+ "_" + location.resource_id + "/" );
+    static get_and_processM3u8(location, setOption, seasonId, episode) {
+        // 检查参数有效性
+        if (location == undefined || location == null) {
+            return;
+        }
+        if (location.type === undefined || location.resource_id === undefined) {
+            return;
+        }
+        if (seasonId === undefined || episode === undefined) {
+            return;
+        }
+        
+        // 如果是电影类型，设置默认值
+        if (location.type === "movie") {
+            episode = 0;
+            seasonId = 0;
+        }
+        
+        // 构建URL
+        const prefix = "http://127.0.0.1:8848/videos/longvideos/" + encodeURIComponent(location.type + "_" + location.resource_id + "_" + seasonId + "_" + episode + "/");
         const m3u8Url = prefix + encodeURIComponent("index.m3u8");
 
-        console.log("Fetching M3U8 from:", m3u8Url);
-
-        fetch(m3u8Url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.text();
-            })
-            .then(content => {
-                console.log("Original M3U8 content:\n", content);
-
+        // 使用axios代替fetch
+        return axios.get(m3u8Url)
+            .then(response => {                
+                // 处理M3U8内容
+                console.log("getting contents from" + m3u8Url)
+                const content = response.data;
                 const lines = content.split("\n");
                 const processedLines = lines.map(line => {
                     if (line.endsWith('.ts')) {
@@ -740,14 +752,15 @@ export default class VideoUtil {
                     }
                     return line;
                 });
-
+                
+                // 创建修改后的Blob和URL
                 const modifiedData = processedLines.join('\n');
-
                 const blob = new Blob([modifiedData], { type: 'application/x-mpegURL' });
                 const url = URL.createObjectURL(blob);
-//
+                
+                // 设置播放器选项
                 setOption({
-                    autoplay: true,
+                    autoplay: false,
                     controls: true,
                     responsive: true,
                     fluid: true,

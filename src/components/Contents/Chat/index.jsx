@@ -21,7 +21,6 @@ export default function Chat(props) {
   
   let { refresh, sideBarSelector, setSideBarSelector } = props
 
-  console.log(props)
 
   // const history = useLocation()
   // console.log(history)

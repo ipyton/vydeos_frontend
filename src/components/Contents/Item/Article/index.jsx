@@ -52,7 +52,6 @@ const ExpandMore = styled((props) => {
 }));
 
 export default function Article(props) {
-  console.log(props.content)
   const [expanded, setExpanded] = React.useState(false);
   const [likes, setLikes] = React.useState(props.content.likes)
   const [comments, setComments] = React.useState(props.content.comments)

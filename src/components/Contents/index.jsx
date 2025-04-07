@@ -55,7 +55,6 @@ export default function Contents(props) {
         message: "helloworld"
     });
 
-    console.log(props)
     const { setLogin } = props
 
     const [avatar, setAvatar] = useState(null)

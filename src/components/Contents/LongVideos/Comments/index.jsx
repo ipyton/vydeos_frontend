@@ -16,7 +16,6 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 export default function Comments(props) {
-  console.log(props)
     return (<div>
         {props.comments && props.comments.map(element => {
           

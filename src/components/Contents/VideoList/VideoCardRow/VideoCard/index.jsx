@@ -7,7 +7,6 @@ import { CardActionArea } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 export default function(props) {
-  console.log(props)
   const content = props.content
   const navigate = useNavigate()
   const handleClick = () => {

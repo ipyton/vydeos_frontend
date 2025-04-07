@@ -10,7 +10,6 @@ let token;
 let userId;
 
 const connectWebSocket = (url) => {
-    console.log(url)
     if (!socket || socket.readyState !== WebSocket.OPEN) {
         socket = new WebSocket(url);
 
@@ -40,7 +39,6 @@ const connectWebSocket = (url) => {
         };
     }
 };
-console.log("webworker start ----")
 
 function getNewestMessages() {
     return DatabaseManipulator.getTimestamp().then((timestamp) => {

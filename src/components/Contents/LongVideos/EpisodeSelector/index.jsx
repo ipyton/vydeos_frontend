@@ -15,124 +15,210 @@ import {
 } from '@mui/material';
 import GridViewIcon from '@mui/icons-material/GridView';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import VideoUtil from '../../../../util/io_utils/VideoUtil';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+
+const GridEpisodeItem = ({
+  item,
+  episode,
+  theme,
+  handleEpisodeChange,
+  playableEpisodes = []
+}) => {
+  // Check if this episode can be played
+  const isPlayable = playableEpisodes.includes(item);
+
+  return (
+    <Grid item xs={3} sm={2} md={1.5} lg={1.2} key={item}>
+      <Paper
+        elevation={2}
+        onClick={() => isPlayable && handleEpisodeChange(item)}
+        sx={{
+          textAlign: 'center',
+          py: 1.5,
+          cursor: isPlayable ? 'pointer' : 'not-allowed',
+          bgcolor: item === episode ? theme.palette.primary.main : 'background.paper',
+          color: item === episode ? 'white' : 'text.primary',
+          transition: 'all 0.2s',
+          position: 'relative',
+          opacity: isPlayable ? 1 : 0.7,
+          '&:hover': isPlayable ? {
+            bgcolor: item === episode
+              ? theme.palette.primary.dark
+              : theme.palette.action.hover,
+            transform: 'translateY(-2px)',
+            boxShadow: 3
+          } : {}
+        }}
+      >
+        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+          {item}
+        </Typography>
+
+        {/* Indicator for playable status */}
+        {isPlayable ? (
+          <PlayCircleIcon
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              fontSize: 16,
+              color: item === episode ? 'white' : theme.palette.success.main
+            }}
+          />
+        ) : (
+          <CloudDownloadIcon
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              fontSize: 16,
+              color: item === episode ? 'white' : theme.palette.text.disabled
+            }}
+          />
+        )}
+      </Paper>
+    </Grid>
+  );
+};
+
+// List view episode component
+const ListEpisodeItem = ({
+  item,
+  episode,
+  theme,
+  handleEpisodeChange,
+  playableEpisodes = []
+}) => {
+  // Check if this episode can be played
+  const isPlayable = playableEpisodes.includes(item);
+
+  return (
+    <Paper
+      key={item}
+      elevation={2}
+      onClick={() => isPlayable && handleEpisodeChange(item)}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        p: 2,
+        cursor: isPlayable ? 'pointer' : 'not-allowed',
+        bgcolor: item === episode ? theme.palette.primary.main : 'background.paper',
+        color: item === episode ? 'white' : 'text.primary',
+        transition: 'all 0.2s',
+        opacity: isPlayable ? 1 : 0.7,
+        '&:hover': isPlayable ? {
+          bgcolor: item === episode
+            ? theme.palette.primary.dark
+            : theme.palette.action.hover
+        } : {}
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+          Episode {item}
+        </Typography>
+        {item === episode && (
+          <Box
+            component="span"
+            sx={{
+              fontSize: '0.75rem',
+              bgcolor: 'rgba(255,255,255,0.2)',
+              px: 1,
+              py: 0.3,
+              borderRadius: 1
+            }}
+          >
+            Now Playing
+          </Box>
+        )}
+        {!isPlayable && (
+          <Box
+            component="span"
+            sx={{
+              fontSize: '0.75rem',
+              bgcolor: item === episode ? 'rgba(255,255,255,0.2)' : theme.palette.action.disabledBackground,
+              color: item === episode ? 'white' : theme.palette.text.disabled,
+              px: 1,
+              py: 0.3,
+              borderRadius: 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5
+            }}
+          >
+            <CloudDownloadIcon fontSize="small" />
+            waiting
+          </Box>
+        )}
+      </Box>
+      <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        {isPlayable ? (
+          item === episode ? 'Selected' : 'Play'
+        ) : (
+          'Waiting'
+        )}
+        {isPlayable && item !== episode && <PlayCircleIcon fontSize="small" />}
+      </Typography>
+    </Paper>
+  );
+};
+
+
+
 
 const EpisodeSelector = (props) => {
   // props: give video information and season information, set episode.
-  console.log(props)
-  const {seasonId, setSeasonId, episode, setEpisode, details, totalSeason, setTotalSeason, position} = props;
+  //seasonId={currentSeason} setSeasonId={setCurrentSeason} episode={currentEpisode} setEpisode={setCurrentEpisode} totalEpisodes={totalEpisodes} totalSeasons={totalSeasons} details={videoMeta}
+  const { seasonId, setSeasonId, episode, setEpisode, details, totalEpisodes, playableEpisodes } = props;
   //position is one of : manager, player
   // which decide to show/hide the add button.
   //const [selectedEpisode, setSelectedEpisode] = useState(1);
   //const [selectedSeason, setSelectedSeason] = useState(1);
-  const [viewMode, setViewMode] = useState('grid');  
+  const [viewMode, setViewMode] = useState('grid');
   const theme = useTheme();
-  const [totalEpisodes, setTotalEpisodes] = useState(0);
-  const [episodes, setEpisodes] = useState([]);
-  
-    // // Generate episodes array from newest to oldest
+  // const [episodes, setEpisodes] = useState([]);
+  let episodes = [];
+  // // Generate episodes array from newest to oldest
+  console.log("totalEpisodes:" + totalEpisodes)
+  if (totalEpisodes) {
+    episodes = Array.from(
+      { length: totalEpisodes },
+      (_, i) => totalEpisodes - i
+    )
+  }
 
-  useEffect(() => {
-    if (seasonId && seasonId !== 0 ) {
-      VideoUtil.get_season_meta(details.resource_id, details.type, seasonId).then((res) => {
-        if (res.data.code === 0 && res.data.message !== "null") {
-          let result = JSON.parse(res.data.message)
-            const episodes = Array.from(
-              { length: result.totalEpisode }, 
-              (_, i) => result.totalEpisode - i
-            );
-          episodes.push("Add");
-          setEpisodes(episodes);
-          setTotalEpisodes(result.totalEpisode);
-        } else {
-          setEpisodes([]);
-          setTotalEpisodes(0);
-          setEpisode(0);
-        }
-
-      })
-
-      .catch((error) => {
-        console.error('Error fetching season metadata:', error);
-      });
-    }
-  }, [seasonId])
-  
   // Season data
   const seasons = [];
-  for (let i = 1; i <= totalSeason; i++) {
+  for (let i = 1; i <= details.total_season; i++) {
     seasons.push({
       id: i,
       title: `Season ${i}`,
       episodes: 1
     });
   }
-  seasons.push({id:-1, title: 'Add', episodes: details.totalEpisodes});
-  
-  
-  const currentSeason = seasons.find(season => season.id === seasonId);
-  // const totalEpisodes = currentSeason ? currentSeason.episodes : 0;
-  
 
-  
+  // const currentSeason = seasons.find(season => season.id === seasonId);
+  // // const totalEpisodes = currentSeason ? currentSeason.episodes : 0;
+
+
+
   const handleSeasonChange = (event) => {
     const newSeason = event.target.value;
-    if (event.target.value === -1) {
-      //add is clicked
-      VideoUtil.add_season(details.resource_id, details.type).then((res) => {
-        if(!res || !res.data || res.data.code === -1) {
-          console.log("add season error")
-          return
-        } 
-        else {
-          setTotalSeason(totalSeason + 1);
-        }
-        console.log(res)
-      })
-    }
-    else {
-      setSeasonId(newSeason);
-      setEpisode(0);
-
-    }
+    setSeasonId(newSeason);
+    setEpisode(0);
   };
 
   const handleEpisodeChange = (episode) => {
-    console.log(episode + "------------" + " episode selected");
-    if (episode === "Add") {
-      //add is clicked
-      VideoUtil.add_episode(details.resource_id, details.type, seasonId).then((res) => {
-        if(!res || !res.data || res.data.code === -1) {
-          console.log("add episode error")
-          return
-        } 
-        else {
-          let tmp = episodes.unshift(totalEpisodes + 1);
-          console.log("------------------" + totalEpisodes)
-          setEpisodes(episodes);
-          setTotalEpisodes(totalEpisodes + 1);
-        }
-        console.log(res)
-      })
-    }
-    else {
-      setEpisode(episode);
-    }
-
+    setEpisode(episode);
   }
-  useEffect(() => {
-    if (details && seasonId) {
-
-    }
-
-  },[details, seasonId])
-
 
   return (
     <Container maxWidth="lg" sx={{ my: 4 }}>
-      <Paper 
-        elevation={3} 
-        sx={{ 
+      <Paper
+        elevation={3}
+        sx={{
           p: 3,
           borderRadius: 2,
           overflow: 'hidden',
@@ -153,10 +239,10 @@ const EpisodeSelector = (props) => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {/* Season dropdown */}
-            <FormControl 
-              variant="outlined" 
+            <FormControl
+              variant="outlined"
               size="small"
-              sx={{ 
+              sx={{
                 minWidth: 120,
                 '& .MuiOutlinedInput-root': {
                   color: 'white',
@@ -187,9 +273,9 @@ const EpisodeSelector = (props) => {
                 ))}
               </Select>
             </FormControl>
-            
+
             <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.3)', height: 24 }} />
-            
+
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
                 正片
@@ -202,18 +288,18 @@ const EpisodeSelector = (props) => {
               </Typography>
             </Box>
           </Box>
-          
+
           {/* View mode toggle */}
-          <Box sx={{ 
-            display: 'flex', 
-            bgcolor: 'rgba(255,255,255,0.2)', 
+          <Box sx={{
+            display: 'flex',
+            bgcolor: 'rgba(255,255,255,0.2)',
             borderRadius: 1,
             p: 0.5,
           }}>
-            <IconButton 
+            <IconButton
               aria-label="網格視圖"
               onClick={() => setViewMode('grid')}
-              sx={{ 
+              sx={{
                 p: 0.5,
                 color: viewMode === 'grid' ? theme.palette.primary.main : 'white',
                 bgcolor: viewMode === 'grid' ? 'white' : 'transparent',
@@ -224,10 +310,10 @@ const EpisodeSelector = (props) => {
             >
               <GridViewIcon />
             </IconButton>
-            <IconButton 
+            <IconButton
               aria-label="列表視圖"
               onClick={() => setViewMode('list')}
-              sx={{ 
+              sx={{
                 p: 0.5,
                 color: viewMode === 'list' ? theme.palette.primary.main : 'white',
                 bgcolor: viewMode === 'list' ? 'white' : 'transparent',
@@ -245,79 +331,27 @@ const EpisodeSelector = (props) => {
         {viewMode === 'grid' ? (
           <Grid container spacing={1}>
             {episodes.map((item) => (
-              <Grid item xs={3} sm={2} md={1.5} lg={1.2} key={item}>
-                <Paper
-                  elevation={2}
-                  onClick={() => handleEpisodeChange(item)}
-                  sx={{
-                    textAlign: 'center',
-                    py: 1.5,
-                    cursor: 'pointer',
-                    bgcolor: item === episode ? theme.palette.primary.main : 'background.paper',
-                    color: item === episode ? 'white' : 'text.primary',
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      bgcolor: item === episode
-                        ? theme.palette.primary.dark
-                        : theme.palette.action.hover,
-                      transform: 'translateY(-2px)',
-                      boxShadow: 3
-                    }
-                  }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                    {item}
-                  </Typography>
-                </Paper>
-              </Grid>
+              <GridEpisodeItem
+                key={item}
+                item={item}
+                episode={episode}
+                theme={theme}
+                handleEpisodeChange={handleEpisodeChange}
+                playableEpisodes={playableEpisodes}
+              />
             ))}
           </Grid>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {episodes.map((item) => (
-              <Paper
+              <ListEpisodeItem
                 key={item}
-                elevation={2}
-                onClick={() => handleEpisodeChange(item)}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  p: 2,
-                  cursor: 'pointer',
-                  bgcolor: item === episode ? theme.palette.primary.main : 'background.paper',
-                  color: item === episode ? 'white' : 'text.primary',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    bgcolor: item === episode
-                      ? theme.palette.primary.dark
-                      : theme.palette.action.hover
-                  }
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                    Episode {item}
-                  </Typography>
-                  {item === episode && (
-                    <Box 
-                      component="span" 
-                      sx={{ 
-                        fontSize: '0.75rem', 
-                        bgcolor: 'rgba(255,255,255,0.2)', 
-                        px: 1, 
-                        py: 0.3, 
-                        borderRadius: 1 
-                      }}
-                    >
-                      Now Playing
-                    </Box>
-                  )}
-                </Box>
-                <Typography variant="body2">
-                  {item === episode ? 'Selected' : 'Select'}
-                </Typography>
-              </Paper>
+                item={item}
+                episode={episode}
+                theme={theme}
+                handleEpisodeChange={handleEpisodeChange}
+                playableEpisodes={playableEpisodes}
+              />
             ))}
           </Box>
         )}

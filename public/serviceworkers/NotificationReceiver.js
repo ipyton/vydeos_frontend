@@ -29,25 +29,7 @@ function urlBase64ToUint8Array(base64String) {
 
 self.addEventListener('activate', (event) => {
     console.log("activated")
-    // if (Notification.permission === 'granted') {
-    //     // 订阅推送通知
-    //     console.log(event.target.registration.pushManager)
-    //     event.target.registration.pushManager.getSubscription().then(res => {
-    //         if (res) {
-    //             console.log("Already subscribed", res.toJSON());
 
-    //         } else {
-    //             event.target.registration.pushManager.subscribe({
-    //                 userVisibleOnly: true, // 必须为 true，表示通知是可见的
-    //                 applicationServerKey: urlBase64ToUint8Array("BL8kyKsZ9viSyVsHzn6H35TbPKVaTdzXnX-Z8iOStICFciCcDn7LzZWWe7k6Tg3Ht_56qlaOD-b_goT52WLqmFw") // 替换为实际的 VAPID 公钥
-    //             }).then(function (subscription) {
-    //                 console.log('Subscribed successfully:', subscription);
-    //                 // 将订阅信息发送到服务器
-    //             }).catch(function (error) {
-    //                 console.error('Subscription failed:', error);
-    //             });
-    //         }
-    //     })
     event.waitUntil(self.clients.claim());  // 控制当前客户端，立即生效
 
 

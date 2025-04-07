@@ -10,7 +10,7 @@ function Copyright() {
     <Typography variant="body2" color="text.secondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://github.com/ipyton/blog">
-        Vydeo.js 0.8.1-0.8.0 Aplpha
+        Vydeo 0.0.0-0.0.0 Aplpha
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}

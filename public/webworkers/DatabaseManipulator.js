@@ -32,13 +32,10 @@ class DatabaseManipulator {
         // do not exist: add it to the first place.
         // and add user empty chat records
         if (contact.type === "group") {
-            console.log(contact)
             res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "group", "remain":0}, ...res];
-            console.log(res)
             localforage.setItem("group_" + contact.userId, []);
         } else if (contact.type === "single") {
             res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "single", "remain":0}, ...res];
-            console.log(res)
             localforage.setItem("single_" + contact.userId, []);
         } else {
             return null;
@@ -130,9 +127,7 @@ class DatabaseManipulator {
     static async batchAddContactHistory(messages) {
         let result = null;
         let timestamp = -1;
-        console.log(messages)
         for (let i = 0; i < messages.length; i++) {
-            console.log(messages[i])
             timestamp = Math.max(new Date(messages[i].time).getTime(), timestamp);
             result = this.addContactHistory(messages[i])
         }
@@ -142,7 +137,6 @@ class DatabaseManipulator {
 
 
     static addContactHistory(message) {
-        console.log(message)
         if ((!message.receiverId && !message.groupId) || !message.type) {
             return;    
         }
