@@ -9,7 +9,7 @@ import localforage from "localforage"
 export default class AccountUtil {
 
   static getUrlBase() {
-    return "http://localhost:8080"
+    return "/api"
   }
 
   dispatch = useDispatch()
@@ -213,7 +213,7 @@ export default class AccountUtil {
   static uploadAvatar(data) {
     async function upload() {
       let response = await axios({
-        url: "http://localhost:8080/account/uploadAvatar",
+        url: AccountUtil.getUrlBase() + "/account/uploadAvatar",
         method: 'post',
         data: { avatar: data },
         headers: {

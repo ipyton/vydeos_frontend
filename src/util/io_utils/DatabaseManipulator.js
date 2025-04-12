@@ -1,5 +1,4 @@
 import localforage from "localforage";
-import { update } from "../../components/redux/UserDetails";
 export default class DatabaseManipulator {
 
     static async updateTimestamp(timestamp) {

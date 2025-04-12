@@ -7,8 +7,7 @@ import DatabaseManipulator from "./DatabaseManipulator"
 export default class MessageUtil {
 
     static getUrlBase() {
-        return "http://localhost:8080"
-    }
+        return "/api"    }
 
     static initialize() {
         // initialize when user first start the application

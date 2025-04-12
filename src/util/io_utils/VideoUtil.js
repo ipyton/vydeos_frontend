@@ -8,22 +8,22 @@ import xxhash from 'xxhash-wasm';
 export default class VideoUtil {
 
     static getUrlBase() {
-        return "http://127.0.0.1:8080"
+                return "/api"
     }
 
     static getUploadUrlBase() {
-        return "http://localhost:8080"
+                return "/api"
     }
 
     static getDownloadUrlBase() {
-        return "http://127.0.0.1:5001"
+        return "/api"
     }
 
 
     static sendRequest(videoIdentifier) {
         let language = JSON.parse(localStorage.getItem("userInfo")).language
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/sendRequest",
+            url: VideoUtil.getUrlBase() + "/movie_management/sendRequest",
             method: 'post',
             data: {resourceId: videoIdentifier.resource_id, type: videoIdentifier.type, language: language},
             transformRequest: [function (data) {
@@ -68,7 +68,7 @@ export default class VideoUtil {
 
     static isRequested(movieIdentifier) {
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/isRequested?videoId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
+            url: VideoUtil.getUrlBase() + "/movie_management/isRequested?videoId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
             method: 'get',
             data: {  token: localStorage.getItem("token") },
             transformRequest: [function (data) {
@@ -86,7 +86,7 @@ export default class VideoUtil {
     
     static getRequests() {
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/getRequests",
+            url: VideoUtil.getUrlBase() + "/movie_management/getRequests",
             method: 'get',
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
@@ -364,7 +364,7 @@ export default class VideoUtil {
 
     static isStared(videoIdentifier) {
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/isStared",
+            url: VideoUtil.getUrlBase() + "/movie_management/isStared",
             method: 'get', params: { resourceId: videoIdentifier.resource_id, type: videoIdentifier.type },
             headers: {
                 "token": localStorage.getItem("token"),
@@ -377,7 +377,7 @@ export default class VideoUtil {
             return
         }
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type + 
+            url: VideoUtil.getUrlBase() + "/movie_management/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type + 
             "&seasonId=" + seasonId + "&episode=" + episode,
             method: 'get',
             data: {  token: localStorage.getItem("token") },
@@ -391,7 +391,7 @@ export default class VideoUtil {
 
     static get_season_meta(resource_id, type, season_id) {
         return axios({
-            url: VideoUtil.getUploadUrlBase() + "/movie/get_season_meta                      ",
+            url: VideoUtil.getUploadUrlBase() + "/movie_management/get_season_meta                      ",
             method: 'post',
             data: { resourceId: resource_id, type: type, seasonId:season_id},
  headers: {
@@ -404,7 +404,7 @@ export default class VideoUtil {
 
     static isPlayable(movieIdentifier) {
         return axios({
-            url: VideoUtil.getUrlBase() + "/movie/isPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
+            url: VideoUtil.getUrlBase() + "/movie_management/isPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
             method: 'get',
             headers: {
                 "token": localStorage.getItem("token"),
@@ -424,7 +424,7 @@ export default class VideoUtil {
             seasonId = 1
         }
         return axios({
-            url: "http://127.0.0.1:5000" + "/movie/get_meta",
+            url:  VideoUtil.getUrlBase() + "/movie/get_meta",
             method: 'get',
             params: {id:movieIdentifier.resource_id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language": language},
             headers: {  
@@ -453,7 +453,7 @@ export default class VideoUtil {
 
     static add_season(resourceId, type ) {
         return axios({
-            url: VideoUtil.getUploadUrlBase() + "/movie/add_season",
+            url: VideoUtil.getUploadUrlBase() + "/movie_management/add_season",
             method: 'post',
             data:{resourceId:resourceId, type:type},
             headers: {
@@ -466,7 +466,7 @@ export default class VideoUtil {
 
     static add_episode(resourceId, type, seasonId) {
         return axios({
-            url: VideoUtil.getUploadUrlBase() + "/movie/add_episode",
+            url: VideoUtil.getUploadUrlBase() + "/movie_management/add_episode",
             method: 'post',
             data:{resourceId:resourceId, type:type, seasonId: seasonId},
             headers: {
@@ -736,7 +736,7 @@ export default class VideoUtil {
         }
         
         // 构建URL
-        const prefix = "http://127.0.0.1:8848/videos/longvideos/" + encodeURIComponent(location.type + "_" + location.resource_id + "_" + seasonId + "_" + episode + "/");
+        const prefix = "/play_videos/longvideos/" + encodeURIComponent(location.type + "_" + location.resource_id + "_" + seasonId + "_" + episode + "/");
         const m3u8Url = prefix + encodeURIComponent("index.m3u8");
 
         // 使用axios代替fetch

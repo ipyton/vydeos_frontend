@@ -29,7 +29,7 @@ const ResetPassword = () => {
         setError("");
         try {
             // Send POST request to reset password API
-            const response = await axios.post("http://your-backend-api/reset-password", {
+            const response = await axios.post("/api/reset-password", {
                 oldPassword,
                 newPassword,
             },

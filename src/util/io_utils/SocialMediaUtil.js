@@ -9,7 +9,7 @@ import { SettingsSystemDaydreamTwoTone } from "@mui/icons-material"
 export default class SocialMediaUtil {
 
     static getUrlBase() {
-        return "http://localhost:8080"
+        return "/api"   
     }
 
 

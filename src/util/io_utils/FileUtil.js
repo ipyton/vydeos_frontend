@@ -4,9 +4,13 @@ import axios from "axios"
 import Qs from 'qs'
 export default class PictureUtil {
 
+
+    static getArticleBase() {
+        return "/api"    }
+
     static uploadArticlePics(data) {
         let response = axios({
-            url: "http://localhost:8080/article/upload_pic",
+            url:  PictureUtil.getArticleBase()+ "/article/upload_pic",
             method: 'post',
             data: { pics: data },
             transformRequest: [function (data) {
@@ -25,7 +29,7 @@ export default class PictureUtil {
     static downloadArticlePics(articleID, from, to) {
         async function download() {
             let response = await axios({
-                url: "http://localhost:8080/article/get_pic",
+                url: PictureUtil.getArticleBase() + "/article/get_pic",
                 method: 'post',
                 data: { from: 1, from: to, articleID: articleID },
                 headers: {
@@ -45,7 +49,7 @@ export default class PictureUtil {
     static getAvatar() {
         async function download() {
             let response = await axios({
-                url: "http://localhost:8080/account/getAvatar",
+                url: PictureUtil.getArticleBase() +"/account/getAvatar",
                 method: 'post',
                 headers: {
                     token: localStorage.getItem("token"),

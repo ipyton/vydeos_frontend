@@ -3,13 +3,13 @@ import axios from "axios"
 
 export default class PostUtil {
     static getUrlBase() {
-        return "http://localhost:8000/post"
+        return "/api"
     }
 
 
     static uploadPicture(pic, picurl, setPicurl) {
         axios({
-            url: "http://localhost:8000/file/uploadPostPic",
+            url: PostUtil.getUrlBase() + "/file/uploadPostPic",
             method: 'post',
             data: { file: pic },
             headers: {
@@ -32,7 +32,7 @@ export default class PostUtil {
         
         console.log(data)
         axios({
-            url: this.getUrlBase() + "/upload",
+            url: this.getUrlBase() + "/post/upload",
             method: 'post',
             data: data,
             headers: {
@@ -52,7 +52,7 @@ export default class PostUtil {
     
     static getPostsById(id, list,setList) {
         axios({
-            url: this.getUrlBase() + "/get_by_user_id",
+            url: this.getUrlBase() + "/post/get_by_user_id",
             method: 'post',
             data: {userID: localStorage.getItem("userId")},
             transformRequest: [function (data) {
@@ -75,7 +75,7 @@ export default class PostUtil {
 
     static getFriendPosts(list, setList) {
         axios({
-            url: this.getUrlBase() + "/get_friends_posts",
+            url: this.getUrlBase() + "/post/get_friends_posts",
             method: 'post',
             data: {},
             transformRequest: [function (data) {

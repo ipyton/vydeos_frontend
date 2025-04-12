@@ -5,7 +5,7 @@ import { Language } from '@mui/icons-material';
 
 export default class SearchUtil {
   static getBaseUrl() {
-    return "http://localhost:8080";
+    return "/api"
   }
 
   static stateSetter(list, dispatch) {
@@ -118,7 +118,7 @@ export default class SearchUtil {
     language = JSON.parse(userInfo).language
     console.log(language)
     return axios({
-      url: "http://127.0.0.1:5000/movie/search",
+      url:  "/api/movie/search",
       method: 'get',
       params: { "keyword": keyword, page_number:1, "Accept-Language": language},
       transformRequest: [function (data) {
