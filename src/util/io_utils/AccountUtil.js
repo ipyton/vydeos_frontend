@@ -8,7 +8,7 @@ import localforage from "localforage"
 
 export default class AccountUtil {
 
-  static getUrlBase() {
+  static cgetUrlBase() {
     return "/api"
   }
 
