@@ -19,6 +19,7 @@ import { Stack } from '@mui/material';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
 import { useEffect } from 'react';
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 function Copyright(props) {
   return (
@@ -45,6 +46,9 @@ export default function SignUp(props) {
   const [validatepw, setValidatepw] = useState("")
   let [activeStep, setActiveStep] = useState(0);
   let navigate = useNavigate()
+
+  const { showNotification } = useNotification();
+  
   const [barState, setBarState] = React.useState({
     open: false,
     vertical: 'top',

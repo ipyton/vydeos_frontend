@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, TextField, Grid, Typography, Box, Container, Alert } from "@mui/material";
 import axios from "axios";
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 const ResetPassword = () => {
     // State management
@@ -10,6 +11,7 @@ const ResetPassword = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+  const { showNotification } = useNotification();
 
     // Handle form submission
     const handleSubmit = async (e) => {
@@ -17,11 +19,11 @@ const ResetPassword = () => {
 
         // Basic form validation
         if (newPassword !== confirmPassword) {
-            setError("新密码和确认密码不匹配");
+            setError("not match");
             return;
         }
         if (newPassword.length < 6) {
-            setError("密码长度必须至少为6个字符");
+            setError("at least 6 characters");
             return;
         }
 

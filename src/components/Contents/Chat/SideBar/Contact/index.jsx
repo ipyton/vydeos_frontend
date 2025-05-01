@@ -2,10 +2,12 @@ import * as React from 'react';
 import { ListItem, ListItemText, ListItemAvatar, Avatar, ListItemButton, Badge, Divider, Typography, Box } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
+import { useNotification } from '../../../../../Providers/NotificationProvider';
 
 export default function Contact(props) {
   const { userId, name, avatar, unreadCount, lastMessage, lastMessageTime } = props.content;
   const { selected, onClick } = props;
+    const { showNotification } = useNotification();
   
   const isSelected = React.useMemo(() => {
     if (selected.type === "userId") {

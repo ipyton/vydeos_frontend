@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import { Navigate, useNavigate } from 'react-router-dom'
+import { useNotification } from "../../../Providers/NotificationProvider"
 
 
 import { useEffect } from 'react';
@@ -17,6 +18,8 @@ export default function HorizontalLinearStepper() {
   const steps = ['Input Details', 'Validate', "New Password", 'Success'];
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
+  const { showNotification } = useNotification();
+  
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       event.preventDefault();

@@ -16,6 +16,7 @@ import {
 import GridViewIcon from '@mui/icons-material/GridView';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import VideoUtil from '../../../../util/io_utils/VideoUtil';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 const EpisodeSelector = (props) => {
   // props: give video information and season information, set episode.
@@ -28,6 +29,7 @@ const EpisodeSelector = (props) => {
   const theme = useTheme();
   const [totalEpisodes, setTotalEpisodes] = useState(0);
   const [episodes, setEpisodes] = useState([]);
+  const { showNotification } = useNotification();
 
   // // Generate episodes array from newest to oldest
 

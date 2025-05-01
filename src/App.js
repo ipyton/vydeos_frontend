@@ -18,7 +18,7 @@ import AccountUtil from './util/io_utils/AccountUtil';
 import localforage from 'localforage';
 import { StrictMode } from 'react';
 import { NotificationProvider } from './Providers/NotificationProvider';
-
+import { useNotification } from './Providers/NotificationProvider';
 const defaultTheme = createTheme();
 
 function checkNetworkStatus() {
@@ -38,6 +38,7 @@ function App() {
   const [avatar, setAvatar] = useState(null);
   const [badgeContent, setBadgeContent] = useState([]);
   const [networkStatus, setNetworkStatus] = useState(false);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     // Verify tokens only if not already logged in
@@ -46,7 +47,24 @@ function App() {
         setLogin(isAuthenticated);
         // Update localStorage with the login state
         localStorage.setItem('isLoggedIn', isAuthenticated.toString());
-      });
+      }).then(
+            async response => {
+              if (response === undefined || response.data === undefined) {
+                console.log("login error")
+                showNotification("Login error", "error");                
+                return
+              }
+              let responseData = response.data
+              await localforage.setItem("userId", response.data.message)
+              if (responseData.code === 1) {
+                setLogin(true)
+              } else {
+                showNotification(responseData.message, "error");
+
+              }
+
+            }
+          )
     }
   }, []); // Empty dependency array ensures this runs only once
 

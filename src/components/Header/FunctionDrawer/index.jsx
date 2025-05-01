@@ -1,29 +1,21 @@
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import CssBaseline from '@mui/material/CssBaseline';
-import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MessageIcon from '@mui/icons-material/Message'; 
-import TuneIcon from '@mui/icons-material/Tune';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
-import HomeIcon from '@mui/icons-material/Home';
-// import * as babel from "babel-standalone";
-import * as ReactDOM from 'react-dom';
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import AuthUtil from '../../../util/io_utils/AuthUtil';
 
+// Import all Material UI icons dynamically
+import * as MuiIcons from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -57,24 +49,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
     width: drawerWidth,
@@ -92,83 +66,108 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
+// Helper function to get Material UI icon component by name
+const DynamicIcon = ({ iconName }) => {
+  // Material UI exports icons without the "Icon" suffix
+  // Convert "MessageIcon" to "Message" for proper lookup
+  const iconNameWithoutSuffix = iconName.replace(/Icon$/, '');
+  
+  // Default to Inbox if the requested icon doesn't exist
+  const IconComponent = MuiIcons[iconNameWithoutSuffix] || MuiIcons['Inbox'];
+  return <IconComponent />;
+};
+
 export default function FunctionDrawer(props) {
   const theme = useTheme();
   const navigate = useNavigate();
-  const {open, setOpen} = props
+  const { open, setOpen } = props;
+  const [navigationItems, setNavigationItems] = useState([]);
+  
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  let items = [{name:'Inbox', icon:"Inbox", direct:"www.baidu.com"}]
-  let iconName = "MessageIcon"
+  // Default navigation map with icon names as strings
+  const defaultNavigationMap = [
+    { name: 'Chat', route: '/chat', iconName: 'Message' },
+    { name: 'Trending', route: '/trending', iconName: 'Whatshot' },
+    { name: 'Posts', route: '/', iconName: 'Home' },
+    { name: 'Videos', route: '/videolist', iconName: 'VideoLibrary' },
+    { name: 'Edit', route: '/edit', iconName: 'Edit' },
+    { name: 'Friend', route: '/friends', iconName: 'People' },
+    { name: 'Settings', route: '/settings', iconName: 'Tune' },
+    { name: 'Download', route: '/download', iconName: 'Download' },
+    { name: 'Ask', route: '/qa', iconName: 'QuestionAnswer' },
+    { name: 'Handle Download Request', route: '/downloadRequestsManager', iconName: 'DownloadForOffline' },
+    { name: 'User Management', route: '/userManage', iconName: 'ManageAccounts' },
+    { name: 'Role Management', route: '/role', iconName: 'AdminPanelSettings' },
+    { name: 'Version Log', route: '/logs', iconName: 'History' },
+    { name: 'About', route: '/about', iconName: 'Info' }
+  ];
 
-  let predefined_list = {"Inbox":"InboxIcon", "Message":"MessageIcon", "Settings":"TuneIcon", "Trending":"WhatshotIcon", "Posts":"HomeIcon"}
+  useEffect(() => {
+    // Initialize with default navigation
+    setNavigationItems(defaultNavigationMap);
+    
+    // Fetch available paths when component mounts
+    AuthUtil.getPaths()
+      .then(response => {
+        console.log(response);
+        
+        // If the API returns navigation data, update the state
+        if (response && response.data && Array.isArray(response.data)) {
+          // Assuming the response has a format like:
+          // [{ name: 'Chat', route: '/chat', iconName: 'MessageIcon' }, ...]
+          setNavigationItems(response.data);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        // Keep using default navigation on error
+      });
+  }, []);
 
-  // let iconList = {}
-  // for (const [key,value] of Object.entries(predefined_list)) {
-  //   let iconFunctionString = "()=>{return (<" + value + "></" + value + ">)}"
-  //   iconList[key] = eval(babel.transform(iconFunctionString,{presets:["react", "es2017",]}).code)
-  // }
-
-// const jsxString = '<div>Hello World!</div>'; 
-// const element = React.createElement(eval('(' + jsxString + ')'));
-
-  // const func = new Function("React", "MessageIcon", `return ${iconList["Message"]}`)
-  // const Component = func(MessageIcon)
-  // const Component = eval("MessageIcon")
-  
-  // console.log(iconList)
-  //return eval(iconList["Message"])
-  //return <Component></Component>
-  // functionName: method to create this component.
-
-  //let iconList = {"Inbox":function(){return (<InboxIcon></InboxIcon>)}, "Message":"eval(iconFunctionString)", "Settings":TuneIcon, "Trending":WhatshotIcon, "Posts":HomeIcon}
-
-  let functions = ['Chat', 'Trending', 'Posts', 'Videos', 'Edit', 'Friend', 'Settings', "Download", "Ask", "Handle Download Request", "User Management", "Role Management","Version Log", "About"]
-  let routeTable = ['/chat', '/trending', '/', '/videolist', '/edit', '/friends', '/settings', "/download", "/qa", "/downloadRequestsManager", "/userManage","/role", "/logs", "/about"]
-  // let routeTable = {'Chat': '/chat', 'Settings': 'settings', 'Trending': 'trending', 'Posts': 'home'}
-
-  let handleMessageJump = (index) => {
-    console.log(functions[index])
-    navigate(routeTable[index])
-  }  
-
-
+  const handleNavigation = (route) => {
+    navigate(route);
+  };
 
   return (
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={toggleDrawer}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {functions.map((text, index) => (
-            <ListItem onClick={()=> handleMessageJump(index)} key={text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
+    <Drawer variant="permanent" open={open}>
+      <DrawerHeader>
+        <IconButton onClick={toggleDrawer}>
+          {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        </IconButton>
+      </DrawerHeader>
+      <Divider />
+      <List>
+        {navigationItems.map((item) => (
+          <ListItem 
+            onClick={() => handleNavigation(item.route)} 
+            key={item.name} 
+            disablePadding 
+            sx={{ display: 'block' }}
+          >
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? 'initial' : 'center',
+                px: 2.5,
+              }}
+            >
+              <ListItemIcon
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
+                  minWidth: 0,
+                  mr: open ? 3 : 'auto',
+                  justifyContent: 'center',
                 }}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {/* {iconList["Inbox"]()} */}
-                </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-     
+                <DynamicIcon iconName={item.iconName} />
+              </ListItemIcon>
+              <ListItemText primary={item.name} sx={{ opacity: open ? 1 : 0 }} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Drawer>
   );
 }

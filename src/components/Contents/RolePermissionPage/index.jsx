@@ -17,6 +17,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import PathIcon from '@mui/icons-material/SignpostOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import { alpha } from '@mui/material/styles';
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 const RolePermissionPage = () => {
   const [roles, setRoles] = useState([]);
@@ -29,6 +30,7 @@ const RolePermissionPage = () => {
   const [roleId, setRoleId] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [selectedRoleIndex, setSelectedRoleIndex] = useState(null);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     fetchRoles();

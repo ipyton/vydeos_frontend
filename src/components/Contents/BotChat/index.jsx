@@ -12,11 +12,13 @@ import MessageUtil from '../../../util/io_utils/MessageUtil';
 import localforage from 'localforage';
 // import { useIsFocused } from '@react-navigation/native';
 import { useLocation } from 'react-router-dom';
+import { useNotification } from '../../../Providers/NotificationProvider'; 
 
 
 export default function BotChat(props) {
     let height = window.innerHeight * 0.8
     //const isFocused = useIsFocused();
+  const { showNotification } = useNotification();
 
     let [select,setSelect] = useState()
     useEffect(()=> {

@@ -19,6 +19,7 @@ import Qs from "qs";
 import AccountUtil from "../../../../util/io_utils/AccountUtil";
 import DatabaseManipulator from "../../../../util/io_utils/DatabaseManipulator";
 import { update } from '../../../redux/refresh';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 //this is used to show the user information.
 export default function (props) {
@@ -35,6 +36,7 @@ export default function (props) {
 
     position = (!props.position ? position : props.position)
 
+  const { showNotification } = useNotification();
 
     let navigate = useNavigate()
     let dispatch = useDispatch()

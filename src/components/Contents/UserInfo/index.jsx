@@ -18,6 +18,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { deepOrange } from '@mui/material/colors';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 import PictureUtil from '../../../util/io_utils/FileUtil';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
@@ -53,6 +54,7 @@ const countries = [
 
 export default function UserInfo(props) {
   const { login, setLogin } = props.status;
+  const { showNotification } = useNotification();
 
   const [userInfo, setUserInfo] = useState({
     avatar: "",

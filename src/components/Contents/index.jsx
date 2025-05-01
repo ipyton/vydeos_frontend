@@ -44,6 +44,8 @@ import DownloadRequestManager from "./DownloadRequestManager"
 import Iridescence from "../../Animations/Iridescence/Iridescence"
 import UpdateLog from "./UpdateLog"
 
+import { useNotification } from '../../Providers/NotificationProvider';
+
 const defaultTheme = createTheme();
 
 export default function Contents(props) {
@@ -73,6 +75,7 @@ export default function Contents(props) {
     const [userRecords, setUserRecords] = useState([])
     const [sideBarSelector, setSideBarSelector] = useState({ type: "", userId: "" })
     const location = useLocation()
+  const { showNotification } = useNotification();
 
     // useEffect(()=>{
     //     if (!location.pathname.startsWith("/chat")) {

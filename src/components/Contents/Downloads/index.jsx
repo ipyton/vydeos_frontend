@@ -13,9 +13,12 @@ import PropTypes from 'prop-types';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { useNotification } from '../../../Providers/NotificationProvider';
+
 export default function Downloads() {
     const [checked, setChecked] = React.useState([]);
     const [downloadsRecords, setDownloadsRecords] = React.useState([])
+  const { showNotification } = useNotification();
 
     // React.useEffect(() => {
     //     VideoUtil.check_current_download_status(setDownloadsRecords)

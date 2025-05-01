@@ -17,6 +17,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { alpha } from '@mui/material/styles';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 const UserManagementService = () => {
   const [users, setUsers] = useState([]);
@@ -32,6 +33,7 @@ const UserManagementService = () => {
   const [searching, setSearching] = useState(false);
   const [availableRoles, setAvailableRoles] = useState([]);
   const [searchError, setSearchError] = useState(false);
+  const { showNotification } = useNotification();
 
   // Fetch available roles on component mount
   useEffect(() => {

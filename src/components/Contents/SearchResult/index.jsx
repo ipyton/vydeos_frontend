@@ -5,6 +5,7 @@ import { Stack, Box, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import SearchSidebar from './SideBar';
 import Introductions from '../Introductions';
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 export default function SearchResults() {
   const theme = useTheme();
@@ -14,6 +15,7 @@ export default function SearchResults() {
   
   const [selector, setSelector] = useState({ type: "", objectId: null });
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.8);
+  const { showNotification } = useNotification();
   
   // Update height on window resize for responsive layout
   useEffect(() => {

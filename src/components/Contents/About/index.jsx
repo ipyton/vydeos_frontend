@@ -23,9 +23,12 @@ import {
   Code as SkillsIcon,
   Favorite as FavoriteIcon
 } from '@mui/icons-material';
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 const AboutPage = () => {
   // Simplified personal information
+    const { showNotification } = useNotification();
+  
   const personalInfo = {
     name: "Your Name",
     title: "Frontend Developer",

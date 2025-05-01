@@ -14,6 +14,7 @@ import Tab from '@mui/material/Tab';
 import { useTheme } from '@mui/material/styles';
 import StarIcon from '@mui/icons-material/Star';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 const style = {
   py: 3,
@@ -30,6 +31,7 @@ const style = {
 export default function Trends() {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
+  const { showNotification } = useNotification();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -40,17 +42,17 @@ export default function Trends() {
     {
       title: "Artificial Intelligence",
       introduction: "Latest advancements in AI are transforming industries worldwide.",
-      pic: "/api/placeholder/400/200"
+      pic: "https://images.unsplash.com/photo-1739476478915-8646a5f88d0d?q=80&w=3174&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       title: "Remote Work",
       introduction: "Companies adapting new policies for hybrid and remote working environments.",
-      pic: "/api/placeholder/400/200"
+      pic: "https://plus.unsplash.com/premium_photo-1672155840274-fe92cc76dc40?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       title: "Renewable Energy",
       introduction: "Sustainable energy solutions gaining momentum in global markets.",
-      pic: "/api/placeholder/400/200"
+      pic: "https://images.unsplash.com/photo-1739467372234-2aba33f6b7ee?q=80&w=3135&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
   ];
 

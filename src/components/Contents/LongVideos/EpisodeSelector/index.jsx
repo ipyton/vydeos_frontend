@@ -17,6 +17,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 const GridEpisodeItem = ({
   item,
@@ -176,6 +177,8 @@ const EpisodeSelector = (props) => {
   // which decide to show/hide the add button.
   //const [selectedEpisode, setSelectedEpisode] = useState(1);
   //const [selectedSeason, setSelectedSeason] = useState(1);
+    const { showNotification } = useNotification();
+  
   const [viewMode, setViewMode] = useState('grid');
   const theme = useTheme();
   // const [episodes, setEpisodes] = useState([]);

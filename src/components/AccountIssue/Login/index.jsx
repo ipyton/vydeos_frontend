@@ -19,6 +19,8 @@ import Qs from "qs"
 import NetworkError from '../../Errors/NetworkError';
 import IOUtil from '../../../util/ioUtil';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
+import { useNotification } from '../../../Providers/NotificationProvider';
+
 
 function Copyright(props) {
   return (
@@ -40,6 +42,7 @@ const defaultTheme = createTheme();
 export default function Login(props) {
   const [selected, setSelected] = useState(false)
   const [networkErr, setNetworkErr] = useState(false)
+  const { showNotification } = useNotification();
 
   const { login, setLogin } = props
 

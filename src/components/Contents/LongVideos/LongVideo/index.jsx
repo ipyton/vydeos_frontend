@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 // Register plugin
 require("@silvermine/videojs-quality-selector")(videojs);
@@ -10,6 +11,7 @@ export default function LongVideo({ options, onReady }) {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const isUnmounted = useRef(false);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     // Initialize player reference

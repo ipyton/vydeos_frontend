@@ -10,6 +10,7 @@ import SendIcon from '@mui/icons-material/Send';
 import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 import localforage from 'localforage';
 import DatabaseManipulator from '../../../../../util/io_utils/DatabaseManipulator';
+import { useNotification } from '../../../../../Providers/NotificationProvider';
 
 // Styled components
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -52,6 +53,7 @@ export default function InputBox(props) {
   const { select, setChatRecords } = props;
   const open = Boolean(anchorEl);
   const inputRef = React.useRef(null);
+  const { showNotification } = useNotification();
 
   const handleOpenAttachmentMenu = (event) => {
     setAnchorEl(event.currentTarget);

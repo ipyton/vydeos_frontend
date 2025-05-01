@@ -18,8 +18,11 @@ import Qs from "qs"
 import { List, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
 import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
 import { update } from '../../../redux/refresh';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 export default function (props) {
+    const { showNotification } = useNotification();
+    
     const users = [
         { name: 'John Doe', avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg' },
         { name: 'Jane Smith', avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg' },

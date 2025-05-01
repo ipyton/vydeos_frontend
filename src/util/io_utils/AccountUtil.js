@@ -43,27 +43,14 @@ export default class AccountUtil {
     if (localStorage.getItem("token") === null) {
       return
     }
-    axios({
+    return axios({
       url: AccountUtil.getUrlBase() + "/account/verifyToken",
       method: 'post',
       data: { token: localStorage.getItem("token") },
       headers: {
         token: localStorage.getItem("token"),
       }
-    }).catch(err => {
-      console.log(err)
-    }).then(
-      async response => {
-        if (response === undefined || response.data === undefined) {
-          console.log("login error")
-          return
-        }
-        let responseData = response.data
-        await localforage.setItem("userId", response.data.message)
-        setState(responseData.code === 1)
-        console.log(responseData.code === 1)
-      }
-    )
+    })
 
   }
 

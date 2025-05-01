@@ -13,6 +13,7 @@ import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import IconButton from '@mui/material/IconButton';
 import localforage from 'localforage';
+import { useNotification } from '../../../../../Providers/NotificationProvider';
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -27,6 +28,8 @@ export default function (props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [text, setText] = React.useState(null);
+  const { showNotification } = useNotification();
+  
   const {select, userRecords, setUserRecords, chatRecords, setChatRecords} = props
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

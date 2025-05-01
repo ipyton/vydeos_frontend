@@ -4,6 +4,7 @@ import "video.js/dist/video-js.css";
 import { useLocation } from "react-router-dom";
 import { Box, Stack, Typography, Paper, useTheme } from "@mui/material";
 import LongVideo from "./LongVideo";
+import { useNotification } from '../../../Providers/NotificationProvider';
 import Comments from "./Comments";
 import VideoUtil from "../../../util/io_utils/VideoUtil";
 import CommentSendComponent from "../Util/CommentSendingComponent";
@@ -23,6 +24,7 @@ const VideoPage = () => {
   const [currentEpisode, setCurrentEpisode] = useState(0);
   const [currentSeason, setCurrentSeason] = useState(0);
   const [playableEpisodes, setPlayableEpisodes] = useState([]);
+  const { showNotification } = useNotification();
 
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 import IOUtil from "../../../util/ioUtil";
 import PostUtil from "../../../util/io_utils/PostUtil";
 import Article from "./Article";
+import { useNotification } from '../../../Providers/NotificationProvider';
 
 // Material UI imports
 import {
@@ -113,6 +114,7 @@ function Item(props) {
   const [location, setLocation] = useState("");
   const [page, setPage] = useState("friend");
   const [open, setOpen] = useState(false);
+  const { showNotification } = useNotification();
 
   // Handler functions
   const handleChange = (panel) => (event, isExpanded) => {

@@ -7,12 +7,15 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 export default function SideBar(props) {
   let { select, setSelect } = props;
   const [userRecords, setUserRecords] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+    const { showNotification } = useNotification();
+  
   
   let location = useLocation();
   const refresh = useSelector((state) => state.refresh.value.refresh);

@@ -25,6 +25,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 const theme = createTheme({
   typography: {
@@ -55,6 +56,8 @@ export default function Article(props) {
   const [expanded, setExpanded] = React.useState(false);
   const [likes, setLikes] = React.useState(props.content.likes)
   const [comments, setComments] = React.useState(props.content.comments)
+    const { showNotification } = useNotification();
+  
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };

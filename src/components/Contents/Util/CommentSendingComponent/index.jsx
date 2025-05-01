@@ -13,8 +13,12 @@ import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import VideoUtil from '../../../../util/io_utils/VideoUtil';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 const CommentSendComponent = ({ movieIdentifier,comments, setComments}) => {
+
+    const { showNotification } = useNotification();
+  
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userAvatar, setUserAvatar] = useState('https://example.com/user-avatar.png'); // Replace with actual user avatar URL

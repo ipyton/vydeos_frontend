@@ -62,12 +62,13 @@ export default function MovieDetails(props) {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isStared, setIsStared] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { showNotification } = useNotification();
 
   const [playable, setPlayable] = useState(false);
   const location = useLocation();
   const navigate = useNavigate()
   const position = props.position || "center";
+  const { showNotification } = useNotification();
+  
 
   // Handle initialization from props or route state
   useEffect(() => {

@@ -18,6 +18,9 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Checkbox, Fo
 
 import Introductions from "../Introductions"
 import AccountUtil from "../../../util/io_utils/AccountUtil";
+import { useNotification } from '../../../Providers/NotificationProvider';
+
+
 export default function Friends(props) {
   let list = [12, 12, 312, 4, 13, 4123, 5, 345, 34]
   let height = window.innerHeight * 0.8
@@ -28,6 +31,7 @@ export default function Friends(props) {
   const [selectedGroupUser, setSelectedGroupUser] = useState([])
   const [dialogList, setDialogList] = useState([])
   const [groupName, setGroupName] = useState("")
+  const { showNotification } = useNotification();
 
   useEffect(()=>{
     return ()=>{

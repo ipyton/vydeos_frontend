@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import SearchItem from './SearchItem';
 import SearchUtil from '../../../../util/io_utils/SearchUtil';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -51,6 +52,8 @@ export default function SearchResults(props) {
     const search = useSelector((state) => state.search.search);
     const searchType = useSelector((state) => state.search.searchType);
     const changed = useSelector((state) => state.search.changed);
+    const { showNotification } = useNotification();
+    
 
     React.useEffect(() => {
         states[value] = list;
