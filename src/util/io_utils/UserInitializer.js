@@ -1,6 +1,6 @@
 //this file will do localstorage/indexDB storage cache.
 import axios from "axios";
-import AccountUtil from "./io_utils/AccountUtil";
+import AccountUtil from "./AccountUtil";
 import Qs from 'qs'
 
 

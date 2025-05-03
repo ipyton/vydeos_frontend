@@ -13,14 +13,11 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import axios from 'axios';
 import { Navigate } from "react-router-dom";
-import Qs from "qs"
 import NetworkError from '../../Errors/NetworkError';
-import IOUtil from '../../../util/ioUtil';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
 import { useNotification } from '../../../Providers/NotificationProvider';
-
+import localforage from 'localforage';
 
 function Copyright(props) {
   return (
@@ -69,7 +66,38 @@ export default function Login(props) {
     const data = new FormData(event.currentTarget);
     data["remember"] = selected
     if (validate(data.get("email"), data.get("password"))) {
-      AccountUtil.login(data, setLogin)
+      AccountUtil.login().then(function (response) {
+        console.log(response)
+        if (response === undefined || response.data === undefined) {
+          console.log("errror")
+          return
+        }
+        let responseData = response.data
+        if (responseData.code === -1) {
+          showNotification(responseData.message, "error");
+        }
+        else if (responseData.code === 1) {
+          localStorage.setItem("token", responseData.message)
+          localStorage.setItem("userId", data.get("email"))
+          localforage.setItem("userId", data.get("email")).then( async ()=> {
+            const userInfoResponse = await AccountUtil.getOwnerInfo();
+            console.log("User Info Response: ")
+            console.log(localStorage.getItem("token"))
+            console.log(userInfoResponse)
+            
+            if (userInfoResponse && userInfoResponse.data && userInfoResponse.data.code !== -1) {
+              const content = JSON.parse(userInfoResponse.data.message);
+              localStorage.setItem("userInfo", JSON.stringify(content));
+            }
+            setLogin(true)}
+          )
+  
+        }
+        else {
+          showNotification(responseData.message, "error");
+        }
+        //setNetworkErr(false)
+      })
 
       // .catch(function(error) {
       //   if ("Network Error" ===  error.message) {
@@ -83,7 +111,8 @@ export default function Login(props) {
     }
     else {
       //props.setBarState({...props.barState, message:"please check your input", open:true})
-      console.log("error when login")
+      showNotification("Wrong password or email", "error");
+
     }
   };
 
@@ -131,7 +160,7 @@ export default function Login(props) {
             />
             <FormControlLabel
               control={<Checkbox onClick={handleSelection} value="remember" color="primary" />}
-              label="Remember me"
+              label="Remember me for 30 days"
             />
             <Button
               type="submit"

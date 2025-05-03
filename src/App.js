@@ -1,25 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import Header from './components/Header';
 import Contents from './components/Contents';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import Footer from './components/Footer';
-import IOUtil from './util/ioUtil';
-import PictureUtil from './util/io_utils/FileUtil';
+
 import NetworkError from './components/Errors/NetworkError';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import Login from './components/AccountIssue/Login';
 import EndpointNotAvailableError from './components/Errors/EndpointNotAvailableError';
 import AccountIssue from './components/AccountIssue';
 import AccountUtil from './util/io_utils/AccountUtil';
 import localforage from 'localforage';
 import { StrictMode } from 'react';
-import { NotificationProvider } from './Providers/NotificationProvider';
 import { useNotification } from './Providers/NotificationProvider';
-const defaultTheme = createTheme();
 
 function checkNetworkStatus() {
   return navigator.onLine;
@@ -42,7 +31,6 @@ function App() {
 
   useEffect(() => {
     // Verify tokens only if not already logged in
-    if (!login) {
       AccountUtil.verifyTokens((isAuthenticated) => {
         setLogin(isAuthenticated);
         // Update localStorage with the login state
@@ -55,18 +43,17 @@ function App() {
                 return
               }
               let responseData = response.data
-              await localforage.setItem("userId", response.data.message)
               if (responseData.code === 1) {
+                await localforage.setItem("userId", response.data.message)
+
                 setLogin(true)
               } else {
                 showNotification(responseData.message, "error");
-
+                setLogin(false)
               }
 
             }
-          )
-    }
-  }, []); // Empty dependency array ensures this runs only once
+          )}, []); // Empty dependency array ensures this runs only once
 
   if (checkNetworkStatus() === false) {
     return <NetworkError />;

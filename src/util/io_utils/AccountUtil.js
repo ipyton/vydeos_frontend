@@ -8,7 +8,7 @@ import localforage from "localforage"
 
 export default class AccountUtil {
 
-  static cgetUrlBase() {
+  static getUrlBase() {
     return "/api"
   }
 
@@ -54,8 +54,8 @@ export default class AccountUtil {
 
   }
 
-  static login(data, setLogin) {
-    axios({
+  static login(data) {
+    return axios({
       url: AccountUtil.getUrlBase() + "/account/login",
       method: 'post',
       data: { email: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), remember: data.get("remember") },
@@ -64,78 +64,8 @@ export default class AccountUtil {
         return Qs.stringify(data)
       }],
 
-    }).then(function (response) {
-      console.log(response)
-      if (response === undefined || response.data === undefined) {
-        console.log("errror")
-        return
-      }
-      let responseData = response.data
-      if (responseData.code === -1) {
-        //props.setBarState({...props.barState, message:responseData.message, open:true})
-      }
-      else if (responseData.code === 1) {
-        localStorage.setItem("token", responseData.message)
-        localStorage.setItem("userId", data.get("email"))
-        localforage.setItem("userId", data.get("email")).then( async ()=> {
-          const userInfoResponse = await AccountUtil.getOwnerInfo();
-          console.log("User Info Response: ")
-          console.log(localStorage.getItem("token"))
-          console.log(userInfoResponse)
-          
-          if (userInfoResponse && userInfoResponse.data && userInfoResponse.data.code !== -1) {
-            const content = JSON.parse(userInfoResponse.data.message);
-            localStorage.setItem("userInfo", JSON.stringify(content));
-          }
-          setLogin(true)
-        }
-
-        )
-
-      }
-      else {
-        //props.setBarState({...props.barState, message:responseData.message, open:true})
-      }
-      //setNetworkErr(false)
     })
   }
-
-  // static requestUserInfo(userId) {
-  //   console.log("token" + localStorage.getItem("token"))
-  //   axios({
-  //     url: AccountUtil.getUrlBase() + "/account/userIntro",
-  //     method: 'post',
-  //     data: { token: localStorage.getItem("token"), userIdTofollow:userId},
-  //     transformRequest: [function (data) {
-  //       // 对 data 进行任意转换处理
-  //       return Qs.stringify(data)
-  //     }], headers: {
-  //       token: localStorage.getItem("token"),
-  //     }
-  //   }).catch(error => {
-  //     if ("Network Error" === error.message) {
-  //       //props.setBarState({...props.barState, message:"please login first1233333" + error, open:true})
-  //       // setNetworkErr(true)
-  //       console.log("error")
-  //     }
-  //   }).then(function (response) {
-  //     if (response === undefined || response.data === undefined) {
-  //       console.log("errror")
-  //     }
-  //     let responseData = response.data
-  //     if (responseData.code === -1) {
-  //       //props.setBarState({...props.barState, message:responseData.message, open:true})
-  //     }
-  //     else if (responseData.code === 1) {
-
-  //     }
-  //     else {
-  //       //props.setBarState({...props.barState, message:responseData.message, open:true})
-  //     }
-  //     //setNetworkErr(false)
-  //   })
-  // }
-
 
 
   static registerStep1(activeStep, setStep, userId) {
@@ -163,6 +93,31 @@ export default class AccountUtil {
     )
 
   }
+  static sendVerificationCode() {
+    return axios({
+      url: AccountUtil.getUrlBase() + "/account/sendVerificationCode",
+      method: 'post',
+      data: { email: localStorage.getItem("email") },
+      transformRequest: [function (data) {
+        // transform data -> json
+        return Qs.stringify(data)
+      }],
+    }).catch((err) => {
+      console.log(err)
+      return
+    }).then(
+      (response) => {
+        console.log(response);
+        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
+          console.log("Verification code sent")
+        }
+        else {
+          console.log("Please check your input")
+        }
+      }
+    )
+    }
+
 
   static registerStep2(activeStep, setStep, code) {
     setStep(activeStep + 1)

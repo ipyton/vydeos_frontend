@@ -27,7 +27,7 @@ import {update} from "../redux/refreshMessages"
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import UserInitializer from "../../util/UserInitializer"
+import UserInitializer from "../../util/io_utils/UserInitializer"
 import LongVideoIntroduction from "./Introductions/LongVideoIntroduction"
 import localforage from "localforage"
 import { useLayoutEffect } from "react"
