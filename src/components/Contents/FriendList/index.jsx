@@ -42,7 +42,7 @@ export default function Friends(props) {
   useEffect(() => {
     if (openDialog) {
       axios({
-        url: AccountUtil.getUrlBase() + "/friends/get_friends",
+        url: URL.API_BASE_URL + "/friends/get_friends",
         method: "post",
         data: {},
         headers: {
@@ -68,7 +68,7 @@ export default function Friends(props) {
   const handleCreateGroup = () => {
     if (selectedFriends.length > 0 && groupName.length !== 0) {
       axios({
-        url: AccountUtil.getUrlBase() + "/group_chat/create",
+        url: URL.API_BASE_URL + "/group_chat/create",
         method: "post",
         data: {
             groupName: groupName,

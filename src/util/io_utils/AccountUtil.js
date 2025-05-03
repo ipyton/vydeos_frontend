@@ -5,18 +5,17 @@ import EncryptionUtil from "./EncryptionUtil"
 import { update } from "../../components/redux/UserDetails"
 import { useDispatch } from "react-redux"
 import localforage from "localforage"
+import {API_BASE_URL, DOWNLOAD_BASE_URL} from "./URL";
 
 export default class AccountUtil {
 
-  static getUrlBase() {
-    return "/api"
-  }
+
 
   dispatch = useDispatch()
 
   static getLanguages(setLanguages) {
     return axios({
-      url: AccountUtil.getUrlBase() + "/i18n/getLanguages",
+      url: API_BASE_URL + "/i18n/getLanguages",
       method: 'get',
       headers: {
         token: localStorage.getItem("token"),
@@ -44,7 +43,7 @@ export default class AccountUtil {
       return
     }
     return axios({
-      url: AccountUtil.getUrlBase() + "/account/verifyToken",
+      url: API_BASE_URL+ "/account/verifyToken",
       method: 'post',
       data: { token: localStorage.getItem("token") },
       headers: {
@@ -55,10 +54,11 @@ export default class AccountUtil {
   }
 
   static login(data) {
+    console.log(API_BASE_URL + " safsfsfsdfsdfsdfsd")
     return axios({
-      url: AccountUtil.getUrlBase() + "/account/login",
+      url: API_BASE_URL+ "/account/login",
       method: 'post',
-      data: { email: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), remember: data.get("remember") },
+      data: { email: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), remember: data["remember"] },
       transformRequest: [function (data) {
         // 对 data 进行任意转换处理
         return Qs.stringify(data)
@@ -70,7 +70,7 @@ export default class AccountUtil {
 
   static registerStep1(activeStep, setStep, userId) {
     axios({
-      url: AccountUtil.getUrlBase() + "/account/registerStep1",
+      url: API_BASE_URL + "/account/registerStep1",
       method: 'post',
       data: { userId: userId },
       transformRequest: [function (data) {
@@ -95,7 +95,7 @@ export default class AccountUtil {
   }
   static sendVerificationCode() {
     return axios({
-      url: AccountUtil.getUrlBase() + "/account/sendVerificationCode",
+      url: API_BASE_URL + "/account/sendVerificationCode",
       method: 'post',
       data: { email: localStorage.getItem("email") },
       transformRequest: [function (data) {
@@ -125,7 +125,7 @@ export default class AccountUtil {
 
   static registerStep3(activeStep, setStep, password, token,barState, setBarState) {
     axios({
-      url: AccountUtil.getUrlBase() + "/account/registerStep3",
+      url: API_BASE_URL + "/account/registerStep3",
       method: 'post',
       data: { password: EncryptionUtil.encryption(password), userId: token },
       transformRequest: [function (data) {
@@ -155,7 +155,7 @@ export default class AccountUtil {
   static uploadAvatar(data) {
     async function upload() {
       let response = await axios({
-        url: AccountUtil.getUrlBase() + "/account/uploadAvatar",
+        url: API_BASE_URL + "/account/uploadAvatar",
         method: 'post',
         data: { avatar: data },
         headers: {
@@ -174,7 +174,7 @@ export default class AccountUtil {
 
     return localforage.getItem("userId").then(res => {
       return axios({
-        url: AccountUtil.getUrlBase() + "/account/getinfo",
+        url: API_BASE_URL + "/account/getinfo",
         method: 'post',
         data: { userId: res },
         transformRequest: [function (data) {
@@ -203,7 +203,7 @@ export default class AccountUtil {
     })
     localforage.getItem("userId").then(res => {
       axios({
-        url: AccountUtil.getUrlBase() + "/account/setinfo",
+        url: API_BASE_URL + "/account/setinfo",
         method: 'post',
         data: {
           userId: res,
@@ -232,7 +232,7 @@ export default class AccountUtil {
   static async getAvatar(avatar, setAvatar) {
     try {
       axios({
-        url: AccountUtil.getUrlBase() + "/account/getAvatar",
+        url: API_BASE_URL + "/account/getAvatar",
         method: 'get',
         transformRequest: [function (data) {
           return Qs.stringify(data)

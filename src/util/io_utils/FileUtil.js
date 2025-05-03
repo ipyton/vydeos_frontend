@@ -2,15 +2,15 @@
 import { responsiveFontSizes } from "@mui/material"
 import axios from "axios"
 import Qs from 'qs'
+
+import {API_BASE_URL, DOWNLOAD_BASE_URL} from "./URL";
+
 export default class PictureUtil {
 
 
-    static getArticleBase() {
-        return "/api"    }
-
     static uploadArticlePics(data) {
         let response = axios({
-            url:  PictureUtil.getArticleBase()+ "/article/upload_pic",
+            url:  + "/article/upload_pic",
             method: 'post',
             data: { pics: data },
             transformRequest: [function (data) {
@@ -29,7 +29,7 @@ export default class PictureUtil {
     static downloadArticlePics(articleID, from, to) {
         async function download() {
             let response = await axios({
-                url: PictureUtil.getArticleBase() + "/article/get_pic",
+                url:  + "/article/get_pic",
                 method: 'post',
                 data: { from: 1, from: to, articleID: articleID },
                 headers: {
@@ -39,7 +39,6 @@ export default class PictureUtil {
                 responseType: 'arraybuffer'
             })
             let responseData = response.data
-            console.log("-------------------")
             console.log(responseData)
             return responseData.code === 1
         }

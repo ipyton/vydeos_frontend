@@ -2,7 +2,7 @@
 import axios from "axios";
 import AccountUtil from "./AccountUtil";
 import Qs from 'qs'
-
+import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
 
 
 export default class UserInitializer {
@@ -39,7 +39,7 @@ export default class UserInitializer {
     // This method is called first time the user login/ or no cache.
     static downloadUserInformations() {
         axios({
-            url: AccountUtil.getUrlBase() + "/account/verifyToken",
+            url: API_BASE_URL + "/account/verifyToken",
             method: 'post',
             data: { token: localStorage.getItem("token") },
             transformRequest: [function (data) {

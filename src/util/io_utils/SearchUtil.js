@@ -2,11 +2,10 @@ import Qs from 'qs'
 import axios from "axios"
 import { add, clear, batchAdd } from "../../components/redux/searchResult"
 import { Language } from '@mui/icons-material';
+import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
 
 export default class SearchUtil {
-  static getBaseUrl() {
-    return "/api"
-  }
+
 
   static stateSetter(list, dispatch) {
     dispatch(clear())
@@ -20,7 +19,7 @@ export default class SearchUtil {
 
   static searchChatContactById(keyword, setList) {
     axios({
-      url: SearchUtil.getBaseUrl() + "/search/contactById",
+      url: API_BASE_URL + "/search/contactById",
       method: 'post',
       data: { userId: keyword },
       transformRequest: [function (data) {
@@ -71,7 +70,7 @@ export default class SearchUtil {
 
   static searchContactByName(keyword, setSearchResults, pagingStatus, setPagingStatus) {
     axios({
-      url: SearchUtil.getBaseUrl() + "/search/contacts",
+      url: API_BASE_URL + "/search/contacts",
       method: 'post',
       data: { userId: keyword },
       transformRequest: [function (data) {
@@ -118,7 +117,7 @@ export default class SearchUtil {
     language = JSON.parse(userInfo).language
     console.log(language)
     return axios({
-      url:  "/api/movie/search",
+      url: API_BASE_URL + "/api/movie/search",
       method: 'get',
       params: { "keyword": keyword, page_number:1, "Accept-Language": language},
       transformRequest: [function (data) {

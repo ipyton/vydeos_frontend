@@ -2,12 +2,12 @@ import localforage from "localforage"
 import Qs from 'qs'
 import axios from "axios"
 import { update, clear, updateFollowState } from "../../components/redux/UserDetails"
+import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
 
 import DatabaseManipulator from "./DatabaseManipulator"
 export default class MessageUtil {
 
-    static getUrlBase() {
-        return "/api"    }
+
 
     static initialize() {
         // initialize when user first start the application
@@ -40,7 +40,7 @@ export default class MessageUtil {
                 if (type === "group") {
                     return axios(
                         {
-                            url: MessageUtil.getUrlBase() + "/chat/get_messages",
+                            url: URL.API_BASE_URL + "/chat/get_messages",
                             method: "post",
                             data: { type:type,groupId:receiverId, timestamp:timestamp },
                             transformRequest: [function (data) {
@@ -58,7 +58,7 @@ export default class MessageUtil {
                 else {
                     return axios(
                         {
-                            url: MessageUtil.getUrlBase() + "/chat/get_messages",
+                            url: API_BASE_URL + "/chat/get_messages",
                             method: "post",
                             data: { type:type,receiverId:receiverId, timestamp:timestamp },
                             transformRequest: [function (data) {
@@ -95,7 +95,7 @@ export default class MessageUtil {
         p256dh = btoa(String.fromCharCode.apply(null, new Uint8Array(p256dh)));
         auth = btoa(String.fromCharCode.apply(null, new Uint8Array(auth)));
         axios({
-            url: `${MessageUtil.getUrlBase()}/chat/registerWebPushEndpoints`, // 使用模板字符串
+            url: `${API_BASE_URL}/chat/registerWebPushEndpoints`, // 使用模板字符串
             method: 'post',
             data: {
                 endpoint: endpoint,
@@ -124,7 +124,7 @@ export default class MessageUtil {
             }
             axios(
                 {
-                    url: MessageUtil.getUrlBase() + "/chat/getNewestMessages",
+                    url: API_BASE_URL + "/chat/getNewestMessages",
                     method: "post",
                     data: { "userId": friendId, "timestamp": timestamp },
                     transformRequest: [function (data) {
@@ -245,7 +245,7 @@ export default class MessageUtil {
         console.log(data)
         return axios(
             {
-                url: MessageUtil.getUrlBase() + "/chat/sendMessage",
+                url: API_BASE_URL + "/chat/sendMessage",
                 method: "post",
                 data: data,
                 transformRequest: [function (data) {
@@ -263,7 +263,7 @@ export default class MessageUtil {
     static requestUserInfo(userId, setDetails) {
         //get information from search/ friend list.
         axios({
-            url: MessageUtil.getUrlBase() + "/friends/getUserIntro",
+            url: API_BASE_URL + "/friends/getUserIntro",
             method: 'post',
             data: { token: localStorage.getItem("token"), userIdToFollow: userId },
             transformRequest: [function (data) {

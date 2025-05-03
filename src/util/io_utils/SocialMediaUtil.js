@@ -5,18 +5,16 @@ import qs from 'qs'
 import axios from "axios"
 import localforage from "localforage"
 import { SettingsSystemDaydreamTwoTone } from "@mui/icons-material"
-
+import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
 export default class SocialMediaUtil {
 
-    static getUrlBase() {
-        return "/api"   
-    }
+
 
 
     static follow(sender, receiver, details, setDetails) {
         axios(
             {
-                url: SocialMediaUtil.getUrlBase() + "/friends/follow",
+                url: API_BASE_URL + "/friends/follow",
                 method: "post",
                 data: { "sender": sender, "receiver": receiver },
                 transformRequest: [function (data) {
@@ -59,7 +57,7 @@ export default class SocialMediaUtil {
     static unfollow(sender, receiver, details, setDetails) {
         axios(
             {
-                url: SocialMediaUtil.getUrlBase() + "/friends/unfollow",
+                url: DOWNLOAD_BASE_URL + "/friends/unfollow",
                 method: "post",
                 data: { sender: sender, receiver: receiver, },
                 transformRequest: [function (data) {
@@ -103,7 +101,7 @@ export default class SocialMediaUtil {
 
     static getFollowState(sender, receiver, setDetails) {
         axios({
-            url: SocialMediaUtil.getUrlBase() + "/friends/getFollowState",
+            url: API_BASE_URL + "/friends/getFollowState",
             method: "post",
             data: { "sender": sender, "receiver": receiver },
             transformRequest: [function (data) {
@@ -156,7 +154,7 @@ export default class SocialMediaUtil {
         }
 
         axios({
-            url: SocialMediaUtil.getUrlBase() + domain + requestName,
+            url: API_BASE_URL + domain + requestName,
             method: "get",
             data: {},
             transformRequest: [function (data) {

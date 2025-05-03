@@ -18,6 +18,8 @@ import PathIcon from '@mui/icons-material/SignpostOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import { alpha } from '@mui/material/styles';
 import { useNotification } from '../../../Providers/NotificationProvider';
+import {API_BASE_URL, DOWNLOAD_BASE_URL} from "../../../util/io_utils/URL.js";
+
 
 const RolePermissionPage = () => {
   const [roles, setRoles] = useState([]);
@@ -39,7 +41,7 @@ const RolePermissionPage = () => {
   const fetchRoles = () => {
     setLoading(true);
     axios({
-      url: AccountUtil.getUrlBase() + "/account/getRole",
+      url: API_BASE_URL + "/account/getRole",
       method: 'get',
       headers: {
         "token": localStorage.getItem("token")
@@ -74,7 +76,7 @@ const RolePermissionPage = () => {
     const newRoleId = roleId === -1 ? roles.length + 1 : roleId;
     
     axios({
-      url: AccountUtil.getUrlBase() + "/account/upsertRole",
+      url: API_BASE_URL + "/account/upsertRole",
       method: 'post',
       data: {
         roleId: newRoleId,
@@ -134,7 +136,7 @@ const RolePermissionPage = () => {
       setLoading(true);
       
       axios({
-        url: AccountUtil.getUrlBase() + "/account/deleteRole",
+        url: API_BASE_URL + "/account/deleteRole",
         method: 'post',
         data: {
           roleId: role.roleId

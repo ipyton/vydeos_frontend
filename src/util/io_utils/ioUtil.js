@@ -1,13 +1,13 @@
 import axios from "axios"
 import Qs from 'qs'
+import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
 
 export default class IOUtil {
-    static url_base = "http://localhost:8080"
 
     static getSearchResult(keyword) {
         async function post() {
             let response = await axios({
-                url: this.url_base + "/search/search",
+                url: API_BASE_URL+ "/search/search",
                 method: 'post',
                 data: { tokens: localStorage.getItem("token") },
                 transformRequest: [function (data) {
@@ -30,7 +30,7 @@ export default class IOUtil {
     static setSearch(config) {
         async function post() {
             let response = await axios({
-                url: this.url_base + "/search/set",
+                url: API_BASE_URL + "/search/set",
                 method: 'post',
                 data: { tokens: localStorage.getItem("token") },
                 transformRequest: [function (data) {

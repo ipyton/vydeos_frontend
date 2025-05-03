@@ -42,7 +42,7 @@ const UserManagementService = () => {
 
   const fetchAvailableRoles = () => {
     axios({
-      url: AccountUtil.getUrlBase() + "/account/getRole",
+      url: URL.API_BASE_URL + "/account/getRole",
       method: 'get',
       headers: {
         "token": localStorage.getItem("token")
@@ -84,7 +84,7 @@ const UserManagementService = () => {
     setSearchError(false);
     
     axios({
-      url: AccountUtil.getUrlBase() + "/account/getAuthById",
+      url: URL.API_BASE_URL + "/account/getAuthById",
       method: 'get',
       params: {
         userEmail: email
@@ -124,7 +124,7 @@ const UserManagementService = () => {
     setLoading(true);
     
     axios({
-      url: AccountUtil.getUrlBase() + "/account/deleteUser",
+      url: URL.API_BASE_URL + "/account/deleteUser",
       method: 'post',
       data: {
         userId: selectedUser.userId
@@ -161,7 +161,7 @@ const UserManagementService = () => {
     setLoading(true);
     
     axios({
-      url: AccountUtil.getUrlBase() + "/account/changeRole",
+      url: URL.API_BASE_URL + "/account/changeRole",
       method: 'post',
       data: {
         roleId: newRoleId,

@@ -31,6 +31,9 @@ function App() {
 
   useEffect(() => {
     // Verify tokens only if not already logged in
+    if (localStorage.getItem("token") === null) {
+      return
+    }
       AccountUtil.verifyTokens((isAuthenticated) => {
         setLogin(isAuthenticated);
         // Update localStorage with the login state

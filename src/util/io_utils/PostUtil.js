@@ -1,15 +1,14 @@
 import Qs from 'qs'
 import axios from "axios"
+import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
 
 export default class PostUtil {
-    static getUrlBase() {
-        return "/api"
-    }
+
 
 
     static uploadPicture(pic, picurl, setPicurl) {
         axios({
-            url: PostUtil.getUrlBase() + "/file/uploadPostPic",
+            url: API_BASE_URL + "/file/uploadPostPic",
             method: 'post',
             data: { file: pic },
             headers: {
@@ -32,7 +31,7 @@ export default class PostUtil {
         
         console.log(data)
         axios({
-            url: this.getUrlBase() + "/post/upload",
+            url: API_BASE_URL + "/post/upload",
             method: 'post',
             data: data,
             headers: {
@@ -52,7 +51,7 @@ export default class PostUtil {
     
     static getPostsById(id, list,setList) {
         axios({
-            url: this.getUrlBase() + "/post/get_by_user_id",
+            url: API_BASE_URL + "/post/get_by_user_id",
             method: 'post',
             data: {userID: localStorage.getItem("userId")},
             transformRequest: [function (data) {
@@ -75,7 +74,7 @@ export default class PostUtil {
 
     static getFriendPosts(list, setList) {
         axios({
-            url: this.getUrlBase() + "/post/get_friends_posts",
+            url: API_BASE_URL + "/post/get_friends_posts",
             method: 'post',
             data: {},
             transformRequest: [function (data) {

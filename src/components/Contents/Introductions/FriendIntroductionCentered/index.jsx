@@ -41,23 +41,6 @@ export default function (props) {
     let navigate = useNavigate()
     let dispatch = useDispatch()
 
-    // React.useEffect(() => {
-    //     axios({
-    //         url: AccountUtil.getUrlBase() + "/friends/getUserIntro?userIdToFollow=" + userId,
-    //         method: 'get'
-    //         , 
-    //         headers: {
-    //             token: localStorage.getItem("token"),
-    //         }
-    //     }).then(res=>{
-    //         if (res.status === 200) {
-    //             setDetails(res.data)
-    //         }
-    //     })
-
-
-
-    // }, [userId])
 
     React.useEffect(()=>{
         if (!details || details.relationship == null || details.relationship == undefined) {

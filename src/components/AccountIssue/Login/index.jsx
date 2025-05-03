@@ -65,11 +65,12 @@ export default function Login(props) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     data["remember"] = selected
+    console.log(data)
     if (validate(data.get("email"), data.get("password"))) {
-      AccountUtil.login().then(function (response) {
+      AccountUtil.login(data).then(function (response) {
         console.log(response)
         if (response === undefined || response.data === undefined) {
-          console.log("errror")
+          console.log("error")
           return
         }
         let responseData = response.data
@@ -88,8 +89,9 @@ export default function Login(props) {
             if (userInfoResponse && userInfoResponse.data && userInfoResponse.data.code !== -1) {
               const content = JSON.parse(userInfoResponse.data.message);
               localStorage.setItem("userInfo", JSON.stringify(content));
+              setLogin(true)
             }
-            setLogin(true)}
+            }
           )
   
         }
@@ -112,7 +114,6 @@ export default function Login(props) {
     else {
       //props.setBarState({...props.barState, message:"please check your input", open:true})
       showNotification("Wrong password or email", "error");
-
     }
   };
 

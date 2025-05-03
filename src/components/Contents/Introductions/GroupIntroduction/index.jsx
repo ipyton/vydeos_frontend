@@ -46,7 +46,7 @@ export default function (props) {
     }
     useEffect(() => {
         axios({
-            url: AccountUtil.getUrlBase() + "/group_chat/getDetail?groupId=" + props.groupId,
+            url: URL.API_BASE_URL + "/group_chat/getDetail?groupId=" + props.groupId,
             method: 'get',
             data: { token: localStorage.getItem("token") },
             transformRequest: [function (data) {
@@ -65,7 +65,7 @@ export default function (props) {
                 }
                 setDetails(response.data)
                 axios({
-                    url: AccountUtil.getUrlBase() + "/group_chat/get_members?groupId=" + props.groupId,
+                    url: URL.API_BASE_URL + "/group_chat/get_members?groupId=" + props.groupId,
                     method: 'get',
                     data: { token: localStorage.getItem("token") },
                     transformRequest: [function (data) {
