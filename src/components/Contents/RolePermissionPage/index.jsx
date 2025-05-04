@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import {
   Container, Box, Typography, Button, TextField, Chip, Paper,
   List, ListItem, ListItemText, Snackbar, Alert, Card, CardContent,
-  Divider, Grid, InputAdornment, CircularProgress
+  Divider, Grid, InputAdornment, CircularProgress, Dialog, DialogTitle,
+  DialogContent, DialogActions, Select, MenuItem, FormControl, InputLabel
 } from '@mui/material';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
@@ -10,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import FolderIcon from '@mui/icons-material/Folder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import EditIcon from '@mui/icons-material/Edit';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
 import Qs from "qs";
 import axios from 'axios';
@@ -19,7 +21,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { alpha } from '@mui/material/styles';
 import { useNotification } from '../../../Providers/NotificationProvider';
 import {API_BASE_URL, DOWNLOAD_BASE_URL} from "../../../util/io_utils/URL.js";
-
+import AuthUtil from '../../../util/io_utils/AuthUtil.js';
 
 const RolePermissionPage = () => {
   const [roles, setRoles] = useState([]);
@@ -28,11 +30,19 @@ const RolePermissionPage = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [paths, setPaths] = useState([]);
-  const [newPath, setNewPath] = useState("");
+  const [editPathIndex, setEditPathIndex] = useState(-1);
+  const [editPathOpen, setEditPathOpen] = useState(false);
+  const [newPath, setNewPath] = useState({
+    name: "",
+    route: "",
+    type: "nav"
+  });
   const [roleId, setRoleId] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [selectedRoleIndex, setSelectedRoleIndex] = useState(null);
   const { showNotification } = useNotification();
+
+  const pathTypes = ["nav", "api", "resource", "admin"];
 
   useEffect(() => {
     fetchRoles();
@@ -41,7 +51,7 @@ const RolePermissionPage = () => {
   const fetchRoles = () => {
     setLoading(true);
     axios({
-      url: API_BASE_URL + "/account/getRole",
+      url: API_BASE_URL + "/auth/getRole",
       method: 'get',
       headers: {
         "token": localStorage.getItem("token")
@@ -75,19 +85,19 @@ const RolePermissionPage = () => {
     setLoading(true);
     const newRoleId = roleId === -1 ? roles.length + 1 : roleId;
     
+    // Convert paths to string format before sending
+    
     axios({
-      url: API_BASE_URL + "/account/upsertRole",
+      url: API_BASE_URL + "/auth/upsertRole",
       method: 'post',
       data: {
         roleId: newRoleId,
         roleName: roleName,
         allowedPaths: paths,
       },
-      transformRequest: [function (data) {
-        return Qs.stringify(data);
-      }],
       headers: {
         token: localStorage.getItem("token"),
+        "Content-Type": "application/json"
       }
     })
       .then(res => {
@@ -124,9 +134,28 @@ const RolePermissionPage = () => {
 
   const handleRoleSelection = (role, index) => {
     setRoleName(role.roleName);
-    setPaths(role.allowedPaths || []);
     setRoleId(role.roleId);
     setSelectedRoleIndex(index);
+    AuthUtil.getAllPathsByRoleId(role.roleId).then(res => {
+      if (!res || !res.data || res.data.code !== 0) { 
+        showNotification("error", "Failed to fetch paths");
+        return 
+      }
+      try {
+        // Parse each path string into JSON object
+        const pathObjects = JSON.parse(res.data.message).map(path => {
+          try {
+            return typeof path === 'string' ? JSON.parse(path) : path;
+          } catch (e) {
+            return { name: "Unknown", route: path, type: "nav" };
+          }
+        });
+        setPaths(pathObjects);
+      } catch (e) {
+        console.error("Error parsing paths:", e);
+        showSnackbar("Error parsing paths", "error");
+      }
+    })
   };
 
   const handleDeleteRole = (event, role) => {
@@ -167,22 +196,62 @@ const RolePermissionPage = () => {
   };
 
   const addPath = () => {
-    if (!newPath.trim()) {
-      showSnackbar("Path cannot be empty", "error");
+    if (!newPath.name.trim() || !newPath.route.trim()) {
+      showSnackbar("Path name and route cannot be empty", "error");
       return;
     }
     
-    if (!paths.includes(newPath.trim())) {
-      setPaths([...paths, newPath.trim()]);
-      setNewPath("");
+    const pathExists = paths.some(path => 
+      path.route === newPath.route && path.type === newPath.type
+    );
+    
+    if (!pathExists) {
+      setPaths([...paths, { ...newPath }]);
+      setNewPath({
+        name: "",
+        route: "",
+        type: "nav"
+      });
       showSnackbar("Path added", "success");
     } else {
-      showSnackbar("Path already exists", "warning");
+      showSnackbar("This path already exists", "warning");
     }
   };
 
   const handleDeletePath = (pathToDelete) => {
-    setPaths(paths.filter(path => path !== pathToDelete));
+    AuthUtil.deletePath(paths[pathToDelete], roleId).then(res => {
+      if (!res || !res.data || res.data.code !== 0) { 
+        showNotification("error", "Failed to delete path");
+        return 
+      }
+      showSnackbar("Path deleted successfully", "success");
+      setPaths(paths.filter((path, index) => index !== pathToDelete));
+    })
+  };
+
+  const openEditPathDialog = (index) => {
+    setEditPathIndex(index);
+    setEditPathOpen(true);
+  };
+
+  const handleEditPath = () => {
+    if (editPathIndex >= 0) {
+      const updatedPaths = [...paths];
+      updatedPaths[editPathIndex] = { ...newPath };
+      setPaths(updatedPaths);
+      closeEditPathDialog();
+      showSnackbar("Path updated successfully", "success");
+    }
+  };
+
+  const closeEditPathDialog = () => {
+    setEditPathOpen(false);
+    setEditPathIndex(-1);
+    setNewPath({
+      name: "",
+      route: "",
+      type: "nav"
+    });
   };
 
   const resetForm = () => {
@@ -190,6 +259,11 @@ const RolePermissionPage = () => {
     setPaths([]);
     setRoleId(-1);
     setSelectedRoleIndex(null);
+    setNewPath({
+      name: "",
+      route: "",
+      type: "nav"
+    });
   };
 
   const showSnackbar = (message, severity = "success") => {
@@ -198,11 +272,16 @@ const RolePermissionPage = () => {
     setOpenSnackbar(true);
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      addPath();
-    }
+  // Get a display string for the path
+  const formatPathForDisplay = (path) => {
+    return `${path.name} (${path.route}) - ${path.type}`;
   };
+
+  useEffect(() => {
+    if (editPathIndex >= 0 && paths[editPathIndex]) {
+      setNewPath({ ...paths[editPathIndex] });
+    }
+  }, [editPathIndex, editPathOpen]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -271,18 +350,34 @@ const RolePermissionPage = () => {
                                 ID: {role.roleId}
                               </Typography>
                               <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {(role.allowedPaths || []).slice(0, 3).map((path, i) => (
+                                {(role.allowedPaths || []).slice(0, 2).map((path, i) => {
+                                  let pathObj;
+                                  try {
+                                    pathObj = typeof path === 'string' ? JSON.parse(path) : path;
+                                    return (
+                                      <Chip
+                                        key={i}
+                                        label={`${pathObj.name}: ${pathObj.route}`}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ fontSize: '0.7rem' }}
+                                      />
+                                    );
+                                  } catch (e) {
+                                    return (
+                                      <Chip
+                                        key={i}
+                                        label={String(path)}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ fontSize: '0.7rem' }}
+                                      />
+                                    );
+                                  }
+                                })}
+                                {(role.allowedPaths || []).length > 2 && (
                                   <Chip
-                                    key={i}
-                                    label={path}
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{ fontSize: '0.7rem' }}
-                                  />
-                                ))}
-                                {(role.allowedPaths || []).length > 3 && (
-                                  <Chip
-                                    label={`+${role.allowedPaths.length - 3} more`}
+                                    label={`+${role.allowedPaths.length - 2} more`}
                                     size="small"
                                     variant="outlined"
                                     sx={{ fontSize: '0.7rem' }}
@@ -322,7 +417,28 @@ const RolePermissionPage = () => {
                   const result = roles.find(item => item.roleName === e.target.value);
                   if (result) {
                     setRoleId(result.roleId);
-                    setPaths(result.allowedPaths || []);
+                    
+                    AuthUtil.getAllPathsByRoleId(result.roleId).then(res => {
+                      if (!res || !res.data || res.data.code !== 0) { 
+                        showNotification("error", "Failed to fetch paths");
+                        return 
+                      }
+                      try {
+                        // Parse each path string into JSON object
+                        const pathObjects = JSON.parse(res.data.message).map(path => {
+                          try {
+                            return typeof path === 'string' ? JSON.parse(path) : path;
+                          } catch (e) {
+                            return { name: "Unknown", route: path, type: "nav" };
+                          }
+                        });
+                        setPaths(pathObjects);
+                      } catch (e) {
+                        console.error("Error parsing paths:", e);
+                        showSnackbar("Error parsing paths", "error");
+                      }
+                    });
+                    
                     setSelectedRoleIndex(roles.findIndex(r => r.roleId === result.roleId));
                   } else if (roleId !== -1) {
                     // Only reset if we were editing an existing role
@@ -336,6 +452,7 @@ const RolePermissionPage = () => {
                 sx={{ mb: 3 }}
               />
               
+              {/* Path List */}
               <Box sx={{ mb: 3 }}>
                 <Typography variant="subtitle1" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
                   <PathIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
@@ -347,24 +464,51 @@ const RolePermissionPage = () => {
                   sx={{ 
                     p: 2, 
                     minHeight: '100px',
+                    maxHeight: '250px',
+                    overflow: 'auto',
                     borderRadius: 1,
-                    bgcolor: alpha('#f5f5f5', 0.6),
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 1
+                    bgcolor: alpha('#f5f5f5', 0.6)
                   }}
                 >
                   {paths.length > 0 ? (
-                    paths.map((path, index) => (
-                      <Chip
-                        key={index}
-                        label={path}
-                        onDelete={() => handleDeletePath(path)}
-                        color="primary"
-                        variant="outlined"
-                        sx={{ '& .MuiChip-deleteIcon': { color: 'inherit' } }}
-                      />
-                    ))
+                    <List dense>
+                      {paths.map((path, index) => (
+                        <ListItem
+                          key={index}
+                          secondaryAction={
+                            <Box>
+                              <IconButton edge="end" aria-label="edit" onClick={() => openEditPathDialog(index)}>
+                                <EditIcon sx={{ fontSize: '1.2rem', color: '#3f51b5' }} />
+                              </IconButton>
+                              <IconButton edge="end" aria-label="delete" onClick={() => handleDeletePath(index)}>
+                                <DeleteIcon sx={{ fontSize: '1.2rem', color: 'error.main' }} />
+                              </IconButton>
+                            </Box>
+                          }
+                        >
+                          <ListItemText
+                            primary={
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Typography variant="body2" fontWeight="medium">
+                                  {path.name}
+                                </Typography>
+                                <Chip 
+                                  label={path.type} 
+                                  size="small" 
+                                  color={path.type === 'admin' ? 'error' : path.type === 'api' ? 'info' : 'default'}
+                                  sx={{ ml: 1, height: '20px' }}
+                                />
+                              </Box>
+                            }
+                            secondary={
+                              <Typography variant="caption" color="text.secondary">
+                                {path.route}
+                              </Typography>
+                            }
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
                   ) : (
                     <Typography variant="body2" color="text.secondary" sx={{ width: '100%', textAlign: 'center', p: 2 }}>
                       No paths assigned. Add paths below.
@@ -373,34 +517,66 @@ const RolePermissionPage = () => {
                 </Paper>
               </Box>
               
-              <Box sx={{ display: 'flex', mb: 3 }}>
-                <TextField
-                  label="Add New Path"
-                  placeholder="e.g., /dashboard"
-                  value={newPath}
-                  onChange={(e) => setNewPath(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  fullWidth
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PathIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <Button 
-                  variant="contained" 
-                  onClick={addPath} 
-                  sx={{ ml: 1, bgcolor: '#4caf50', '&:hover': { bgcolor: '#388e3c' } }}
-                  disabled={!newPath.trim()}
-                >
-                  <AddCircleIcon sx={{ mr: 0.5 }} />
-                  Add
-                </Button>
+              {/* Add New Path */}
+              <Box sx={{ mb: 3, p: 2, border: '1px dashed', borderColor: alpha('#3f51b5', 0.3), borderRadius: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 2 }}>Add New Path</Typography>
+                
+                <Grid container spacing={2} mb={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Path Name"
+                      placeholder="e.g., Posts"
+                      value={newPath.name}
+                      onChange={(e) => setNewPath({...newPath, name: e.target.value})}
+                      fullWidth
+                      size="small"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Route"
+                      placeholder="e.g., /posts"
+                      value={newPath.route}
+                      onChange={(e) => setNewPath({...newPath, route: e.target.value})}
+                      fullWidth
+                      size="small"
+                    />
+                  </Grid>
+                </Grid>
+                
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={8}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Type</InputLabel>
+                      <Select
+                        value={newPath.type}
+                        label="Type"
+                        onChange={(e) => setNewPath({...newPath, type: e.target.value})}
+                      >
+                        {pathTypes.map(type => (
+                          <MenuItem key={type} value={type}>
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Button 
+                      variant="contained" 
+                      fullWidth
+                      onClick={addPath} 
+                      sx={{ bgcolor: '#4caf50', '&:hover': { bgcolor: '#388e3c' } }}
+                      disabled={!newPath.name.trim() || !newPath.route.trim()}
+                    >
+                      <AddCircleIcon sx={{ mr: 0.5 }} />
+                      Add
+                    </Button>
+                  </Grid>
+                </Grid>
               </Box>
               
+              {/* Action Buttons */}
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Button
                   variant="contained"
@@ -431,6 +607,60 @@ const RolePermissionPage = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Edit Path Dialog */}
+      <Dialog open={editPathOpen} onClose={closeEditPathDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit Path</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 0.5 }}>
+            <Grid item xs={12}>
+              <TextField
+                label="Path Name"
+                value={newPath.name}
+                onChange={(e) => setNewPath({...newPath, name: e.target.value})}
+                fullWidth
+                margin="dense"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Route"
+                value={newPath.route}
+                onChange={(e) => setNewPath({...newPath, route: e.target.value})}
+                fullWidth
+                margin="dense"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={newPath.type}
+                  label="Type"
+                  onChange={(e) => setNewPath({...newPath, type: e.target.value})}
+                >
+                  {pathTypes.map(type => (
+                    <MenuItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeEditPathDialog}>Cancel</Button>
+          <Button 
+            onClick={handleEditPath}
+            variant="contained" 
+            color="primary"
+            disabled={!newPath.name.trim() || !newPath.route.trim()}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar for feedback messages */}
       <Snackbar

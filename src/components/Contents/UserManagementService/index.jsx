@@ -42,7 +42,7 @@ const UserManagementService = () => {
 
   const fetchAvailableRoles = () => {
     axios({
-      url: URL.API_BASE_URL + "/account/getRole",
+      url: URL.API_BASE_URL + "/auth/getRole",
       method: 'get',
       headers: {
         "token": localStorage.getItem("token")

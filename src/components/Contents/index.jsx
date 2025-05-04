@@ -73,7 +73,7 @@ export default function Contents(props) {
     const [notifications, setNotifications] = useState([])
     //const [chatRecords, setChatRecords] = useState([])
     const [userRecords, setUserRecords] = useState([])
-    const [sideBarSelector, setSideBarSelector] = useState({ type: "", userId: "" })
+    const [sideBarSelector, setSideBarSelector] = useState()
     const location = useLocation()
   const { showNotification } = useNotification();
 

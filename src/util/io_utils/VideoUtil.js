@@ -512,7 +512,7 @@ export default class VideoUtil {
             try {
                 if (retrytimes === 0) clearInterval(intervalId);
                 axios({
-                    url: VideoUtil.getDownloadUrlBase() + "/movie/get_files",
+                    url: DOWNLOAD_BASE_URL + "/movie/get_files",
                     method: 'post',
                     data: { gid: meta_gid, movieId: movie_id, resource: source_id },
                     transformRequest: [function (data) {
@@ -556,7 +556,7 @@ export default class VideoUtil {
 
     static select(movie_id,type, source_id, gid, place, setSelectOpen) {
         axios({
-            url: URL.API_BASE_URL + "/movie/select",
+            url: API_BASE_URL + "/movie/select",
             method: 'post',
             data: { gid: gid, movieId: movie_id, resource: source_id, place: place, type: type },
             transformRequest: [function (data) {
@@ -583,7 +583,7 @@ export default class VideoUtil {
 
     static start_download(movie_id, source_id, name, sources, setSources, setOpen, setSelections, setSelectOpen, setTmpGid) {
         axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/start",
+            url: DOWNLOAD_BASE_URL + "/movie/start",
             method: 'post',
             data: { movieId: movie_id, source: source_id, name: name },
             transformRequest: [function (data) {
@@ -616,7 +616,7 @@ export default class VideoUtil {
 
     static resume_download(movie_id, gid, setRecords) {
         axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/resume",
+            url: DOWNLOAD_BASE_URL+ "/movie/resume",
             method: 'post',
             data: { gid: gid, movie_id: movie_id },
             transformRequest: [function (data) {
@@ -639,7 +639,7 @@ export default class VideoUtil {
 
     static pause_download(movie_id, gid, setRecord) {
         axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/pause",
+            url: DOWNLOAD_BASE_URL + "/movie/pause",
             method: 'post',
             data: { movie_id: movie_id, gid: gid },
             transformRequest: [function (data) {
@@ -662,7 +662,7 @@ export default class VideoUtil {
 
     static remove_download(movie_id, gid, setRecord) {
         axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/remove",
+            url: DOWNLOAD_BASE_URL + "/movie/remove",
             method: 'post',
             data: { movie_id: movie_id, gid: gid },
             transformRequest: [function (data) {
@@ -686,7 +686,7 @@ export default class VideoUtil {
     static check_current_download_status(setRecord) {
 
         axios({
-            url: VideoUtil.getDownloadUrlBase() + "/movie/get_download_status",
+            url: DOWNLOAD_BASE_URL + "/movie/get_download_status",
             method: 'get',
             transformRequest: [function (data) {
                 // 对 data 进行任意转换处理
@@ -727,7 +727,7 @@ export default class VideoUtil {
         }
         
         // 构建URL
-        const prefix = "/play_videos/longvideos/" + encodeURIComponent(location.type + "_" + location.resource_id + "_" + seasonId + "_" + episode + "/");
+        const prefix =  DOWNLOAD_BASE_URL + "/play_videos/longvideos/" + encodeURIComponent(location.type + "_" + location.resource_id + "_" + seasonId + "_" + episode + "/");
         const m3u8Url = prefix + encodeURIComponent("index.m3u8");
 
         // 使用axios代替fetch

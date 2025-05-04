@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Typography, CircularProgress, Paper, List, InputBase } from '@mui/material';
+import { Box, Typography, CircularProgress, Paper, List, InputBase, useMediaQuery, useTheme } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Header from './Header';
 import Contact from './Contact';
@@ -10,7 +10,7 @@ import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../../../Providers/NotificationProvider';
 
 export default function SideBar(props) {
-  let { select, setSelect } = props;
+  let { select, setSelect, isMobile } = props;
   const [userRecords, setUserRecords] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,9 @@ export default function SideBar(props) {
   const refresh = useSelector((state) => state.refresh.value.refresh);
   
   useEffect(() => {
+    if (location&& location.type && location.userId) {
     setSelect(location);
+    }
   }, [location.type, location.userId, setSelect]);
 
   useEffect(() => {
@@ -42,7 +44,6 @@ export default function SideBar(props) {
     setSearchQuery(event.target.value);
   };
 
-  // Safely filter the contacts, ensuring userRecords is an array
   const filteredContacts = Array.isArray(userRecords) 
     ? userRecords.filter(record => 
         (record.name && record.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
@@ -59,27 +60,39 @@ export default function SideBar(props) {
 
   return (
     <Paper
-      elevation={3}
+      elevation={0}
       sx={{
-        width: "30%",
-        height: "100%",
+        width: isMobile ? "100%" : "30%",
+        height: isMobile ? "100vh" : "100%",
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: 3,
+        borderRadius: 0,
         overflow: 'hidden',
-        border: '1px solid rgba(0,0,0,0.08)'
+        backgroundColor: '#ffffff',
+        position: 'relative',
+        minWidth: isMobile ? '100%' : '30%'
       }}
     >
       <Header />
       
-      <Box sx={{ p: 2, backgroundColor: '#f5f7fa' }}>
+      <Box sx={{ 
+        p: isMobile ? 1 : 2, 
+        backgroundColor: '#f5f7fa',
+        borderBottom: '1px solid rgba(0,0,0,0.08)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1,
+        width: '100%'
+      }}>
         <Paper
           sx={{
             p: '2px 4px',
             display: 'flex',
             alignItems: 'center',
             borderRadius: 2,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+            boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+            backgroundColor: '#ffffff',
+            width: '90%'
           }}
         >
           <SearchIcon sx={{ color: 'action.active', ml: 1, mr: 1 }} />
@@ -96,8 +109,9 @@ export default function SideBar(props) {
         flexGrow: 1, 
         overflow: 'auto',
         backgroundColor: '#ffffff',
+        width: '100%',
         '&::-webkit-scrollbar': {
-          width: '8px',
+          width: '4px',
         },
         '&::-webkit-scrollbar-track': {
           background: '#f1f1f1',
@@ -111,29 +125,67 @@ export default function SideBar(props) {
         },
       }}>
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <CircularProgress size={40} />
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '100%',
+            minHeight: isMobile ? '60vh' : 'auto',
+            width: '100%'
+          }}>
+            <CircularProgress size={isMobile ? 30 : 40} />
           </Box>
         ) : !Array.isArray(userRecords) || userRecords.length === 0 ? (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant="body1" color="text.secondary">
+          <Box sx={{ 
+            p: isMobile ? 2 : 4, 
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: isMobile ? '60vh' : 'auto',
+            width: '100%'
+          }}>
+            <Typography variant={isMobile ? "body2" : "body1"} color="text.secondary">
               Start making some friends first
             </Typography>
           </Box>
         ) : filteredContacts.length === 0 ? (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant="body1" color="text.secondary">
+          <Box sx={{ 
+            p: isMobile ? 2 : 4, 
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: isMobile ? '60vh' : 'auto',
+            width: '100%'
+          }}>
+            <Typography variant={isMobile ? "body2" : "body1"} color="text.secondary">
               No contacts found matching "{searchQuery}"
             </Typography>
           </Box>
         ) : (
-          <List sx={{ width: '100%', bgcolor: 'background.paper', py: 1 }}>
+          <List sx={{ 
+            width: '100%', 
+            bgcolor: 'background.paper',
+            p: 0,
+            '& .MuiListItem-root': {
+              px: isMobile ? 2 : 3,
+              py: isMobile ? 1.5 : 2,
+              borderBottom: '1px solid rgba(0,0,0,0.08)',
+              '&:last-child': {
+                borderBottom: 'none'
+              }
+            }
+          }}>
             {filteredContacts.map((content, idx) => (
               <Contact 
                 key={content.userId || idx} 
                 onClick={onClick(idx)} 
                 content={content} 
-                selected={select} 
+                selected={select}
+                isMobile={isMobile}
               />
             ))}
           </List>

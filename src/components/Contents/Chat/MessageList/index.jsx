@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Box, Paper, Typography, useMediaQuery, useTheme, CircularProgress } from "@mui/material";
+import { Box, Paper, Typography, useMediaQuery, useTheme, CircularProgress, IconButton } from "@mui/material";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Header from "./Header";
 import MessageList from "./MessageList";
 import InputBox from "./InputBox";
@@ -10,27 +11,45 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function ChatContainer(props) {
-  const { select, setSelect } = props;
+  const { select, setSelect, isMobile } = props;
   const [chatRecords, setChatRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const location = useLocation();
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleBackClick = () => {
-    // Handle back button click for mobile view
-    if (typeof props.onBack === 'function') {
-      props.onBack();
-    }
+    setSelect(null);
   };
 
   useEffect(() => {
     const fetchMessages = async () => {
       // Validate if we have a valid selection
       if (!select || !select.type || !select.userId || select.type === "" || select.userId === "") {
-        return;
+        return (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              p: isMobile ? 2 : 4,
+              backgroundColor: '#f5f7fb',
+              borderRadius: isMobile ? 0 : 2,
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            <Typography variant={isMobile ? "body1" : "h6"} color="text.secondary" gutterBottom>
+              Select a conversation
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Choose a contact from the list to start chatting
+            </Typography>
+          </Box>
+        );
+    
       }
       
       setLoading(true);
@@ -57,38 +76,40 @@ export default function ChatContainer(props) {
   }, [select.type, select.userId, refresh]);
 
   if (!select || !select.type || !select.userId) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          p: 4,
-          backgroundColor: '#f5f7fb',
-          borderRadius: 2
-        }}
-      >
-        <Typography variant="h6" color="text.secondary" gutterBottom>
-          Select a conversation
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Choose a contact from the list to start chatting
-        </Typography>
-      </Box>
-    );
+    return null;
   }
 
   return (
     <Paper
-      elevation={3}
+      elevation={0}
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        width: isMobile ? "100%" : "70%",
-        borderRadius: isMobile ? 0 : 2
+        width: "100%",
+        height: isMobile ? "100vh" : "100%",
+        borderRadius: 0,
+        position: 'relative',
+        backgroundColor: '#ffffff'
       }}
     >
+      {isMobile && (
+        <IconButton
+          onClick={handleBackClick}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            zIndex: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            }
+          }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+      )}
+      
       <Header selected={select} onBack={handleBackClick} />
       
       {loading ? (
@@ -97,7 +118,8 @@ export default function ChatContainer(props) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            flexGrow: 1
+            flexGrow: 1,
+            height: isMobile ? 'calc(100vh - 120px)' : 'auto'
           }}
         >
           <CircularProgress />
@@ -109,8 +131,9 @@ export default function ChatContainer(props) {
             justifyContent: 'center',
             alignItems: 'center',
             flexGrow: 1,
-            p: 3,
-            color: 'error.main'
+            p: isMobile ? 2 : 3,
+            color: 'error.main',
+            height: isMobile ? 'calc(100vh - 120px)' : 'auto'
           }}
         >
           <Typography>{error}</Typography>
@@ -119,9 +142,11 @@ export default function ChatContainer(props) {
         <Box 
           sx={{ 
             flexGrow: 1, 
-            overflow: 'hidden',
+            overflow: 'auto',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            height: isMobile ? 'calc(100vh - 120px)' : 'auto',
+            paddingBottom: isMobile ? '20px' : '0'
           }}
         >
           <MessageList
@@ -132,7 +157,12 @@ export default function ChatContainer(props) {
         </Box>
       )}
       
-      <Box sx={{ flexShrink: 0 }}>
+      <Box sx={{ 
+        flexShrink: 0, 
+        p: isMobile ? 1 : 2,
+        backgroundColor: '#ffffff',
+        borderTop: isMobile ? '1px solid rgba(0,0,0,0.08)' : 'none'
+      }}>
         <InputBox
           chatRecords={chatRecords}
           setChatRecords={setChatRecords}

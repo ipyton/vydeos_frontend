@@ -5,6 +5,7 @@ import EncryptionUtil from "./EncryptionUtil"
 import { update } from "../../components/redux/UserDetails"
 import { useDispatch } from "react-redux"
 import localforage from "localforage"
+
 import {API_BASE_URL, DOWNLOAD_BASE_URL} from "./URL";
 
 export default class AccountUtil {

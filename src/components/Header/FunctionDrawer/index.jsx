@@ -93,7 +93,7 @@ export default function FunctionDrawer(props) {
     { name: 'Trending', route: '/trending', iconName: 'Whatshot' },
     { name: 'Posts', route: '/', iconName: 'Home' },
     { name: 'Videos', route: '/videolist', iconName: 'VideoLibrary' },
-    { name: 'Edit', route: '/edit', iconName: 'Edit' },
+    { name: 'Edit', route: '/editor', iconName: 'Edit' },
     { name: 'Friend', route: '/friends', iconName: 'People' },
     { name: 'Settings', route: '/settings', iconName: 'Tune' },
     { name: 'Download', route: '/download', iconName: 'Download' },

@@ -15,9 +15,9 @@ import axios from "axios";
 import TextField from "@mui/material/TextField";
 //import FriendIntroductionCentered from '../Introductions/FriendIntroductionCentered';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Checkbox, FormControlLabel } from "@mui/material";
+import {API_BASE_URL, DOWNLOAD_BASE_URL} from "../../../util/io_utils/URL";
 
 import Introductions from "../Introductions"
-import AccountUtil from "../../../util/io_utils/AccountUtil";
 import { useNotification } from '../../../Providers/NotificationProvider';
 
 
@@ -42,7 +42,7 @@ export default function Friends(props) {
   useEffect(() => {
     if (openDialog) {
       axios({
-        url: URL.API_BASE_URL + "/friends/get_friends",
+        url: API_BASE_URL + "/friends/get_friends",
         method: "post",
         data: {},
         headers: {
@@ -68,7 +68,7 @@ export default function Friends(props) {
   const handleCreateGroup = () => {
     if (selectedFriends.length > 0 && groupName.length !== 0) {
       axios({
-        url: URL.API_BASE_URL + "/group_chat/create",
+        url: API_BASE_URL + "/group_chat/create",
         method: "post",
         data: {
             groupName: groupName,
