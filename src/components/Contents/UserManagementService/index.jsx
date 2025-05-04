@@ -18,6 +18,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { alpha } from '@mui/material/styles';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';
 import { useNotification } from '../../../Providers/NotificationProvider';
+import {API_BASE_URL, DOWNLOAD_BASE_URL} from "../../../util/io_utils/URL";
 
 const UserManagementService = () => {
   const [users, setUsers] = useState([]);
@@ -42,7 +43,7 @@ const UserManagementService = () => {
 
   const fetchAvailableRoles = () => {
     axios({
-      url: URL.API_BASE_URL + "/auth/getRole",
+      url: API_BASE_URL + "/auth/getRole",
       method: 'get',
       headers: {
         "token": localStorage.getItem("token")
@@ -84,7 +85,7 @@ const UserManagementService = () => {
     setSearchError(false);
     
     axios({
-      url: URL.API_BASE_URL + "/account/getAuthById",
+      url: API_BASE_URL + "/account/getAuthById",
       method: 'get',
       params: {
         userEmail: email
@@ -124,7 +125,7 @@ const UserManagementService = () => {
     setLoading(true);
     
     axios({
-      url: URL.API_BASE_URL + "/account/deleteUser",
+      url: API_BASE_URL + "/account/deleteUser",
       method: 'post',
       data: {
         userId: selectedUser.userId
@@ -161,7 +162,7 @@ const UserManagementService = () => {
     setLoading(true);
     
     axios({
-      url: URL.API_BASE_URL + "/account/changeRole",
+      url: API_BASE_URL + "/account/changeRole",
       method: 'post',
       data: {
         roleId: newRoleId,
