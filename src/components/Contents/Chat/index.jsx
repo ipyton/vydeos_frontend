@@ -4,57 +4,59 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import SideBar from './SideBar';
 import MessageList from './MessageList';
-import { fireEvent } from '@testing-library/react';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import MessageUtil from '../../../util/io_utils/MessageUtil';
-import localforage from 'localforage';
-// import { useIsFocused } from '@react-navigation/native';
 import { useLocation } from 'react-router-dom';
 import { useTheme, useMediaQuery } from '@mui/material';
+import Slide from '@mui/material/Slide';
+import Fade from '@mui/material/Fade';
 
 export default function Chat(props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  let height = window.innerHeight * 0.8
-  //const isFocused = useIsFocused();
+  let height = window.innerHeight * 0.8;
   
-  let { refresh, sideBarSelector, setSideBarSelector } = props
-
-
-  console.log(sideBarSelector)
-  // const history = useLocation()
-  console.log( "1" + "isMobile: " + isMobile + "sideBarSelector: " + (sideBarSelector === null) + "result: " + !(!!isMobile && (sideBarSelector===null)))
-
-  console.log("2" + "isMobile: " + isMobile + "sideBarSelector: " + (sideBarSelector === null) + "result: " + (sideBarSelector===null))
-  // userId
+  let { refresh, sideBarSelector, setSideBarSelector } = props;
+  
   return (
-    <Stack 
-      sx={{ 
+    <Stack
+      sx={{
         margin: isMobile ? '0' : '20px',
         marginTop: isMobile ? '0' : '20px',
         width: isMobile ? '100%' : '95%',
         height: isMobile ? '100vh' : height,
         padding: isMobile ? '0' : '0 20px',
-      }} 
-      direction={isMobile ? "column" : "row"} 
+      }}
+      direction={isMobile ? "column" : "row"}
       spacing={2}
     >
-
       {!(!!isMobile && (!!sideBarSelector)) && (
-        <SideBar 
-          select={sideBarSelector} 
-          setSelect={setSideBarSelector}
-          isMobile={isMobile}
-        />
+        <Fade in={true} timeout={500}>
+          <div style={{ width: isMobile ? '100%' : '350px' }}> {/* Fixed width for sidebar container */}
+            <SideBar
+              select={sideBarSelector}
+              setSelect={setSideBarSelector}
+              isMobile={isMobile}
+            />
+          </div>
+        </Fade>
       )}
+      
       {!!(sideBarSelector) && (
-        <MessageList 
-          select={sideBarSelector} 
-          setSelect={setSideBarSelector} 
-          refresh={refresh}
-          isMobile={isMobile}
-        />
+        <Slide
+          direction="left"
+          in={true}
+          mountOnEnter
+          unmountOnExit
+          timeout={300}
+        >
+          <div style={{ flexGrow: 1, width: isMobile ? '100%' : 'calc(100% - 370px)' }}> {/* Adjusted width for message list */}
+            <MessageList
+              select={sideBarSelector}
+              setSelect={setSideBarSelector}
+              refresh={refresh}
+              isMobile={isMobile}
+            />
+          </div>
+        </Slide>
       )}
     </Stack>
   );

@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Box, Typography, CircularProgress, Paper, List, InputBase, useMediaQuery, useTheme } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Header from './Header';
+// If you have the enhanced Contact component, import it
+// Otherwise, continue using the original Contact component
 import Contact from './Contact';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -14,15 +16,14 @@ export default function SideBar(props) {
   const [userRecords, setUserRecords] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-    const { showNotification } = useNotification();
-  
+  const { showNotification } = useNotification();
   
   let location = useLocation();
   const refresh = useSelector((state) => state.refresh.value.refresh);
   
   useEffect(() => {
-    if (location&& location.type && location.userId) {
-    setSelect(location);
+    if (location && location.type && location.userId) {
+      setSelect(location);
     }
   }, [location.type, location.userId, setSelect]);
 
@@ -62,7 +63,7 @@ export default function SideBar(props) {
     <Paper
       elevation={0}
       sx={{
-        width: isMobile ? "100%" : "30%",
+        width: '100%', // Take full width of parent container
         height: isMobile ? "100vh" : "100%",
         display: 'flex',
         flexDirection: 'column',
@@ -70,40 +71,67 @@ export default function SideBar(props) {
         overflow: 'hidden',
         backgroundColor: '#ffffff',
         position: 'relative',
-        minWidth: isMobile ? '100%' : '30%'
       }}
     >
       <Header />
       
       <Box sx={{ 
-        p: isMobile ? 1 : 2, 
-        backgroundColor: '#f5f7fa',
-        borderBottom: '1px solid rgba(0,0,0,0.08)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1,
-        width: '100%'
-      }}>
-        <Paper
-          sx={{
-            p: '2px 4px',
-            display: 'flex',
-            alignItems: 'center',
-            borderRadius: 2,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-            backgroundColor: '#ffffff',
-            width: '90%'
-          }}
-        >
-          <SearchIcon sx={{ color: 'action.active', ml: 1, mr: 1 }} />
-          <InputBase
-            sx={{ ml: 1, flex: 1 }}
-            placeholder="Search contacts"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-        </Paper>
-      </Box>
+  backgroundColor: '#f5f7fa',
+  borderBottom: '1px solid rgba(0,0,0,0.08)',
+  position: 'sticky',
+  top: 0,
+  zIndex: 1,
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center', // 关键点：垂直居中
+
+  height: '70px',
+}}>
+  <Paper
+    elevation={1}
+    sx={{
+      // p: '8px 16px', // Increased padding for more space around input
+      display: 'flex',
+      alignItems: 'center',
+      borderRadius: 8,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      backgroundColor: '#ffffff',
+      width: '90%', // Changed from fixed pixel value to percentage
+      maxWidth: '300px', // Added max-width for larger screens
+      height: '70%',
+      transition: 'all 0.2s ease-in-out',
+      '&:hover': {
+        boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+      },
+      border: '1px solid rgba(0,0,0,0.03)'
+    }}
+  >
+    <SearchIcon sx={{ 
+      color: 'text.secondary', 
+      mr: 1, // Added margin right for better spacing from text
+      ml: 1.5,
+      fontSize: isMobile ? '1.2rem' : '1.4rem' 
+    }} />
+    <InputBase
+      sx={{ 
+        flex: 1,
+        fontSize: isMobile ? '0.95rem' : '1rem',
+        ml: 0.2, // Reduced margin left from 0.5 to 0.2
+        '& .MuiInputBase-input': {
+          py: 0.75,
+          pl: 0.2, // Reduced padding left from 0.5 to 0.2
+          overflow: 'hidden', // Prevent text overflow
+          textOverflow: 'ellipsis', // Add ellipsis for overflowing text
+          whiteSpace: 'nowrap' // Keep text on one line
+        }
+      }}
+      placeholder="Search contacts..."
+      value={searchQuery}
+      onChange={handleSearchChange}
+    />
+  </Paper>
+</Box>
       
       <Box sx={{ 
         flexGrow: 1, 
@@ -169,13 +197,12 @@ export default function SideBar(props) {
           <List sx={{ 
             width: '100%', 
             bgcolor: 'background.paper',
-            p: 0,
+            p: 0.5,
             '& .MuiListItem-root': {
-              px: isMobile ? 2 : 3,
-              py: isMobile ? 1.5 : 2,
-              borderBottom: '1px solid rgba(0,0,0,0.08)',
+              borderRadius: 1,
+              my: 0.5,
               '&:last-child': {
-                borderBottom: 'none'
+                mb: 0
               }
             }
           }}>
