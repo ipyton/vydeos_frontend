@@ -75,7 +75,7 @@ export default function Contents(props) {
     const [userRecords, setUserRecords] = useState([])
     const [sideBarSelector, setSideBarSelector] = useState()
     const location = useLocation()
-  const { showNotification } = useNotification();
+    const { showNotification } = useNotification();
 
     // useEffect(()=>{
     //     if (!location.pathname.startsWith("/chat")) {
@@ -93,7 +93,6 @@ export default function Contents(props) {
             setUserRecords(res)
         }
         ).then(() => {
-            // setWorker(new Worker(`${process.env.PUBLIC_URL}/webworkers/NotificationReceiver.js`))
         })
     }
 
@@ -103,7 +102,7 @@ export default function Contents(props) {
     }, [])
     const dispatcher = useDispatch()
     useEffect(() => {
-        const worker = new Worker("webworkers/NotificationReceiver.js");
+        const worker = new Worker("/webworkers/NotificationReceiver.js");
 
         // 主线程接收 Worker 消息
         worker.onmessage = (event) => {

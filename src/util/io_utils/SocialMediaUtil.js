@@ -28,7 +28,7 @@ export default class SocialMediaUtil {
         ).catch(error => {
             console.log(error)
         }).then(response => {
-            if (response.data.code === 1) {
+            if (response.data.code === 0) {
                 // localforage.getItem("userIntro").then((res) => {
                 //     //res is a userIntro
                 //     res.relationship = res.relationship % 10 + 10
@@ -72,7 +72,7 @@ export default class SocialMediaUtil {
         ).catch(error => {
             console.log(error)
         }).then(response => {
-            if (response.data.code === 1) {
+            if (response.data.code === 0) {
                 // localforage.getItem("userIntro").then((res) => {
                 //     res.relationship = res.relationship % 10
                     details.relationship = details.relationship % 10

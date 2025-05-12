@@ -48,7 +48,7 @@ export default class SearchUtil {
       if (responseData.code === -1) {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
       }
-      else if (responseData.code === 1) {
+      else if (responseData.code === 0) {
         //setSearchResults(responseData.result)
         // if (pagingStatus === null) {
         //     setPagingStatus(responseData.pagingStatus)
@@ -94,7 +94,7 @@ export default class SearchUtil {
       if (responseData.code === -1) {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
       }
-      else if (responseData.code === 1) {
+      else if (responseData.code === 0) {
         if (responseData.result !== null) {
           setSearchResults(responseData.result)
         }

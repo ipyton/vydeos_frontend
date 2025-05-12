@@ -22,7 +22,7 @@ export default class IOUtil {
                 }
             })
             let responseData = response.data
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -45,7 +45,7 @@ export default class IOUtil {
                 }
             })
             let responseData = response.data
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
 
@@ -69,7 +69,7 @@ export default class IOUtil {
                 }
             })
             let responseData = response.data
-            setState(responseData.code === 1)
+            setState(responseData.code === 0)
         }
         return post()
     }
@@ -90,7 +90,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -110,7 +110,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -131,7 +131,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -152,7 +152,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -178,7 +178,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -199,7 +199,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -223,7 +223,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
 
@@ -250,7 +250,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -274,7 +274,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }
@@ -298,7 +298,7 @@ export default class IOUtil {
             })
             let responseData = response.data
             console.log(response)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return post()
     }

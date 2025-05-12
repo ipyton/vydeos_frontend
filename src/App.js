@@ -9,7 +9,7 @@ import AccountUtil from './util/io_utils/AccountUtil';
 import localforage from 'localforage';
 import { StrictMode } from 'react';
 import { useNotification } from './Providers/NotificationProvider';
-
+import AuthUtil from './util/io_utils/AuthUtil';
 function checkNetworkStatus() {
   return navigator.onLine;
 }
@@ -27,6 +27,7 @@ function App() {
   const [avatar, setAvatar] = useState(null);
   const [badgeContent, setBadgeContent] = useState([]);
   const [networkStatus, setNetworkStatus] = useState(false);
+  const [paths, setPaths] = useState([]);
   const { showNotification } = useNotification();
 
   useEffect(() => {
@@ -46,10 +47,26 @@ function App() {
                 return
               }
               let responseData = response.data
-              if (responseData.code === 1) {
-                await localforage.setItem("userId", response.data.message)
+              if (responseData.code === 0) {
+                localforage.setItem("userId", response.data.message)
+                localStorage.setItem("userId", response.data.message)
+                AuthUtil.getPaths().then(
+                  (response1) => {
+                    console.log(response)
+                    if (response1.data.code === 0) {
+                      
+                       localforage.setItem("paths", JSON.parse(response1.data.message)).then(  
+                        () => {
 
-                setLogin(true)
+                          console.log(response)
+                          setPaths(JSON.parse(response1.data.message))
+                          setLogin(true)
+                        }
+                       )
+                    }
+                  }
+                )
+
               } else {
                 showNotification(responseData.message, "error");
                 setLogin(false)
@@ -87,7 +104,6 @@ function App() {
           setLogin={async (newState) => {
             setLogin(newState);
             localStorage.setItem('isLoggedIn', newState.toString());
-
             
           }} 
         />

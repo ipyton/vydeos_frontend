@@ -55,11 +55,11 @@ export default class AccountUtil {
   }
 
   static login(data) {
-    console.log(API_BASE_URL + " safsfsfsdfsdfsdfsd")
+    console.log(data.get("remember") )
     return axios({
       url: API_BASE_URL+ "/account/login",
       method: 'post',
-      data: { email: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), remember: data["remember"] },
+      data: { email: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), remember: data.get("remember") },
       transformRequest: [function (data) {
         // 对 data 进行任意转换处理
         return Qs.stringify(data)
@@ -69,8 +69,8 @@ export default class AccountUtil {
   }
 
 
-  static registerStep1(activeStep, setStep, userId) {
-    axios({
+  static  registerStep1( userId) {
+    return axios({
       url: API_BASE_URL + "/account/registerStep1",
       method: 'post',
       data: { userId: userId },
@@ -78,78 +78,58 @@ export default class AccountUtil {
         // transform data -> json
         return Qs.stringify(data)
       }],
-    }).catch((err) => {
-      console.log(err)
-      return
-    }).then(
-      (response) => {
-        console.log(response);
-        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
-          setStep(activeStep + 1)
-        }
-        else {
-          console.log("Please check your input")
-        }
-      }
-    )
+    })
 
   }
-  static sendVerificationCode() {
+  static resetStep1(userId) {
+    return axios({
+      url: API_BASE_URL + "/account/registerStep1",
+      method: 'post',
+      data: { userId: userId },
+      transformRequest: [function (data) {
+        // transform data -> json
+        return Qs.stringify(data)
+      }],
+    })
+
+  }
+
+
+  static sendVerificationCode(email) {
     return axios({
       url: API_BASE_URL + "/account/sendVerificationCode",
       method: 'post',
-      data: { email: localStorage.getItem("email") },
+      data: { userId: email},
       transformRequest: [function (data) {
         // transform data -> json
         return Qs.stringify(data)
       }],
-    }).catch((err) => {
-      console.log(err)
-      return
-    }).then(
-      (response) => {
-        console.log(response);
-        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
-          console.log("Verification code sent")
-        }
-        else {
-          console.log("Please check your input")
-        }
-      }
-    )
+    })
     }
 
 
-  static registerStep2(activeStep, setStep, code) {
-    setStep(activeStep + 1)
-  }
-
-  static registerStep3(activeStep, setStep, password, token,barState, setBarState) {
-    axios({
-      url: API_BASE_URL + "/account/registerStep3",
+  static registerStep2( email, code) {
+    return axios({
+      url: API_BASE_URL + "/account/registerStep2",
       method: 'post',
-      data: { password: EncryptionUtil.encryption(password), userId: token },
+      data: { userId: email, code: code },
       transformRequest: [function (data) {
         // transform data -> json
         return Qs.stringify(data)
       }],
-    }).catch((err) => {
-      console.log("Connection error")
-      return
-    }).then(
-      (response) => {
-        console.log(response)
-        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 1) {
-          setStep(activeStep + 1)
-        }
-        else {
-          console.log("Please check your input")
-          console.log(response.data.message)
-          setBarState({ ...barState, open: true, message:response.data.message})
+    })
+  }
 
-        }
-      }
-    )
+  static registerStep3(userId,password, token) {
+   return axios({
+      url: API_BASE_URL + "/account/registerStep3",
+      method: 'post',
+      data: { password: EncryptionUtil.encryption(password), token: token, userId: userId },
+      transformRequest: [function (data) {
+        // transform data -> json
+        return Qs.stringify(data)
+      }],
+    })
 
   }
 
@@ -165,7 +145,7 @@ export default class AccountUtil {
         }
       })
       let responseData = response.data
-      return responseData.code === 1
+      return responseData.code === 0
     }
     return upload()
   }

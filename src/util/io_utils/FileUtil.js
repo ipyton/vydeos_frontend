@@ -23,7 +23,7 @@ export default class PictureUtil {
         })
         let responseData = response.data
         console.log(response)
-        return responseData.code === 1
+        return responseData.code === 0
     }
 
     static downloadArticlePics(articleID, from, to) {
@@ -40,7 +40,7 @@ export default class PictureUtil {
             })
             let responseData = response.data
             console.log(responseData)
-            return responseData.code === 1
+            return responseData.code === 0
         }
         return download()
     }

@@ -22,7 +22,7 @@ class MerkleTree {
 
     // 构建 Merkle Tree
     buildTree(nodes) {
-        if (nodes.length === 1) {
+        if (nodes.length === 0) {
             return nodes[0];
         }
 

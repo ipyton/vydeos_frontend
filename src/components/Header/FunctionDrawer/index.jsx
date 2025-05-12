@@ -13,7 +13,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import AuthUtil from '../../../util/io_utils/AuthUtil';
-
+import localforage from 'localforage';
 // Import all Material UI icons dynamically
 import * as MuiIcons from '@mui/icons-material';
 
@@ -86,6 +86,9 @@ export default function FunctionDrawer(props) {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const paths = localforage.getItem("paths")
+  console.log(paths)
+
 
   // Default navigation map with icon names as strings
   const defaultNavigationMap = [
@@ -104,27 +107,44 @@ export default function FunctionDrawer(props) {
     { name: 'Version Log', route: '/logs', iconName: 'History' },
     { name: 'About', route: '/about', iconName: 'Info' }
   ];
-
+  const iconMap = {
+    '/chat': 'Message',
+    '/trending': 'Whatshot',
+    '/': 'Home',
+    '/videolist': 'VideoLibrary',
+    '/editor': 'Edit',
+    '/friends': 'People',
+    '/settings': 'Tune',
+    '/download': 'Download',
+    '/qa': 'QuestionAnswer',
+    '/downloadRequestsManager': 'DownloadForOffline',
+    '/userManage': 'ManageAccounts',
+    '/role': 'AdminPanelSettings',
+    '/logs': 'History',
+    '/about': 'Info'
+  };
   useEffect(() => {
     // Initialize with default navigation
-    setNavigationItems(defaultNavigationMap);
-    
-    // Fetch available paths when component mounts
-    AuthUtil.getPaths()
-      .then(response => {
-        console.log(response);
-        
-        // If the API returns navigation data, update the state
-        if (response && response.data && Array.isArray(response.data)) {
-          // Assuming the response has a format like:
-          // [{ name: 'Chat', route: '/chat', iconName: 'MessageIcon' }, ...]
-          setNavigationItems(response.data);
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        // Keep using default navigation on error
-      });
+    localforage.getItem("paths").then(
+      (response) => {
+        console.log(response)
+        let tmp = []
+
+        response.forEach(element => {
+          console.log(element.route == "/**")
+          if (element.route === "/**") {
+            setNavigationItems(defaultNavigationMap);
+            return;
+          }
+          else {
+            tmp.push({ name: element.name, route: element.route, iconName: iconMap[element.route] })
+            setNavigationItems(tmp)
+         }
+        });
+      }
+    ) 
+
+
   }, []);
 
   const handleNavigation = (route) => {

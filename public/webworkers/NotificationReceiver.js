@@ -70,10 +70,7 @@ function getNewestMessages() {
                 return
             }
             return DatabaseManipulator.batchAddContactHistory(JSON.parse(response.data.message))
-            //console.log(JSON.parse(response.data.message))
-            // await localforage.setItem("userId", response.data.message)
-            // setState(responseData.code === 1)
-            // console.log(responseData.code === 1)
+
         }
     )
 

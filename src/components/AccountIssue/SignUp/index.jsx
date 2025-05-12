@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,6 +8,9 @@ import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import EmailIcon from '@mui/icons-material/Email';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -15,324 +18,567 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import { Stack } from '@mui/material';
+import { Paper, Stack, Divider, Fade, Alert } from '@mui/material';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
-import { useEffect } from 'react';
-import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
 import { useNotification } from '../../../Providers/NotificationProvider';
+import { useRef } from 'react';
+import { CountDownButton } from '../CountDownButton.jsx';
 
+// Custom theme with a more modern palette
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#3f51b5',
+      light: '#757de8',
+      dark: '#002984',
+    },
+    secondary: {
+      main: '#f50057',
+      light: '#ff5983',
+      dark: '#bb002f',
+    },
+    background: {
+      default: '#f5f5f5',
+    },
+  },
+  typography: {
+    fontFamily: [
+      'Poppins',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+    ].join(','),
+    h4: {
+      fontWeight: 600,
+    },
+    h5: {
+      fontWeight: 500,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          textTransform: 'none',
+          fontWeight: 600,
+          boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
+        },
+        containedPrimary: {
+          '&:hover': {
+            boxShadow: '0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)',
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          marginBottom: '16px',
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8,
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07)',
+        },
+      },
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
+        },
+      },
+    },
+  },
+});
+
+// Copyright component
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
+      <Link color="inherit" href="/">
         Your Website
       </Link>{' '}
       {new Date().getFullYear()}
-      {'.'}
     </Typography>
   );
 }
 
-const defaultTheme = createTheme();
+// Step icons for the stepper
+const StepIcons = {
+  0: <EmailIcon />,
+  1: <LockOutlinedIcon />,
+  2: <PersonAddIcon />,
+  3: <CheckCircleIcon />
+};
 
 export default function SignUp(props) {
   const [skipped, setSkipped] = useState(new Set());
-  const [receive, setReceive] = useState(false)
-  const [selected, setSelected] = useState(false)
-  const [email, setEmail] = useState("")
-  const [code, setCode] = useState("")
-  const [password, setPassword] = useState("")
-  const [validatepw, setValidatepw] = useState("")
-  let [activeStep, setActiveStep] = useState(0);
-  let navigate = useNavigate()
-
+  const [email, setEmail] = useState("");
+  const [activeStep, setActiveStep] = useState(0);
+  const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const [step3Tokens, setStep3Tokens] = useState("");
   const { showNotification } = useNotification();
   
-  const [barState, setBarState] = React.useState({
+  // Snackbar state
+  const [barState, setBarState] = useState({
     open: false,
     vertical: 'top',
     horizontal: 'center',
-    message: ""
+    message: "",
+    severity: "info"
   });
-  const { vertical, horizontal, open,message } = barState;
+  const { vertical, horizontal, open, message, severity } = barState;
 
-  const { loginState, setLoginState } = props
-  const [transactionNumber, setTransactionNumber] = useState("000000")
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      event.preventDefault();
-      // Custom logic to handle the refresh
-      // Display a confirmation message or perform necessary actions
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
+  const { loginState, setLoginState } = props;
+  
 
 
-  if (true === loginState) {
-    return <Navigate to="/" replace />
+  
+
+  // Redirect if already logged in
+  if (loginState === true) {
+    return <Navigate to="/" replace />;
   }
+  console.log("[[")
+
   const validate = (nickname, username, password) => {
-    return true
-  }
-
-  const handleReceive = (event) => {
-    setReceive(!receive)
-  }
-  const handleSubmit = (event) => {
-    const data = new FormData(event.currentTarget);
-    console.log(data)
-    setActiveStep(1)
-    if (!validate(data.get('nickname'), data.get('username'), data.get('password')), data.get('selected')) {
-      // props.setBarState({...props.barState, message:"please check your input", open:true})
-      console.log("error!!")
-    }
-    else {
-      console.log({
-        email: data.get('email'),
-        password: data.get('password'),
-        nickname: data.get('nickname'),
-        recv: receive
-      });
-
-      AccountUtil.registerStep1(data, activeStep, setActiveStep, setBarState, setTransactionNumber)
-    }
+    return true;
   };
 
+
   const step1 = (event) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    console.log(data.get("email"))
-    AccountUtil.registerStep1(activeStep, setActiveStep, data.get("email"))
-  }
-  const step2 = (event) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    AccountUtil.registerStep2(activeStep, setActiveStep, data.get("digits"))
-    setActiveStep(activeStep + 1)
-  }
-  const step3 = (event) => {
-    event.preventDefault()
-    if (password == validatepw) {
-      AccountUtil.registerStep3(activeStep, setActiveStep, password, email,barState, setBarState)
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const emailValue = data.get("email");
+    setEmail(emailValue);
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailValue)) {
+      showNotification("Please enter a valid email address", "error")
+      return;
     }
-    else return
-  }
+    setIsLoading(true);
+
+        
+    // Simulate API delay for demo purposes
+      AccountUtil.registerStep1(emailValue).catch((err) => {
+        console.log(err)
+        return
+      }).then(
+        (response) => {
+          console.log(response);
+          if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
+            console.log(emailValue)
+            AccountUtil.sendVerificationCode(emailValue).catch((err) => {
+              console.log(err)
+              return
+            }).then(
+              (response) => {
+                console.log(response);
+                if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
+                  console.log("Verification code sent")
+                  setIsLoading(false);
+                  setActiveStep(activeStep + 1)
+                  showNotification("Verification code sent", "success")
+                }
+                else {
+                  showNotification("Please check your input", "error")
+                }
+              }
+            )
+          }
+          else {
+            showNotification("Please check your input", "error")
+          }
+        }
+      )
+
+  };
+
+  const step2 = (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    const data = new FormData(event.currentTarget);
+    const codeValue = data.get("digits");
+    
+    // Validate the code is 6 digits
+    if (!/^\d{6}$/.test(codeValue)) {
+      showNotification("Please enter a valid 6-digit code", "error")
+      setIsLoading(false);
+      return;
+    }
+    
+    // Simulate API delay for demo purposes
+      AccountUtil.registerStep2(email, codeValue).then(
+        (response) => { 
+          console.log(response);
+          if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
+            setActiveStep(2);
+            setIsLoading(false);
+            setStep3Tokens(response.data.message);
+          }
+          else {
+            showNotification("Please check your input", "error")
+            setIsLoading(false);
+          }
+        }
+      )
+  };
+
+  const step3 = (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    let password = event.currentTarget.password.value
+    let validatepw = event.currentTarget.confirmPassword.value
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    if (!strongPasswordRegex.test(password)) {
+      setPasswordError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character");
+      setIsLoading(false);
+      return;
+    }
+    
+    if (password !== validatepw) {
+      setPasswordError("Passwords don't match");
+      setIsLoading(false);
+      return;
+    }
+    
+
+    if (step3Tokens == null || step3Tokens == undefined || step3Tokens === "") {
+      showNotification("Please restart from the beginning", "error")
+      setIsLoading(false);
+      return;
+    }
+
+    AccountUtil.registerStep3(email, password, step3Tokens).then(
+      (response) => {
+        console.log(response)
+        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
+          setActiveStep(activeStep + 1)
+        }
+        else {
+          console.log("Please check your input")
+          console.log(response.data.message)
+          setBarState({ ...barState, open: true, message:response.data.message})
+
+        }
+        setIsLoading(false);
+      }
+    )
+  };
+
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-
-    setBarState({...barState, open:false});
+    setBarState({...barState, open: false});
   };
-  const handlePasswordChange = (event) => {
-    setPassword(event.currentTarget.value)
-  }
 
-  const handlePasswordValidateChange = (event) => {
-    setValidatepw(event.currentTarget.value)
-  }
 
-  const isStepOptional = (step) => {
-    return false;
-  };
 
   const previousStep = () => {
-    setActiveStep(activeStep - 1)
-  }
+    setActiveStep(activeStep - 1);
+  };
 
   const isStepSkipped = (step) => {
     return skipped.has(step);
   };
-  const jumpToLoginPage = () => {
-    navigate("account/login")
-  }
-  const steps = [
-    'Input Email',
-    'Validate',
-    'Input Password',
-    'Done',
-  ];
-  let stepComponent = (<div>something must went wrong!!</div>)
 
-  if (activeStep == 0) {
-    stepComponent = (
-      <ThemeProvider theme={defaultTheme}>
-        <Container component="main" maxWidth="xs">
-          <CssBaseline />
-          <Box
-            sx={{
-              marginTop: 8,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign up
-            </Typography>
-            <Box component="form" noValidate onSubmit={step1} sx={{ mt: 3 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
-                    onChange={(event)=>{
-                      setEmail(event.target.value)
-                    }}
-                  />
+  const jumpToLoginPage = () => {
+    navigate("/account/login");
+  };
+
+  const steps = [
+    'Email Address',
+    'Verification',
+    'Set Password',
+    'Complete',
+  ];
+
+  // Step Content Components
+  const StepContent = () => {
+    switch (activeStep) {
+      case 0:
+        return (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
+                <EmailIcon fontSize="large" />
+              </Avatar>
+              <Typography component="h1" variant="h4" gutterBottom>
+                Create Account
+              </Typography>
+              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
+                Enter your email to get started with your new account
+              </Typography>
+              
+              <Box component="form" noValidate onSubmit={step1} sx={{ width: '100%' }}>
+                <TextField
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  // onChange={(event) => setEmail(event.target.value)}
+                  // value={email}
+                  sx={{ mb: 2 }}
+                  variant="outlined"
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  disabled={isLoading}
+                  sx={{ py: 1.5 }}
+                >
+                  {isLoading ? "Sending Verification..." : "Continue"}
+                </Button>
+                <Grid container justifyContent="center" sx={{ mt: 3 }}>
+                  <Grid item>
+                    <Link href="/account/login" variant="body2" color="primary.main">
+                      Already have an account? Sign in
+                    </Link>
+                  </Grid>
                 </Grid>
-              </Grid>
+              </Box>
+            </Box>
+        );
+      case 1:
+        return (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
+                <LockOutlinedIcon fontSize="large" />
+              </Avatar>
+              <Typography component="h1" variant="h4" gutterBottom>
+                Verify Email
+              </Typography>
+              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 1 }}>
+                We've sent a verification code to
+              </Typography>
+              <Typography variant="body1" fontWeight="bold" sx={{ mb: 3 }}>
+                {email}
+              </Typography>
+              
+              <Box component="form" noValidate onSubmit={step2} sx={{ width: '100%' }}>
+                <TextField
+                  required
+                  fullWidth
+                  id="digits"
+                  label="6-Digit Code"
+                  name="digits"
+                  placeholder="000000"
+                  inputProps={{ maxLength: 6 }}
+                  sx={{ mb: 2 }}
+                />
+                
+                <Stack direction="row" spacing={2}>
+                  <Button
+                    onClick={previousStep}
+                    variant="outlined"
+                    sx={{ py: 1.5, flex: 1 }}
+                    disabled={isLoading}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{ py: 1.5, flex: 2 }}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Verifying..." : "Verify Code"}
+                  </Button>
+                </Stack>
+                <CountDownButton email={email} activeStep={activeStep} />
+              </Box>
+            </Box>
+        );
+        
+      case 2:
+        return (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
+                <PersonAddIcon fontSize="large" />
+              </Avatar>
+              <Typography component="h1" variant="h4" gutterBottom>
+                Set Password
+              </Typography>
+              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
+                Create a secure password for your new account
+              </Typography>
+              
+              <Box component="form" noValidate onSubmit={step3} sx={{ width: '100%' }}>
+                <TextField
+                  required
+                  fullWidth
+                  id="password"
+                  label="Password"
+                  name="password"
+                  type="password"
+                  error={!!passwordError}
+                  sx={{ mb: 2 }}
+                />
+                <TextField
+                  required
+                  fullWidth
+                  id="confirmPassword"
+                  label="Confirm Password"
+                  type="password"
+                  error={!!passwordError}
+                  helperText={passwordError}
+                  sx={{ mb: 2 }}
+                />
+                
+                <Stack direction="row" spacing={2}>
+                  <Button
+                    onClick={previousStep}
+                    variant="outlined"
+                    sx={{ py: 1.5, flex: 1 }}
+                    disabled={isLoading}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{ py: 1.5, flex: 2 }}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating Account..." : "Complete Registration"}
+                  </Button>
+                </Stack>
+              </Box>
+            </Box>
+        );
+        
+      case 3:
+        return (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+              }}
+            >
+              <Avatar sx={{ m: 2, bgcolor: 'success.main', width: 64, height: 64 }}>
+                <CheckCircleIcon fontSize="large" />
+              </Avatar>
+              <Typography component="h1" variant="h4" gutterBottom>
+                Registration Complete!
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 400 }}>
+                Your account has been successfully created. You can now sign in to access your account.
+              </Typography>
+              
               <Button
-                type="submit"
+                onClick={jumpToLoginPage}
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ py: 1.5 }}
               >
-                Next Step
+                Sign In
               </Button>
-              <Grid container justifyContent="flex-end">
-                <Grid item>
-                  <Link href="/account/login" replace="true" variant="body2">
-                    Already have an account? Sign in
-                  </Link>
-                </Grid>
-              </Grid>
             </Box>
-          </Box>
-          <Copyright sx={{ mt: 5 }} />
-        </Container>
-      </ThemeProvider>)
-  } else if (activeStep == 1) {
-    stepComponent = (
-      <Stack spacing={3} sx={{ marginTop: "20%" }}>
-        <Typography variant="body1" gutterBottom>
-          We have sent an email in your box.
-          Please Enter 6 digits numbers here
-        </Typography>
-        <Box component="form" noValidate onSubmit={step2} sx={{ mt: 3 }}>
-        <TextField
-          required
-          id="outlined-required"
-          label="6 digits"
-          name="digits"
-        />
-        <Stack direction="row" spacing={2}>
-          <Button
-            onClick={previousStep}
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >Previous Step</Button>
-          <Button
-            type='submit'
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >Next Step</Button>
-
-          </Stack>
-          </Box>
-      </Stack>)
-  } else if (activeStep == 2) {
-    stepComponent = (
-
-      <Stack spacing={3} sx={{ marginTop: "20%" }} >
-        <Typography variant="body1" gutterBottom>
-          Last Step:Some optional information needed!
-        </Typography>
-        <Box component="form" noValidate onSubmit={step3} sx={{ mt: 3 }}>
-
-        <TextField
-          required
-          id="outlined-required"
-          label="Password"
-          name='password'
-          type="password"
-            onChange={handlePasswordChange}
-        />
-        <TextField
-          required
-          id="outlined-required"
-          label="Retype Password"
-          type='password'
-            onChange={handlePasswordValidateChange}
-        />
-        <Stack direction="row" spacing={2}>
-
-          <Button
-            type='submit'
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >Next Step</Button>
-        
-
-        </Stack>
-        </Box>
-
-
-
-      </Stack>)
-  } else if (activeStep == 3) {
-    stepComponent = (
-      <Stack spacing={3} sx={{ marginTop: "20%" }}>
-        <Typography variant="body1" gutterBottom>
-          Successful, Now you can login!
-        </Typography>
-        <Button
-          onClick={jumpToLoginPage}
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-        >Go to login page</Button>
-      </Stack>)
-  }
-
-
-
-  return (<Box sx={{ width: '60%', marginLeft: "20%", marginTop: "5%" }}>
-    <Snackbar
-      anchorOrigin={{ vertical, horizontal }}
-      open={open}
-      message={message}
-      key={vertical + horizontal}
-      autoHideDuration={5000}
-      onClose={handleClose}
-
-    />
-
-    <Stepper activeStep={activeStep}>
-      {steps.map((label, index) => {
-        const stepProps = {};
-        const labelProps = {};
-        if (isStepOptional(index)) {
-          labelProps.optional = (
-            <Typography variant="caption">Optional</Typography>
-          );
-        }
-        if (isStepSkipped(index)) {
-          stepProps.completed = false;
-        }
-        return (
-          <Step key={label} {...stepProps}>
-            <StepLabel {...labelProps}>{label}</StepLabel>
-          </Step>
         );
-      })}
-    </Stepper>
-    {stepComponent}
-  </Box>)
+        
+      default:
+        return <Typography>Something went wrong!</Typography>;
+    }
+  };
 
-
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Container component="main" maxWidth="sm" sx={{ mb: 8 }}>
+        <Snackbar
+          anchorOrigin={{ vertical, horizontal }}
+          open={open}
+          onClose={handleClose}
+          autoHideDuration={5000}
+          sx={{ mt: 6 }}
+        >
+          <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+            {message}
+          </Alert>
+        </Snackbar>
+        
+        <Paper
+          elevation={3}
+          sx={{
+            mt: 8,
+            p: 4,
+            pt: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+          }}
+        >
+          <Box sx={{ pt: 2, pb: 4 }}>
+            <Stepper activeStep={activeStep} alternativeLabel>
+              {steps.map((label, index) => {
+                const stepProps = {};
+                const labelProps = {};
+                
+                if (isStepSkipped(index)) {
+                  stepProps.completed = false;
+                }
+                
+                return (
+                  <Step key={label} {...stepProps}>
+                    <StepLabel 
+                      {...labelProps}
+                      StepIconProps={{
+                        icon: StepIcons[index]
+                      }}
+                    >
+                      {label}
+                    </StepLabel>
+                  </Step>
+                );
+              })}
+            </Stepper>
+          </Box>
+          
+          <Divider sx={{ mb: 4 }} />
+          
+          <StepContent />
+        </Paper>
+        
+        <Copyright sx={{ mt: 5 }} />
+      </Container>
+    </ThemeProvider>
+  );
 }

@@ -68,13 +68,19 @@ function register(serviceWorkerRegistration) {
     );
 }
 
+
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+//reportWebVitals();
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistration().then(existingRegistration => {
         if (existingRegistration) {
             console.log('Service Worker already registered:', existingRegistration.scope);
         } else {
             console.log('No Service Worker found. Registering a new one...');
-            navigator.serviceWorker.register('./NotificationReceiver.js').then(
+            navigator.serviceWorker.register('/serviceworkers/NotificationReceiver.js').then(
                 registration => {
                     console.log('Service Worker registered successfully:', registration.scope);
 
@@ -109,9 +115,3 @@ if ('serviceWorker' in navigator) {
 } else {
     console.error('Service workers are not supported in this browser.');
 }
-
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-//reportWebVitals();
