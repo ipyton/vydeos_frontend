@@ -129,7 +129,7 @@ export default function FunctionDrawer(props) {
       (response) => {
         console.log(response)
         let tmp = []
-
+        console.log(response)
         response.forEach(element => {
           console.log(element.route == "/**")
           if (element.route === "/**") {

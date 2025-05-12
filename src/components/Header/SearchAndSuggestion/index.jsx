@@ -10,7 +10,7 @@ export default function (props) {
 
 
     return <List id="category"  hidden={searchSuggestionOpen} sx={{
-        marginTop: "1%", width: '100%', maxWidth: 360, maxHeight: 500, bgcolor: 'background.paper', position: 'absolute', left: left ? (100 * ((window.innerWidth + 240) / (2 * window.innerWidth)) + '%') : (100 * ((window.innerWidth + 30) / (2 * window.innerWidth)) + '%'), top: 40, transform: 'translate(-50%, 0)', zIndex: 500,
+        marginTop: "1%", width: '80%', maxWidth: 280, maxHeight: 500, bgcolor: 'background.paper', position: 'absolute', left: left ? (100 * ((window.innerWidth + 240) / (2 * window.innerWidth)) + '%') : (100 * ((window.innerWidth + 30) / (2 * window.innerWidth)) + '%'), top: 40, transform: 'translate(-50%, 0)', zIndex: 500,
         overflow: "scroll", border: '1px solid black'  // 这里增加黑色边框
 
     }}>

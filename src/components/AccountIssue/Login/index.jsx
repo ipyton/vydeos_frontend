@@ -20,7 +20,7 @@ import AccountUtil from '../../../util/io_utils/AccountUtil';
 import { useNotification } from '../../../Providers/NotificationProvider';
 import localforage from 'localforage';
 import { Paper, Divider, Fade, Alert, Snackbar, CircularProgress } from '@mui/material';
-
+import AuthUtil from '../../../util/io_utils/AuthUtil';
 // Custom theme with a more modern palette - matching the signup theme
 const theme = createTheme({
   palette: {
@@ -244,11 +244,21 @@ export default function Login(props) {
             const content = JSON.parse(userInfoResponse.data.message);
             localStorage.setItem("userInfo", JSON.stringify(content));
             showNotification("Login successful!", "success")
-            
+            AuthUtil.getPaths().then(
+              (response1) => {
+                if (response1.data.code === 0) {
+                  localforage.setItem("paths", JSON.parse(response1.data.message)).then(  
+                    () => {
+                      setTimeout(() => {
+                        setLogin(true);
+                      }, 500);
+                    }
+                  )
+                }
+              }
+            )
             // Give the notification time to show before redirecting
-            setTimeout(() => {
-              setLogin(true);
-            }, 500);
+
           }
         } catch (err) {
           showNotification("Error retrieving user information", "error");

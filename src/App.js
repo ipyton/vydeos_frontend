@@ -10,6 +10,7 @@ import localforage from 'localforage';
 import { StrictMode } from 'react';
 import { useNotification } from './Providers/NotificationProvider';
 import AuthUtil from './util/io_utils/AuthUtil';
+
 function checkNetworkStatus() {
   return navigator.onLine;
 }
@@ -50,22 +51,7 @@ function App() {
               if (responseData.code === 0) {
                 localforage.setItem("userId", response.data.message)
                 localStorage.setItem("userId", response.data.message)
-                AuthUtil.getPaths().then(
-                  (response1) => {
-                    console.log(response)
-                    if (response1.data.code === 0) {
-                      
-                       localforage.setItem("paths", JSON.parse(response1.data.message)).then(  
-                        () => {
 
-                          console.log(response)
-                          setPaths(JSON.parse(response1.data.message))
-                          setLogin(true)
-                        }
-                       )
-                    }
-                  }
-                )
 
               } else {
                 showNotification(responseData.message, "error");
@@ -83,6 +69,8 @@ function App() {
     return <EndpointNotAvailableError />;
   }
 
+
+
   if (login === false) {
     return (
       <StrictMode>
@@ -98,6 +86,7 @@ function App() {
   }
 
   if (login === true) {
+
     return (
       <BrowserRouter>
         <Contents 
