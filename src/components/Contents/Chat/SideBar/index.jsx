@@ -10,14 +10,16 @@ import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../../../Providers/NotificationProvider';
-
+import { useThemeMode } from '../../../../Themes/ThemeContext';
 export default function SideBar(props) {
   let { select, setSelect, isMobile } = props;
   const [userRecords, setUserRecords] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const { showNotification } = useNotification();
-  
+  const { mode } = useThemeMode();
+
+
   let location = useLocation();
   const refresh = useSelector((state) => state.refresh.value.refresh);
   
@@ -69,25 +71,24 @@ export default function SideBar(props) {
         flexDirection: 'column',
         borderRadius: 0,
         overflow: 'hidden',
-        backgroundColor: '#ffffff',
+        backgroundColor: mode === 'dark' ? '#121212' : '#ffffff',
         position: 'relative',
       }}
     >
       <Header />
       
       <Box sx={{ 
-  backgroundColor: '#f5f7fa',
-  borderBottom: '1px solid rgba(0,0,0,0.08)',
-  position: 'sticky',
-  top: 0,
-  zIndex: 1,
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center', // 关键点：垂直居中
-
-  height: '70px',
-}}>
+        backgroundColor: mode === 'dark' ? '#1e1e1e' : '#f5f7fa',
+        borderBottom: mode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1,
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center', // 关键点：垂直居中
+        height: '70px',
+      }}>
   <Paper
     elevation={1}
     sx={{
@@ -96,7 +97,7 @@ export default function SideBar(props) {
       alignItems: 'center',
       borderRadius: 8,
       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-      backgroundColor: '#ffffff',
+      backgroundColor: mode === 'dark' ? '#333333' : '#ffffff',
       width: '90%', // Changed from fixed pixel value to percentage
       maxWidth: '300px', // Added max-width for larger screens
       height: '70%',
@@ -104,7 +105,7 @@ export default function SideBar(props) {
       '&:hover': {
         boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
       },
-      border: '1px solid rgba(0,0,0,0.03)'
+      border: mode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.03)'
     }}
   >
     <SearchIcon sx={{ 
@@ -136,7 +137,7 @@ export default function SideBar(props) {
       <Box sx={{ 
         flexGrow: 1, 
         overflow: 'auto',
-        backgroundColor: '#ffffff',
+        backgroundColor: mode === 'dark' ? '#121212' : '#ffffff',
         width: '100%',
         '&::-webkit-scrollbar': {
           width: '4px',
@@ -196,7 +197,7 @@ export default function SideBar(props) {
         ) : (
           <List sx={{ 
             width: '100%', 
-            bgcolor: 'background.paper',
+            bgcolor: mode === 'dark' ? '#121212' : 'background.paper',
             p: 0.5,
             '& .MuiListItem-root': {
               borderRadius: 1,

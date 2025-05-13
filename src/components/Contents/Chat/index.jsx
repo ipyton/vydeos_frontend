@@ -8,14 +8,13 @@ import { useLocation } from 'react-router-dom';
 import { useTheme, useMediaQuery } from '@mui/material';
 import Slide from '@mui/material/Slide';
 import Fade from '@mui/material/Fade';
-
 export default function Chat(props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   let height = window.innerHeight * 0.8;
   
   let { refresh, sideBarSelector, setSideBarSelector } = props;
-  
+
   return (
     <Stack
       sx={{

@@ -3,8 +3,11 @@ import { Box, Typography, IconButton } from '@mui/material';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SearchIcon from '@mui/icons-material/Search';
+import { useThemeMode } from '../../../../../Themes/ThemeContext';
 
 export default function Header() {
+  const { mode } = useThemeMode();
+
   return (
     <Box 
       sx={{
@@ -12,7 +15,7 @@ export default function Header() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '16px 20px',
-        backgroundColor: 'primary.main',
+        backgroundColor: mode === 'dark' ? '#333333' : 'primary.main',
         color: 'white',
         borderRadius: '12px 12px 0 0',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)'

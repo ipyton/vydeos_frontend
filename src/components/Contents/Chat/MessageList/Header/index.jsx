@@ -10,6 +10,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { useThemeMode } from '../../../../../Themes/ThemeContext';
 
 // Create a simple avatar utility function here instead of importing
 const stringToColor = (string) => {
@@ -55,7 +56,7 @@ export default function Header(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+  const { mode } = useThemeMode();
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -76,13 +77,13 @@ export default function Header(props) {
         elevation={0}
         sx={{ 
           borderBottom: '1px solid',
-          borderColor: 'divider',
-          backgroundColor: 'white',
+          borderColor: theme.palette.divider,
+          backgroundColor: mode === 'dark' ? '#1e1e1e' : 'white',
           color: 'text.primary'
         }}
       >
         <Toolbar>
-          {isMobile && (
+          {isMobile && (  
             <IconButton
               edge="start"
               color="inherit"

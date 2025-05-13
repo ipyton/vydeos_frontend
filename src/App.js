@@ -10,7 +10,7 @@ import localforage from 'localforage';
 import { StrictMode } from 'react';
 import { useNotification } from './Providers/NotificationProvider';
 import AuthUtil from './util/io_utils/AuthUtil';
-
+import { ThemeContextProvider } from './Themes/ThemeContext';
 function checkNetworkStatus() {
   return navigator.onLine;
 }
@@ -89,13 +89,15 @@ function App() {
 
     return (
       <BrowserRouter>
-        <Contents 
-          setLogin={async (newState) => {
-            setLogin(newState);
-            localStorage.setItem('isLoggedIn', newState.toString());
-            
-          }} 
-        />
+        <ThemeContextProvider>
+          <Contents 
+            setLogin={async (newState) => {
+              setLogin(newState);
+              localStorage.setItem('isLoggedIn', newState.toString());
+              
+            }} 
+          />
+        </ThemeContextProvider>
       </BrowserRouter>
     );
   }

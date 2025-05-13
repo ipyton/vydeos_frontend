@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import format from 'date-fns/format';
-
+import { useThemeMode } from '../../../../../../Themes/ThemeContext';
 const MessageItem = styled(Paper)(({ theme, position }) => ({
   padding: theme.spacing(1.5),
   borderRadius: position === 'right' ? '18px 4px 18px 18px' : '4px 18px 18px 18px',
@@ -15,14 +15,18 @@ const MessageItem = styled(Paper)(({ theme, position }) => ({
   wordBreak: 'break-word',
   position: 'relative',
   boxShadow: 'none',
-  backgroundColor: position === 'right' ? theme.palette.primary.light : theme.palette.grey[100],
+  backgroundColor: position === 'right' 
+  ? (theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.light) 
+  : (theme.palette.mode === 'dark' ? '#2d2d2d' : theme.palette.grey[100]),
   color: position === 'right' ? theme.palette.primary.contrastText : theme.palette.text.primary,
 }));
 
 const TimeStamp = styled(Typography)(({ theme, position }) => ({
   fontSize: '0.7rem',
-  color: position === 'right' ? 'rgba(255, 255, 255, 0.7)' : theme.palette.text.secondary,
-  marginTop: theme.spacing(0.5),
+  color: position === 'right' 
+  ? 'rgba(255, 255, 255, 0.7)' 
+  : theme.palette.text.secondary,
+    marginTop: theme.spacing(0.5),
   display: 'inline-block',
   marginRight: position === 'right' ? 0 : theme.spacing(1),
   marginLeft: position === 'right' ? theme.spacing(1) : 0,
@@ -108,8 +112,9 @@ export default function SingleMessage(props) {
                     sx={{ 
                       fontSize: '0.8rem', 
                       ml: 0.5,
-                      color: content.read ? '#34b7f1' : 'rgba(255, 255, 255, 0.7)'
-                    }} 
+                      color: content.read 
+                      ? (theme.palette.mode === 'dark' ? '#90caf9' : '#34b7f1') 
+                      : 'rgba(255, 255, 255, 0.7)'                                        }} 
                   />
                 )}
               </Box>

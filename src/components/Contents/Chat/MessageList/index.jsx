@@ -9,7 +9,7 @@ import MessageUtil from "../../../../util/io_utils/MessageUtil";
 import DatabaseManipulator from "../../../../util/io_utils/DatabaseManipulator";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-
+import { useThemeMode } from "../../../../Themes/ThemeContext";
 export default function ChatContainer(props) {
   const { select, setSelect, isMobile } = props;
   const [chatRecords, setChatRecords] = useState([]);
@@ -17,7 +17,7 @@ export default function ChatContainer(props) {
   const [error, setError] = useState(null);
   const location = useLocation();
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
-  const theme = useTheme();
+  const { mode, toggleMode } = useThemeMode();
 
   const handleBackClick = () => {
     setSelect(null);
@@ -35,7 +35,7 @@ export default function ChatContainer(props) {
               justifyContent: 'center',
               alignItems: 'center',
               p: isMobile ? 2 : 4,
-              backgroundColor: '#f5f7fb',
+              backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb',
               borderRadius: isMobile ? 0 : 2,
               width: "100%",
               height: "100%",
@@ -89,7 +89,7 @@ export default function ChatContainer(props) {
         height: isMobile ? "100vh" : "100%",
         borderRadius: 0,
         position: 'relative',
-        backgroundColor: '#ffffff'
+        backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb'
       }}
     >
       {isMobile && (

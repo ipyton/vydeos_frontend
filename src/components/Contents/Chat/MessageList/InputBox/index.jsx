@@ -13,13 +13,15 @@ import DatabaseManipulator from '../../../../../util/io_utils/DatabaseManipulato
 import { useNotification } from '../../../../../Providers/NotificationProvider';
 
 // Styled components
-const StyledPaper = styled(Paper)(({ theme }) => ({
+const StyledPaper = styled(Paper)(({ theme, isMobile }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(1),
   borderRadius: 20,
-  boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+  boxShadow: theme => theme.palette.mode === 'dark' ? '0 2px 5px rgba(255,255,255,0.05)' : '0 2px 5px rgba(0,0,0,0.1)',
   width: '100%',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
+  borderTop: isMobile ? `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}` : 'none'
 }));
 
 const StyledTextField = styled(TextField)({
@@ -38,7 +40,7 @@ const StyledTextField = styled(TextField)({
 });
 
 const SendButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
   color: 'white',
   '&:hover': {
     backgroundColor: theme.palette.primary.dark,
@@ -121,7 +123,7 @@ export default function InputBox(props) {
 
   return (
     <Stack direction="row" sx={{ width: "100%", padding: 2 }} alignItems="center" spacing={1}>
-      <StyledPaper elevation={0}>
+      <StyledPaper elevation={0} isMobile={window.innerWidth <= 768}>
         <IconButton
           color="primary"
           aria-label="Attach files"

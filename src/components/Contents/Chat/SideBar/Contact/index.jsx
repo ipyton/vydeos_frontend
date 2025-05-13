@@ -2,11 +2,13 @@ import * as React from 'react';
 import { ListItem, ListItemText, ListItemAvatar, Avatar, ListItemButton, Badge, Typography, Box } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
+import { useThemeMode } from '../../../../../Themes/ThemeContext';
 
 export default function Contact(props) {
   const { userId, name, avatar, unreadCount, lastMessage, lastMessageTime } = props.content;
   const { selected, onClick, isMobile } = props;
-  
+  const { mode } = useThemeMode();
+
   const isSelected = React.useMemo(() => {
     if (!selected) {
       return false;
@@ -43,13 +45,13 @@ export default function Contact(props) {
         my: 0,
         mx: 0,
         '&:hover': {
-          backgroundColor: 'rgba(25, 118, 210, 0.08)',
+          backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(25, 118, 210, 0.08)',
         },
         '&.Mui-selected': {
-          backgroundColor: 'rgba(25, 118, 210, 0.12)',
+          backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(25, 118, 210, 0.08)',
           borderLeft: isMobile ? '4px solid #1976d2' : 'none',
           '&:hover': {
-            backgroundColor: 'rgba(25, 118, 210, 0.18)',
+            backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(25, 118, 210, 0.18)',
           }
         }
       }}
@@ -67,7 +69,7 @@ export default function Contact(props) {
             }}
             sx={{
               '& .MuiBadge-badge': {
-                boxShadow: '0 0 0 2px #fff',
+                boxShadow: mode === 'dark' ? '0 0 0 2px #121212' : '0 0 0 2px #fff',
                 fontWeight: 'bold',
                 fontSize: isMobile ? '0.6rem' : '0.75rem',
                 height: isMobile ? '16px' : '20px',
@@ -102,7 +104,7 @@ export default function Contact(props) {
             noWrap
             sx={{ 
               fontWeight: unreadCount ? 700 : 500,
-              color: isSelected ? 'primary.main' : 'text.primary',
+              color: isSelected ? (mode === 'dark' ? '#90caf9' : 'primary.main') : (mode === 'dark' ? '#ffffff' : 'text.primary'),
               fontSize: isMobile ? '0.9rem' : '1rem'
             }}
           >

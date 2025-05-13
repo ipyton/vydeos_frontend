@@ -1,128 +1,175 @@
+import React, { useState } from 'react';
+import { 
+  AppBar,
+  Box,
+  Card,
+  CardContent,
+  Container,
+  CssBaseline,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Paper,
+  Switch,
+  ThemeProvider,
+  Toolbar,
+  Typography,
+  createTheme
+} from '@mui/material';
 
-import  React, {useState} from 'react';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-
-import localforage from 'localforage';
-
+// Material UI icons
 import {
-  DndContext, 
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-
-} from '@dnd-kit/sortable';
-
-
-import ListItem from './ListItem';
-import Item from '../Item';
+  Settings as SettingsIcon,
+  Brightness4 as DarkModeIcon,
+  Notifications as NotificationsIcon,
+  Language as LanguageIcon,
+  Security as SecurityIcon,
+  ArrowBack as ArrowBackIcon
+} from '@mui/icons-material';
+import { useThemeMode } from '../../../Themes/ThemeContext';
+export default function SettingsPage() {
+  // State for dark mode toggle
   
-export default function Settings(props) {
-  const [settings, setSettings]=React.useState([])
+  // State for other settings (for demonstration)
+  const [notifications, setNotifications] = useState(true);
+  const [autoLanguage, setAutoLanguage] = useState(false);
+  const [enhancedSecurity, setEnhancedSecurity] = useState(true);
+  const { mode, toggleMode } = useThemeMode();
 
-  // return (
-  //   <Box display="flex" justifyContent="center">
-  //       <List sx={{ width: '100%', bgcolor: 'background.paper'}} >
-  //     <ListItem>
-  //       <ListItemAvatar>
-  //         <Avatar>
-  //           <ImageIcon />
-  //         </Avatar>
-  //       </ListItemAvatar>
-  //       <ListItemText primary="Photos" />
-  //       <FormControlLabel
-  //       control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
-  //       />
-  //     </ListItem>
-  //     <Divider variant="inset" component="li" />
-  //     <ListItem>
-  //       <ListItemAvatar>
-  //         <Avatar>
-  //           <WorkIcon />
-  //         </Avatar>
-  //       </ListItemAvatar>
-  //       <ListItemText primary="Work" />
-  //       <FormControlLabel
-  //       control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
-  //       />
-  //     </ListItem>
-  //     <Divider variant="inset" component="li" />
-  //     <ListItem>
-  //       <ListItemAvatar>
-  //         <Avatar>
-  //           <BeachAccessIcon />   
-  //         </Avatar>
-  //       </ListItemAvatar>
-  //       <ListItemText primary="Vacation" />
-  //       <FormControlLabel
-  //       control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
-  //       />
-  //     </ListItem>
-  //   </List>
-  //   </Box>
-    
-  // );
-  const [items, setItems] = useState([1,2,3]);
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  // Create theme based on dark mode state
 
 
-  let handleSave= (event)=> {
-    console.log(items)
-  }
-  let handleInvalidCache = (event) => {
-    localforage.clear()
-    window.location.reload()
-  }
+  // Toggle dark mode
 
   return (
-    <div sx={{top:"1%"}}>
-      <DndContext 
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext 
-          items={items}
-          strategy={verticalListSortingStrategy}
-        >
-
-          {items.map(id => <ListItem key={id} id={id} name={id +"uigafdiub"} picture ={"pictures"}/>)}
-        </SortableContext>
-      </DndContext>
-
-      <Button variant="contained" onClick={handleSave} sx={{left:"40%"}}>Save</Button>
-      <Button variant="contained" onClick={handleInvalidCache} sx={{ left: "50%" }}>Invalid Cache</Button>
-
-
-
-    </div>
-
-  );
-  
-  function handleDragEnd(event) {
-    const {active, over} = event;
-    
-    if (active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id);
-        const newIndex = items.indexOf(over.id);
+      <Box sx={{ flexGrow: 1,  minHeight: '100vh' }}>
+        <AppBar position="static">
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="back"
+              sx={{ mr: 2 }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Settings
+            </Typography>
+            <IconButton color="inherit">
+              <SettingsIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
         
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  }
+        <Container maxWidth="md" sx={{ py: 4 }}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <Typography variant="h5" component="h1" sx={{ mb: 3, px: 2 }}>
+              Settings
+            </Typography>
+
+            <Divider sx={{ mb: 3 }} />
+
+            <List>
+              {/* Dark Mode Setting */}
+              <Card sx={{ mb: 2 }}>
+                <CardContent>
+                  <ListItem>
+                    <ListItemIcon>
+                      <DarkModeIcon />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Dark Mode" 
+                      secondary="Toggle between light and dark themes" 
+                    />
+                    <ListItemSecondaryAction>
+                      <Switch
+                        edge="end"
+                        onChange={toggleMode}
+                        color="primary"
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </CardContent>
+              </Card>
+
+              {/* Notifications Setting */}
+              <Card sx={{ mb: 2 }}>
+                <CardContent>
+                  <ListItem>
+                    <ListItemIcon>
+                      <NotificationsIcon />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Notifications" 
+                      secondary="Enable or disable notifications" 
+                    />
+                    <ListItemSecondaryAction>
+                      <Switch
+                        edge="end"
+                        checked={notifications}
+                        onChange={() => setNotifications(!notifications)}
+                        color="primary"
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </CardContent>
+              </Card>
+
+              {/* Language Setting */}
+              <Card sx={{ mb: 2 }}>
+                <CardContent>
+                  <ListItem>
+                    <ListItemIcon>
+                      <LanguageIcon />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Auto-detect Language" 
+                      secondary="Automatically detect and adjust to system language" 
+                    />
+                    <ListItemSecondaryAction>
+                      <Switch
+                        edge="end"
+                        checked={autoLanguage}
+                        onChange={() => setAutoLanguage(!autoLanguage)}
+                        color="primary"
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </CardContent>
+              </Card>
+
+              {/* Security Setting */}
+              <Card sx={{ mb: 2 }}>
+                <CardContent>
+                  <ListItem>
+                    <ListItemIcon>
+                      <SecurityIcon />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Enhanced Security" 
+                      secondary="Enable additional security features" 
+                    />
+                    <ListItemSecondaryAction>
+                      <Switch
+                        edge="end"
+                        checked={enhancedSecurity}
+                        onChange={() => setEnhancedSecurity(!enhancedSecurity)}
+                        color="primary"
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </CardContent>
+              </Card>
+            </List>
+
+
+          </Paper>
+        </Container>
+      </Box>
+  );
 }
