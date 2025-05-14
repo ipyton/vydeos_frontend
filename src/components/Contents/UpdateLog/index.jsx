@@ -24,6 +24,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import HistoryIcon from '@mui/icons-material/History';
 import PendingIcon from '@mui/icons-material/Pending';
+import { useThemeMode } from '../../../Themes/ThemeContext'; 
 
 // Sample update log data
 const updateLogs = [
@@ -66,6 +67,7 @@ const formatDate = (dateString) => {
 };
 
 const UpdateLog = () => {
+  const { mode } = useThemeMode();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [darkMode, setDarkMode] = useState(prefersDarkMode);
   const [activeTab, setActiveTab] = useState(0);
@@ -78,7 +80,7 @@ const UpdateLog = () => {
     () =>
       createTheme({
         palette: {
-          mode: darkMode ? 'dark' : 'light',
+          mode: mode ? 'dark' : 'light',
           primary: {
             main: '#3b82f6',
           },
@@ -90,9 +92,7 @@ const UpdateLog = () => {
     [darkMode],
   );
   
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+
   
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -184,16 +184,7 @@ const UpdateLog = () => {
       <CssBaseline />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', mb: 4 }}>
-          {/* Dark mode toggle */}
-          <IconButton 
-            onClick={toggleDarkMode} 
-            sx={{ position: 'absolute', right: 0, top: 0 }}
-            color="primary"
-            aria-label={`Switch to ${darkMode ? 'light' : 'dark'} mode`}
-          >
-            {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
-          </IconButton>
-          
+
           {/* Logo */}
           <Box sx={{ mb: 2 }}>
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

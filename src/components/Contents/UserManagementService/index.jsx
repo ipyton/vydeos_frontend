@@ -19,7 +19,7 @@ import { alpha } from '@mui/material/styles';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';
 import { useNotification } from '../../../Providers/NotificationProvider';
 import {API_BASE_URL, DOWNLOAD_BASE_URL} from "../../../util/io_utils/URL";
-
+import { useThemeMode } from '../../../Themes/ThemeContext';
 const UserManagementService = () => {
   const [users, setUsers] = useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -35,6 +35,7 @@ const UserManagementService = () => {
   const [availableRoles, setAvailableRoles] = useState([]);
   const [searchError, setSearchError] = useState(false);
   const { showNotification } = useNotification();
+  const { mode } = useThemeMode();
 
   // Fetch available roles on component mount
   useEffect(() => {
@@ -235,20 +236,20 @@ const UserManagementService = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2, bgcolor: alpha('#3f51b5', 0.05), border: '1px solid', borderColor: alpha('#3f51b5', 0.2) }}>
+      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2, bgcolor: mode === 'dark' ? '#1e1e1e' : alpha('#3f51b5', 0.05), border: '1px solid', borderColor: alpha('#3f51b5', 0.2) }}>
         <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#3f51b5', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
           <AdminPanelSettingsIcon sx={{ mr: 2, fontSize: 32 }} />
           User Management
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: mode === 'dark' ? '#fff' : 'black' }}>
           Search for users by email and manage their roles and permissions.
         </Typography>
       </Paper>
 
-      <Card elevation={3} sx={{ borderRadius: 2, mb: 4 }}>
+      <Card elevation={3} sx={{ borderRadius: 2, mb: 4, bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper' }}>
         <CardContent>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-            <SearchIcon sx={{ mr: 1 }} />
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', display: 'flex', alignItems: 'center', color: mode === 'dark' ? '#fff' : 'black' }}>
+            <SearchIcon sx={{ mr: 1, color: mode === 'dark' ? '#fff' : 'black' }} />
             Find User
           </Typography>
           
@@ -257,26 +258,39 @@ const UserManagementService = () => {
             variant="outlined"
             fullWidth
             value={searchEmail}
+            
             onChange={(e) => setSearchEmail(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <EmailIcon color="action" />
+                  <EmailIcon sx={{ color: mode === 'dark' ? '#fff' : 'black' }} />
                 </InputAdornment>
               ),
               endAdornment: searching ? (
                 <InputAdornment position="end">
-                  <CircularProgress size={20} />
+                  <CircularProgress size={20} color="primary" />
                 </InputAdornment>
               ) : null
             }}
-            placeholder="Enter user email address..."
+            placeholder="Enter user email address."
             error={searchError}
             helperText={searchError ? "User not found or error occurred" : ""}
-            sx={{ mb: 1 }}
-          />
+            sx={{
+              input: {
+                color: mode === 'dark' ? '#fff' : 'black',
+              },
+              label: {
+                color: mode === 'dark' ? '#aaa' : 'black',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: mode === 'dark' ? '#2c2c2c' : '#e0e0e0',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: mode === 'dark' ? '#444' : '#bdbdbd',
+              },
+            }}  />
           
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1, color: mode === 'dark' ? '#fff' : 'black' }}>
             Enter the complete email address of the user you want to manage.
           </Typography>
         </CardContent>

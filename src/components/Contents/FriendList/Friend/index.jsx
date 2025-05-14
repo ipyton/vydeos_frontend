@@ -13,6 +13,7 @@ import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import SocialMediaUtil from '../../../../util/io_utils/SocialMediaUtil';
+import { useThemeMode } from '../../../../Themes/ThemeContext';
 
 import { useEffect, useState } from 'react';
 
@@ -56,7 +57,7 @@ export default function (props) {
     const [value, setValue] = React.useState(0)
     const [list, setList] = React.useState([])
     const {setSelector} = props
-
+    const { mode } = useThemeMode();
 
     const [windowHeight, setWindowHeight] = useState(window.innerHeight);  // 存储窗口的高度
 
@@ -83,7 +84,7 @@ export default function (props) {
         setValue(index);
     };
     return (<Stack sx={{ boxShadow: 1, borderRadius: 2, maxHeight: '100%', }} spacing={2}>
-        <Box sx={{ bgcolor: 'background.paper' }}>
+        <Box sx={{ bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper' }}>
             <AppBar position="static">
                 <Tabs
                     value={value}

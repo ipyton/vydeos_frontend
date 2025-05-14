@@ -22,6 +22,7 @@ import { alpha } from '@mui/material/styles';
 import { useNotification } from '../../../Providers/NotificationProvider';
 import {API_BASE_URL, DOWNLOAD_BASE_URL} from "../../../util/io_utils/URL.js";
 import AuthUtil from '../../../util/io_utils/AuthUtil.js';
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 const RolePermissionPage = () => {
   const [roles, setRoles] = useState([]);
@@ -41,7 +42,7 @@ const RolePermissionPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRoleIndex, setSelectedRoleIndex] = useState(null);
   const { showNotification } = useNotification();
-
+  const { mode } = useThemeMode();
   const pathTypes = ["nav", "api", "resource", "admin"];
 
   useEffect(() => {
@@ -285,11 +286,11 @@ const RolePermissionPage = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2, bgcolor: alpha('#3f51b5', 0.05), border: '1px solid', borderColor: alpha('#3f51b5', 0.2) }}>
+      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2, bgcolor: mode === 'dark' ? '#1e1e1e' : alpha('#3f51b5', 0.05), border: '1px solid', borderColor: alpha('#3f51b5', 0.2) }}>
         <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#3f51b5', fontWeight: 'bold' }}>
           Role Permission Management
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: mode === 'dark' ? '#fff' : 'black' }}>
           Manage roles and their access permissions to different paths in the application.
         </Typography>
       </Paper>
@@ -297,19 +298,19 @@ const RolePermissionPage = () => {
       <Grid container spacing={3}>
         {/* Role List */}
         <Grid item xs={12} md={5}>
-          <Card elevation={3} sx={{ borderRadius: 2, height: '100%' }}>
+          <Card elevation={3} sx={{ borderRadius: 2, height: '100%', bgcolor: mode === 'dark' ? '#1e1e1e' : 'white' }}>
             <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-                <PersonIcon sx={{ mr: 1 }} />
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', display: 'flex', alignItems: 'center', color: mode === 'dark' ? '#fff' : 'black' }}>
+                <PersonIcon sx={{ mr: 1, color: mode === 'dark' ? '#fff' : 'black' }} />
                 Available Roles
               </Typography>
               
               {loading && roles.length === 0 ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                  <CircularProgress />
+                  <CircularProgress color="primary" />
                 </Box>
               ) : roles.length > 0 ? (
-                <List sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
+                <List sx={{ bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper', borderRadius: 1 }}>
                   {roles.map((role, index) => (
                     <React.Fragment key={role.roleId}>
                       <ListItem
@@ -321,32 +322,33 @@ const RolePermissionPage = () => {
                           mb: 1,
                           '&:hover': { bgcolor: alpha('#3f51b5', 0.08) },
                           '&.Mui-selected': { bgcolor: alpha('#3f51b5', 0.12) },
+                          color: mode === 'dark' ? '#fff' : 'black'
                         }}
                         secondaryAction={
                           <IconButton
                             edge="end"
                             aria-label="delete"
                             onClick={(e) => handleDeleteRole(e, role)}
-                            sx={{ color: 'error.main' }}
+                            sx={{ color: mode === 'dark' ? '#fff' : 'black' }}
                           >
-                            <DeleteIcon />
+                            <DeleteIcon sx={{ color: mode === 'dark' ? '#fff' : 'black' }} />
                           </IconButton>
                         }
                       >
                         <ListItemAvatar>
-                          <Avatar sx={{ bgcolor: alpha('#3f51b5', 0.8) }}>
+                          <Avatar sx={{ bgcolor: alpha('#3f51b5', 0.8), color: mode === 'dark' ? '#fff' : 'black' }}>
                             <PersonIcon />
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText
                           primary={
-                            <Typography variant="subtitle1" fontWeight="medium">
+                            <Typography variant="subtitle1" fontWeight="medium" sx={{ color: mode === 'dark' ? '#fff' : 'black' }}>
                               {role.roleName}
                             </Typography>
                           }
                           secondary={
                             <>
-                              <Typography variant="body2" color="text.secondary">
+                              <Typography variant="body2" sx={{ color: mode === 'dark' ? '#fff' : 'black' }}>
                                 ID: {role.roleId}
                               </Typography>
                               <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -402,10 +404,10 @@ const RolePermissionPage = () => {
 
         {/* Role Editor */}
         <Grid item xs={12} md={7}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
+          <Card elevation={3} sx={{ borderRadius: 2, bgcolor: mode === 'dark' ? '#1e1e1e' : 'white' }}>
             <CardContent>
-              <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-                <SaveIcon sx={{ mr: 1 }} />
+              <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', display: 'flex', alignItems: 'center', color: mode === 'dark' ? '#fff' : 'black' }}>
+                <SaveIcon sx={{ mr: 1, color: mode === 'dark' ? '#fff' : 'black' }} />
                 {roleId === -1 ? "Create New Role" : "Edit Role"}
               </Typography>
 
@@ -449,13 +451,26 @@ const RolePermissionPage = () => {
                 }}
                 fullWidth
                 variant="outlined"
-                sx={{ mb: 3 }}
+                sx={{
+                  input: {
+                    color: mode === 'dark' ? '#fff' : 'black',
+                  },
+                  label: {
+                    color: mode === 'dark' ? '#aaa' : 'black',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: mode === 'dark' ? '#2c2c2c' : '#e0e0e0',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: mode === 'dark' ? '#444' : '#bdbdbd',
+                  },
+                }}
               />
               
               {/* Path List */}
               <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
-                  <PathIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
+                <Typography variant="subtitle1" sx={{ mb: 1, display: 'flex', alignItems: 'center', color: mode === 'dark' ? '#fff' : 'black' }}>
+                  <PathIcon sx={{ mr: 1, fontSize: '1.2rem', color: mode === 'dark' ? '#fff' : 'black' }} />
                   Allowed Paths
                 </Typography>
                 
@@ -467,7 +482,7 @@ const RolePermissionPage = () => {
                     maxHeight: '250px',
                     overflow: 'auto',
                     borderRadius: 1,
-                    bgcolor: alpha('#f5f5f5', 0.6)
+                    bgcolor: mode === 'dark' ? '#1e1e1e' : alpha('#f5f5f5', 0.6)
                   }}
                 >
                   {paths.length > 0 ? (
@@ -510,7 +525,7 @@ const RolePermissionPage = () => {
                       ))}
                     </List>
                   ) : (
-                    <Typography variant="body2" color="text.secondary" sx={{ width: '100%', textAlign: 'center', p: 2 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ width: '100%', textAlign: 'center', p: 2, color: mode === 'dark' ? '#fff' : 'black' }}>
                       No paths assigned. Add paths below.
                     </Typography>
                   )}
@@ -519,7 +534,7 @@ const RolePermissionPage = () => {
               
               {/* Add New Path */}
               <Box sx={{ mb: 3, p: 2, border: '1px dashed', borderColor: alpha('#3f51b5', 0.3), borderRadius: 1 }}>
-                <Typography variant="subtitle2" sx={{ mb: 2 }}>Add New Path</Typography>
+                <Typography variant="subtitle2" sx={{ color: mode === 'dark' ? '#fff' : 'black' }}>Add New Path</Typography>
                 
                 <Grid container spacing={2} mb={2}>
                   <Grid item xs={12} sm={6}>
@@ -530,6 +545,20 @@ const RolePermissionPage = () => {
                       onChange={(e) => setNewPath({...newPath, name: e.target.value})}
                       fullWidth
                       size="small"
+                      sx={{
+                        input: {
+                          color: mode === 'dark' ? '#fff' : 'black',
+                        },
+                        label: {
+                          color: mode === 'dark' ? '#aaa' : 'black',
+                        },
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: mode === 'dark' ? '#2c2c2c' : '#e0e0e0',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: mode === 'dark' ? '#444' : '#bdbdbd',
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -540,69 +569,150 @@ const RolePermissionPage = () => {
                       onChange={(e) => setNewPath({...newPath, route: e.target.value})}
                       fullWidth
                       size="small"
+                      sx={{
+                        input: {
+                          color: mode === 'dark' ? '#fff' : 'black',
+                        },
+                        label: {
+                          color: mode === 'dark' ? '#aaa' : 'black',
+                        },
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: mode === 'dark' ? '#2c2c2c' : '#e0e0e0',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: mode === 'dark' ? '#444' : '#bdbdbd',
+                        },
+                      }}
                     />
                   </Grid>
                 </Grid>
                 
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={8}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel>Type</InputLabel>
-                      <Select
-                        value={newPath.type}
-                        label="Type"
-                        onChange={(e) => setNewPath({...newPath, type: e.target.value})}
-                      >
-                        {pathTypes.map(type => (
-                          <MenuItem key={type} value={type}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Button 
-                      variant="contained" 
-                      fullWidth
-                      onClick={addPath} 
-                      sx={{ bgcolor: '#4caf50', '&:hover': { bgcolor: '#388e3c' } }}
-                      disabled={!newPath.name.trim() || !newPath.route.trim()}
-                    >
-                      <AddCircleIcon sx={{ mr: 0.5 }} />
-                      Add
-                    </Button>
-                  </Grid>
+                <Grid item xs={8}>
+  <FormControl fullWidth size="small">
+    <InputLabel sx={{ color: mode === 'dark' ? '#aaa' : 'black' }}>
+      Type
+    </InputLabel>
+    <Select
+      value={newPath.type}
+      label="Type"
+      onChange={(e) => setNewPath({ ...newPath, type: e.target.value })}
+      sx={{
+        color: mode === 'dark' ? '#fff' : 'black',
+        '.MuiOutlinedInput-notchedOutline': {
+          borderColor: mode === 'dark' ? '#555' : '#ccc',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: mode === 'dark' ? '#888' : '#666',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: mode === 'dark' ? '#3f51b5' : '#3f51b5',
+        },
+        backgroundColor: mode === 'dark' ? '#1e1e1e' : 'white',
+      }}
+      MenuProps={{
+        PaperProps: {
+          sx: {
+            backgroundColor: mode === 'dark' ? '#1e1e1e' : '#fff',
+            color: mode === 'dark' ? '#fff' : 'black',
+          },
+        },
+      }}
+    >
+      {pathTypes.map((type) => (
+        <MenuItem key={type} value={type} sx={{ color: mode === 'dark' ? '#fff' : 'black' }}>
+          {type.charAt(0).toUpperCase() + type.slice(1)}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
+
+<Grid item xs={4}>
+  <Button
+    variant="contained"
+    fullWidth
+    onClick={addPath}
+    disabled={!newPath.name.trim() || !newPath.route.trim()}
+    sx={{
+      bgcolor: mode === 'dark' ? '#66bb6a' : '#4caf50',
+      color: mode === 'dark' ? '#000' : '#fff',
+      '&:hover': {
+        bgcolor: mode === 'dark' ? '#43a047' : '#388e3c',
+      },
+      '&.Mui-disabled': {
+        bgcolor: mode === 'dark' ? '#2e2e2e' : '#e0e0e0',
+        color: mode === 'dark' ? '#888' : '#9e9e9e',
+        opacity: 1, // remove MUI's default fading
+      },
+      borderRadius: 1.5,
+      textTransform: 'none',
+    }}
+  >
+    <AddCircleIcon
+      sx={{
+        mr: 0.5,
+        color:
+          !newPath.name.trim() || !newPath.route.trim()
+            ? mode === 'dark' ? '#888' : '#9e9e9e'
+            : mode === 'dark' ? '#000' : '#fff',
+      }}
+    />
+    Add
+  </Button>
+</Grid>
+
+
                 </Grid>
               </Box>
               
               {/* Action Buttons */}
               <Box sx={{ display: 'flex', gap: 2 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  size="large"
-                  onClick={handleAddRole}
-                  disabled={loading || !roleName.trim() || paths.length === 0}
-                  startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                  sx={{ borderRadius: 1.5 }}
-                >
-                  {roleId === -1 ? "Create Role" : "Update Role"}
-                </Button>
-                
-                {roleId !== -1 && (
-                  <Button
-                    variant="outlined"
-                    onClick={resetForm}
-                    fullWidth
-                    size="large"
-                    sx={{ borderRadius: 1.5 }}
-                  >
-                    Cancel
-                  </Button>
-                )}
-              </Box>
+  <Button
+    variant="contained"
+    color="primary"
+    fullWidth
+    size="large"
+    onClick={handleAddRole}
+    disabled={loading || !roleName.trim() || paths.length === 0}
+    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+    sx={{
+      borderRadius: 1.5,
+      bgcolor: mode === 'dark' ? '#4caf50' : '#4caf50', // primary green button
+      color: mode === 'dark' ? '#fff' : '#fff', // text in white
+      '&:hover': {
+        bgcolor: mode === 'dark' ? '#388e3c' : '#388e3c', // darker shade on hover
+      },
+      '&.Mui-disabled': {
+        bgcolor: mode === 'dark' ? '#2e2e2e' : '#e0e0e0', // faded background when disabled
+        color: mode === 'dark' ? '#888' : '#9e9e9e', // faded text when disabled
+      },
+    }}
+  >
+    {roleId === -1 ? "Create Role" : "Update Role"}
+  </Button>
+
+  {roleId !== -1 && (
+    <Button
+      variant="outlined"
+      onClick={resetForm}
+      fullWidth
+      size="large"
+      sx={{
+        borderRadius: 1.5,
+        borderColor: mode === 'dark' ? '#ffffff' : '#000000', // matching border for cancel button
+        color: mode === 'dark' ? '#fff' : '#000', // text color in dark/light mode
+        '&:hover': {
+          borderColor: mode === 'dark' ? '#888' : '#3f51b5', // border color on hover
+          backgroundColor: mode === 'dark' ? '#333' : '#f0f0f0', // background color on hover
+        },
+      }}
+    >
+      Cancel
+    </Button>
+  )}
+</Box>
+
             </CardContent>
           </Card>
         </Grid>
@@ -633,14 +743,19 @@ const RolePermissionPage = () => {
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth margin="dense">
-                <InputLabel>Type</InputLabel>
+                <InputLabel sx={{ color: mode === 'dark' ? '#aaa' : 'black' }}>Type</InputLabel>
                 <Select
                   value={newPath.type}
                   label="Type"
                   onChange={(e) => setNewPath({...newPath, type: e.target.value})}
+                  sx={{
+                    input: {
+                      color: mode === 'dark' ? '#fff' : 'black',
+                    },
+                  }}
                 >
                   {pathTypes.map(type => (
-                    <MenuItem key={type} value={type}>
+                    <MenuItem key={type} value={type} sx={{ color: mode === 'dark' ? '#fff' : 'black' }}>
                       {type.charAt(0).toUpperCase() + type.slice(1)}
                     </MenuItem>
                   ))}

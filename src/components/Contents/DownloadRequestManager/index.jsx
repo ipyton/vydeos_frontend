@@ -26,6 +26,7 @@ import {
   IconButton
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTheme, alpha } from '@mui/material/styles';
 
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
@@ -36,17 +37,32 @@ import EpisodeSelector from "./EpisodeSelector";
 
 // Progress bar with label component
 function LinearProgressWithLabel(props) {
+  const theme = useTheme();
+  
   return (
     <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
       <Box sx={{ width: "100%", mr: 1 }}>
         <LinearProgress
           variant="determinate"
           {...props}
-          sx={{ height: 10, borderRadius: 5 }}
+          sx={{ 
+            height: 10, 
+            borderRadius: 5,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[300],
+            '& .MuiLinearProgress-bar': {
+              backgroundColor: theme.palette.primary.main,
+            }
+          }}
         />
       </Box>
       <Box sx={{ minWidth: 35 }}>
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: theme.palette.text.secondary,
+            fontWeight: 500
+          }}
+        >
           {`${Math.round(props.value)}%`}
         </Typography>
       </Box>
@@ -59,8 +75,9 @@ LinearProgressWithLabel.propTypes = {
 };
 
 export default function DownloadManager() {
+  const theme = useTheme();
+  
   // State management
-
   const [open, setOpen] = useState(false);
   const [tmpGid, setTmpGid] = useState("");
   const [tmpSource, setTmpSource] = useState("");
@@ -296,17 +313,28 @@ export default function DownloadManager() {
   // Get status color based on status
   const getStatusColor = (status) => {
     switch (status) {
-      case "finished": return "success.main";
-      case "downloading": return "info.main";
-      case "paused": return "warning.main";
-      case "cancelled": return "error.main";
-      default: return "text.secondary";
+      case "finished": return theme.palette.success.main;
+      case "downloading": return theme.palette.info.main;
+      case "paused": return theme.palette.warning.main;
+      case "cancelled": return theme.palette.error.main;
+      default: return theme.palette.text.secondary;
     }
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+    <Box sx={{ 
+      padding: 3,
+      minHeight: '100vh',
+      backgroundColor: theme.palette.background.default
+    }}>
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          mb: 3,
+          color: theme.palette.text.primary,
+          fontWeight: theme.palette.mode === 'dark' ? 400 : 600
+        }}
+      >
         Download Manager
       </Typography>
 
@@ -314,10 +342,23 @@ export default function DownloadManager() {
       <TableContainer
         component={Paper}
         elevation={3}
-        sx={{ mb: 4, borderRadius: 2, overflow: "hidden" }}
+        sx={{ 
+          mb: 4, 
+          borderRadius: 2, 
+          overflow: "hidden",
+          backgroundColor: theme.palette.background.paper,
+          ...(theme.palette.mode === 'dark' && {
+            border: `1px solid ${theme.palette.grey[700]}`,
+          })
+        }}
       >
         <Table aria-label="movie downloads table">
-          <TableHead sx={{ backgroundColor: "primary.main" }}>
+          <TableHead sx={{ 
+            backgroundColor: theme.palette.primary.main,
+            ...(theme.palette.mode === 'dark' && {
+              backgroundColor: theme.palette.primary.dark,
+            })
+          }}>
             <TableRow>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Resource ID</TableCell>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>Type </TableCell>
@@ -333,24 +374,36 @@ export default function DownloadManager() {
           <TableBody>
             {requests == null ? (
               <TableRow>
-                <TableCell colSpan={7} align="center">No data available</TableCell>
+                <TableCell colSpan={7} align="center" sx={{ color: theme.palette.text.secondary }}>
+                  No data available
+                </TableCell>
               </TableRow>
             ) : (
               requests.map((row, index) => (
                 <TableRow
                   key={row.movieId || index}
                   sx={{
-                    "&:nth-of-type(odd)": { backgroundColor: "action.hover" },
-                    "&:hover": { backgroundColor: "action.selected" },
+                    "&:nth-of-type(odd)": { 
+                      backgroundColor: theme.palette.mode === 'dark' 
+                        ? theme.palette.grey[900] 
+                        : theme.palette.action.hover 
+                    },
+                    "&:hover": { 
+                      backgroundColor: theme.palette.mode === 'dark'
+                        ? theme.palette.grey[800]
+                        : theme.palette.action.selected 
+                    },
                     transition: "background-color 0.2s"
                   }}
                 >
-                  <TableCell>{row.resource_id}</TableCell>
-                  <TableCell>{row.type}</TableCell>
-                  <TableCell>{row.movieName}</TableCell>
-                  <TableCell>{row.release_year}</TableCell>
-                  <TableCell>{row.userId}</TableCell>
-                  <TableCell>{new Date(row.timestamp).toLocaleDateString(JSON.parse(localStorage.getItem("userInfo")).language)}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{row.resource_id}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{row.type}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{row.movieName}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{row.release_year}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{row.userId}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>
+                    {new Date(row.timestamp).toLocaleDateString(JSON.parse(localStorage.getItem("userInfo")).language)}
+                  </TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
@@ -370,12 +423,40 @@ export default function DownloadManager() {
       </TableContainer>
 
       {/* Sources dialog */}
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-        <DialogTitle sx={{ bgcolor: "primary.main", color: "white" }}>
+      <Dialog 
+        open={open} 
+        onClose={handleClose} 
+        fullWidth 
+        maxWidth="md"
+        PaperProps={{
+          sx: {
+            backgroundColor: theme.palette.background.paper,
+            ...(theme.palette.mode === 'dark' && {
+              backgroundImage: 'none',
+            })
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          bgcolor: theme.palette.primary.main, 
+          color: "white",
+          ...(theme.palette.mode === 'dark' && {
+            bgcolor: theme.palette.primary.dark,
+          })
+        }}>
           {details?.movieName ? `Sources for ${details.movieName}` : "Sources"}
         </DialogTitle>
-        <DialogContent dividers>
-          <DialogContentText sx={{ mb: 2 }}>
+        <DialogContent 
+          dividers
+          sx={{
+            backgroundColor: theme.palette.background.paper,
+            borderColor: theme.palette.divider,
+          }}
+        >
+          <DialogContentText sx={{ 
+            mb: 2,
+            color: theme.palette.text.secondary
+          }}>
             Manage download sources for this movie. Add, delete, or start downloads.
           </DialogContentText>
 
@@ -393,7 +474,9 @@ export default function DownloadManager() {
                     sx={{
                       width: "100%",
                       alignItems: "center",
-                      bgcolor: index % 2 === 0 ? "action.hover" : "transparent",
+                      bgcolor: index % 2 === 0 
+                        ? (theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.action.hover)
+                        : "transparent",
                       borderRadius: 1,
                       padding: 1
                     }}
@@ -410,7 +493,15 @@ export default function DownloadManager() {
                     <ListItemText
                       primary={item.source}
                       secondary={`Status: ${item.status || "Unknown"}`}
-                      sx={{ flexGrow: 1 }}
+                      sx={{ 
+                        flexGrow: 1,
+                        '& .MuiListItemText-primary': {
+                          color: theme.palette.text.primary,
+                        },
+                        '& .MuiListItemText-secondary': {
+                          color: theme.palette.text.secondary,
+                        }
+                      }}
                     />
                     <Stack direction="row" spacing={1}>
                       <Button
@@ -452,8 +543,27 @@ export default function DownloadManager() {
                 {index < sources.length - 1 && <Divider component="li" />}
               </React.Fragment>
             ))}
-            <Box sx={{ mt: 3, p: 2, bgcolor: "background.paper", borderRadius: 2, boxShadow: 1 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2 }}>Add New Source</Typography>
+            <Box sx={{ 
+              mt: 3, 
+              p: 2, 
+              bgcolor: theme.palette.background.paper, 
+              borderRadius: 2, 
+              boxShadow: 1,
+              ...(theme.palette.mode === 'dark' && {
+                bgcolor: theme.palette.grey[800],
+                border: `1px solid ${theme.palette.grey[700]}`,
+              })
+            }}>
+              <Typography 
+                variant="subtitle1" 
+                sx={{ 
+                  mb: 2,
+                  color: theme.palette.text.primary,
+                  fontWeight: 500
+                }}
+              >
+                Add New Source
+              </Typography>
               <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
                 <TextField
                   fullWidth
@@ -462,6 +572,22 @@ export default function DownloadManager() {
                   size="small"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: theme.palette.mode === 'dark' ? theme.palette.grey[600] : undefined,
+                      },
+                      '&:hover fieldset': {
+                        borderColor: theme.palette.primary.main,
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: theme.palette.text.secondary,
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: theme.palette.text.primary,
+                    },
+                  }}
                 />
                 <Button
                   variant="contained"
@@ -474,7 +600,16 @@ export default function DownloadManager() {
 
               <Divider sx={{ my: 2 }} />
 
-              <Typography variant="subtitle1" sx={{ mb: 2 }}>Upload Video File</Typography>
+              <Typography 
+                variant="subtitle1" 
+                sx={{ 
+                  mb: 2,
+                  color: theme.palette.text.primary,
+                  fontWeight: 500
+                }}
+              >
+                Upload Video File
+              </Typography>
               <Stack direction="column" spacing={2}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Button
@@ -489,7 +624,10 @@ export default function DownloadManager() {
                       onChange={handleFileChange}
                     />
                   </Button>
-                  <Typography variant="body2">
+                  <Typography 
+                    variant="body2"
+                    sx={{ color: theme.palette.text.secondary }}
+                  >
                     {file ? file.name + indicator : "No file selected"}
                   </Typography>
                 </Box>
@@ -512,17 +650,50 @@ export default function DownloadManager() {
           </List>
 
           <div>
-            <Typography variant="h6" gutterBottom>
+            <Typography 
+              variant="h6" 
+              gutterBottom
+              sx={{ 
+                color: theme.palette.text.primary,
+                fontWeight: 500
+              }}
+            >
               Playable Resources
             </Typography>
             <List>
               {playableData.map((item, index) => (
-                <ListItem key={index} divider>
+                <ListItem 
+                  key={index} 
+                  divider
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover,
+                    }
+                  }}
+                >
                   <ListItemText
                     primary={`Resource: ${item.resource_id}, Type: ${item.type}, Quality: ${item.quality}`}
                     secondary={`Bucket: ${item.bucket}, Path: ${item.path}`}
+                    sx={{
+                      '& .MuiListItemText-primary': {
+                        color: theme.palette.text.primary,
+                      },
+                      '& .MuiListItemText-secondary': {
+                        color: theme.palette.text.secondary,
+                      }
+                    }}
                   />
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleFileDelete(index)}>
+                  <IconButton 
+                    edge="end" 
+                    aria-label="delete" 
+                    onClick={() => handleFileDelete(index)}
+                    sx={{
+                      color: theme.palette.error.main,
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.error.main, 0.04),
+                      }
+                    }}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </ListItem>
@@ -531,7 +702,10 @@ export default function DownloadManager() {
 
           </div>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
+        <DialogActions sx={{ 
+          p: 2,
+          backgroundColor: theme.palette.background.paper
+        }}>
           <Button onClick={handleClose} variant="contained" sx={{ borderRadius: 2 }}>
             Close
           </Button>
@@ -539,12 +713,40 @@ export default function DownloadManager() {
       </Dialog>
 
       {/* File selection dialog */}
-      <Dialog open={selectOpen} onClose={select} fullWidth maxWidth="md">
-        <DialogTitle sx={{ bgcolor: "primary.main", color: "white" }}>
+      <Dialog 
+        open={selectOpen} 
+        onClose={select} 
+        fullWidth 
+        maxWidth="md"
+        PaperProps={{
+          sx: {
+            backgroundColor: theme.palette.background.paper,
+            ...(theme.palette.mode === 'dark' && {
+              backgroundImage: 'none',
+            })
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          bgcolor: theme.palette.primary.main, 
+          color: "white",
+          ...(theme.palette.mode === 'dark' && {
+            bgcolor: theme.palette.primary.dark,
+          })
+        }}>
           Select File to Download
         </DialogTitle>
-        <DialogContent dividers>
-          <DialogContentText sx={{ mb: 2 }}>
+        <DialogContent 
+          dividers
+          sx={{
+            backgroundColor: theme.palette.background.paper,
+            borderColor: theme.palette.divider,
+          }}
+        >
+          <DialogContentText sx={{ 
+            mb: 2,
+            color: theme.palette.text.secondary
+          }}>
             You are using a P2P resource. Please select exactly one file you want to download.
           </DialogContentText>
           <List sx={{ width: "100%" }}>
@@ -553,7 +755,20 @@ export default function DownloadManager() {
                 key={idx}
                 sx={{
                   borderRadius: 1,
-                  bgcolor: checkedNumber === idx ? "action.selected" : idx % 2 === 0 ? "action.hover" : "transparent",
+                  bgcolor: checkedNumber === idx 
+                    ? (theme.palette.mode === 'dark' 
+                        ? alpha(theme.palette.primary.main, 0.12)
+                        : theme.palette.action.selected) 
+                    : idx % 2 === 0 
+                        ? (theme.palette.mode === 'dark' 
+                            ? theme.palette.grey[800] 
+                            : theme.palette.action.hover) 
+                        : "transparent",
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.primary.main, 0.08)
+                      : theme.palette.action.hover,
+                  }
                 }}
               >
                 <Stack direction="row" spacing={2} sx={{ width: "100%", alignItems: "center" }}>
@@ -565,13 +780,24 @@ export default function DownloadManager() {
                   <ListItemText
                     primary={item.path}
                     secondary={`${(item.size / 1000000).toFixed(2)} MB`}
+                    sx={{
+                      '& .MuiListItemText-primary': {
+                        color: theme.palette.text.primary,
+                      },
+                      '& .MuiListItemText-secondary': {
+                        color: theme.palette.text.secondary,
+                      }
+                    }}
                   />
                 </Stack>
               </ListItem>
             ))}
           </List>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
+        <DialogActions sx={{ 
+          p: 2,
+          backgroundColor: theme.palette.background.paper
+        }}>
           <Button
             onClick={select}
             variant="contained"

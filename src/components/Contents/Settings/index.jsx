@@ -31,40 +31,35 @@ import {
   ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 import { useThemeMode } from '../../../Themes/ThemeContext';
+
 export default function SettingsPage() {
-  // State for dark mode toggle
-  
   // State for other settings (for demonstration)
   const [notifications, setNotifications] = useState(true);
   const [autoLanguage, setAutoLanguage] = useState(false);
   const [enhancedSecurity, setEnhancedSecurity] = useState(true);
   const { mode, toggleMode } = useThemeMode();
 
-  // Create theme based on dark mode state
-
-
-  // Toggle dark mode
+  // Create theme based on current mode
+  const theme = createTheme({
+    palette: {
+      mode: mode, // This will be 'light' or 'dark'
+      ...(mode === 'dark' && {
+        background: {
+          default: '#121212',
+          paper: '#1d1d1d',
+        },
+        text: {
+          primary: '#ffffff',
+          secondary: '#b3b3b3',
+        },
+      }),
+    },
+  });
 
   return (
-      <Box sx={{ flexGrow: 1,  minHeight: '100vh' }}>
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="back"
-              sx={{ mr: 2 }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Settings
-            </Typography>
-            <IconButton color="inherit">
-              <SettingsIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/* This ensures proper background colors */}
+      <Box sx={{ flexGrow: 1, minHeight: '100vh' }}>
         
         <Container maxWidth="md" sx={{ py: 4 }}>
           <Paper elevation={3} sx={{ p: 2 }}>
@@ -89,6 +84,7 @@ export default function SettingsPage() {
                     <ListItemSecondaryAction>
                       <Switch
                         edge="end"
+                        checked={mode === 'dark'}
                         onChange={toggleMode}
                         color="primary"
                       />
@@ -166,10 +162,9 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
             </List>
-
-
           </Paper>
         </Container>
       </Box>
+    </ThemeProvider>
   );
 }

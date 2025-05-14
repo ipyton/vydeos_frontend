@@ -19,7 +19,7 @@ import {API_BASE_URL, DOWNLOAD_BASE_URL} from "../../../util/io_utils/URL";
 
 import Introductions from "../Introductions"
 import { useNotification } from '../../../Providers/NotificationProvider';
-
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 export default function Friends(props) {
   let list = [12, 12, 312, 4, 13, 4123, 5, 345, 34]
@@ -32,7 +32,7 @@ export default function Friends(props) {
   const [dialogList, setDialogList] = useState([])
   const [groupName, setGroupName] = useState("")
   const { showNotification } = useNotification();
-
+  const { mode } = useThemeMode();
   useEffect(()=>{
     return ()=>{
       console.log("deregister")
@@ -91,12 +91,20 @@ export default function Friends(props) {
   return (
     <Stack sx={{ marginLeft: '10%', width: '80%', marginTop: 3, height: height }} direction="row" justify="center" spacing={2}>
 
-      <Dialog open={openDialog} onClose={()=>{setOpenDialog(false)}}>
-        <DialogTitle>Select Friends to Create Group</DialogTitle>
+      <Dialog open={openDialog} onClose={()=>{setOpenDialog(false)}} sx={{
+        '& .MuiDialog-paper': {
+          backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
+        },
+      }}>
+        <DialogTitle sx={{
+          color: mode === 'dark' ? '#fff' : 'black',
+        }}>Select Friends to Create Group</DialogTitle>
         <DialogContent>
           <List>
             {dialogList.map((friend) => (
-              <ListItem key={friend.id}>
+              <ListItem sx={{
+                color: mode === 'dark' ? '#fff' : 'black',
+              }} key={friend.id}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -111,9 +119,26 @@ export default function Friends(props) {
               </ListItem>
             ))}
           </List>
-          <TextField id="outlined-basic" onChange={(res)=>{
-           setGroupName(res.target.value)
-          }} label="group name" variant="outlined" />
+          <TextField
+            id="outlined-basic"
+            label="Group Name"
+            variant="outlined"
+            onChange={(res) => setGroupName(res.target.value)}
+            sx={{
+              input: {
+                color: mode === 'dark' ? '#fff' : 'black',
+              },
+              label: {
+                color: mode === 'dark' ? '#aaa' : 'black',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: mode === 'dark' ? '#2c2c2c' : '#e0e0e0',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: mode === 'dark' ? '#444' : '#bdbdbd',
+              },
+            }}
+          />
 
         </DialogContent>
         <DialogActions>

@@ -14,11 +14,13 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { useNotification } from '../../../Providers/NotificationProvider';
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 export default function Downloads() {
     const [checked, setChecked] = React.useState([]);
     const [downloadsRecords, setDownloadsRecords] = React.useState([])
-  const { showNotification } = useNotification();
+    const { showNotification } = useNotification();
+    const { mode } = useThemeMode();
 
     // React.useEffect(() => {
     //     VideoUtil.check_current_download_status(setDownloadsRecords)
@@ -72,17 +74,91 @@ export default function Downloads() {
 
     console.log(downloadsRecords)
     return (
-        <Stack spacing={2} direction="column" alignItems="center"
-            justifyContent="center" >
+        <Stack 
+            spacing={2} 
+            direction="column" 
+            alignItems="center"
+            justifyContent="center"
+            sx={{
+                minHeight: '100vh',
+                backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                paddingY: 3
+            }}
+        >
             <Stack spacing={2} direction="row">
-                <Button variant="contained" onClick={handleStop}>stop</Button>
-                <Button variant="contained" onClick={handlePause}>pause</Button>
-                <Button variant="contained" onClick={handleContinue}>continue</Button>
-                <Button variant="contained" onClick={handleRemove}>remove</Button>
+                <Button 
+                    variant="contained" 
+                    onClick={handleStop}
+                    sx={{
+                        ...(mode === 'dark' && {
+                            backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                            '&:hover': {
+                                backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                            }
+                        })
+                    }}
+                >
+                    stop
+                </Button>
+                <Button 
+                    variant="contained" 
+                    onClick={handlePause}
+                    sx={{
+                        ...(mode === 'dark' && {
+                            backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                            '&:hover': {
+                                backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                            }
+                        })
+                    }}
+                >
+                    pause
+                </Button>
+                <Button 
+                    variant="contained" 
+                    onClick={handleContinue}
+                    sx={{
+                        ...(mode === 'dark' && {
+                            backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                            '&:hover': {
+                                backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                            }
+                        })
+                    }}
+                >
+                    continue
+                </Button>
+                <Button 
+                    variant="contained" 
+                    onClick={handleRemove}
+                    sx={{
+                        ...(mode === 'dark' && {
+                            backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                            '&:hover': {
+                                backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.default',
+                            }
+                        })
+                    }}
+                >
+                    remove
+                </Button>
 
             </Stack>
 
-            <List dense sx={{ width: '80%', marginLeft: "10%", bgcolor: 'background.paper' }}>
+            <List 
+                dense 
+                sx={{ 
+                    width: '80%', 
+                    marginLeft: "10%", 
+                    bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
+                    // Enhanced styling for dark mode
+                    ...(mode === 'dark' && {
+                        border: `1px solid ${mode === 'dark' ? '#2c2c2c' : 'grey[800]'}`,
+                        borderRadius: 2,
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)'
+                    })
+                }}
+            >
                 {downloadsRecords.map((value) => {
                     const labelId = `checkbox-list-secondary-label-${value}`;
                     return (
@@ -94,14 +170,45 @@ export default function Downloads() {
                                     onChange={handleToggle(value)}
                                     checked={checked.indexOf(value) !== -1}
                                     inputProps={{ 'aria-labelledby': labelId }}
+                                    sx={{
+                                        color: mode === 'dark' ? '#fff' : 'primary.main',
+                                        '&.Mui-checked': {
+                                            color: mode === 'dark' ? '#fff' : 'primary.main',
+                                        },
+                                    }}
                                 />
                             }
                             spacing={2}
+                            sx={{
+                                // Add hover effect for better UX
+                                '&:hover': {
+                                    backgroundColor: mode === 'dark' ? '#1e1e1e' : 'action.hover',
+                                },
+                                // Add slight border between items in dark mode
+                                ...(mode === 'dark' && {
+                                    borderBottom: `1px solid ${mode === 'dark' ? '#2c2c2c' : 'divider'}`,
+                                    '&:last-child': {
+                                        borderBottom: 'none',
+                                    }
+                                })
+                            }}
                         >
 
 
                             <Box sx={{ position: 'relative', display: 'inline-flex', }}>
-                                <CircularProgress variant="determinate" value={value.total_size === 0 ? 0 : value.complete_size / value.total_size * 100} />
+                                <CircularProgress 
+                                    variant="determinate" 
+                                    value={value.total_size === 0 ? 0 : value.complete_size / value.total_size * 100}
+                                    sx={{
+                                        color: mode === 'dark' ? '#fff' : 'primary.main',
+                                        // Add a subtle background circle in dark mode
+                                        ...(mode === 'dark' && {
+                                            '& .MuiCircularProgress-circle': {
+                                                backgroundColor: `${mode === 'dark' ? '#fff' : 'primary.main'}`,
+                                            }
+                                        })
+                                    }}
+                                />
                                 <Box
                                     sx={{
                                         top: 0,
@@ -114,13 +221,44 @@ export default function Downloads() {
                                         justifyContent: 'center'
                                     }}
                                 >
-                                    <Typography variant="caption" component="div" color="text.secondary">
+                                    <Typography 
+                                        variant="caption" 
+                                        component="div" 
+                                        sx={{ 
+                                            color: mode === 'dark' ? '#fff' : 'text.secondary',
+                                            fontWeight: 600
+                                        }}
+                                    >
                                         {`${Math.round(value.total_size === 0 ? 0 : value.complete_size / value.total_size * 100)}%`}
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            <ListItemText id={labelId} primary={value.name} sx={{ paddingLeft: 2 }} secondary={value.speed / 1000 + "kbps   " + value.complete_size / 1000000 + "MB/" + value.total_size / 1000000 + "MB" + "      " + value.status} />
+                            <ListItemText 
+                                id={labelId} 
+                                primary={
+                                    <Typography 
+                                        sx={{ 
+                                            color: mode === 'dark' ? '#fff' : 'white',
+                                            fontWeight: 500
+                                        }}
+                                    >
+                                        {value.name}
+                                    </Typography>
+                                }
+                                sx={{ paddingLeft: 2 }} 
+                                secondary={
+                                    <Typography 
+                                        variant="body2" 
+                                        sx={{ 
+                                            color: mode === 'dark' ? '#fff' : 'white',
+                                            fontSize: '0.875rem'
+                                        }}
+                                    >
+                                        {value.speed / 1000 + "kbps   " + value.complete_size / 1000000 + "MB/" + value.total_size / 1000000 + "MB" + "      " + value.status}
+                                    </Typography>
+                                }
+                            />
 
                         </ListItem>
                     );
