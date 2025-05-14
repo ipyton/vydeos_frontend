@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Avatar, 
   Button, 
-  CssBaseline, 
   TextField, 
   Select, 
   InputLabel, 
@@ -12,18 +11,34 @@ import {
   Typography, 
   Container, 
   IconButton, 
-  FormControl 
+  FormControl,
+  Paper,
+  Divider,
+  Card,
+  CardContent,
+  FormHelperText,
+  Stack,
+  Tooltip
 } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { deepOrange } from '@mui/material/colors';
+import { createTheme, ThemeProvider, alpha } from '@mui/material/styles';
+import { deepPurple, purple, grey } from '@mui/material/colors';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { useNotification } from '../../../Providers/NotificationProvider';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import PersonIcon from '@mui/icons-material/Person';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LanguageIcon from '@mui/icons-material/Language';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import EditIcon from '@mui/icons-material/Edit';
+import InfoIcon from '@mui/icons-material/Info';
+import SaveIcon from '@mui/icons-material/Save';
 
+import { useNotification } from '../../../Providers/NotificationProvider';
 import PictureUtil from '../../../util/io_utils/FileUtil';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
-
-const defaultTheme = createTheme();
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 // Country list moved inline for simplicity
 const countries = [
@@ -51,9 +66,8 @@ const countries = [
   "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
 ];
 
-
 export default function UserInfo(props) {
-  const { login, setLogin } = props.status;
+  const { login, setLogin } = props.status || {};
   const { showNotification } = useNotification();
 
   const [userInfo, setUserInfo] = useState({
@@ -67,8 +81,102 @@ export default function UserInfo(props) {
     country: ""
   });
 
+  const { mode } = useThemeMode();
   const [avatar, setAvatar] = useState(null);
   const [languages, setLanguages] = useState([]);
+
+  // Create a theme based on the current mode
+  const theme = React.useMemo(() => createTheme({
+    palette: {
+      mode: mode,
+      primary: {
+        main: purple[500],
+        light: purple[300],
+        dark: purple[700],
+      },
+      background: {
+        default: mode === 'dark' ? '#121212' : '#f5f5f5',
+        paper: mode === 'dark' ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: mode === 'dark' ? '#ffffff' : '#333333',
+        secondary: mode === 'dark' ? '#b0b0b0' : '#666666',
+      },
+    },
+    shape: {
+      borderRadius: 12,
+    },
+    typography: {
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      h4: {
+        fontWeight: 600,
+      },
+      h5: {
+        fontWeight: 600,
+      },
+      h6: {
+        fontWeight: 500,
+      },
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: '28px',
+            textTransform: 'none',
+            fontWeight: 600,
+            padding: '10px 24px',
+          },
+          containedPrimary: {
+            boxShadow: `0 8px 16px ${alpha(purple[500], 0.3)}`,
+            '&:hover': {
+              boxShadow: `0 12px 20px ${alpha(purple[500], 0.4)}`,
+            },
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '12px',
+            },
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: '16px',
+            boxShadow: mode === 'dark' 
+              ? '0 8px 16px rgba(0, 0, 0, 0.4)' 
+              : '0 8px 16px rgba(0, 0, 0, 0.1)',
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: '16px',
+          },
+        },
+      },
+      MuiAvatar: {
+        styleOverrides: {
+          root: {
+            boxShadow: `0 4px 8px ${alpha('#000000', 0.2)}`,
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            fontWeight: 500,
+          },
+        },
+      },
+    },
+  }), [mode]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -115,6 +223,7 @@ export default function UserInfo(props) {
       const avatarUrl = URL.createObjectURL(file);
       setAvatar(avatarUrl);
       AccountUtil.uploadAvatar(file);
+      showNotification("Avatar uploaded successfully!", "success");
     }
   };
 
@@ -135,155 +244,295 @@ export default function UserInfo(props) {
       userInfo.language, 
       userInfo.country
     );
+    
+    showNotification("Profile updated successfully!", "success");
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <div>
-            <input 
-              id="uploadPic" 
-              type="file" 
-              onChange={handleAvatarUpload} 
-              hidden 
-              accept="image/*"
+    <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Container maxWidth="md" sx={{ mt: 5, mb: 5 }}>
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              borderRadius: 4,
+              overflow: 'hidden',
+            }}
+          >
+            {/* Header banner */}
+            <Box
+              sx={{
+                height: '120px',
+                background: `linear-gradient(45deg, ${purple[700]} 0%, ${purple[400]} 100%)`,
+                position: 'relative',
+              }}
             />
-            <label htmlFor="uploadPic">
-              <IconButton component="span">
-                <Avatar 
-                  id="avatar" 
-                  src={avatar} 
-                  sx={{ bgcolor: deepOrange[500] }}
-                >
-                  {userInfo.userName ? userInfo.userName[0] : 'N'}
-                </Avatar>
-              </IconButton>
-            </label>
-          </div>
-          
-          <Typography component="h1" variant="h5">
-            User Information
-          </Typography>
-          
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  name="userName"
-                  fullWidth
-                  label="Nickname"
-                  value={userInfo.userName}
-                  onChange={handleChange}
-                  variant="filled"
-                  color="success"
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  name="location"
-                  fullWidth
-                  label="Region"
-                  value={userInfo.location}
-                  onChange={handleChange}
-                  variant="filled"
-                  color="success"
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  name="introduction"
-                  fullWidth
-                  label="Introduction"
-                  value={userInfo.introduction}
-                  onChange={handleChange}
-                  variant="filled"
-                  color="success"
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="gender-select-label">Gender</InputLabel>
-                  <Select
-                    name="gender"
-                    labelId="gender-select-label"
-                    value={userInfo.gender ?? ''}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value={true}>Male</MenuItem>
-                    <MenuItem value={false}>Female</MenuItem>
-                    <MenuItem value="">Prefer not to say</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              
-              <Grid item xs={12}>
-                <DatePicker
-                  label="Date of Birth"
-                  value={dayjs(userInfo.dateOfBirth)}
-                  onChange={handleDateChange}
-                  slotProps={{ textField: { fullWidth: true } }}
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <FormControl fullWidth sx={{ mb: 2 }}>
-                  <InputLabel>Language</InputLabel>
-                  <Select
-                    name="language"
-                    value={userInfo.language}
-                    onChange={handleChange}
-                  >
-                    {languages.map((lang) => (
-                      <MenuItem 
-                        key={`${lang.language}-${lang.country}`} 
-                        value={lang.language}
-                      >
-                        {lang.language}/{lang.country}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                
-                <FormControl fullWidth>
-                  <InputLabel>Country/Region</InputLabel>
-                  <Select
-                    name="country"
-                    value={userInfo.country}
-                    onChange={handleChange}
-                  >
-                    {countries.map((country) => (
-                      <MenuItem key={country} value={country}>
-                        {country}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
             
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+            {/* Avatar section */}
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center',
+                mt: -8,
+                mb: 3
+              }}
             >
-              Update
-            </Button>
-          </Box>
-        </Box>
-      </Container>
+              <Box sx={{ position: 'relative' }}>
+                <Avatar 
+                  src={avatar} 
+                  sx={{ 
+                    width: 140, 
+                    height: 140, 
+                    border: '5px solid',
+                    borderColor: theme.palette.background.paper,
+                    backgroundColor: deepPurple[500],
+                    fontSize: '4rem'
+                  }}
+                >
+                  {userInfo.userName ? userInfo.userName[0].toUpperCase() : 'U'}
+                </Avatar>
+                <Tooltip title="Upload photo">
+                  <label htmlFor="upload-avatar">
+                    <input
+                      style={{ display: 'none' }}
+                      id="upload-avatar"
+                      name="upload-avatar"
+                      type="file"
+                      onChange={handleAvatarUpload}
+                      accept="image/*"
+                    />
+                    <IconButton 
+                      component="span"
+                      sx={{
+                        position: 'absolute',
+                        bottom: 5,
+                        right: 5,
+                        backgroundColor: theme.palette.primary.main,
+                        color: '#fff',
+                        '&:hover': {
+                          backgroundColor: theme.palette.primary.dark,
+                        },
+                        width: 40,
+                        height: 40,
+                      }}
+                    >
+                      <PhotoCameraIcon />
+                    </IconButton>
+                  </label>
+                </Tooltip>
+              </Box>
+
+              <Typography variant="h4" component="h1" sx={{ mt: 2, fontWeight: 'bold' }}>
+                User Profile
+              </Typography>
+              
+              <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 2 }}>
+                Customize your personal information
+              </Typography>
+            </Box>
+
+            <Divider variant="middle" sx={{ mb: 4 }} />
+
+            {/* Main form */}
+            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ px: 4, pb: 5 }}>
+              <Grid container spacing={3}>
+                {/* Personal Information Card */}
+                <Grid item xs={12}>
+                  <Card variant="outlined" sx={{ mb: 3 }}>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <PersonIcon color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="h6" component="h2">
+                          Personal Information
+                        </Typography>
+                      </Box>
+
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label="Nickname"
+                            name="userName"
+                            value={userInfo.userName}
+                            onChange={handleChange}
+                            InputProps={{
+                              startAdornment: <EditIcon color="action" sx={{ mr: 1, opacity: 0.6 }} />,
+                            }}
+                            variant="outlined"
+                          />
+                        </Grid>
+                        
+                        <Grid item xs={12} md={6}>
+                          <FormControl fullWidth>
+                            <InputLabel id="gender-select-label">Gender</InputLabel>
+                            <Select
+                              labelId="gender-select-label"
+                              name="gender"
+                              value={userInfo.gender ?? ''}
+                              onChange={handleChange}
+                              label="Gender"
+                            >
+                              <MenuItem value={true}>Male</MenuItem>
+                              <MenuItem value={false}>Female</MenuItem>
+                              <MenuItem value="">Prefer not to say</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="Introduction"
+                            name="introduction"
+                            value={userInfo.introduction}
+                            onChange={handleChange}
+                            multiline
+                            rows={3}
+                            placeholder="Tell us about yourself..."
+                            InputProps={{
+                              startAdornment: <InfoIcon color="action" sx={{ mr: 1, mt: 1, opacity: 0.6 }} />,
+                            }}
+                            variant="outlined"
+                          />
+                          <FormHelperText>
+                            A brief introduction about yourself that will be displayed on your profile
+                          </FormHelperText>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* Location Information Card */}
+                <Grid item xs={12}>
+                  <Card variant="outlined" sx={{ mb: 3 }}>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <LocationOnIcon color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="h6" component="h2">
+                          Location & Date
+                        </Typography>
+                      </Box>
+
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <TextField
+                            fullWidth
+                            label="Region"
+                            name="location"
+                            value={userInfo.location}
+                            onChange={handleChange}
+                            InputProps={{
+                              startAdornment: <LocationOnIcon color="action" sx={{ mr: 1, opacity: 0.6 }} />,
+                            }}
+                            variant="outlined"
+                          />
+                        </Grid>
+                        
+                        <Grid item xs={12} md={6}>
+                          <DatePicker
+                            label="Date of Birth"
+                            value={dayjs(userInfo.dateOfBirth)}
+                            onChange={handleDateChange}
+                            slotProps={{ 
+                              textField: { 
+                                fullWidth: true,
+                                InputProps: {
+                                  startAdornment: <CalendarTodayIcon color="action" sx={{ mr: 1, opacity: 0.6 }} />,
+                                }
+                              }
+                            }}
+                          />
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* Regional Settings Card */}
+                <Grid item xs={12}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <LanguageIcon color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="h6" component="h2">
+                          Regional Settings
+                        </Typography>
+                      </Box>
+
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <FormControl fullWidth>
+                            <InputLabel>Language</InputLabel>
+                            <Select
+                              name="language"
+                              value={userInfo.language || ''}
+                              onChange={handleChange}
+                              label="Language"
+                            >
+                              {languages.map((lang) => (
+                                <MenuItem 
+                                  key={`${lang.language}-${lang.country}`} 
+                                  value={lang.language}
+                                >
+                                  {lang.language}/{lang.country}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        
+                        <Grid item xs={12} md={6}>
+                          <FormControl fullWidth>
+                            <InputLabel>Country/Region</InputLabel>
+                            <Select
+                              name="country"
+                              value={userInfo.country || ''}
+                              onChange={handleChange}
+                              label="Country/Region"
+                            >
+                              {countries.map((country) => (
+                                <MenuItem key={country} value={country}>
+                                  {country}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+
+              {/* Submit Button */}
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  mt: 5 
+                }}
+              >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  startIcon={<SaveIcon />}
+                  sx={{
+                    px: 5,
+                    py: 1.5,
+                    fontSize: '1rem',
+                  }}
+                >
+                  Save Changes
+                </Button>
+              </Box>
+            </Box>
+          </Paper>
+        </Container>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

@@ -15,6 +15,7 @@ import MusicNoteOutlinedIcon from '@mui/icons-material/MusicNoteOutlined';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import NewspaperOutlinedIcon from '@mui/icons-material/NewspaperOutlined';
+import { useThemeMode } from '../../../../Themes/ThemeContext';
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -30,46 +31,58 @@ export default function (props) {
         setCategory(true)
         setCategorySelected([false, false, false, false, false])
     }
+    const { mode } = useThemeMode();
+    const iconColor = mode === 'dark' ? '#ffffff' : '#000000';
 
     return (
         <Stack direction="row">
-            <Checkbox {...label} id="category" icon={<PermContactCalendarOutlinedIcon />}
-                checkedIcon={<PermContactCalendarIcon />} onChange={()=>{handleClick(0)}} checked={categorySelected[0]} />
             <Checkbox
-                id="category"
-                {...label}
-                icon={<SpeakerNotesOutlinedIcon />}
-                checkedIcon={<SpeakerNotesIcon />}
-                onChange={()=>{handleClick(1)}}
-                checked={categorySelected[1]} />
-            <Checkbox
-                id="category"
-                {...label}
-                icon={<MovieCreationOutlinedIcon />}
-                checkedIcon={<MovieIcon />}
-                onChange={()=>{handleClick(2)}}
-                checked={categorySelected[2]} />
-            {/* music */}
-            <Checkbox
-                id="category"
-                {...label}
-                icon={<MusicNoteOutlinedIcon />}
-                checkedIcon={<MusicNoteIcon />}
-                onChange={()=>{handleClick(3)}}
-                checked={categorySelected[3]} />
-            {/* posts */}
-            <Checkbox
-                id="category"
-                {...label}
-                icon={<NewspaperOutlinedIcon />}
-                checkedIcon={<NewspaperIcon />}
-                onChange={()=>{handleClick(4)}}
-                checked={categorySelected[4]} />
+  {...label}
+  id="category"
+  icon={<PermContactCalendarOutlinedIcon sx={{ color: iconColor }} />}
+  checkedIcon={<PermContactCalendarIcon sx={{ color: iconColor }} />}
+  onChange={() => handleClick(0)}
+  checked={categorySelected[0]}
+/>
 
-            <IconButton id="category"
-                onClick={clear}
-            >
-                <NotInterestedIcon id="category" />
-            </IconButton>
+<Checkbox
+  id="category"
+  {...label}
+  icon={<SpeakerNotesOutlinedIcon sx={{ color: iconColor }} />}
+  checkedIcon={<SpeakerNotesIcon sx={{ color: iconColor }} />}
+  onChange={() => handleClick(1)}
+  checked={categorySelected[1]}
+/>
+
+<Checkbox
+  id="category"
+  {...label}
+  icon={<MovieCreationOutlinedIcon sx={{ color: iconColor }} />}
+  checkedIcon={<MovieIcon sx={{ color: iconColor }} />}
+  onChange={() => handleClick(2)}
+  checked={categorySelected[2]}
+/>
+
+<Checkbox
+  id="category"
+  {...label}
+  icon={<MusicNoteOutlinedIcon sx={{ color: iconColor }} />}
+  checkedIcon={<MusicNoteIcon sx={{ color: iconColor }} />}
+  onChange={() => handleClick(3)}
+  checked={categorySelected[3]}
+/>
+
+<Checkbox
+  id="category"
+  {...label}
+  icon={<NewspaperOutlinedIcon sx={{ color: iconColor }} />}
+  checkedIcon={<NewspaperIcon sx={{ color: iconColor }} />}
+  onChange={() => handleClick(4)}
+  checked={categorySelected[4]}
+/>
+
+<IconButton id="category" onClick={clear}>
+  <NotInterestedIcon sx={{ color: iconColor }} />
+</IconButton>
         </Stack>)
 }

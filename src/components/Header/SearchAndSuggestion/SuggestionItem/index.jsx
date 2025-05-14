@@ -6,14 +6,16 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItem from '@mui/material/ListItem';
 import CardMedia from '@mui/material/CardMedia';
 import * as React from 'react';
-
+import { useThemeMode } from '../../../../Themes/ThemeContext';
 export default function (props) {
   let { title, introduction, pics, type } = props.searchResult
   let { setSuggestionOpen } = props
-
+  const { mode } = useThemeMode();
   let miniture = (<div></div>)
-
-  //console.log(setSuggestionOpen)
+  const bgColor = mode === 'dark' ? '#2a2a2a' : '#fff';
+  const textColor = mode === 'dark' ? '#fff' : '#000';
+  const secondaryTextColor = mode === 'dark' ? '#aaa' : '#555';
+    //console.log(setSuggestionOpen)
 
   const handleSuggestionSelection = (event) => {
     //console.log(setSuggestionOpen)
@@ -39,20 +41,21 @@ export default function (props) {
 
 
   return (
-    <ListItemButton onClick={handleSuggestionSelection}>
-      <ListItem alignItems="flex-start">
-        {
-          miniture
-        }
-        <ListItemText
-          primary={title}
-          secondary={
-            <React.Fragment>
-              {introduction}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-    </ListItemButton>
+
+<ListItemButton onClick={handleSuggestionSelection} sx={{ bgcolor: bgColor }}>
+  <ListItem alignItems="flex-start">
+    {miniture}
+    <ListItemText
+      primary={title}
+      secondary={
+        <React.Fragment>
+          {introduction}
+        </React.Fragment>
+      }
+      primaryTypographyProps={{ sx: { color: textColor } }}
+      secondaryTypographyProps={{ sx: { color: secondaryTextColor } }}
+    />
+  </ListItem>
+</ListItemButton>
   )
 }

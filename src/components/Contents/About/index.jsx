@@ -24,10 +24,12 @@ import {
   Favorite as FavoriteIcon
 } from '@mui/icons-material';
 import { useNotification } from '../../../Providers/NotificationProvider';
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 const AboutPage = () => {
   // Simplified personal information
     const { showNotification } = useNotification();
+    const { mode } = useThemeMode();
   
   const personalInfo = {
     name: "Your Name",
@@ -62,138 +64,148 @@ const AboutPage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 8 }}>
-      {/* Header Section */}
-      <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
-        <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} alignItems="center" mb={3}>
-          <Avatar 
-            src={personalInfo.avatarUrl}
-            alt={personalInfo.name}
-            sx={{ 
-              width: 150, 
-              height: 150, 
-              mr: { xs: 0, sm: 4 },
-              mb: { xs: 2, sm: 0 }
+    
+<Container
+  maxWidth="md"
+  sx={{
+    py: 8,
+    bgcolor: mode === 'dark' ? '#121212' : '#FFFFFF',
+    color: mode === 'dark' ? '#FFFFFF' : '#000000'
+  }}
+>
+  {/* Header Section */}
+  <Paper
+    elevation={3}
+    sx={{
+      p: 4,
+      mb: 4,
+      borderRadius: 2,
+      bgcolor: mode === 'dark' ? '#1E1E1E' : '#FAFAFA',
+      color: mode === 'dark' ? '#FFFFFF' : '#000000'
+    }}
+  >
+    <Box display="flex" flexDirection={{ xs:  'column', sm: 'row' }} alignItems="center" mb={3}>
+      <Avatar 
+        src={personalInfo.avatarUrl}
+        alt={personalInfo.name}
+        sx={{ 
+          width: 150, 
+          height: 150, 
+          mr: { xs: 0, sm: 4 },
+          mb: { xs: 2, sm: 0 }
+        }}
+      />
+      <Box>
+        <Typography variant="h4" component="h1" gutterBottom>
+          {personalInfo.name}
+        </Typography>
+        <Typography variant="h6" sx={{ color: mode === 'dark' ? '#BB86FC' : '#6200EE' }} gutterBottom>
+          {personalInfo.title}
+        </Typography>
+        <Box display="flex" alignItems="center" mb={1}>
+          <LocationIcon fontSize="small" sx={{ color: mode === 'dark' ? '#90CAF9' : '#1976D2', mr: 1 }} />
+          <Typography variant="body2" sx={{ color: mode === 'dark' ? '#B0B0B0' : '#555555' }}>
+            {personalInfo.location}
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
+
+    <Divider sx={{ my: 3, bgcolor: mode === 'dark' ? '#2C2C2C' : '#E0E0E0' }} />
+
+    <Typography variant="h6" component="h2" gutterBottom>
+      About Me
+    </Typography>
+    <Typography variant="body1" paragraph>
+      {personalInfo.bio}
+    </Typography>
+  </Paper>
+
+  {/* Skills Section */}
+  <Paper
+    elevation={3}
+    sx={{
+      p: 4,
+      mb: 4,
+      borderRadius: 2,
+      bgcolor: mode === 'dark' ? '#1E1E1E' : '#FAFAFA',
+      color: mode === 'dark' ? '#FFFFFF' : '#000000'
+    }}
+  >
+    <Box display="flex" alignItems="center" mb={2}>
+      <SkillsIcon sx={{ color: mode === 'dark' ? '#90CAF9' : '#1976D2', mr: 1 }} />
+      <Typography variant="h6" component="h2">
+        Skills
+      </Typography>
+    </Box>
+    <Grid container spacing={1}>
+      {personalInfo.skills.map((skill, index) => (
+        <Grid item key={index}>
+          <Chip
+            label={skill}
+            sx={{
+              bgcolor: mode === 'dark' ? '#333333' : '#E0E0E0',
+              color: mode === 'dark' ? '#FFFFFF' : '#000000'
             }}
           />
-          <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
-              {personalInfo.name}
-            </Typography>
-            <Typography variant="h6" color="primary" gutterBottom>
-              {personalInfo.title}
-            </Typography>
-            <Box display="flex" alignItems="center" mb={1}>
-              <LocationIcon fontSize="small" color="action" sx={{ mr: 1 }} />
-              <Typography variant="body2" color="text.secondary">
-                {personalInfo.location}
-              </Typography>
-            </Box>
-            <Box display="flex" mt={2}>
-              <IconButton 
-                color="primary" 
-                aria-label="LinkedIn profile"
-                href={personalInfo.social.linkedin}
-                target="_blank"
-                rel="noopener"
-              >
-                <LinkedInIcon />
-              </IconButton>
-              <IconButton 
-                color="primary" 
-                aria-label="GitHub profile"
-                href={personalInfo.social.github}
-                target="_blank" 
-                rel="noopener"
-              >
-                <GitHubIcon />
-              </IconButton>
-              <Button 
-                variant="outlined" 
-                startIcon={<EmailIcon />}
-                href="#contact"
-                sx={{ ml: 1 }}
-              >
-                Contact
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-
-        <Divider sx={{ my: 3 }} />
-
-        <Typography variant="h6" component="h2" gutterBottom>
-          About Me
-        </Typography>
-        <Typography variant="body1" paragraph>
-          {personalInfo.bio}
-        </Typography>
-      </Paper>
-
-      {/* Skills Section */}
-      <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
-        <Box display="flex" alignItems="center" mb={2}>
-          <SkillsIcon color="primary" sx={{ mr: 1 }} />
-          <Typography variant="h6" component="h2">
-            Skills
-          </Typography>
-        </Box>
-        <Grid container spacing={1}>
-          {personalInfo.skills.map((skill, index) => (
-            <Grid item key={index}>
-              <Chip
-                label={skill}
-                color="primary"
-                variant="outlined"
-              />
-            </Grid>
-          ))}
         </Grid>
-      </Paper>
+      ))}
+    </Grid>
+  </Paper>
 
-      {/* Special Thanks Section */}
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-        <Box display="flex" alignItems="center" mb={3}>
-          <FavoriteIcon color="primary" sx={{ mr: 1 }} />
-          <Typography variant="h6" component="h2">
-            Special Thanks
-          </Typography>
-        </Box>
-        
-        <Grid container spacing={2}>
-          {personalInfo.specialThanks.map((thanks, index) => (
-            <Grid item xs={12} md={6} key={index}>
-              <Paper 
-                elevation={1} 
-                sx={{ 
-                  p: 2, 
-                  height: '100%',
-                  bgcolor: 'background.default',
-                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 4
-                  }
-                }}
-              >
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                  {thanks.name}
-                </Typography>
-                <Typography variant="body2">
-                  {thanks.contribution}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
+  {/* Special Thanks Section */}
+  <Paper
+    elevation={3}
+    sx={{
+      p: 4,
+      borderRadius: 2,
+      bgcolor: mode === 'dark' ? '#1E1E1E' : '#FAFAFA',
+      color: mode === 'dark' ? '#FFFFFF' : '#000000'
+    }}
+  >
+    <Box display="flex" alignItems="center" mb={3}>
+      <FavoriteIcon sx={{ color: mode === 'dark' ? '#90CAF9' : '#1976D2', mr: 1 }} />
+      <Typography variant="h6" component="h2">
+        Special Thanks
+      </Typography>
+    </Box>
+
+    <Grid container spacing={2}>
+      {personalInfo.specialThanks.map((thanks, index) => (
+        <Grid item xs={12} md={6} key={index}>
+          <Paper
+            elevation={1}
+            sx={{
+              p: 2,
+              height: '100%',
+              bgcolor: mode === 'dark' ? '#121212' : '#FFFFFF',
+              color: mode === 'dark' ? '#FFFFFF' : '#000000',
+              transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: 4
+              }
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              {thanks.name}
+            </Typography>
+            <Typography variant="body2">
+              {thanks.contribution}
+            </Typography>
+          </Paper>
         </Grid>
+      ))}
+    </Grid>
 
-        <Box textAlign="center" mt={4}>
-          <Typography variant="body1" fontStyle="italic">
-            "Thank you to everyone who has been part of this journey. Your support and encouragement make all the difference."
-          </Typography>
-        </Box>
-      </Paper>
-    </Container>
+    <Box textAlign="center" mt={4}>
+      <Typography variant="body1" fontStyle="italic">
+        "Thank you to everyone who has been part of this journey. Your support and encouragement make all the difference."
+      </Typography>
+    </Box>
+  </Paper>
+</Container>
+
   );
 };
 

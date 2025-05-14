@@ -164,12 +164,26 @@ export default function FunctionDrawer(props) {
   };
 
   return (
-    <Drawer variant="permanent" open={open}>
-      <DrawerHeader>
+    <Drawer variant="permanent" open={open}   sx={{
+      backgroundColor: mode === 'dark' ? '#121212' : '#fff', // or match with MUI theme.paper
+      color: mode === 'dark' ? '#fff' : '#000',
+      '& .MuiDrawer-paper': {
+        backgroundColor: mode === 'dark' ? '#121212' : '#fff',
+        color: mode === 'dark' ? '#fff' : '#000',
+      },
+    }}>
+      <DrawerHeader  sx={{
+      backgroundColor: mode === 'dark' ? '#121212' : '#fff', // Set header background color
+      color: mode === 'dark' ? '#fff' : '#000',              // Set text/icon color in header
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      px: 2, // Optional padding
+    }}>
         <IconButton 
           onClick={toggleDrawer}
           sx={{
-            color: mode === 'dark' ? '#ffffff' : 'inherit',
+            color: mode === 'dark' ? '#ffffff' : '#000000',
           }}
         >
           {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
