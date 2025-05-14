@@ -15,23 +15,27 @@ import { useTheme } from '@mui/material/styles';
 import StarIcon from '@mui/icons-material/Star';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { useNotification } from '../../../Providers/NotificationProvider';
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
-const style = {
-  py: 3,
-  px: 2,
-  width: '100%',
-  maxWidth: 900,
-  mx: 'auto',
-  borderRadius: 3,
-  border: 'none',
-  backgroundColor: 'background.paper',
-  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)',
-};
+
 
 export default function Trends() {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
   const { showNotification } = useNotification();
+  const { mode } = useThemeMode();
+
+  const style = {
+    py: 3,
+    px: 2,
+    width: '100%',
+    maxWidth: 900,
+    mx: 'auto',
+    borderRadius: 3,
+    border: 'none',
+    backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
+    boxShadow: mode === 'dark' ? '0 8px 24px rgba(255, 255, 255, 0.08)' : '0 8px 24px rgba(0, 0, 0, 0.08)',
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -109,9 +113,9 @@ export default function Trends() {
                 borderRadius: 2,
                 transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.01)',
+                  backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.01)',
                   transform: 'translateY(-4px)',
-                  boxShadow: '0 12px 20px rgba(0, 0, 0, 0.1)'
+                  boxShadow: mode === 'dark' ? '0 12px 20px rgba(255, 255, 255, 0.05)' : '0 12px 20px rgba(0, 0, 0, 0.1)'
                 }
               }}
             >
@@ -124,7 +128,7 @@ export default function Trends() {
                   overflow: 'hidden',
                   boxShadow: 'none',
                   borderRadius: 3,
-                  bgcolor: 'background.paper',
+                  bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
                   position: 'relative'
                 }}
               >
@@ -232,9 +236,9 @@ export default function Trends() {
       sx={{ 
         py: 5, 
         px: 3, 
-        backgroundColor: '#f8f9fa', 
+        backgroundColor: mode === 'dark' ? '#121212' : '#f8f9fa', 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+        background: mode === 'dark' ? 'linear-gradient(135deg, #121212 0%, #1e1e1e 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
       }}
     >
       <Typography 
@@ -244,7 +248,7 @@ export default function Trends() {
           textAlign: 'center', 
           fontWeight: 800,
           letterSpacing: '-0.02em',
-          color: '#1a1a2e'
+          color: mode === 'dark' ? '#ffffff' : '#1a1a2e'
         }}
       >
         Trending Content
@@ -266,11 +270,11 @@ export default function Trends() {
       <Box 
         sx={{ 
           borderRadius: 3,
-          backgroundColor: '#fff',
+          backgroundColor: mode === 'dark' ? '#333333' : '#fff',
           width: '100%', 
           maxWidth: 500, 
           mx: 'auto',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+          boxShadow: mode === 'dark' ? '0 4px 12px rgba(255, 255, 255, 0.03)' : '0 4px 12px rgba(0, 0, 0, 0.05)'
         }}
       >
         <Tabs 

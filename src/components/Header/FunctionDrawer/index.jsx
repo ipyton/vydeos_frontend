@@ -16,6 +16,7 @@ import AuthUtil from '../../../util/io_utils/AuthUtil';
 import localforage from 'localforage';
 // Import all Material UI icons dynamically
 import * as MuiIcons from '@mui/icons-material';
+import { useThemeMode } from '../../../Themes/ThemeContext'; 
 
 const drawerWidth = 240;
 
@@ -26,6 +27,8 @@ const openedMixin = (theme) => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: 'hidden',
+  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.8)' : theme.palette.background.default,
+  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
 });
 
 const closedMixin = (theme) => ({
@@ -38,6 +41,8 @@ const closedMixin = (theme) => ({
   [theme.breakpoints.up('sm')]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
+  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.8)' : theme.palette.background.default,
+  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
 });
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -45,6 +50,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   padding: theme.spacing(0, 1),
+  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.9)' : theme.palette.background.default,
+  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
@@ -55,6 +62,10 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     flexShrink: 0,
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
+    '& .MuiDrawer-paper': {
+      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.8)' : theme.palette.background.default,
+      color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+    },
     ...(open && {
       ...openedMixin(theme),
       '& .MuiDrawer-paper': openedMixin(theme),
@@ -68,13 +79,14 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 // Helper function to get Material UI icon component by name
 const DynamicIcon = ({ iconName }) => {
+  const { mode } = useThemeMode(); // Access theme mode
   // Material UI exports icons without the "Icon" suffix
   // Convert "MessageIcon" to "Message" for proper lookup
   const iconNameWithoutSuffix = iconName.replace(/Icon$/, '');
   
   // Default to Inbox if the requested icon doesn't exist
   const IconComponent = MuiIcons[iconNameWithoutSuffix] || MuiIcons['Inbox'];
-  return <IconComponent />;
+  return <IconComponent sx={{ color: mode === 'dark' ? '#ffffff' : 'inherit' }} />;
 };
 
 export default function FunctionDrawer(props) {
@@ -82,13 +94,13 @@ export default function FunctionDrawer(props) {
   const navigate = useNavigate();
   const { open, setOpen } = props;
   const [navigationItems, setNavigationItems] = useState([]);
+  const { mode } = useThemeMode(); // Access theme mode
   
   const toggleDrawer = () => {
     setOpen(!open);
   };
   const paths = localforage.getItem("paths")
   console.log(paths)
-
 
   // Default navigation map with icon names as strings
   const defaultNavigationMap = [
@@ -154,12 +166,25 @@ export default function FunctionDrawer(props) {
   return (
     <Drawer variant="permanent" open={open}>
       <DrawerHeader>
-        <IconButton onClick={toggleDrawer}>
+        <IconButton 
+          onClick={toggleDrawer}
+          sx={{
+            color: mode === 'dark' ? '#ffffff' : 'inherit',
+          }}
+        >
           {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>
       </DrawerHeader>
-      <Divider />
-      <List>
+      <Divider sx={{
+        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+      }} />
+      <List sx={{
+        backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.8)' : theme.palette.background.default,
+        color: mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+        '& .MuiListItemIcon-root': {
+          color: mode === 'dark' ? '#ffffff' : 'inherit',
+        },
+      }}>
         {navigationItems.map((item) => (
           <ListItem 
             onClick={() => handleNavigation(item.route)} 
@@ -172,6 +197,9 @@ export default function FunctionDrawer(props) {
                 minHeight: 48,
                 justifyContent: open ? 'initial' : 'center',
                 px: 2.5,
+                '&:hover': {
+                  backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                },
               }}
             >
               <ListItemIcon
@@ -179,11 +207,20 @@ export default function FunctionDrawer(props) {
                   minWidth: 0,
                   mr: open ? 3 : 'auto',
                   justifyContent: 'center',
+                  color: mode === 'dark' ? '#ffffff' : 'inherit',
                 }}
               >
                 <DynamicIcon iconName={item.iconName} />
               </ListItemIcon>
-              <ListItemText primary={item.name} sx={{ opacity: open ? 1 : 0 }} />
+              <ListItemText 
+                primary={item.name} 
+                sx={{ 
+                  opacity: open ? 1 : 0,
+                  '& .MuiTypography-root': {
+                    color: mode === 'dark' ? '#ffffff' : 'inherit',
+                  }
+                }} 
+              />
             </ListItemButton>
           </ListItem>
         ))}

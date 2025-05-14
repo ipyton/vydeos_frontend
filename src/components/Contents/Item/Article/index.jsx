@@ -26,6 +26,9 @@ import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNotification } from '../../../../Providers/NotificationProvider';
+import { useThemeMode } from '../../../../Themes/ThemeContext';
+
+
 
 const theme = createTheme({
   typography: {
@@ -56,8 +59,8 @@ export default function Article(props) {
   const [expanded, setExpanded] = React.useState(false);
   const [likes, setLikes] = React.useState(props.content.likes)
   const [comments, setComments] = React.useState(props.content.comments)
-    const { showNotification } = useNotification();
-  
+  const { showNotification } = useNotification();
+  const { mode } = useThemeMode();
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -67,11 +70,14 @@ export default function Article(props) {
     <Card sx={{width:"100%"}}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+          <Avatar sx={{ bgcolor: mode === 'dark' ? 'primary.main' : red[500] }} aria-label="recipe">
           </Avatar>
         }
         action={
-          <IconButton aria-label="settings">
+          <IconButton aria-label="settings" sx={{
+            bgcolor: mode === 'dark' ? 'background.paper' : 'white',
+            color: mode === 'dark' ? 'text.primary' : 'inherit',
+          }}>
             <MoreVertIcon />
           </IconButton>
         }
@@ -88,6 +94,8 @@ export default function Article(props) {
         height="194"
         image="/static/images/cards/paella.jpg"
         alt="Paella dish"
+        sx={{ filter: mode === 'dark' ? 'brightness(0.8)' : 'none' }}
+
       />
 
       <CardActions disableSpacing>
@@ -111,7 +119,7 @@ export default function Article(props) {
         <CardContent >
           <Stack sx={{ justifyContent: "center", alignItems:"center" }}>
             <Stack sx={{ width:"80%"}} direction="row">
-              <FormControl fullWidth variant="standard">
+              <FormControl fullWidth variant="standard"  sx={{ color: 'text.primary' }}>
                 <InputLabel htmlFor="input-with-icon-adornment">
                   Comment here
                 </InputLabel>

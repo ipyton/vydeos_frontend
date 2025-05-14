@@ -28,6 +28,7 @@ import {
 // Import createSvgIcon from the correct location
 import { createSvgIcon } from '@mui/material/utils';
 import { styled } from '@mui/material/styles';
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 // Create custom Plus icon
 const PlusIcon = createSvgIcon(
@@ -114,7 +115,7 @@ function Item(props) {
   const [page, setPage] = useState("friend");
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotification();
-
+  const { mode } = useThemeMode();
   // Handler functions
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -254,11 +255,18 @@ function Item(props) {
             event.preventDefault();
             handleSend();
           },
+          sx: {
+            bgcolor: mode === 'dark' ? '#121212' : 'white',
+            color: mode === 'dark' ? '#fff' : 'inherit',
+          }
         }}
       >
         <DialogTitle>Share Your Thoughts</DialogTitle>
         
-        <DialogContent>
+        <DialogContent sx={{ 
+  bgcolor: mode === 'dark' ? '#121212' : 'white',
+  color: mode === 'dark' ? '#fff' : 'inherit' 
+}}>
           <TextField
             id="post-content"
             label="Say Something"
@@ -267,7 +275,20 @@ function Item(props) {
             value={content}
             onChange={(event) => setContent(event.target.value)}
             variant="filled"
-            sx={{ width: "100%", mb: 2 }}
+            sx={{     
+              width: "100%", 
+              mb: 2,
+              bgcolor: mode === 'dark' ? '#121212' : 'white',
+              '& .MuiFilledInput-root': {
+                bgcolor: mode === 'dark' ? '#1e1e1e' : 'rgba(0, 0, 0, 0.06)',
+              },
+              '& .MuiInputLabel-root': {
+                color: mode === 'dark' ? '#aaa' : 'rgba(0, 0, 0, 0.6)',
+              },
+              '& .MuiFilledInput-input': {
+                color: mode === 'dark' ? '#fff' : 'inherit',
+              }
+            }}
           />
           
           <ImageList sx={{ width: "100%" }} cols={3} rowHeight={164}>
@@ -287,13 +308,30 @@ function Item(props) {
             ))}
 
             {postPics.length < 9 && (
-              <ImageListItem>
+              <ImageListItem sx={{ 
+                overflow: 'hidden', 
+                padding: 0,
+                bgcolor: mode === 'dark' ? '#1e1e1e' : 'white',
+                '& .MuiImageListItem-img': {
+                  bgcolor: mode === 'dark' ? '#1e1e1e' : 'white',
+                }
+              }}>
                 <Button
                   component="label"
-                  variant="contained"
-                  sx={{ width: 1, height: 1 }}
+                  variant={mode === 'dark' ? "outlined" : "contained"}
+                  label="Search Location"
+                  sx={{ 
+                    width: 1, 
+                    height: 1,
+                    bgcolor: mode === 'dark' ? '#1e1e1e' : 'primary.main',
+                    color: mode === 'dark' ? '#fff' : 'white',
+                    border: mode === 'dark' ? '1px dashed rgba(255, 255, 255, 0.3)' : 'none',
+                    '&:hover': {
+                      bgcolor: mode === 'dark' ? '#333' : 'primary.dark',
+                    }
+                  }}
                 >
-                  <PlusIcon />
+                  <PlusIcon color={mode === 'dark' ? "#fff" : "white"}/>
                   <VisuallyHiddenInput 
                     type="file" 
                     accept="image/*"
@@ -306,16 +344,22 @@ function Item(props) {
         </DialogContent>
 
         {/* Location accordion */}
-        <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+        <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}   sx={{
+    bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
+    color: mode === 'dark' ? '#fff' : 'inherit',
+    '& .MuiAccordionSummary-root': {
+      bgcolor: mode === 'dark' ? '#121212' : 'background.paper',
+    }
+  }}>
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+            expandIcon={<ExpandMoreIcon sx={{ color: mode === 'dark' ? '#fff' : 'inherit' }} />}
             aria-controls="panel1-content"
             id="panel1-header"
           >
-            <Typography sx={{ width: '33%', flexShrink: 0 }}>
+            <Typography sx={{ width: '33%', flexShrink: 0, color: mode === 'dark' ? '#fff' : 'inherit' }}>
               Location
             </Typography>
-            <Typography sx={{ color: 'text.secondary' }}>
+            <Typography sx={{ color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
               Configure a location
             </Typography>
           </AccordionSummary>
@@ -326,21 +370,43 @@ function Item(props) {
               fullWidth
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+              sx={{
+                '& .MuiInputBase-root': {
+                  color: mode === 'dark' ? '#fff' : 'inherit',
+                },
+                '& .MuiInputLabel-root': {
+                  color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'inherit',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+                  }
+                }
+              }}
             />
           </AccordionDetails>
         </Accordion>
 
         {/* Mentions accordion */}
-        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')} sx={{
+    bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
+    color: mode === 'dark' ? '#fff' : 'inherit',
+    '& .MuiAccordionSummary-root': {
+      bgcolor: mode === 'dark' ? '#121212' : 'background.paper',
+    }
+  }}>
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+            expandIcon={<ExpandMoreIcon sx={{ color: mode === 'dark' ? '#fff' : 'inherit' }} />}
             aria-controls="panel2-content"
             id="panel2-header"
           >
-            <Typography sx={{ width: '33%', flexShrink: 0 }}>
+            <Typography sx={{ width: '33%', flexShrink: 0, color: mode === 'dark' ? '#fff' : 'inherit' }}>
               Mention Someone
             </Typography>
-            <Typography sx={{ color: 'text.secondary' }}>
+            <Typography sx={{ color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
               <Stack direction="row" spacing={1} sx={{ overflow: "auto" }}>
                 {notice.map((person, idx) => (
                   <Chip
@@ -362,7 +428,22 @@ function Item(props) {
               id="people-search"
               label="Search People"
               fullWidth
-              sx={{ mb: 2 }}
+              sx={{
+                '& .MuiInputBase-root': {
+                  color: mode === 'dark' ? '#fff' : 'inherit',
+                },
+                '& .MuiInputLabel-root': {
+                  color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'inherit',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+                  }
+                }
+              }}
             />
             <List sx={{ maxHeight: 200, overflow: "auto" }}>
               {articles.slice(0, 5).map((_, idx) => (
@@ -381,16 +462,22 @@ function Item(props) {
         </Accordion>
 
         {/* Privacy accordion */}
-        <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+        <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')} sx={{
+    bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
+    color: mode === 'dark' ? '#fff' : 'inherit',
+    '& .MuiAccordionSummary-root': {
+      bgcolor: mode === 'dark' ? '#121212' : 'background.paper',
+    }
+  }}>
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+            expandIcon={<ExpandMoreIcon sx={{ color: mode === 'dark' ? '#fff' : 'inherit' }} />}
             aria-controls="panel3-content"
             id="panel3-header"
           >
-            <Typography sx={{ width: '33%', flexShrink: 0 }}>
+            <Typography sx={{ width: '33%', flexShrink: 0, color: mode === 'dark' ? '#fff' : 'inherit' }}>
               Who Can See
             </Typography>
-            <Typography sx={{ color: 'text.secondary' }}>
+            <Typography sx={{ color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
               Public By Default
             </Typography>
           </AccordionSummary>
@@ -421,6 +508,11 @@ function Item(props) {
                           tabIndex={-1}
                           disableRipple
                           inputProps={{ 'aria-labelledby': labelId }}
+                          sx={{
+                            '& .MuiSvgIcon-root': {
+                              color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.54)',
+                            },
+                          }}
                         />
                       </ListItemIcon>
                       <ListItemText id={labelId} primary={`Friend Group ${value + 1}`} />
@@ -456,6 +548,14 @@ function Item(props) {
             onClick={handleFriends} 
             color={page === "friend" ? "secondary" : "default"}
             aria-label="friends posts"
+            sx={{
+              bgcolor: page === "friend" 
+                ? 'secondary.main' 
+                : mode === 'dark' ? 'background.paper' : undefined,
+              color: page === "friend" 
+                ? 'secondary.contrastText' 
+                : mode === 'dark' ? 'text.primary' : undefined,
+            }}
           >
             <EditIcon sx={{ mr: 1 }} />
             Friends
@@ -466,6 +566,14 @@ function Item(props) {
             onClick={handleMy} 
             color={page === "my" ? "secondary" : "default"}
             aria-label="my posts"
+            sx={{
+              bgcolor: page === "friend" 
+                ? 'secondary.main' 
+                : mode === 'dark' ? 'background.paper' : undefined,
+              color: page === "friend" 
+                ? 'secondary.contrastText' 
+                : mode === 'dark' ? 'text.primary' : undefined,
+            }}
           >
             <NavigationIcon sx={{ mr: 1 }} />
             My Posts
