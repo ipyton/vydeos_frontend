@@ -16,7 +16,7 @@ export default function SideBar({ select, setSelect, sessions, setSessions }) {
   return (
     <Stack 
       sx={{ 
-        width: "30%", 
+        width: "100%", 
         boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)',
         borderRadius: 3,
         height: '100vh',

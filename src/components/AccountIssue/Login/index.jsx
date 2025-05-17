@@ -21,6 +21,9 @@ import { useNotification } from '../../../Providers/NotificationProvider';
 import localforage from 'localforage';
 import { Paper, Divider, Fade, Alert, Snackbar, CircularProgress } from '@mui/material';
 import AuthUtil from '../../../util/io_utils/AuthUtil';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import SignInButton from './SignInButton';
+
 // Custom theme with a more modern palette - matching the signup theme
 const theme = createTheme({
   palette: {
@@ -375,6 +378,9 @@ export default function Login(props) {
                   label="Remember me for 30 days"
                   sx={{ mb: 2 }}
                 />
+                        <GoogleOAuthProvider clientId="你的客户端ID">
+          <SignInButton />
+        </GoogleOAuthProvider>
                 
                 <Button
                   type="submit"

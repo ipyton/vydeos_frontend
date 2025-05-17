@@ -18,7 +18,9 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Slide
+  Slide,
+  Paper,
+  Fade
 } from '@mui/material';
 import Friend from './Friend';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -27,6 +29,7 @@ import {API_BASE_URL} from "../../../util/io_utils/URL";
 import Introductions from "../Introductions";
 import { useNotification } from '../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../Themes/ThemeContext';
+import CloseIcon from '@mui/icons-material/Close';
 
 // Transition for the mobile fullscreen dialog
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -38,7 +41,6 @@ export default function Friends(props) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   // State variables
-  const height = window.innerHeight * 0.8;
   const [selector, setSelector] = useState({type:"userId", content:"null"});
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogList, setDialogList] = useState([]);
@@ -128,11 +130,10 @@ export default function Friends(props) {
   return (
     <Stack 
       sx={{ 
-        width: isMobile ? '100%' : '80%', 
-        marginLeft: isMobile ? '0' : '10%',
-        marginTop: 2, 
-        height: height,
-        padding: isMobile ? 1 : 3
+        margin: isMobile ? '5px' : '5px',
+        width: isMobile ? '100%' : '100%',
+        height: isMobile ? "calc(100vh - 64px - 66px)" : "calc(100vh - 64px - 66px)",
+        padding: isMobile ? '0' : '0 5px',
       }} 
       direction={isMobile ? "column" : "row"} 
       spacing={2}
@@ -214,17 +215,25 @@ export default function Friends(props) {
       {/* Mobile Detail View as Dialog/Slide */}
       {isMobile && (
         <Dialog
-          fullScreen
           open={showMobileDetail}
           onClose={handleBackToList}
           TransitionComponent={Transition}
           sx={{
             '& .MuiDialog-paper': {
               backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
+              width: '100%',
+              height: '100%',
             }
           }}
         >
-          <AppBar position="static" color="primary" elevation={0}>
+
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
+          <Typography variant="h6">User Details</Typography>
+          <IconButton onClick={handleBackToList}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+          {/* <AppBar position="static" color="primary" elevation={0}>
             <Toolbar>
               <IconButton
                 edge="start"
@@ -238,45 +247,43 @@ export default function Friends(props) {
                 User Details
               </Typography>
             </Toolbar>
-          </AppBar>
+          </AppBar> */}
           <Box sx={{ height: 'calc(100vh - 56px)', overflow: 'auto' }}>
-            <Introductions selector={selector} position="bottom" isMobile={true} />
+            <Introductions selector={selector} handleBack={handleBackToList} isMobile={isMobile} />
           </Box>
         </Dialog>
       )}
       
-      {/* Main Content Layout */}
-      <Box sx={{
-        display: isMobile && showMobileDetail ? 'none' : 'block',
-        width: "100%",
-      }}>
-        <Stack sx={{
-          width: isMobile ? "100%" : "40%", 
-          height: isMobile ? "100%" : "100%",
-          minHeight: "300px",
-          float: isMobile ? 'none' : 'left'
-        }}>
-          <Button 
-            variant="contained" 
-            onClick={() => { setOpenDialog(true) }}
-            sx={{ mb: 2 }}
-          >
-            Create A Group
-          </Button>
-          <Friend setSelector={setSelector} />
-        </Stack>
-
-        {!isMobile && (
-          <Box sx={{ 
-            width: "58%",
-            height: "100%",
-            minHeight: "300px",
-            float: 'right'
-          }}>
-            <Introductions selector={selector} position="right" />
-          </Box>
-        )}
+      {!(!!isMobile && selector.content !== "null") && (
+  <Fade in={true} timeout={500}>
+    <div style={{ width: isMobile ? '100%' : '40%' }}>
+      <Box sx={{ height: '100%' }}>
+        <Button
+          variant="contained"
+          onClick={() => { setOpenDialog(true) }}
+          sx={{ mb: 2, width: '100%' }}
+        >
+          Create A Group
+        </Button>
+        <Friend setSelector={setSelector} />
       </Box>
+    </div>
+  </Fade>
+)}
+      
+      {selector.content !== "null" && (
+        <Slide
+          direction="left"
+          in={true}
+          mountOnEnter
+          unmountOnExit
+          timeout={300}
+        >
+          <div style={{ flexGrow: 1, width: isMobile ? '100%' : '50%' }}>
+            <Introductions selector={selector} position="right" />
+          </div>
+        </Slide>
+      )}
     </Stack>
   );
 }

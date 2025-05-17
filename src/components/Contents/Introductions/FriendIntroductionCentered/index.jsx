@@ -28,7 +28,8 @@ export default function (props) {
     const [contactButtonText, setContactButtonText] = useState("")
     const [followButtonText, setFollowButtonText] = useState("")
     const [extraInformation, setExtraInformation] = useState("")
-    const { userId } = props
+    const { userId, isMobile } = props
+
     let position = "center";
     // if (location.state ) {
     //     position = location.state.position
@@ -166,7 +167,7 @@ export default function (props) {
                 // justifyContent="center"
                 alignItems="center"
                 spacing={0.5} sx={{ width: "100%", overflow: "scroll", boxShadow: 0,height:"100%"}}>
-                <Stack direction="row" justifyContent="end" sx={{ width: "70%" }}>
+                <Stack direction={isMobile ? "column" : "row"} justifyContent="end" sx={{ width: "70%" }}>
                     <ListItem alignItems="flex-start" >
                         <ListItemAvatar>
                             <Avatar alt={details.userName} src={details.avatar} />

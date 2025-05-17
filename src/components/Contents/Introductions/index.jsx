@@ -47,7 +47,6 @@ export default function Introductions(props) {
                     textAlign: "center", 
                     pt: 4,
                     height: "100%",
-                    display: "flex",
                     justifyContent: "center",
                     alignItems: "center" 
                 }}>
@@ -62,28 +61,8 @@ export default function Introductions(props) {
     // For mobile views, we include our own AppBar if onBack is provided
     if (isMobile && typeof onBack === "function") {
         return (
-            <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-                <AppBar >
-                    <Toolbar>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            onClick={onBack}
-                            aria-label="back"
-                        >
-                            <ArrowBackIcon />
-                        </IconButton>
-                        <Typography variant="h6" component="div" sx={{ ml: 1, flex: 1 }}>
-                            {selector.type === "contact" ? "User Details" : 
-                             selector.type === "groupId" ? "Group Details" :
-                             selector.type === "movie" || selector.type === "tv" ? "Video Details" :
-                             "Details"}
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
-                <Box sx={{ flex: 1, overflow: "auto" }}>
-                    {renderContent()}
-                </Box>
+            <Box >
+                {renderContent()}
             </Box>
         );
     }
