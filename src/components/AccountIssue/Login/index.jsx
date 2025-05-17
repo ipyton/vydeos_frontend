@@ -387,7 +387,7 @@ export default function Login(props) {
                   fullWidth
                   variant="contained"
                   disabled={isLoading}
-                  sx={{ py: 1.5 }}
+                  sx={{ py: 1.5, mt: 2 }}
                 >
                   {isLoading ? (
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
