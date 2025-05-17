@@ -86,7 +86,8 @@ export default function ChatContainer(props) {
         display: 'flex',
         flexDirection: 'column',
         width: "100%",
-        height: isMobile ? "100vh" : "100%",
+        height: isMobile ? "calc(100vh - 64px - 66px)" : "calc(100vh - 64px - 66px)",
+
         borderRadius: 0,
         position: 'relative',
         backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb'
@@ -160,7 +161,7 @@ export default function ChatContainer(props) {
       <Box sx={{ 
         flexShrink: 0, 
         p: isMobile ? 1 : 2,
-        backgroundColor: '#ffffff',
+        backgroundColor: mode === 'dark' ? '#1e1e1e' : '#ffffff',
         borderTop: isMobile ? '1px solid rgba(0,0,0,0.08)' : 'none'
       }}>
         <InputBox

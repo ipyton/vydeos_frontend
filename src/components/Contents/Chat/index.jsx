@@ -18,18 +18,18 @@ export default function Chat(props) {
   return (
     <Stack
       sx={{
-        margin: isMobile ? '0' : '20px',
+        margin: isMobile ? '0' : '0px',
         marginTop: isMobile ? '0' : '20px',
-        width: isMobile ? '100%' : '95%',
-        height: isMobile ? '100vh' : height,
-        padding: isMobile ? '0' : '0 20px',
+        width: isMobile ? '100%' : '100%',
+        height: isMobile ? "calc(100vh - 64px - 66px)" : "calc(100vh - 64px - 66px)",
+        padding: isMobile ? '0' : '0 5px',
       }}
       direction={isMobile ? "column" : "row"}
       spacing={2}
     >
       {!(!!isMobile && (!!sideBarSelector)) && (
         <Fade in={true} timeout={500}>
-          <div style={{ width: isMobile ? '100%' : '350px' }}> {/* Fixed width for sidebar container */}
+          <div style={{ width: isMobile ? '100%' : '40%' }}> {/* Fixed width for sidebar container */}
             <SideBar
               select={sideBarSelector}
               setSelect={setSideBarSelector}
@@ -47,7 +47,7 @@ export default function Chat(props) {
           unmountOnExit
           timeout={300}
         >
-          <div style={{ flexGrow: 1, width: isMobile ? '100%' : 'calc(100% - 370px)' }}> {/* Adjusted width for message list */}
+          <div style={{ flexGrow: 1, width: isMobile ? '100%' : '50%' }}> {/* Adjusted width for message list */}
             <MessageList
               select={sideBarSelector}
               setSelect={setSideBarSelector}

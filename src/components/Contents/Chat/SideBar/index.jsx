@@ -66,7 +66,7 @@ export default function SideBar(props) {
       elevation={0}
       sx={{
         width: '100%', // Take full width of parent container
-        height: isMobile ? "100vh" : "100%",
+        height: isMobile ? "calc(100vh - 64px - 66px)" : "calc(100vh - 64px - 66px)",
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 0,
@@ -112,6 +112,7 @@ export default function SideBar(props) {
       color: 'text.secondary', 
       mr: 1, // Added margin right for better spacing from text
       ml: 1.5,
+      color: mode === 'dark' ? 'white' : 'black',
       fontSize: isMobile ? '1.2rem' : '1.4rem' 
     }} />
     <InputBase
@@ -125,7 +126,8 @@ export default function SideBar(props) {
           overflow: 'hidden', // Prevent text overflow
           textOverflow: 'ellipsis', // Add ellipsis for overflowing text
           whiteSpace: 'nowrap' // Keep text on one line
-        }
+        },
+        color: mode === 'dark' ? 'white' : 'black',
       }}
       placeholder="Search contacts..."
       value={searchQuery}
@@ -158,8 +160,7 @@ export default function SideBar(props) {
             display: 'flex', 
             justifyContent: 'center', 
             alignItems: 'center', 
-            height: '100%',
-            minHeight: isMobile ? '60vh' : 'auto',
+            minHeight: isMobile ? 'calc(100vh - 64px - 66px - 70px)' : 'auto',
             width: '100%'
           }}>
             <CircularProgress size={isMobile ? 30 : 40} />
@@ -172,7 +173,7 @@ export default function SideBar(props) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            minHeight: isMobile ? '60vh' : 'auto',
+            minHeight: isMobile ? 'calc(100vh - 64px - 66px - 70px)' : 'auto',
             width: '100%'
           }}>
             <Typography variant={isMobile ? "body2" : "body1"} color="text.secondary">
@@ -181,7 +182,7 @@ export default function SideBar(props) {
           </Box>
         ) : filteredContacts.length === 0 ? (
           <Box sx={{ 
-            p: isMobile ? 2 : 4, 
+            p: isMobile ? 4 : 4, 
             textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',

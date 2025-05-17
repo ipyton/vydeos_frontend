@@ -11,12 +11,12 @@ import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 import localforage from 'localforage';
 import DatabaseManipulator from '../../../../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../../../../Providers/NotificationProvider';
-
+import { useThemeMode } from '../../../../../Themes/ThemeContext';
 // Styled components
 const StyledPaper = styled(Paper)(({ theme, isMobile }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: theme.spacing(1),
+  padding: 0,
   borderRadius: 20,
   boxShadow: theme => theme.palette.mode === 'dark' ? '0 2px 5px rgba(255,255,255,0.05)' : '0 2px 5px rgba(0,0,0,0.1)',
   width: '100%',
@@ -56,7 +56,7 @@ export default function InputBox(props) {
   const open = Boolean(anchorEl);
   const inputRef = React.useRef(null);
   const { showNotification } = useNotification();
-
+  const theme = useThemeMode();
   const handleOpenAttachmentMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -122,8 +122,8 @@ export default function InputBox(props) {
   };
 
   return (
-    <Stack direction="row" sx={{ width: "100%", padding: 2 }} alignItems="center" spacing={1}>
-      <StyledPaper elevation={0} isMobile={window.innerWidth <= 768}>
+    <Stack direction="row" sx={{ width: "100%", padding: 0 }} alignItems="center" spacing={1} >
+      <StyledPaper elevation={0} isMobile={window.innerWidth <= 768} sx={{ backgroundColor: theme.mode === 'dark' ? '#1e1e1e' : '#ffffff' }}>
         <IconButton
           color="primary"
           aria-label="Attach files"
@@ -168,6 +168,7 @@ export default function InputBox(props) {
           vertical: 'bottom',
           horizontal: 'center',
         }}
+
       >
         <input id="uploadPic" type="file" accept="image/*" onChange={() => handleFileUpload('picture')} hidden />
         <input id="uploadVid" type="file" accept="video/*" onChange={() => handleFileUpload('video')} hidden />
