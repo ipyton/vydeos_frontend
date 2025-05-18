@@ -2,7 +2,7 @@ import Qs from 'qs'
 import axios from "axios"
 import { add, clear, batchAdd } from "../../components/redux/searchResult"
 import { Language } from '@mui/icons-material';
-import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
+import {DOWNLOAD_BASE_URL, API_BASE_URL, FLASK_API_BASE_URL} from "./URL";
 
 export default class SearchUtil {
 
@@ -19,7 +19,7 @@ export default class SearchUtil {
 
   static searchChatContactById(keyword, setList) {
     axios({
-      url: API_BASE_URL + "/search/contactById",
+      url: FLASK_API_BASE_URL + "/search/contactById",
       method: 'post',
       data: { userId: keyword },
       transformRequest: [function (data) {
@@ -117,7 +117,7 @@ export default class SearchUtil {
     language = JSON.parse(userInfo).language
     console.log(language)
     return axios({
-      url: API_BASE_URL + "/api/movie/search",
+      url: FLASK_API_BASE_URL + "/movie/search",
       method: 'get',
       params: { "keyword": keyword, page_number:1, "Accept-Language": language},
       transformRequest: [function (data) {

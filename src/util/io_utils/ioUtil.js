@@ -17,7 +17,6 @@ export default class IOUtil {
                 }],
                 headers: {
                     tokens: localStorage.getItem("token"),
-                    userEmail: '1838169994@qq.com',
                     keyword: keyword
                 }
             })
@@ -40,7 +39,6 @@ export default class IOUtil {
                 }],
                 headers: {
                     token: localStorage.getItem("token"),
-                    userEmail: '1838169994@qq.com',
                     config: config
                 }
             })
@@ -56,7 +54,6 @@ export default class IOUtil {
             if (localStorage.getItem("token") === null) {
                 return
             }
-            console.log("veryfying tokens")
             let response = await axios({
                 url: this.url_base + "/account/verifyToken",
                 method: 'post',
@@ -85,7 +82,6 @@ export default class IOUtil {
                 }],
                 headers: {
                     token: localStorage.getItem("token"),
-                    'userEmail': '1838169994@qq.com'
                 }
             })
             let responseData = response.data

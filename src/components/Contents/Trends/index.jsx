@@ -65,17 +65,17 @@ export default function Trends() {
     {
       title: "Inception 2",
       introduction: "Christopher Nolan returns with the long-awaited sequel to his mind-bending thriller.",
-      pic: "/api/placeholder/400/200"
+      pic: "https://images.unsplash.com/photo-1739467372234-2aba33f6b7ee?q=80&w=3135&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       title: "Eternal Sunshine",
       introduction: "A heartwarming sci-fi romance that explores the nature of memory and love.",
-      pic: "/api/placeholder/400/200"
+      pic: "https://images.unsplash.com/photo-1739467372234-2aba33f6b7ee?q=80&w=3135&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       title: "The Last Journey",
       introduction: "An epic adventure across uncharted territories with stunning visual effects.",
-      pic: "/api/placeholder/400/200"
+      pic: "https://images.unsplash.com/photo-1739467372234-2aba33f6b7ee?q=80&w=3135&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
   ];
 
