@@ -208,7 +208,7 @@ export default function MovieDetails(props) {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="none"  sx={{ py: 4,    width: 'calc(100% - 80px)', }}>
       <Paper elevation={3} sx={{ borderRadius: 2, overflow: "hidden" }}>
         {/* Movie Details Section */}
         <Box sx={{ p: 3 }}>

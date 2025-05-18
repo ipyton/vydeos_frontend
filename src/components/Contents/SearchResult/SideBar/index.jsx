@@ -7,10 +7,11 @@ import { useSelector } from 'react-redux';
 import SearchItem from './SearchItem';
 import SearchUtil from '../../../../util/io_utils/SearchUtil';
 import { useNotification } from '../../../../Providers/NotificationProvider';
-
+import { useMediaQuery } from '@mui/material';
+import { useThemeMode } from '../../../../Themes/ThemeContext';
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
-
+const { mode } = useThemeMode();
     return (
         <div
             role="tabpanel"
@@ -44,7 +45,7 @@ function a11yProps(index) {
 export default function SearchResults(props) {
     const theme = useTheme();
     const { setSelector } = props;
-    
+    const { mode } = useThemeMode();
     const [value, setValue] = React.useState(0);
     const [list, setList] = React.useState([]);
     const [states, setState] = React.useState([[], [], [], [], []]);
@@ -53,7 +54,7 @@ export default function SearchResults(props) {
     const searchType = useSelector((state) => state.search.searchType);
     const changed = useSelector((state) => state.search.changed);
     const { showNotification } = useNotification();
-    
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     React.useEffect(() => {
         states[value] = list;
@@ -114,7 +115,7 @@ export default function SearchResults(props) {
     return (
         <Stack 
             sx={{ 
-                width: "30%", 
+                width: isMobile ? 'calc(100% - 30px)' : '30%', 
                 height: "100%", 
                 boxShadow: 3, 
                 borderRadius: 1,
