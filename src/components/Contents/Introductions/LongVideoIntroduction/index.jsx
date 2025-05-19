@@ -32,9 +32,12 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { useLocation, useNavigate } from "react-router-dom";
 import VideoUtil from "../../../../util/io_utils/VideoUtil";
 import { useNotification } from "../../../../Providers/NotificationProvider";
-
+import { useThemeMode } from "../../../../Themes/ThemeContext";
+import {ArrowBack as ArrowBackIcon} from "@mui/icons-material";
 // Image component with consistent styling
 function MovieImage({ src, alt }) {
+  const { mode } = useThemeMode();
+  
   return (
     <Box
       component="img"
@@ -43,7 +46,7 @@ function MovieImage({ src, alt }) {
         height: "auto",
         objectFit: "cover",
         borderRadius: 1,
-        boxShadow: 2,
+        boxShadow: mode === "dark" ? "0px 3px 8px rgba(0, 0, 0, 0.5)" : 2,
         transition: "transform 0.3s",
         "&:hover": {
           transform: "scale(1.02)",
@@ -62,13 +65,26 @@ export default function MovieDetails(props) {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isStared, setIsStared] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const { mode } = useThemeMode();
   const [playable, setPlayable] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const position = props.position || "center";
   const { showNotification } = useNotification();
-  
+  const isMobile = props.isMobile || false;
+
+  // Theme colors based on mode
+  const themeColors = {
+    background: mode === "dark" ? "#121212" : "#ffffff",
+    paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
+    cardBg: mode === "dark" ? "#2d2d2d" : "#f5f5f5",
+    text: {
+      primary: mode === "dark" ? "#ffffff" : "#000000",
+      secondary: mode === "dark" ? "#b0b0b0" : "#666666",
+    },
+    divider: mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)",
+    icon: mode === "dark" ? "#90caf9" : "#1976d2",
+  };
 
   // Handle initialization from props or route state
   useEffect(() => {
@@ -80,11 +96,10 @@ export default function MovieDetails(props) {
     
     if (props.content) {
       console.log("Props content:", props.content);
-
       setVideoIdentifier(props.content);
     }
   }, [props.content, location.state]);
-  console.log(details)
+  console.log(details);
 
   // Handle star/favorite action
   const handleStar = () => {
@@ -123,7 +138,7 @@ export default function MovieDetails(props) {
 
   const handlePlay = () => {
     navigate("/longvideos", { state: videoIdentifier });
-  }
+  };
 
   // Load movie data and status
   useEffect(() => {
@@ -147,7 +162,6 @@ export default function MovieDetails(props) {
             if (res.data.code === 0) {
               if (res.data.message === "stared") {
                 setIsStared(true);
-
               } else {
                 setIsStared(false);
               }
@@ -156,31 +170,31 @@ export default function MovieDetails(props) {
             }
           });
 
-          VideoUtil.isPlayable(videoIdentifier).then((res) => {
-            try {
-              console.log(res.data)
+          VideoUtil.isPlayable(videoIdentifier)
+            .then((res) => {
+              try {
+                console.log(res.data);
                 if (res.data && res.data.code === 0) {
-                    if (res.data.message === "true") {
-                        setPlayable(true);
-                    } else {
-                        setPlayable(false);
-                    }
+                  if (res.data.message === "true") {
+                    setPlayable(true);
+                  } else {
+                    setPlayable(false);
+                  }
                 }
-            } catch (err) {
+              } catch (err) {
                 showNotification(`Error: ${err.message}`, "error");
                 setPlayable(false);
-            } finally {
-                setLoading(false);  // 无论成功或失败都执行
-            }
-        })
-        .catch(error => {
-            showNotification("Internal Error", "warning");
-            setLoading(false);
-        });
+              } finally {
+                setLoading(false);  // Execute regardless of success or failure
+              }
+            })
+            .catch(error => {
+              showNotification("Internal Error", "warning");
+              setLoading(false);
+            });
           
           setLoading(false);
-        })
-
+        });
     }
   }, [videoIdentifier]);
 
@@ -190,8 +204,15 @@ export default function MovieDetails(props) {
   // Show loading state
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh" }}>
-        <CircularProgress />
+      <Box sx={{ 
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        height: "50vh",
+        color: themeColors.text.primary,
+        bgcolor: themeColors.background
+      }}>
+        <CircularProgress color={mode === "dark" ? "info" : "primary"} />
         <Typography sx={{ ml: 2 }}>Loading movie details...</Typography>
       </Box>
     );
@@ -199,8 +220,13 @@ export default function MovieDetails(props) {
 
   if (!details) {
     return (
-      <Box sx={{ textAlign: "center", py: 4 }}>
-        <Typography variant="h6" color="text.secondary">
+      <Box sx={{ 
+        textAlign: "center", 
+        py: 4,
+        color: themeColors.text.primary,
+        bgcolor: themeColors.background
+      }}>
+        <Typography variant="h6">
           No movie details available
         </Typography>
       </Box>
@@ -208,26 +234,56 @@ export default function MovieDetails(props) {
   }
 
   return (
-    <Container maxWidth="none"  sx={{ py: 4,    width: 'calc(100% - 80px)', }}>
-      <Paper elevation={3} sx={{ borderRadius: 2, overflow: "hidden" }}>
+    <Container maxWidth="none" sx={{ 
+      py: 4, 
+      width: isMobile === true ? "100%" : '100%',
+      bgcolor: themeColors.background,
+    }}>
+      <Paper elevation={3} sx={{ 
+        borderRadius: 2, 
+        overflow: "hidden", 
+        bgcolor: themeColors.paper,
+        color: themeColors.text.primary
+      }}>
         {/* Movie Details Section */}
-        <Box sx={{ p: 3 }}>
+        <Box >
           <Stack 
             direction={{ xs: "column", sm: "row" }}
             spacing={4} 
             sx={{ width: "100%" }}
           >
+            {isMobile && props.onBack && (
+              <IconButton
+                onClick={() => props.onBack()}
+                sx={{
+                  color: themeColors.icon,
+                  "&:hover": {
+                    color: mode === "dark" ? "#b3e5fc" : "#0d47a1",
+                  },
+                }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+            )}
+
             {/* Movie Poster */}
             <Box sx={{ width: { xs: "100%", sm: "30%" }, mb: { xs: 2, sm: 0 } }}>
               <MovieImage src={details.poster} alt={details.movie_name} />
               
               {/* Action Buttons */}
               <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
-                <ButtonGroup variant="contained" sx={{ boxShadow: 2 }}>
+                <ButtonGroup variant="contained"   orientation="vertical"  sx={{ 
+                  boxShadow: mode === "dark" ? '0px 3px 5px rgba(0, 0, 0, 0.5)' : 2 
+                }}>
                   <Button 
                     color={isStared ? "warning" : "primary"}
                     onClick={isStared ? handleRemove : handleStar}
                     startIcon={isStared ? <StarIcon /> : <StarBorderIcon />}
+                    sx={{
+                      "&.Mui-disabled": {
+                        color: mode === "dark" ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.26)"
+                      }
+                    }}
                   >
                     {isStared ? "Unstar" : "Star"}
                   </Button>
@@ -236,6 +292,12 @@ export default function MovieDetails(props) {
                     onClick={sendRequest} 
                     disabled={isDisabled}
                     startIcon={<MovieIcon />}
+                    sx={{
+                      "&.Mui-disabled": {
+                        color: mode === "dark" ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.26)",
+                        bgcolor: mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)"
+                      }
+                    }}
                   >
                     Request
                   </Button>
@@ -248,10 +310,22 @@ export default function MovieDetails(props) {
               {/* Movie Title and Tags */}
               <Box>
                 <Typography variant="h4" component="h1" gutterBottom>
-                  {details.movie_name + "("+ details.type + ")"}
-                  <IconButton color="primary" aria-label="delete" size="large" disabled={!playable}  onClick={handlePlay}>
-                  <PlayCircleOutlineIcon/>
-</IconButton>
+                  {details.movie_name + " (" + details.type + ")"}
+                  <IconButton 
+                    color="primary" 
+                    aria-label="play" 
+                    size="large" 
+                    disabled={!playable} 
+                    onClick={handlePlay}
+                    sx={{
+                      color: playable ? themeColors.icon : (mode === "dark" ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.26)"),
+                      "&:hover": {
+                        color: playable ? (mode === "dark" ? "#b3e5fc" : "#0d47a1") : undefined,
+                      }
+                    }}
+                  >
+                    <PlayCircleOutlineIcon />
+                  </IconButton>
                 </Typography>
                 
                 {details.tag && (
@@ -259,19 +333,32 @@ export default function MovieDetails(props) {
                     label={details.tag} 
                     size="small" 
                     color="primary" 
-                    sx={{ mr: 1 }} 
+                    sx={{ 
+                      mr: 1,
+                      bgcolor: mode === "dark" ? "#0d47a1" : undefined,
+                      color: mode === "dark" ? "#ffffff" : undefined
+                    }} 
                   />
                 )}
               </Box>
               
-              <Divider />
+              <Divider sx={{ borderColor: themeColors.divider }} />
               
               {/* Movie Details */}
               <Stack spacing={2}>
                 {/* Release Year */}
-                <Card variant="outlined" sx={{ bgcolor: "background.paper" }}>
-                  <CardContent sx={{ display: "flex", alignItems: "center", py: 1, "&:last-child": { pb: 1 } }}>
-                    <CalendarTodayIcon sx={{ mr: 1, color: "primary.main" }} />
+                <Card variant="outlined" sx={{ 
+                  bgcolor: themeColors.cardBg,
+                  borderColor: themeColors.divider
+                }}>
+                  <CardContent sx={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    py: 1, 
+                    "&:last-child": { pb: 1 },
+                    color: themeColors.text.primary
+                  }}>
+                    <CalendarTodayIcon sx={{ mr: 1, color: themeColors.icon }} />
                     <Typography variant="subtitle1" fontWeight="medium">
                       Release Year: {details.release_year}
                     </Typography>
@@ -279,9 +366,18 @@ export default function MovieDetails(props) {
                 </Card>
                 
                 {/* Genre */}
-                <Card variant="outlined" sx={{ bgcolor: "background.paper" }}>
-                  <CardContent sx={{ display: "flex", alignItems: "flex-start", py: 1, "&:last-child": { pb: 1 } }}>
-                    <CategoryIcon sx={{ mr: 1, mt: 0.5, color: "primary.main" }} />
+                <Card variant="outlined" sx={{ 
+                  bgcolor: themeColors.cardBg,
+                  borderColor: themeColors.divider
+                }}>
+                  <CardContent sx={{ 
+                    display: "flex", 
+                    alignItems: "flex-start", 
+                    py: 1, 
+                    "&:last-child": { pb: 1 },
+                    color: themeColors.text.primary
+                  }}>
+                    <CategoryIcon sx={{ mr: 1, mt: 0.5, color: themeColors.icon }} />
                     <Box>
                       <Typography variant="subtitle1" fontWeight="medium">
                         Genres:
@@ -293,6 +389,10 @@ export default function MovieDetails(props) {
                             label={genre} 
                             size="small" 
                             variant="outlined" 
+                            sx={{
+                              borderColor: mode === "dark" ? "rgba(255, 255, 255, 0.23)" : undefined,
+                              color: themeColors.text.primary
+                            }}
                           />
                         ))}
                       </Box>
@@ -301,10 +401,17 @@ export default function MovieDetails(props) {
                 </Card>
                 
                 {/* Introduction */}
-                <Card variant="outlined" sx={{ bgcolor: "background.paper" }}>
-                  <CardContent sx={{ py: 1, "&:last-child": { pb: 1 } }}>
+                <Card variant="outlined" sx={{ 
+                  bgcolor: themeColors.cardBg,
+                  borderColor: themeColors.divider
+                }}>
+                  <CardContent sx={{ 
+                    py: 1, 
+                    "&:last-child": { pb: 1 },
+                    color: themeColors.text.primary
+                  }}>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
+                      <DescriptionIcon sx={{ mr: 1, color: themeColors.icon }} />
                       <Typography variant="subtitle1" fontWeight="medium">
                         Introduction
                       </Typography>
@@ -317,18 +424,32 @@ export default function MovieDetails(props) {
                 
                 {/* Creators/Makers List */}
                 {details.makerList && Object.keys(details.makerList).length > 0 && (
-                  <Card variant="outlined" sx={{ bgcolor: "background.paper" }}>
-                    <CardContent sx={{ py: 1, "&:last-child": { pb: 1 } }}>
+                  <Card variant="outlined" sx={{ 
+                    bgcolor: themeColors.cardBg,
+                    borderColor: themeColors.divider
+                  }}>
+                    <CardContent sx={{ 
+                      py: 1, 
+                      "&:last-child": { pb: 1 },
+                      color: themeColors.text.primary
+                    }}>
                       <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
                         Production Team
                       </Typography>
                       <List dense>
                         {Object.entries(details.makerList).map(([role, person], index) => (
                           <ListItem key={index} sx={{ py: 0.5 }}>
-                            <Typography variant="body2" sx={{ fontWeight: "medium", width: "30%" }}>
+                            <Typography variant="body2" sx={{ 
+                              fontWeight: "medium", 
+                              width: "30%",
+                              color: themeColors.text.primary
+                            }}>
                               {role}:
                             </Typography>
-                            <Typography variant="body2" sx={{ ml: 2 }}>
+                            <Typography variant="body2" sx={{ 
+                              ml: 2,
+                              color: themeColors.text.secondary
+                            }}>
                               {person}
                             </Typography>
                           </ListItem>
@@ -342,16 +463,17 @@ export default function MovieDetails(props) {
           </Stack>
         </Box>
         
-        <Divider />
+        <Divider sx={{ borderColor: themeColors.divider }} />
         
         {/* Cast Section */}
         <Box sx={{ p: 3 }}>
           <Typography variant="h5" component="h2" gutterBottom sx={{ 
             display: "flex", 
             alignItems: "center",
-            mb: 3 
+            mb: 3,
+            color: themeColors.text.primary
           }}>
-            <StarIcon sx={{ mr: 1, color: "gold" }} />
+            <StarIcon sx={{ mr: 1, color: mode === "dark" ? "#ffd54f" : "gold" }} />
             Cast Members
           </Typography>
           
@@ -371,11 +493,11 @@ export default function MovieDetails(props) {
                 sx={{ 
                   overflow: "hidden",
                   borderRadius: 2,
-                  boxShadow: 2,
+                  boxShadow: mode === "dark" ? "0px 3px 8px rgba(0, 0, 0, 0.5)" : 2,
                   transition: "transform 0.3s, box-shadow 0.3s",
                   "&:hover": {
                     transform: "translateY(-4px)",
-                    boxShadow: 4,
+                    boxShadow: mode === "dark" ? "0px 6px 12px rgba(0, 0, 0, 0.7)" : 4,
                   }
                 }}
               >
@@ -384,7 +506,13 @@ export default function MovieDetails(props) {
                   title={actor.name}
                   subtitle={actor.character ? `Character: ${actor.character}` : ""}
                   sx={{
-                    "& .MuiImageListItemBar-title": { fontWeight: "bold" },
+                    "& .MuiImageListItemBar-title": { 
+                      fontWeight: "bold",
+                      color: "#ffffff"
+                    },
+                    "& .MuiImageListItemBar-subtitle": {
+                      color: "rgba(255, 255, 255, 0.8)"
+                    },
                     background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0) 100%)",
                   }}
                   actionIcon={

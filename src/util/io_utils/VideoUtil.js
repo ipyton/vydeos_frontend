@@ -4,7 +4,7 @@ import CryptoJS from "crypto-js";
 
 import SparkMD5 from "spark-md5";
 import xxhash from 'xxhash-wasm';
-import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
+import {DOWNLOAD_BASE_URL, API_BASE_URL, FLASK_API_BASE_URL} from "./URL";
 
 export default class VideoUtil {
 
@@ -340,7 +340,7 @@ export default class VideoUtil {
 
     static removeStar(videoIdentifier) {
         return axios({
-            url: URL.API_BASE_URL + "/gallery/remove",
+            url: API_BASE_URL + "/gallery/remove",
             method: 'post',
             data: { resourceId: videoIdentifier.resource_id, type: videoIdentifier.type},
             transformRequest: [function (data) {
@@ -355,7 +355,7 @@ export default class VideoUtil {
 
     static isStared(videoIdentifier) {
         return axios({
-            url: URL.API_BASE_URL + "/movie_management/isStared",
+            url: API_BASE_URL + "/movie_management/isStared",
             method: 'get', params: { resourceId: videoIdentifier.resource_id, type: videoIdentifier.type },
             headers: {
                 "token": localStorage.getItem("token"),
@@ -368,7 +368,7 @@ export default class VideoUtil {
             return
         }
         return axios({
-            url: URL.API_BASE_URL + "/movie_management/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type + 
+            url: API_BASE_URL + "/movie_management/getPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type + 
             "&seasonId=" + seasonId + "&episode=" + episode,
             method: 'get',
             data: {  token: localStorage.getItem("token") },
@@ -382,7 +382,7 @@ export default class VideoUtil {
 
     static get_season_meta(resource_id, type, season_id) {
         return axios({
-            url:URL.API_BASE_URL+ "/movie_management/get_season_meta                      ",
+            url:API_BASE_URL+ "/movie_management/get_season_meta                      ",
             method: 'post',
             data: { resourceId: resource_id, type: type, seasonId:season_id},
  headers: {
@@ -395,7 +395,7 @@ export default class VideoUtil {
 
     static isPlayable(movieIdentifier) {
         return axios({
-            url: URL.API_BASE_URL + "/movie_management/isPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
+            url: API_BASE_URL + "/movie_management/isPlayable?resourceId=" + movieIdentifier.resource_id + "&type=" + movieIdentifier.type,
             method: 'get',
             headers: {
                 "token": localStorage.getItem("token"),
@@ -415,7 +415,7 @@ export default class VideoUtil {
             seasonId = 1
         }
         return axios({
-            url:  URL.API_BASE_URL + "/movie/get_meta",
+            url:  FLASK_API_BASE_URL + "/movie/get_meta",
             method: 'get',
             params: {id:movieIdentifier.resource_id, type:movieIdentifier.type, userId: localStorage.getItem("userId"), "Accept-Language": language},
             headers: {  
@@ -444,7 +444,7 @@ export default class VideoUtil {
 
     static add_season(resourceId, type ) {
         return axios({
-            url: URL.API_BASE_URL + "/movie_management/add_season",
+            url: API_BASE_URL + "/movie_management/add_season",
             method: 'post',
             data:{resourceId:resourceId, type:type},
             headers: {
@@ -457,7 +457,7 @@ export default class VideoUtil {
 
     static add_episode(resourceId, type, seasonId) {
         return axios({
-            url: URL.API_BASE_URL + "/movie_management/add_episode",
+            url: API_BASE_URL + "/movie_management/add_episode",
             method: 'post',
             data:{resourceId:resourceId, type:type, seasonId: seasonId},
             headers: {
@@ -470,7 +470,7 @@ export default class VideoUtil {
 
     static add_download_source(videoIdentifier, source) {
         return axios({
-            url: URL.API_BASE_URL + "/movie/add_source",
+            url: API_BASE_URL + "/movie/add_source",
             method: 'post',
             data: { resourceId: videoIdentifier.resourceId, type: videoIdentifier.type,  source: source, name:videoIdentifier.movieName},
  headers: {
@@ -483,7 +483,7 @@ export default class VideoUtil {
 
     static remove_download_source(detail, source) {
         return axios({
-            url: URL.API_BASE_URL + "/movie/remove_source",
+            url: API_BASE_URL + "/movie/remove_source",
             method: 'post',
             data: { resourceId: detail.resourceId, source: source, type: detail.type},
              headers: {
@@ -494,7 +494,7 @@ export default class VideoUtil {
 
     static get_download_sources(resource_id, type, seasonId, episode) {
         return axios({
-            url: URL.API_BASE_URL + "/movie/get_sources",
+            url: API_BASE_URL + "/movie/get_sources",
             method: 'post',
             data: { resourceId: resource_id, type: type, seasonId:seasonId, episode:episode},
             headers: {

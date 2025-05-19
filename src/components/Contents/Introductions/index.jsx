@@ -9,7 +9,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 export default function Introductions(props) {
     const { selector, position, isMobile, onBack } = props;
     
-    console.log(selector);
+    console.log(onBack);
     
     // If no selector is provided, show a message
     if (!selector || !selector.type) {
@@ -32,11 +32,11 @@ export default function Introductions(props) {
     // Render appropriate content based on selector type
     const renderContent = () => {
         if ("movie" === selector.type || "tv" === selector.type) {
-            return <LongVideoIntroduction content={selector} position={position} isMobile={isMobile} />;
+            return <LongVideoIntroduction content={selector} position={position} isMobile={isMobile} onBack={onBack}/>;
         } else if ("contact" === selector.type) {
-            return <FriendIntroductionCentered userId={selector.userId} position={position} isMobile={isMobile} />;
+            return <FriendIntroductionCentered userId={selector.userId} position={position} isMobile={isMobile} onBack={onBack}/>;
         } else if ("groupId" === selector.type) {
-            return <GroupIntroduction groupId={selector.content} isMobile={isMobile} />;
+            return <GroupIntroduction groupId={selector.content} isMobile={isMobile} onBack={onBack} />;
         } else if ("music" === selector.type) {
             return <Box sx={{ p: 3 }}>Haven't finished this music record function yet</Box>;
         } else if ("chatRecords" === selector.type) {

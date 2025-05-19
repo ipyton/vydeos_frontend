@@ -18,7 +18,7 @@ export default class SearchUtil {
   }
 
   static searchChatContactById(keyword, setList) {
-    axios({
+    return axios({
       url: FLASK_API_BASE_URL + "/search/contactById",
       method: 'post',
       data: { userId: keyword },
@@ -69,7 +69,7 @@ export default class SearchUtil {
   }
 
   static searchContactByName(keyword, setSearchResults, pagingStatus, setPagingStatus) {
-    axios({
+    return axios({
       url: API_BASE_URL + "/search/contacts",
       method: 'post',
       data: { userId: keyword },
@@ -145,18 +145,30 @@ export default class SearchUtil {
   }
 
   static searchPosts(keyword, setList) {
+            return new Promise((resolve, reject) => {
     setList([{type:"posttesttest"}])
+
+  });
   }
 
   static getSuggestions(keyword, setList) {
+        return new Promise((resolve, reject) => {
     setList([{ type: "testtest" }])
+
+  });
   }
 
   static searchMusics(keyword, setList) {
-    setList([{ type: "musictesttest" }])
+    return new Promise((resolve, reject) => {
+        setList([{ type: "musictesttest" }]) 
+
+  });
   }
   
   static searchLocalResult(keyword, setList) {
-    setList([{ type: "chatrecord testtest" }])
+    return new Promise((resolve, reject) => {
+      setList([{ type: "chatrecord testtest" }])
+
+  });
   } 
 }

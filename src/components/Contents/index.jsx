@@ -187,7 +187,7 @@ export default function Contents(props) {
         < ThemeProvider theme={defaultTheme} >
             <Box sx={{ display: 'flex' }}>
                 <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setLogin={setLogin} setBadgeContent={setNotifications}></Header>
-                <Box width="100%" justifyContent="center" alignItems="center" marginTop="64px">
+                <Box width="calc(100% - 64px)" justifyContent="center" alignItems="center" marginTop="64px">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <div>
                             <div>
