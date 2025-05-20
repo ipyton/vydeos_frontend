@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../../src/util/io_utils/URL";
+
 importScripts('https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js');
 importScripts("/webworkers/DatabaseManipulator.js");
 importScripts('https://cdn.jsdelivr.net/npm/qs/dist/qs.min.js');
@@ -46,7 +48,7 @@ function getNewestMessages() {
             timestamp = -1
         }
         axios({
-        url: "http://localhost:8080" + "/chat/getNewestMessages",
+        url: API_BASE_URL + "/chat/getNewestMessages",
         method: 'post',
         data:{
             timestamp: timestamp

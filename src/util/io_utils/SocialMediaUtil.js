@@ -120,58 +120,58 @@ export default class SocialMediaUtil {
 
 
     static getRelationships(idx) {
-    let requestName = null;
-    let domain = "/friends/";
-    
-    if (0 === idx) {
-        // get friends
-        requestName = "get_friends";
-    } else if (1 === idx) {
-        // get I follow
-        requestName = "get_idols";
-    } else if (2 === idx) {
-        // get followers
-        requestName = "get_followers";
-    } else if (3 === idx) {
-        // get current group
-        requestName = "get_groups";
-        domain = "/group_chat/";
-    } else if (4 === idx) {
-        // get invitations
-        requestName = "get_invitations";
-    } else if (5 === idx) {
-        requestName = "get_black_list";
-    }
-    
-    return axios({
-        url: API_BASE_URL + domain + requestName,
-        method: "get",
-        data: {},
-        transformRequest: [function (data) {
-        return qs.stringify(data);
-        }],
-        headers: {
-        "token": localStorage.getItem("token"),
-        }
-    }).then((response) => {
-        console.log(response);
-        if (!response || !response.data) {
-        console.log("Internal Error");
-        throw new Error("Internal Error");
+        let requestName = null;
+        let domain = "/friends/";
+        
+        if (0 === idx) {
+            // get friends
+            requestName = "get_friends";
+        } else if (1 === idx) {
+            // get I follow
+            requestName = "get_idols";
+        } else if (2 === idx) {
+            // get followers
+            requestName = "get_followers";
+        } else if (3 === idx) {
+            // get current group
+            requestName = "get_groups";
+            domain = "/group_chat/";
+        } else if (4 === idx) {
+            // get invitations
+            requestName = "get_invitations";
+        } else if (5 === idx) {
+            requestName = "get_black_list";
         }
         
-        if (response.data && response.data.code === -1) {
-        throw new Error(response.data.message || "Error with code -1");
-        }
-        
-        try {
-        const list = JSON.parse(response.data.message);
-        console.log(list);
-        return list;
-        } catch (error) {
-        console.error("Error parsing response:", error);
-        throw error;
-        }
-    });
+        return axios({
+            url: API_BASE_URL + domain + requestName,
+            method: "get",
+            data: {},
+            transformRequest: [function (data) {
+            return qs.stringify(data);
+            }],
+            headers: {
+            "token": localStorage.getItem("token"),
+            }
+        }).then((response) => {
+            console.log(response);
+            if (!response || !response.data) {
+            console.log("Internal Error");
+            throw new Error("Internal Error");
+            }
+            
+            if (response.data && response.data.code === -1) {
+            throw new Error(response.data.message || "Error with code -1");
+            }
+            
+            try {
+            const list = JSON.parse(response.data.message);
+            console.log(list);
+            return list;
+            } catch (error) {
+            console.error("Error parsing response:", error);
+            throw error;
+            }
+        });
     }
 }
