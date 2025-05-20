@@ -10,6 +10,10 @@ import DatabaseManipulator from "../../../../util/io_utils/DatabaseManipulator";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useThemeMode } from "../../../../Themes/ThemeContext";
+import { useNotification } from "../../../../Providers/NotificationProvider";
+import RefreshIcon from '@mui/icons-material/Refresh';
+
+
 export default function ChatContainer(props) {
   const { select, setSelect, isMobile } = props;
   const [chatRecords, setChatRecords] = useState([]);
@@ -18,38 +22,16 @@ export default function ChatContainer(props) {
   const location = useLocation();
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   const { mode, toggleMode } = useThemeMode();
+  const { showNotification } = useNotification();
 
   const handleBackClick = () => {
     setSelect(null);
   };
 
-  useEffect(() => {
-    const fetchMessages = async () => {
+      const fetchMessages = async () => {
       // Validate if we have a valid selection
       if (!select || !select.type || !select.userId || select.type === "" || select.userId === "") {
-        return (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              p: isMobile ? 2 : 4,
-              backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb',
-              borderRadius: isMobile ? 0 : 2,
-              width: "100%",
-              height: "100%",
-            }}
-          >
-            <Typography variant={isMobile ? "body1" : "h6"} color="text.secondary" gutterBottom>
-              Select a conversation
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Choose a contact from the list to start chatting
-            </Typography>
-          </Box>
-        );
-    
+        return;
       }
       
       setLoading(true);
@@ -67,16 +49,69 @@ export default function ChatContainer(props) {
       } catch (err) {
         console.error("Error fetching messages:", err);
         setError("Failed to load messages. Please try again.");
+        
+        // Show appropriate notification based on error type
+        if (err.name === 'NetworkError' || err.message?.includes('network')) {
+          showNotification("Network Error: Please check your connection", "error");
+        } else if (err.name === 'DatabaseError' || err.message?.includes('database')) {
+          showNotification("Database Error: Could not retrieve messages", "error");
+        } else if (err.name === 'AuthorizationError' || err.message?.includes('permission')) {
+          showNotification("Authorization Error: You don't have permission to view these messages", "error");
+        } else {
+          showNotification("Error loading messages. Please try again later.", "error");
+        }
       } finally {
         setLoading(false);
       }
     };
+
+  useEffect(() => {
     
     fetchMessages();
-  }, [select.type, select.userId, refresh]);
+  }, [select, refresh, showNotification]);
 
+  const handleSendMessage = async (message) => {
+    try {
+      // Sending message logic here
+      // This would be passed to your InputBox component
+    } catch (error) {
+      console.error("Error sending message:", error);
+      showNotification("Failed to send message. Please try again.", "error");
+    }
+  };
+
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      // Delete message logic here
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      showNotification("Failed to delete message. Please try again.", "error");
+    }
+  };
+  
   if (!select || !select.type || !select.userId) {
-    return null;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: isMobile ? 2 : 4,
+          backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb',
+          borderRadius: isMobile ? 0 : 2,
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <Typography variant={isMobile ? "body1" : "h6"} color="text.secondary" gutterBottom>
+          Select a conversation
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Choose a contact from the list to start chatting
+        </Typography>
+      </Box>
+    );
   }
 
   return (
@@ -87,7 +122,6 @@ export default function ChatContainer(props) {
         flexDirection: 'column',
         width: "100%",
         height: isMobile ? "calc(100vh - 64px - 66px)" : "calc(100vh - 64px - 66px)",
-
         borderRadius: 0,
         position: 'relative',
         backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb'
@@ -133,11 +167,23 @@ export default function ChatContainer(props) {
             alignItems: 'center',
             flexGrow: 1,
             p: isMobile ? 2 : 3,
-            color: 'error.main',
             height: isMobile ? 'calc(100vh - 120px)' : 'auto'
           }}
         >
-          <Typography>{error}</Typography>
+          <Typography color="error.main">{error}</Typography>
+          <Box sx={{ mt: 2 }}>
+            <IconButton 
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                // Retry loading messages
+                fetchMessages();
+              }}
+              color="primary"
+            >
+              <RefreshIcon />
+            </IconButton>
+          </Box>
         </Box>
       ) : (
         <Box 
@@ -154,6 +200,9 @@ export default function ChatContainer(props) {
             chatRecords={chatRecords}
             setChatRecords={setChatRecords}
             select={select}
+            onDeleteError={(error) => {
+              showNotification("Failed to delete message: " + error.message, "error");
+            }}
           />
         </Box>
       )}
@@ -168,6 +217,9 @@ export default function ChatContainer(props) {
           chatRecords={chatRecords}
           setChatRecords={setChatRecords}
           select={select}
+          onSendError={(error) => {
+            showNotification("Failed to send message: " + error.message, "error");
+          }}
         />
       </Box>
     </Paper>

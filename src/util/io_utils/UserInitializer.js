@@ -38,7 +38,7 @@ export default class UserInitializer {
 
     // This method is called first time the user login/ or no cache.
     static downloadUserInformations() {
-        axios({
+        return axios({
             url: API_BASE_URL + "/account/verifyToken",
             method: 'post',
             data: { token: localStorage.getItem("token") },

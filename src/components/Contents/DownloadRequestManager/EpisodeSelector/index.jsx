@@ -60,7 +60,8 @@ const EpisodeSelector = (props) => {
   }, [seasonId])
 
   // Season data
-  const seasons = [];
+const seasons = [];
+if (totalSeason && totalSeason > 0) {
   for (let i = 1; i <= totalSeason; i++) {
     seasons.push({
       id: i,
@@ -68,65 +69,133 @@ const EpisodeSelector = (props) => {
       episodes: 1
     });
   }
-  seasons.push({ id: -1, title: 'Add', episodes: details.totalEpisodes });
-
+  seasons.push({ id: -1, title: 'Add', episodes: details?.totalEpisodes || 0 });
+} else {
+  // If no seasons, just add the "Add" option
+  seasons.push({ id: -1, title: 'Add', episodes: 0 });
+}
 
   const currentSeason = seasons.find(season => season.id === seasonId);
   // const totalEpisodes = currentSeason ? currentSeason.episodes : 0;
 
 
 
-  const handleSeasonChange = (event) => {
-    const newSeason = event.target.value;
-    if (event.target.value === -1) {
-      //add is clicked
-      VideoUtil.add_season(details.resource_id, details.type).then((res) => {
-        if (!res || !res.data || res.data.code === -1) {
-          console.log("add season error")
-          return
+const handleSeasonChange = (event) => {
+  const newSeason = event.target.value;
+  if (event.target.value === -1) {
+    // Add is clicked
+    VideoUtil.add_season(details.resource_id, details.type)
+      .then((res) => {
+        if (!res || !res.data) {
+          showNotification("Failed to receive response when adding season", "error");
+          return;
+        }
+        if (res.data.code === -1) {
+          showNotification("Error adding season: " + (res.data.message || "Unknown error"), "error");
+          return;
         }
         else {
           setTotalSeason(totalSeason + 1);
+          showNotification("Season added successfully", "success");
         }
-        console.log(res)
       })
-    }
-    else {
-      setSeasonId(newSeason);
-      setEpisode(0);
+      .catch((error) => {
+        showNotification("Network error while adding season: " + (error.message || "Unknown error"), "error");
+      });
+  }
+  else {
+    setSeasonId(newSeason);
+    setEpisode(0);
+  }
+};
 
+const handleEpisodeChange = (episode) => {
+  if (episode === "Add") {
+    // Add is clicked
+    if (!details || !details.resource_id || !details.type) {
+      showNotification("Missing video details", "error");
+      return;
     }
-  };
-
-  const handleEpisodeChange = (episode) => {
-    console.log(episode + "------------" + " episode selected");
-    if (episode === "Add") {
-      //add is clicked
-      VideoUtil.add_episode(details.resource_id, details.type, seasonId).then((res) => {
-        if (!res || !res.data || res.data.code === -1) {
-          console.log("add episode error")
-          return
+    
+    if (!seasonId) {
+      showNotification("Please select a season first", "warning");
+      return;
+    }
+    
+    VideoUtil.add_episode(details.resource_id, details.type, seasonId)
+      .then((res) => {
+        if (!res || !res.data) {
+          showNotification("Failed to receive response when adding episode", "error");
+          return;
+        }
+        if (res.data.code === -1) {
+          showNotification("Error adding episode: " + (res.data.message || "Unknown error"), "error");
+          return;
         }
         else {
-          let tmp = episodes.unshift(totalEpisodes + 1);
-          console.log("------------------" + totalEpisodes)
-          setEpisodes(episodes);
+          const newEpisodes = [...episodes];
+          newEpisodes.unshift(totalEpisodes + 1);
+          setEpisodes(newEpisodes);
           setTotalEpisodes(totalEpisodes + 1);
+          showNotification("Episode added successfully", "success");
         }
-        console.log(res)
       })
-    }
-    else {
-      setEpisode(episode);
-    }
-
+      .catch((error) => {
+        showNotification("Network error while adding episode: " + (error.message || "Unknown error"), "error");
+      });
   }
-  useEffect(() => {
-    if (details && seasonId) {
-
+  else {
+    setEpisode(episode);
+  }
+};
+useEffect(() => {
+  if (seasonId && seasonId !== 0) {
+    if (!details || !details.resource_id || !details.type) {
+      console.error('Missing video details for fetching season metadata');
+      return;
     }
-
-  }, [details, seasonId])
+    
+    VideoUtil.get_season_meta(details.resource_id, details.type, seasonId)
+      .then((res) => {
+        if (!res || !res.data) {
+          showNotification("Failed to receive response when fetching season data", "error");
+          return;
+        }
+        
+        if (res.data.code === 0 && res.data.message !== "null") {
+          try {
+            let result = JSON.parse(res.data.message);
+            const episodes = Array.from(
+              { length: result.totalEpisode },
+              (_, i) => result.totalEpisode - i
+            );
+            episodes.push("Add");
+            setEpisodes(episodes);
+            setTotalEpisodes(result.totalEpisode);
+          } catch (error) {
+            showNotification("Error parsing season data: " + error.message, "error");
+            setEpisodes([]);
+            setTotalEpisodes(0);
+            setEpisode(0);
+          }
+        } else {
+          setEpisodes([]);
+          setTotalEpisodes(0);
+          setEpisode(0);
+          
+          if (res.data.code !== 0) {
+            showNotification("Error fetching season data: " + (res.data.message || "Unknown error"), "warning");
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching season metadata:', error);
+        showNotification("Failed to load season data: " + (error.message || "Unknown error"), "error");
+        setEpisodes([]);
+        setTotalEpisodes(0);
+      });
+  }
+}, [seasonId, details]);
 
 
   return (

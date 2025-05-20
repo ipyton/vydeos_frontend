@@ -88,9 +88,11 @@ export default function Friend(props) {
   }, []);
 
   // Initial data load
-  useEffect(() => {
-    setIsLoading(true);
-    SocialMediaUtil.getRelationships(value, setValue, (data) => {
+useEffect(() => {
+  setIsLoading(true);
+  
+  SocialMediaUtil.getRelationships(value)
+    .then(data => {
       setList(data);
       setIsLoading(false);
       
@@ -98,21 +100,17 @@ export default function Friend(props) {
       const newCounts = [...counts];
       newCounts[value] = data.length;
       setCounts(newCounts);
-    });
-  }, []);
-
-  const handleChange = (event, newValue) => {
-    setIsLoading(true);
-    SocialMediaUtil.getRelationships(newValue, setValue, (data) => {
-      setList(data);
+    })
+    .catch(error => {
+      console.error("Error fetching relationships:", error);
       setIsLoading(false);
-      
-      // Update counts when tab changes
-      const newCounts = [...counts];
-      newCounts[newValue] = data.length;
-      setCounts(newCounts);
     });
-  };
+}, [value]);
+
+const handleChange = (event, newValue) => {
+  setValue(newValue);
+  // The useEffect will handle the data fetching when value changes
+};
   
   const handleChangeIndex = (index) => {
     setValue(index);

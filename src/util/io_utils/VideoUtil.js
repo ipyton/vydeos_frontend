@@ -220,7 +220,7 @@ export default class VideoUtil {
 
 
     static batchStop(movies, downloadRecords, setDownloadRecords) {
-        axios({
+        return axios({
             url: DOWNLOAD_BASE_URL + "/movie/batch_stop",
             method: 'post',
             data: { movies: movies },
@@ -230,82 +230,39 @@ export default class VideoUtil {
             }], headers: {
                 "token": localStorage.getItem("token"),
             }
-        }).catch(error => {
-
-        }).then(function (response) {
-            if (response === undefined) {
-                console.log("errror")
-                return
-            }
-            //props.setBarState({...props.barState, message:responseData.message, open:true})
-
-            let list = []
-
         })
 
     }
 
     static batchPause(movies, downloadRecords, setDownloadRecords) {
-        axios({
+        return axios({
             url: DOWNLOAD_BASE_URL + "/movie/batch_pause",
             method: 'post',
             data: { downloads: movies },
             headers: {
                 token: localStorage.getItem("token"),
             }
-        }).catch(error => {
-
-        }).then(function (response) {
-            if (response === undefined) {
-                console.log("errror")
-                return
-            }
-            //props.setBarState({...props.barState, message:responseData.message, open:true})
-            let list = []
         })
     }
 
     static batchContinue(movies, downloadRecords, setDownloadRecords) {
-        axios({
+        return axios({
             url: DOWNLOAD_BASE_URL + "/movie/batch_resume",
             method: 'post',
             data: { downloads: movies }, headers: {
                 token: localStorage.getItem("token"),
             }
-        }).catch(error => {
-
-        }).then(function (response) {
-            if (response === undefined) {
-                console.log("errror")
-                return
-            }
-
         })
     }
 
 
     static batchRemove(movies, downloadRecords, setDownloadRecords) {
-        axios({
+        return axios({
             url: DOWNLOAD_BASE_URL+ "/movie/batch_remove",
             method: 'post',
             data: { downloads: movies }, headers: {
                 token: localStorage.getItem("token"),
             }
-        }).catch(error => {
-
-        }).then(function (response) {
-            if (response === undefined) {
-                console.log("errror")
-                return
-            }
-            const result = []
-            const newChecked = [...downloadRecords];
-            movies.map((item) => {
-                const currentIndex = downloadRecords.indexOf(item);
-                newChecked.splice(currentIndex, 1);
-            })
-            setDownloadRecords(newChecked);
-
         })
     }
 
@@ -470,7 +427,7 @@ export default class VideoUtil {
 
     static add_download_source(videoIdentifier, source) {
         return axios({
-            url: API_BASE_URL + "/movie/add_source",
+            url: FLASK_API_BASE_URL + "/movie/add_source",
             method: 'post',
             data: { resourceId: videoIdentifier.resourceId, type: videoIdentifier.type,  source: source, name:videoIdentifier.movieName},
  headers: {
@@ -483,7 +440,7 @@ export default class VideoUtil {
 
     static remove_download_source(detail, source) {
         return axios({
-            url: API_BASE_URL + "/movie/remove_source",
+            url: FLASK_API_BASE_URL + "/movie/remove_source",
             method: 'post',
             data: { resourceId: detail.resourceId, source: source, type: detail.type},
              headers: {
@@ -494,7 +451,7 @@ export default class VideoUtil {
 
     static get_download_sources(resource_id, type, seasonId, episode) {
         return axios({
-            url: API_BASE_URL + "/movie/get_sources",
+            url: FLASK_API_BASE_URL + "/movie/get_sources",
             method: 'post',
             data: { resourceId: resource_id, type: type, seasonId:seasonId, episode:episode},
             headers: {
@@ -685,7 +642,7 @@ export default class VideoUtil {
 
     static check_current_download_status(setRecord) {
 
-        axios({
+        return axios({
             url: DOWNLOAD_BASE_URL + "/movie/get_download_status",
             method: 'get',
             transformRequest: [function (data) {
@@ -694,8 +651,6 @@ export default class VideoUtil {
             }], headers: {
                 token: localStorage.getItem("token"),
             }
-        }).catch(error => {
-
         }).then(function (response) {
             if (response === undefined || !response.data) {
                 console.log("errror")

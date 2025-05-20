@@ -93,9 +93,45 @@ export default function DownloadManager() {
     { resource_id: "res3", type: "video", quality: 720, bucket: "bucket3", path: "/path/to/resource3" },
   ]);
 
-  const handleFileDelete = (index) => {
+const handleFileDelete = (index) => {
+  try {
+    const fileToDelete = playableData[index];
+    if (!fileToDelete) {
+      showNotification("File not found", "error");
+      return;
+    }
+    
+    // First update UI optimistically
     setPlayableData(playableData.filter((_, i) => i !== index));
-  };
+    
+    // You might want to add an API call here to delete the file on the server
+    // VideoUtil.deletePlayableFile(fileToDelete)
+    //   .then(response => {
+    //     if (response.data !== "success") {
+    //       showNotification("Server error when deleting file", "error");
+    //       // Revert UI change if server deletion failed
+    //       setPlayableData(prevData => {
+    //         const newData = [...prevData];
+    //         newData.splice(index, 0, fileToDelete);
+    //         return newData;
+    //       });
+    //     }
+    //   })
+    //   .catch(error => {
+    //     showNotification("Failed to delete file: " + error.message, "error");
+    //     // Revert UI change if server deletion failed
+    //     setPlayableData(prevData => {
+    //       const newData = [...prevData];
+    //       newData.splice(index, 0, fileToDelete);
+    //       return newData;
+    //     });
+    //   });
+    
+    showNotification("File removed from list", "success");
+  } catch (error) {
+    showNotification("Error removing file: " + error.message, "error");
+  }
+};
 
   const [seasonId, setSeasonId] = useState(0)
 
@@ -130,14 +166,34 @@ export default function DownloadManager() {
     setCheckedNumber(checkedNumber !== idx ? idx : null);
   };
 
-  const select = () => {
-    //select file
-    if (!tmpGid || checkedNumber === null || !tmpSource) {
-      setSelectOpen(false);
-      return;
-    }
-    setVideoId(details.movieId);//////!!!!!!
-    setMovieName(details.movie_name);
+const select = () => {
+  if (!tmpGid) {
+    showNotification("Missing download ID", "error");
+    setSelectOpen(false);
+    return;
+  }
+  
+  if (checkedNumber === null) {
+    showNotification("Please select a file to download", "warning");
+    return;
+  }
+  
+  if (!tmpSource) {
+    showNotification("Source information is missing", "error");
+    setSelectOpen(false);
+    return;
+  }
+  
+  if (!details || !details.resource_id || !details.type) {
+    showNotification("Video details are incomplete", "error");
+    setSelectOpen(false);
+    return;
+  }
+  
+  setVideoId(details.movieId);
+  setMovieName(details.movie_name);
+  
+  try {
     VideoUtil.select(
       details.resource_id,
       details.type,
@@ -145,69 +201,129 @@ export default function DownloadManager() {
       tmpGid,
       checkedNumber + 1,
       setSelectOpen
-    )
-  };
+    ).then(() => {
+      showNotification("File selected successfully", "success");
+    }).catch(error => {
+      showNotification("Error selecting file: " + (error.message || "Unknown error"), "error");
+    });
+  } catch (error) {
+    showNotification("Failed to select file: " + (error.message || "Unknown error"), "error");
+    setSelectOpen(false);
+  }
+};
 
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleSubmit = () => {
-    if (!input || input.length === 0) {
-      return;
-    }
-    console.log(details)
-    VideoUtil.add_download_source(
-      details,
-      input,
-    ).then(function (response) {
+const handleSubmit = () => {
+  if (!input || input.length === 0) {
+    showNotification("Please enter a valid source URL", "warning");
+    return;
+  }
+  if (!details) {
+    showNotification("No video selected", "error");
+    return;
+  }
+  
+  VideoUtil.add_download_source(details, input)
+    .then(function (response) {
       if (response === undefined || !response.data) {
-        console.log("errror")
+        showNotification("Failed to add source", "error");
+        return;
       }
 
-      console.log(response)
-      //props.setBarState({...props.barState, message:responseData.message, open:true})
-      let data = response.data
+      let data = response.data;
       if (data === "success") {
-        setSources([...sources, { id: details.id, source: input, status: "init" }])
+        setSources([...sources, { id: details.id, source: input, status: "init" }]);
+        showNotification("Source added successfully", "success");
+      } else {
+        showNotification("Failed to add source: " + data, "error");
       }
-
     })
-    setInput("");
-  };
+    .catch(function (error) {
+      showNotification("Network error while adding source: " + (error.message || "Unknown error"), "error");
+    });
+    
+  setInput("");
+};
 
-  const handleDelete = (source) => () => {
-    VideoUtil.remove_download_source(details, source).then(function (response) {
+const handleDelete = (source) => () => {
+  if (!details) {
+    showNotification("No video selected", "error");
+    return;
+  }
+  
+  VideoUtil.remove_download_source(details, source)
+    .then(function (response) {
       if (!response) {
-        return
+        showNotification("No response received when deleting source", "error");
+        return;
       }
       else if (response.data !== "success") {
-        return
+        showNotification("Failed to delete source: " + response.data, "error");
+        return;
       }
       else {
+        let sourceFound = false;
         for (let i = 0; i < sources.length; i++) {
           if (sources[i].source === source) {
-            sources.splice(i, 1)
-            break
+            sources.splice(i, 1);
+            sourceFound = true;
+            break;
           }
         }
-        setSources([...sources])
+        if (sourceFound) {
+          setSources([...sources]);
+          showNotification("Source deleted successfully", "success");
+        } else {
+          showNotification("Source not found in list", "warning");
+        }
       }
-
     })
-  };
+    .catch(function (error) {
+      showNotification("Network error while deleting source: " + (error.message || "Unknown error"), "error");
+    });
+};
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
-  const handleUpload = async () => {
-    if (!file) {
-      showNotification("Please select a file first", "warning");
-      return;
-    }
-    VideoUtil.uploadVideos(videoId, details.type, file, setUploadProgress, null, setIndicator, seasonId, episode);
-  };
+const handleUpload = async () => {
+  if (!file) {
+    showNotification("Please select a file first", "warning");
+    return;
+  }
+  
+  if (!videoId) {
+    showNotification("Video ID is missing", "error");
+    return;
+  }
+  
+  if (!details || !details.type) {
+    showNotification("Video type information is missing", "error");
+    return;
+  }
+  
+  try {
+    await VideoUtil.uploadVideos(
+      videoId, 
+      details.type, 
+      file, 
+      setUploadProgress, 
+      null, 
+      setIndicator, 
+      seasonId, 
+      episode
+    );
+    showNotification("Upload completed successfully", "success");
+  } catch (error) {
+    setUploadProgress(0);
+    setIndicator(" failed");
+    showNotification("Upload failed: " + (error.message || "Unknown error"), "error");
+  }
+};
 
   const handlePlay = (resource) => () => {
     navigate("/longvideos", { state: { videoId: videoId, resource: resource } });
@@ -228,28 +344,38 @@ export default function DownloadManager() {
     setTmpSource(source);
   };
 
-  const handleOpenDetails = (row) => {
-    VideoUtil.getVideoInformation(row, null, "en-US").then((res) => {
-      setTotalSeason(res.total_season)
-      console.log(res)
-    }).then(() => {
-      if (row.type === "movie") {
-        setSeasonId(0)
-        setEpisode(0)
+const handleOpenDetails = (row) => {
+  if (!row) {
+    showNotification("Invalid row data", "error");
+    return;
+  }
+  
+  VideoUtil.getVideoInformation(row, null, "en-US")
+    .then((res) => {
+      if (res === undefined || res.data === undefined) {
+        showNotification("Failed to fetch video information", "error");
+        return;
       }
-      else {
-        setSeasonId(1)
-        setEpisode(1)
+      setTotalSeason(res.total_season);
+    })
+    .then(() => {
+      if (row.type === "movie") {
+        setSeasonId(0);
+        setEpisode(0);
+      } else {
+        setSeasonId(1);
+        setEpisode(1);
       }
     })
-    setOpen(true);
-    setDetails(row);
-    setVideoId(row.resource_id);
-    setMovieName(row.movieName);
-
-    console.log(row)
-
-  };
+    .catch(error => {
+      showNotification("Error fetching video details: " + (error.message || "Unknown error"), "error");
+    });
+    
+  setOpen(true);
+  setDetails(row);
+  setVideoId(row.resource_id);
+  setMovieName(row.movieName);
+};
 
   // Load data on component mount
   useEffect(() => {
@@ -276,40 +402,33 @@ export default function DownloadManager() {
   }, []);
 
 
-  useEffect(() => {
-    if (!details) return;
-    VideoUtil.get_download_sources(details.resource_id, details.type, seasonId, episode).then(function (response) {
+useEffect(() => {
+  if (!details) return;
+  
+  VideoUtil.get_download_sources(details.resource_id, details.type, seasonId, episode)
+    .then(function (response) {
       if (response === undefined) {
-        console.log("errror")
-        return
+        showNotification("Failed to fetch download sources", "error");
+        return;
       }
-      console.log(response)
-      //props.setBarState({...props.barState, message:responseData.message, open:true})
-      let data = response.data
-      setSources(data)
-
-      // for (let i = 0; i < sources.length; i++) {
-      //     if (sources[i].source === source) {
-      //         sources.splice(i, 1)
-      //         break
-      //     }
-      // }
-      // setSources([...sources])
+      setSources(response.data);
     })
+    .catch(function (error) {
+      showNotification("Error loading download sources: " + (error.message || "Unknown error"), "error");
+    });
 
-
-    console.log(details, seasonId, episode)
-    VideoUtil.get_playables(details, seasonId, episode).then(function (response) {
+  VideoUtil.get_playables(details, seasonId, episode)
+    .then(function (response) {
       if (response.data && response.data.code === 0) {
         setPlayableData(JSON.parse(response.data.message));
+      } else {
+        showNotification("Failed to load playable files", "warning");
       }
-      else {
-        console.log(response)
-      }
-    }).catch(function (error) {
-      showNotification(error.message, "warning");
     })
-  }, [details, seasonId, episode])
+    .catch(function (error) {
+      showNotification("Error loading playable files: " + (error.message || "Unknown error"), "warning");
+    });
+}, [details, seasonId, episode]);
 
 
   // Get status color based on status

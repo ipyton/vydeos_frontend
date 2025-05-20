@@ -12,7 +12,7 @@ export default class SocialMediaUtil {
 
 
     static follow(sender, receiver, details, setDetails) {
-        axios(
+        return axios(
             {
                 url: API_BASE_URL + "/friends/follow",
                 method: "post",
@@ -25,9 +25,7 @@ export default class SocialMediaUtil {
                     "token": localStorage.getItem("token"),
                 }
             }
-        ).catch(error => {
-            console.log(error)
-        }).then(response => {
+        ).then(response => {
             if (response.data.code === 0) {
                 // localforage.getItem("userIntro").then((res) => {
                 //     //res is a userIntro
@@ -55,7 +53,7 @@ export default class SocialMediaUtil {
     }
 
     static unfollow(sender, receiver, details, setDetails) {
-        axios(
+        return axios(
             {
                 url: DOWNLOAD_BASE_URL + "/friends/unfollow",
                 method: "post",
@@ -89,8 +87,6 @@ export default class SocialMediaUtil {
             else {
                 console.log("state set error!!!")
             }
-        }).catch(error => {
-            console.log("get message by Id error")
         }).then(() => {
             console.log("success!")
         })
@@ -100,7 +96,7 @@ export default class SocialMediaUtil {
 
 
     static getFollowState(sender, receiver, setDetails) {
-        axios({
+        return axios({
             url: API_BASE_URL + "/friends/getFollowState",
             method: "post",
             data: { "sender": sender, "receiver": receiver },
@@ -123,61 +119,59 @@ export default class SocialMediaUtil {
     }
 
 
-    static getRelationships(idx, setValue, setList) {
-
-        let requestName = null;
-        let domain = "/friends/"
-
-        if (0 === idx) {
-            // get friends
-            requestName = "get_friends"
+    static getRelationships(idx) {
+    let requestName = null;
+    let domain = "/friends/";
+    
+    if (0 === idx) {
+        // get friends
+        requestName = "get_friends";
+    } else if (1 === idx) {
+        // get I follow
+        requestName = "get_idols";
+    } else if (2 === idx) {
+        // get followers
+        requestName = "get_followers";
+    } else if (3 === idx) {
+        // get current group
+        requestName = "get_groups";
+        domain = "/group_chat/";
+    } else if (4 === idx) {
+        // get invitations
+        requestName = "get_invitations";
+    } else if (5 === idx) {
+        requestName = "get_black_list";
+    }
+    
+    return axios({
+        url: API_BASE_URL + domain + requestName,
+        method: "get",
+        data: {},
+        transformRequest: [function (data) {
+        return qs.stringify(data);
+        }],
+        headers: {
+        "token": localStorage.getItem("token"),
         }
-        else if (1 === idx) {
-            // get I follow
-            requestName = "get_idols"
+    }).then((response) => {
+        console.log(response);
+        if (!response || !response.data) {
+        console.log("Internal Error");
+        throw new Error("Internal Error");
         }
-        else if (2 === idx) {
-            // get followers
-            requestName = "get_followers"
+        
+        if (response.data && response.data.code === -1) {
+        throw new Error(response.data.message || "Error with code -1");
         }
-        else if (3 === idx) {
-            //get current group
-            requestName = "get_groups"
-            domain = "/group_chat/"
+        
+        try {
+        const list = JSON.parse(response.data.message);
+        console.log(list);
+        return list;
+        } catch (error) {
+        console.error("Error parsing response:", error);
+        throw error;
         }
-        else if (4 === idx) {
-            // get invitations
-            requestName = "get_invitations"
-        }
-        else if (5 === idx) {
-            requestName = "get_black_list"
-        }
-
-        axios({
-            url: API_BASE_URL + domain + requestName,
-            method: "get",
-            data: {},
-            transformRequest: [function (data) {
-                return qs.stringify(data)
-            }],
-            headers: {
-                "token": localStorage.getItem("token"),
-            }
-        }).catch(err => {
-            console.log(err)
-        }).then((response) => {
-            console.log(response)
-            if (!response || !response.data) {
-                console.log("Internal Error")
-                return
-            }
-            if (response.data && response.data.code === -1) {
-                return false
-            }
-            let list = JSON.parse(response.data.message)
-            setValue(idx)
-            setList(list)
-            console.log(list)
-        })
+    });
     }
 }
