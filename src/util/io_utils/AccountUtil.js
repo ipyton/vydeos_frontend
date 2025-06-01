@@ -1,26 +1,18 @@
-import axios from "axios"
 import Qs from 'qs'
 import EncryptionUtil from "./EncryptionUtil"
-
 import { update } from "../../components/redux/UserDetails"
 import { useDispatch } from "react-redux"
 import localforage from "localforage"
-
-import {API_BASE_URL, DOWNLOAD_BASE_URL} from "./URL";
+import apiClient, { publicClient } from "./ApiClient" // Import the API clients
 
 export default class AccountUtil {
-
-
 
   dispatch = useDispatch()
 
   static getLanguages(setLanguages) {
-    return axios({
-      url: API_BASE_URL + "/i18n/getLanguages",
+    return apiClient({
+      url: "/i18n/getLanguages",
       method: 'get',
-      headers: {
-        token: localStorage.getItem("token"),
-      }
     }).catch(err => {
       console.log(err)
     }).then(response => {
@@ -33,114 +25,92 @@ export default class AccountUtil {
       }
       let content = response.data
       console.log(content)
-      // localforage.setItem();
       setLanguages(content)
     })
   }
 
-
-  static verifyTokens(setState) {
-    if (localStorage.getItem("token") === null) {
-      return
-    }
-    return axios({
-      url: API_BASE_URL+ "/account/verifyToken",
-      method: 'post',
-      data: { token: localStorage.getItem("token") },
-      headers: {
-        token: localStorage.getItem("token"),
-      }
-    })
-
-  }
-
   static login(data) {
-    console.log(data.get("remember") )
-    return axios({
-      url: API_BASE_URL+ "/account/login",
+    console.log(data.get("remember"))
+    return publicClient({ // Use publicClient for login (no token needed)
+      url: "/account/login",
       method: 'post',
-      data: { email: data.get('email'), password: EncryptionUtil.encryption(data.get('password')), remember: data.get("remember") },
+      data: { 
+        email: data.get('email'), 
+        password: EncryptionUtil.encryption(data.get('password')), 
+        remember: data.get("remember") 
+      },
       transformRequest: [function (data) {
-        // 对 data 进行任意转换处理
         return Qs.stringify(data)
       }],
-
     })
   }
 
-
-  static  registerStep1( userId) {
-    return axios({
-      url: API_BASE_URL + "/account/registerStep1",
+  static registerStep1(userId) {
+    return publicClient({ // Use publicClient for registration (no token needed)
+      url: "/account/registerStep1",
       method: 'post',
       data: { userId: userId },
       transformRequest: [function (data) {
-        // transform data -> json
         return Qs.stringify(data)
       }],
     })
-
   }
+
   static resetStep1(userId) {
-    return axios({
-      url: API_BASE_URL + "/account/registerStep1",
+    return publicClient({ // Use publicClient for reset (no token needed)
+      url: "/account/registerStep1",
       method: 'post',
       data: { userId: userId },
       transformRequest: [function (data) {
-        // transform data -> json
         return Qs.stringify(data)
       }],
     })
-
   }
-
 
   static sendVerificationCode(email) {
-    return axios({
-      url: API_BASE_URL + "/account/sendVerificationCode",
+    return publicClient({ // Use publicClient for verification (no token needed)
+      url: "/account/sendVerificationCode",
       method: 'post',
       data: { userId: email},
       transformRequest: [function (data) {
-        // transform data -> json
-        return Qs.stringify(data)
-      }],
-    })
-    }
-
-
-  static registerStep2( email, code) {
-    return axios({
-      url: API_BASE_URL + "/account/registerStep2",
-      method: 'post',
-      data: { userId: email, code: code },
-      transformRequest: [function (data) {
-        // transform data -> json
         return Qs.stringify(data)
       }],
     })
   }
 
-  static registerStep3(userId,password, token) {
-   return axios({
-      url: API_BASE_URL + "/account/registerStep3",
+  static registerStep2(email, code) {
+    return publicClient({ // Use publicClient for registration (no token needed)
+      url: "/account/registerStep2",
       method: 'post',
-      data: { password: EncryptionUtil.encryption(password), token: token, userId: userId },
+      data: { userId: email, code: code },
       transformRequest: [function (data) {
-        // transform data -> json
         return Qs.stringify(data)
       }],
     })
+  }
 
+  static registerStep3(userId, password, token) {
+    return publicClient({ // Use publicClient for registration (no token needed)
+      url: "/account/registerStep3",
+      method: 'post',
+      data: { 
+        password: EncryptionUtil.encryption(password), 
+        token: token, 
+        userId: userId 
+      },
+      transformRequest: [function (data) {
+        return Qs.stringify(data)
+      }],
+    })
   }
 
   static uploadAvatar(data) {
     async function upload() {
-      let response = await axios({
-        url: API_BASE_URL + "/account/uploadAvatar",
+      let response = await apiClient({
+        url: "/account/uploadAvatar",
         method: 'post',
         data: { avatar: data },
         headers: {
-          token: localStorage.getItem("token"),
           'Content-Type': 'multipart/form-data',
         }
       })
@@ -150,24 +120,17 @@ export default class AccountUtil {
     return upload()
   }
 
-  // This is about get userInfo
   static getOwnerInfo() {
-
     return localforage.getItem("userId").then(res => {
-      return axios({
-        url: API_BASE_URL + "/account/getinfo",
+      return apiClient({
+        url: "/account/getinfo",
         method: 'post',
         data: { userId: res },
         transformRequest: [function (data) {
           return Qs.stringify(data)
         }],
-        headers: {
-          token: localStorage.getItem("token"),
-        }
       })
     })
-
-
   }
 
   static updateUserInfo(introduction, nickName, location, pictures, birthdate, gender, language, country) {
@@ -182,9 +145,10 @@ export default class AccountUtil {
       language: language,
       country: country
     })
-    localforage.getItem("userId").then(res => {
-      axios({
-        url: API_BASE_URL + "/account/setinfo",
+    
+    return localforage.getItem("userId").then(res => {
+      return apiClient({
+        url: "/account/setinfo",
         method: 'post',
         data: {
           userId: res,
@@ -200,50 +164,44 @@ export default class AccountUtil {
         transformRequest: [function (data) {
           return Qs.stringify(data)
         }],
-        headers: {
-          token: localStorage.getItem("token"),
-        }
       }).catch(err => {
-
+        // Error already handled by interceptor
+        throw err; // Re-throw for caller to handle if needed
       }).then(response => {
         console.log(response)
+        return response;
       })
     })
   }
+
   static async getAvatar(avatar, setAvatar) {
     try {
-      axios({
-        url: API_BASE_URL + "/account/getAvatar",
+      const response = await apiClient({
+        url: "/account/getAvatar",
         method: 'get',
         transformRequest: [function (data) {
           return Qs.stringify(data)
         }],
-        headers: {
-          token: localStorage.getItem("token"),
-        }
-      }).catch(err => {
-
-      }).then(response => {
-        console.log(response)
-        setAvatar(response.data)
-      })
-
+      });
+      
+      console.log(response)
+      setAvatar(response.data)
+      return response;
     } catch (error) {
       console.error('Error fetching avatar:', error);
+      throw error; // Re-throw for caller to handle if needed
     }
   }
 
-
   static registerValidate() {
-
+    // Implementation needed
   }
 
   static registerOptionalData() {
-
+    // Implementation needed
   }
 
   static forget() {
-
+    // Implementation needed
   }
-
 }
