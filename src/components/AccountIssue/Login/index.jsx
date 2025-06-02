@@ -289,135 +289,135 @@ export default function Login(props) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container component="main" maxWidth="sm" sx={{ mb: 8 }}>
-        <Snackbar
-          anchorOrigin={{ vertical, horizontal }}
-          open={open}
-          onClose={handleClose}
-          autoHideDuration={5000}
-          sx={{ mt: 6 }}
-        >
-          <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
-            {message}
-          </Alert>
-        </Snackbar>
-        
-        <Paper
-          elevation={3}
+
+        <Container 
+          component="main" 
+          maxWidth="sm"
           sx={{
-            mt: 8,
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)', // For Safari compatibility
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', // Optional: semi-transparent background
+            borderRadius: '16px', // Optional: rounded corners
+            padding: '20px', // Optional: internal padding
           }}
         >
-          <Fade in={true}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-                <LoginIcon fontSize="large" />
-              </Avatar>
-              
-              <Typography component="h1" variant="h4" gutterBottom>
-                Welcome Back
-              </Typography>
-              
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-                Sign in to access your account
-              </Typography>
-              
-              <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  value={email}
-                  onChange={handleEmailChange}
-                  error={!!emailError}
-                  helperText={emailError}
-                  sx={{ mb: 2 }}
-                />
+          <Snackbar
+            anchorOrigin={{ vertical, horizontal }}
+            open={open}
+            onClose={handleClose}
+            autoHideDuration={5000}
+            sx={{ mt: 6 }}
+          >
+            <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+              {message}
+            </Alert>
+          </Snackbar>
+          
+
+            <Fade in={true}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
+                  <LoginIcon fontSize="large" />
+                </Avatar>
                 
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  error={!!passwordError}
-                  helperText={passwordError}
-                  sx={{ mb: 1 }}
-                />
+                <Typography component="h1" variant="h4" gutterBottom>
+                  Welcome Back
+                </Typography>
                 
-                <FormControlLabel
-                  control={
-                    <Checkbox 
-                      checked={selected}
-                      onChange={handleSelection} 
-                      value="remember" 
-                      color="primary" 
-                      sx={{ borderRadius: 1 }}
-                    />
-                  }
-                  label="Remember me for 30 days"
-                  sx={{ mb: 2 }}
-                />
-                        <GoogleOAuthProvider clientId="你的客户端ID">
-          <SignInButton />
-        </GoogleOAuthProvider>
+                <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
+                  Sign in to access your account
+                </Typography>
                 
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  disabled={isLoading}
-                  sx={{ py: 1.5, mt: 2 }}
-                >
-                  {isLoading ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
-                      Signing In...
-                    </Box>
-                  ) : (
-                    "Sign In"
-                  )}
-                </Button>
-                
-                <Grid container spacing={2} sx={{ mt: 2 }}>
-                  <Grid item xs={12} sm={6} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
-                    <Link href="/forget" variant="body2" color="primary.main">
-                      Forgot password?
-                    </Link>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    value={email}
+                    onChange={handleEmailChange}
+                    error={!!emailError}
+                    helperText={emailError}
+                    sx={{ mb: 2 }}
+                  />
+                  
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    error={!!passwordError}
+                    helperText={passwordError}
+                    sx={{ mb: 1 }}
+                  />
+                  
+                  <FormControlLabel
+                    control={
+                      <Checkbox 
+                        checked={selected}
+                        onChange={handleSelection} 
+                        value="remember" 
+                        color="primary" 
+                        sx={{ borderRadius: 1 }}
+                      />
+                    }
+                    label="Remember me for 30 days"
+                    sx={{ mb: 2 }}
+                  />
+                          <GoogleOAuthProvider clientId="你的客户端ID">
+            <SignInButton />
+          </GoogleOAuthProvider>
+                  
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{ py: 1.5, mt: 2 }}
+                  >
+                    {isLoading ? (
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                        Signing In...
+                      </Box>
+                    ) : (
+                      "Sign In"
+                    )}
+                  </Button>
+                  
+                  <Grid container spacing={2} sx={{ mt: 2 }}>
+                    <Grid item xs={12} sm={6} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
+                      <Link href="/forget" variant="body2" color="primary.main">
+                        Forgot password?
+                      </Link>
+                    </Grid>
+                    <Grid item xs={12} sm={6} sx={{ textAlign: { xs: 'center', sm: 'right' } }}>
+                      <Link href="/signup" variant="body2" color="primary.main">
+                        Don't have an account? Sign Up
+                      </Link>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} sm={6} sx={{ textAlign: { xs: 'center', sm: 'right' } }}>
-                    <Link href="/signup" variant="body2" color="primary.main">
-                      Don't have an account? Sign Up
-                    </Link>
-                  </Grid>
-                </Grid>
+                </Box>
               </Box>
-            </Box>
-          </Fade>
-        </Paper>
-        
-        <Copyright sx={{ mt: 5 }} />
-      </Container>
+            </Fade>          
+          <Copyright sx={{ mt: 3, color: 'white' }} />
+        </Container>
     </ThemeProvider>
   );
 }

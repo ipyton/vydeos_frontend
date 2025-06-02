@@ -522,7 +522,13 @@ export default function SignUp(props) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container component="main" maxWidth="sm" sx={{ mb: 8 }}>
+      <Container component="main" maxWidth="sm"  sx={{
+            backdropFilter: 'blur(30px)',
+            WebkitBackdropFilter: 'blur(30px)', // For Safari compatibility
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', // Optional: semi-transparent background
+            borderRadius: '16px', // Optional: rounded corners
+            padding: '20px', // Optional: internal padding
+          }}>
         <Snackbar
           anchorOrigin={{ vertical, horizontal }}
           open={open}
@@ -535,17 +541,7 @@ export default function SignUp(props) {
           </Alert>
         </Snackbar>
         
-        <Paper
-          elevation={3}
-          sx={{
-            mt: 8,
-            p: 4,
-            pt: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
-          }}
-        >
+
           <Box sx={{ pt: 2, pb: 4 }}>
             <Stepper activeStep={activeStep} alternativeLabel>
               {steps.map((label, index) => {
@@ -575,7 +571,6 @@ export default function SignUp(props) {
           <Divider sx={{ mb: 4 }} />
           
           <StepContent />
-        </Paper>
         
         <Copyright sx={{ mt: 5 }} />
       </Container>

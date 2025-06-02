@@ -101,20 +101,7 @@ const theme = createTheme({
   },
 });
 
-// Copyright component
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-    </Typography>
-  );
-}
 
-// Step icons for the stepper
 const StepIcons = {
   0: <EmailIcon />,
   1: <LockOutlinedIcon />,
@@ -149,21 +136,15 @@ export default function SignUp(props) {
 
   const { loginState, setLoginState } = props;
   const [transactionNumber, setTransactionNumber] = useState("000000");
-  
-
-
-  
 
   // Redirect if already logged in
   if (loginState === true) {
     return <Navigate to="/" replace />;
   }
-  console.log("[[")
 
   const validate = (nickname, username, password) => {
     return true;
   };
-
 
   const step1 = (event) => {
     event.preventDefault();
@@ -178,40 +159,38 @@ export default function SignUp(props) {
     }
     setIsLoading(true);
 
-        
     // Simulate API delay for demo purposes
-      AccountUtil.resetStep1(emailValue).catch((err) => {
-        console.log(err)
-        return
-      }).then(
-        (response) => {
-          console.log(response);
-          if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
-            console.log(emailValue)
-            AccountUtil.sendVerificationCode(emailValue).catch((err) => {
-              console.log(err)
-              return
-            }).then(
-              (response) => {
-                console.log(response);
-                if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
-                  console.log("Verification code sent")
-                  setIsLoading(false);
-                  setActiveStep(activeStep + 1)
-                  showNotification("Verification code sent", "success")
-                }
-                else {
-                  showNotification("Please check your input", "error")
-                }
+    AccountUtil.resetStep1(emailValue).catch((err) => {
+      console.log(err)
+      return
+    }).then(
+      (response) => {
+        console.log(response);
+        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
+          console.log(emailValue)
+          AccountUtil.sendVerificationCode(emailValue).catch((err) => {
+            console.log(err)
+            return
+          }).then(
+            (response) => {
+              console.log(response);
+              if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
+                console.log("Verification code sent")
+                setIsLoading(false);
+                setActiveStep(activeStep + 1)
+                showNotification("Verification code sent", "success")
               }
-            )
-          }
-          else {
-            showNotification("Please check your input", "error")
-          }
+              else {
+                showNotification("Please check your input", "error")
+              }
+            }
+          )
         }
-      )
-
+        else {
+          showNotification("Please check your input", "error")
+        }
+      }
+    )
   };
 
   const step2 = (event) => {
@@ -228,20 +207,20 @@ export default function SignUp(props) {
     }
     
     // Simulate API delay for demo purposes
-      AccountUtil.registerStep2(email, codeValue).then(
-        (response) => { 
-          console.log(response);
-          if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
-            setActiveStep(2);
-            setIsLoading(false);
-            setStep3Tokens(response.data.message);
-          }
-          else {
-            showNotification("Please check your input", "error")
-            setIsLoading(false);
-          }
+    AccountUtil.registerStep2(email, codeValue).then(
+      (response) => { 
+        console.log(response);
+        if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
+          setActiveStep(2);
+          setIsLoading(false);
+          setStep3Tokens(response.data.message);
         }
-      )
+        else {
+          showNotification("Please check your input", "error")
+          setIsLoading(false);
+        }
+      }
+    )
   };
 
   const step3 = (event) => {
@@ -262,7 +241,6 @@ export default function SignUp(props) {
       setIsLoading(false);
       return;
     }
-    
 
     if (step3Tokens == null || step3Tokens == undefined || step3Tokens === "") {
       showNotification("Please restart from the beginning", "error")
@@ -280,7 +258,6 @@ export default function SignUp(props) {
           console.log("Please check your input")
           console.log(response.data.message)
           setBarState({ ...barState, open: true, message:response.data.message})
-
         }
         setIsLoading(false);
       }
@@ -293,8 +270,6 @@ export default function SignUp(props) {
     }
     setBarState({...barState, open: false});
   };
-
-
 
   const previousStep = () => {
     setActiveStep(activeStep - 1);
@@ -320,204 +295,203 @@ export default function SignUp(props) {
     switch (activeStep) {
       case 0:
         return (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-                <EmailIcon fontSize="large" />
-              </Avatar>
-              <Typography component="h1" variant="h4" gutterBottom>
-                  Forget Password
-              </Typography>
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-                Enter your email to recover your account
-              </Typography>
-              
-              <Box component="form" noValidate onSubmit={step1} sx={{ width: '100%' }}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  // onChange={(event) => setEmail(event.target.value)}
-                  // value={email}
-                  sx={{ mb: 2 }}
-                  variant="outlined"
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  disabled={isLoading}
-                  sx={{ py: 1.5 }}
-                >
-                  {isLoading ? "Sending Verification..." : "Continue"}
-                </Button>
-                <Grid container justifyContent="center" sx={{ mt: 3 }}>
-                  <Grid item>
-                    <Link href="/account/login" variant="body2" color="primary.main">
-                      go to login page
-                    </Link>
-                  </Grid>
+          <Box
+          
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
+              <EmailIcon fontSize="large" />
+            </Avatar>
+            <Typography component="h1" variant="h4" gutterBottom>
+              Forget Password
+            </Typography>
+            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
+              Enter your email to recover your account
+            </Typography>
+            
+            <Box component="form" noValidate onSubmit={step1} sx={{ width: '100%' }}>
+              <TextField
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                sx={{ width: '100%' }}
+                variant="outlined"
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={isLoading}
+                sx={{ py: 1.5 }}
+              >
+                {isLoading ? "Sending Verification..." : "Continue"}
+              </Button>
+              <Grid container justifyContent="center" sx={{ mt: 3 }}>
+                <Grid item>
+                  <Link href="/account/login" variant="body2" color="primary.main">
+                  Go to login page
+                  </Link>
                 </Grid>
-              </Box>
+              </Grid>
             </Box>
+          </Box>
         );
       case 1:
         return (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-                <LockOutlinedIcon fontSize="large" />
-              </Avatar>
-              <Typography component="h1" variant="h4" gutterBottom>
-                Verify Email
-              </Typography>
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 1 }}>
-                We've sent a verification code to
-              </Typography>
-              <Typography variant="body1" fontWeight="bold" sx={{ mb: 3 }}>
-                {email}
-              </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
+              <LockOutlinedIcon fontSize="large" />
+            </Avatar>
+            <Typography component="h1" variant="h4" gutterBottom>
+              Verify Email
+            </Typography>
+            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 1 }}>
+              We've sent a verification code to
+            </Typography>
+            <Typography variant="body1" fontWeight="bold" sx={{ mb: 3 }}>
+              {email}
+            </Typography>
+            
+            <Box component="form" noValidate onSubmit={step2} sx={{ width: '100%' }}>
+              <TextField
+                required
+                fullWidth
+                id="digits"
+                label="6-Digit Code"
+                name="digits"
+                placeholder="000000"
+                inputProps={{ maxLength: 6 }}
+                sx={{ mb: 2 }}
+              />
               
-              <Box component="form" noValidate onSubmit={step2} sx={{ width: '100%' }}>
-                <TextField
-                  required
-                  fullWidth
-                  id="digits"
-                  label="6-Digit Code"
-                  name="digits"
-                  placeholder="000000"
-                  inputProps={{ maxLength: 6 }}
-                  sx={{ mb: 2 }}
-                />
-                
-                <Stack direction="row" spacing={2}>
-                  <Button
-                    onClick={previousStep}
-                    variant="outlined"
-                    sx={{ py: 1.5, flex: 1 }}
-                    disabled={isLoading}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{ py: 1.5, flex: 2 }}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Verifying..." : "Verify Code"}
-                  </Button>
-                </Stack>
-                <CountDownButton email={email} activeStep={activeStep} />
-              </Box>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  onClick={previousStep}
+                  variant="outlined"
+                  sx={{ py: 1.5, flex: 1 }}
+                  disabled={isLoading}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ py: 1.5, flex: 2 }}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Verifying..." : "Verify Code"}
+                </Button>
+              </Stack>
+              <CountDownButton email={email} activeStep={activeStep} />
             </Box>
+          </Box>
         );
         
       case 2:
         return (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-                <PersonAddIcon fontSize="large" />
-              </Avatar>
-              <Typography component="h1" variant="h4" gutterBottom>
-                Set Password
-              </Typography>
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-                Create a secure password for your new account.
-              </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
+              <PersonAddIcon fontSize="large" />
+            </Avatar>
+            <Typography component="h1" variant="h4" gutterBottom>
+              Set Password
+            </Typography>
+            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
+              Create a secure password for your new account.
+            </Typography>
+            
+            <Box component="form" noValidate onSubmit={step3} sx={{ width: '100%' }}>
+              <TextField
+                required
+                fullWidth
+                id="password"
+                label="Password"
+                name="password"
+                type="password"
+                error={!!passwordError}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                required
+                fullWidth
+                id="confirmPassword"
+                label="Confirm Password"
+                type="password"
+                error={!!passwordError}
+                helperText={passwordError}
+                sx={{ mb: 2 }}
+              />
               
-              <Box component="form" noValidate onSubmit={step3} sx={{ width: '100%' }}>
-                <TextField
-                  required
-                  fullWidth
-                  id="password"
-                  label="Password"
-                  name="password"
-                  type="password"
-                  error={!!passwordError}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  required
-                  fullWidth
-                  id="confirmPassword"
-                  label="Confirm Password"
-                  type="password"
-                  error={!!passwordError}
-                  helperText={passwordError}
-                  sx={{ mb: 2 }}
-                />
-                
-                <Stack direction="row" spacing={2}>
-                  <Button
-                    onClick={previousStep}
-                    variant="outlined"
-                    sx={{ py: 1.5, flex: 1 }}
-                    disabled={isLoading}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{ py: 1.5, flex: 2 }}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Resetting..." : "Complete Reset"}
-                  </Button>
-                </Stack>
-              </Box>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  onClick={previousStep}
+                  variant="outlined"
+                  sx={{ py: 1.5, flex: 1 }}
+                  disabled={isLoading}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ py: 1.5, flex: 2 }}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Resetting..." : "Complete Reset"}
+                </Button>
+              </Stack>
             </Box>
+          </Box>
         );
         
       case 3:
         return (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-              }}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 2, bgcolor: 'success.main', width: 64, height: 64 }}>
+              <CheckCircleIcon fontSize="large" />
+            </Avatar>
+            <Typography component="h1" variant="h4" gutterBottom>
+              Reset Complete!
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 400 }}>
+              Your account has been successfully reset. You can now sign in to access your account.
+            </Typography>
+            
+            <Button
+              onClick={jumpToLoginPage}
+              fullWidth
+              variant="contained"
+              sx={{ py: 1.5 }}
             >
-              <Avatar sx={{ m: 2, bgcolor: 'success.main', width: 64, height: 64 }}>
-                <CheckCircleIcon fontSize="large" />
-              </Avatar>
-              <Typography component="h1" variant="h4" gutterBottom>
-                Reset Complete!
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 400 }}>
-                Your account has been successfully reset. You can now sign in to access your account.
-              </Typography>
-              
-              <Button
-                onClick={jumpToLoginPage}
-                fullWidth
-                variant="contained"
-                sx={{ py: 1.5 }}
-              >
-                Sign In
-              </Button>
-            </Box>
+              Sign In
+            </Button>
+          </Box>
         );
         
       default:
@@ -528,7 +502,17 @@ export default function SignUp(props) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container component="main" maxWidth="sm" sx={{ mb: 8 }}>
+      <Container 
+        component="main" 
+        maxWidth="sm"
+        sx={{
+          backdropFilter: 'blur(40px)',
+          WebkitBackdropFilter: 'blur(40px)', // For Safari compatibility
+          backgroundColor: 'rgba(255, 255, 255, 0.1)', // Optional: semi-transparent background
+          borderRadius: '16px', // Optional: rounded corners
+          padding: '20px', // Optional: internal padding
+        }}
+      >
         <Snackbar
           anchorOrigin={{ vertical, horizontal }}
           open={open}
@@ -541,49 +525,40 @@ export default function SignUp(props) {
           </Alert>
         </Snackbar>
         
-        <Paper
-          elevation={3}
-          sx={{
-            mt: 8,
-            p: 4,
-            pt: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
-          }}
-        >
-          <Box sx={{ pt: 2, pb: 4 }}>
-            <Stepper activeStep={activeStep} alternativeLabel>
-              {steps.map((label, index) => {
-                const stepProps = {};
-                const labelProps = {};
-                
-                if (isStepSkipped(index)) {
-                  stepProps.completed = false;
-                }
-                
-                return (
-                  <Step key={label} {...stepProps}>
-                    <StepLabel 
-                      {...labelProps}
-                      StepIconProps={{
-                        icon: StepIcons[index]
-                      }}
-                    >
-                      {label}
-                    </StepLabel>
-                  </Step>
-                );
-              })}
-            </Stepper>
+        <Fade in={true}>
+          <Box>
+            <Box sx={{ pt: 2, pb: 4 }}>
+              <Stepper activeStep={activeStep} alternativeLabel>
+                {steps.map((label, index) => {
+                  const stepProps = {};
+                  const labelProps = {};
+                  
+                  if (isStepSkipped(index)) {
+                    stepProps.completed = false;
+                  }
+                  
+                  return (
+                    <Step key={label} {...stepProps}>
+                      <StepLabel 
+                        {...labelProps}
+                        StepIconProps={{
+                          icon: StepIcons[index]
+                        }}
+                      >
+                        {label}
+                      </StepLabel>
+                    </Step>
+                  );
+                })}
+              </Stepper>
+            </Box>
+            
+            <Divider sx={{ mb: 4 }} />
+            
+            <StepContent />
           </Box>
-          
-          <Divider sx={{ mb: 4 }} />
-          
-          <StepContent />
-        </Paper>
+        </Fade>
         
-        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );
