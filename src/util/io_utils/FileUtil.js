@@ -1,71 +1,70 @@
-
 import { responsiveFontSizes } from "@mui/material"
-import axios from "axios"
 import Qs from 'qs'
-
-import {API_BASE_URL, DOWNLOAD_BASE_URL} from "./URL";
+import { apiClient, downloadClient } from "./ApiClient";
 
 export default class PictureUtil {
 
-
-    static uploadArticlePics(data) {
-        let response = axios({
-            url:  + "/article/upload_pic",
-            method: 'post',
-            data: { pics: data },
-            transformRequest: [function (data) {
-                return Qs.stringify(data)
-            }],
-            headers: {
-                token: localStorage.getItem("token"),
-                'userEmail': '1838169994@qq.com'
-            }
-        })
-        let responseData = response.data
-        console.log(response)
-        return responseData.code === 0
+    static async uploadArticlePics(data) {
+        try {
+            let response = await apiClient.post("/article/upload_pic", 
+                Qs.stringify({ pics: data }), 
+                {
+                    headers: {
+                        'userEmail': '1838169994@qq.com',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }
+            );
+            let responseData = response.data;
+            console.log(response);
+            return responseData.code === 0;
+        } catch (error) {
+            console.error('Upload article pics error:', error);
+            return false;
+        }
     }
 
     static downloadArticlePics(articleID, from, to) {
         async function download() {
-            let response = await axios({
-                url:  + "/article/get_pic",
-                method: 'post',
-                data: { from: 1, from: to, articleID: articleID },
-                headers: {
-                    token: localStorage.getItem("token"),
-                    'userEmail': '1838169994@qq.com'
-                },
-                responseType: 'arraybuffer'
-            })
-            let responseData = response.data
-            console.log(responseData)
-            return responseData.code === 0
+            try {
+                let response = await downloadClient.post("/article/get_pic", 
+                    { from: from, to: to, articleID: articleID }, 
+                    {
+                        headers: {
+                            'userEmail': '1838169994@qq.com'
+                        },
+                        responseType: 'arraybuffer'
+                    }
+                );
+                let responseData = response.data;
+                console.log(responseData);
+                return responseData.code === 0;
+            } catch (error) {
+                console.error('Download article pics error:', error);
+                return false;
+            }
         }
-        return download()
+        return download();
     }
 
     static getAvatar() {
         async function download() {
-            let response = await axios({
-                url: PictureUtil.getArticleBase() +"/account/getAvatar",
-                method: 'post',
-                headers: {
-                    token: localStorage.getItem("token"),
-                    'userEmail': '1838169994@qq.com'
-                },
-                responseType: "arraybuffer"
-            })
-            // console.log(response)
-            const blob = new Blob([response.data], { type: "image/jpg" });
-            const imageUrl = URL.createObjectURL(blob);
-            //let blob = new Blob([response.data],{type: "image/jpeg"});
-            // response = URL.createObjectURL(blob)
-            // console.log(response)
-            return imageUrl
+            try {
+                let response = await apiClient.post("/account/getAvatar", {}, {
+                    headers: {
+                        'userEmail': '1838169994@qq.com'
+                    },
+                    responseType: "arraybuffer"
+                });
+                
+                const blob = new Blob([response.data], { type: "image/jpg" });
+                const imageUrl = URL.createObjectURL(blob);
+                return imageUrl;
+            } catch (error) {
+                console.error('Get avatar error:', error);
+                return null;
+            }
         }
-        return download()
+        return download();
     }
-
-
 }

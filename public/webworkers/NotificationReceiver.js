@@ -1,6 +1,8 @@
-import { API_BASE_URL } from "../../src/util/io_utils/URL";
+const API_BASE_URL = "https://apis.vydeo.xyz/java"
+const FLASK_API_BASE_URL = "https://apis.vydeo.xyz/py"
+const DOWNLOAD_BASE_URL = "https://localhost:5000"
+const WebSocket_URL = "wss://apis.vydeo.xyz/ws"
 
-importScripts('https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js');
 importScripts("/webworkers/DatabaseManipulator.js");
 importScripts('https://cdn.jsdelivr.net/npm/qs/dist/qs.min.js');
 

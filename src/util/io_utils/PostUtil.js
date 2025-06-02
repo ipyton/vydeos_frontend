@@ -1,106 +1,92 @@
 import Qs from 'qs'
-import axios from "axios"
-import {DOWNLOAD_BASE_URL, API_BASE_URL} from "./URL";
+import { apiClient } from "./ApiClient";
 
 export default class PostUtil {
 
-
-
     static uploadPicture(pic, picurl, setPicurl) {
-        axios({
-            url: API_BASE_URL + "/file/uploadPostPic",
-            method: 'post',
-            data: { file: pic },
+        apiClient.post("/file/uploadPostPic", { file: pic }, {
             headers: {
-                token: localStorage.getItem("token"),
                 'Content-Type': 'multipart/form-data'
-
             }
         }).catch(exception => {
-
+            console.error('Upload picture error:', exception);
         }).then(response => {
-            setPicurl([...picurl, response.data])
-            console.log(picurl)
-
-        })
-
+            if (response) {
+                setPicurl([...picurl, response.data]);
+                console.log(picurl);
+            }
+        });
     }
 
     static sendPost(content, pics, notice, who_can_see, location, list, setList) {
-        let data = { images: pics, content: content, authorName: "author", notice: [], users: who_can_see, location: location, voices: [], videos: [], comments: [] }
+        let data = { 
+            images: pics, 
+            content: content, 
+            authorName: "author", 
+            notice: [], 
+            users: who_can_see, 
+            location: location, 
+            voices: [], 
+            videos: [], 
+            comments: [] 
+        };
         
-        console.log(data)
-        axios({
-            url: API_BASE_URL + "/post/upload",
-            method: 'post',
-            data: data,
+        console.log(data);
+        apiClient.post("/post/upload", data, {
             headers: {
-                token: localStorage.getItem("token"),
                 'Content-Type': 'application/json'
             }
         }).catch(exception => {
-            console.log(exception)
+            console.log(exception);
         }).then(response => {
-            setList([data, ...list])
-            console.log(response)
-
-        })
+            if (response) {
+                setList([data, ...list]);
+                console.log(response);
+            }
+        });
     }
 
+    static getPostsById(id, list, setList) {
+        const requestData = Qs.stringify({
+            userID: localStorage.getItem("userId")
+        });
 
-    
-    static getPostsById(id, list,setList) {
-        axios({
-            url: API_BASE_URL + "/post/get_by_user_id",
-            method: 'post',
-            data: {userID: localStorage.getItem("userId")},
-            transformRequest: [function (data) {
-                return Qs.stringify(data)
-            }],
+        apiClient.post("/post/get_by_user_id", requestData, {
             headers: {
-                token: localStorage.getItem("token"),
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
         }).catch(exception => {
-            console.log(exception)
+            console.log(exception);
         }).then(response => {
-            console.log(response)
-            if (!response || !response.data || ! response.data.posts) {
-                console.log("connection error")
-                return 
+            console.log(response);
+            if (!response || !response.data || !response.data.posts) {
+                console.log("connection error");
+                return;
             }
-            setList([...list, ...response.data.posts])
-        })
+            setList([...list, ...response.data.posts]);
+        });
     }
 
     static getFriendPosts(list, setList) {
-        axios({
-            url: API_BASE_URL + "/post/get_friends_posts",
-            method: 'post',
-            data: {},
-            transformRequest: [function (data) {
-                return Qs.stringify(data)
-            }],
+        const requestData = Qs.stringify({});
+
+        apiClient.post("/post/get_friends_posts", requestData, {
             headers: {
-                token: localStorage.getItem("token"),
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
         }).catch(exception => {
-            console.log(exception)
+            console.log(exception);
         }).then(response => {
-            console.log(response)
+            console.log(response);
             if (!response || !response.data || !response.data.posts) {
-                console.log("connection error")
-                return 
+                console.log("connection error");
+                return;
             }
-            setList([...list, ...response.data.posts])
-        })
+            setList([...list, ...response.data.posts]);
+        });
     }
 
     static getRecommendPosts() {
-        
+        // Implementation needed
     }
-
-
-
-
-
 }

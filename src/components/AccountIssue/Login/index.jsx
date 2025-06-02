@@ -23,6 +23,8 @@ import { Paper, Divider, Fade, Alert, Snackbar, CircularProgress } from '@mui/ma
 import AuthUtil from '../../../util/io_utils/AuthUtil';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import SignInButton from './SignInButton';
+import { login } from "../../redux/authSlice"; // Adjust path to your auth actions
+import store from "../../redux/store"; // Adjust path to your Redux store
 
 // Custom theme with a more modern palette - matching the signup theme
 const theme = createTheme({
@@ -129,7 +131,6 @@ export default function Login(props) {
   const [passwordError, setPasswordError] = useState("");
   const { showNotification } = useNotification();
 
-  const { login, setLogin } = props;
 
   // Snackbar state
   const [barState, setBarState] = useState({
@@ -253,7 +254,11 @@ export default function Login(props) {
                   localforage.setItem("paths", JSON.parse(response1.data.message)).then(  
                     () => {
                       setTimeout(() => {
-                        setLogin(true);
+                        store.dispatch(login({
+                          user: content.userId,
+                          token: responseData.message
+                        }));
+                        
                       }, 500);
                     }
                   )
@@ -270,6 +275,7 @@ export default function Login(props) {
         showNotification(responseData.message, "error");
       }
     } catch (error) {
+      console.log("aaaaaaaaaaaaa")
       if (error.message === "Network Error") {
         setNetworkErr(true);
       } else {

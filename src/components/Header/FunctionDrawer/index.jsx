@@ -142,6 +142,10 @@ export default function FunctionDrawer(props) {
         console.log(response)
         let tmp = []
         console.log(response)
+        if (!response || response.length === 0) {
+          setNavigationItems([]);
+          return;
+        }
         response.forEach(element => {
           console.log(element.route == "/**")
           if (element.route === "/**") {
