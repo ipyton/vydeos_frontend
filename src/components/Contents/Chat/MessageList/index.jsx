@@ -121,29 +121,14 @@ export default function ChatContainer(props) {
         display: 'flex',
         flexDirection: 'column',
         width: "100%",
-        height: isMobile ? "calc(100vh - 64px - 66px)" : "calc(100vh - 64px - 66px)",
+        height: isMobile ? "calc(100vh - 64px - 2px)" : "calc(100vh - 64px - 66px)",
+        paddingTop: isMobile ? 2 : 0,
         borderRadius: 2,
         position: 'relative',
         backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb'
       }}
     >
-      {isMobile && (
-        <IconButton
-          onClick={handleBackClick}
-          sx={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-            zIndex: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            }
-          }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
-      )}
+
       
       <Header selected={select} onBack={handleBackClick} />
       
@@ -167,7 +152,7 @@ export default function ChatContainer(props) {
             alignItems: 'center',
             flexGrow: 1,
             p: isMobile ? 2 : 3,
-            height: isMobile ? 'calc(100vh - 180px)' : 'auto',
+            height: isMobile ? 'calc(100vh - 64px)' : 'auto',
             borderRadius: "8px",
           }}
         >
@@ -193,8 +178,8 @@ export default function ChatContainer(props) {
             overflow: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            height: isMobile ? 'calc(100vh - 240px)' : 'auto',
-            paddingBottom: isMobile ? '20px' : '0',
+            height: isMobile ? 'calc(100vh - 128px)' : 'auto',
+            paddingBottom: isMobile ? '10px' : '0',
             borderRadius: "8px",
           }}
         >
