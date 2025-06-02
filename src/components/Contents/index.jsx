@@ -235,7 +235,7 @@ export default function Contents(props) {
                             </div>
                         </div>
                     </LocalizationProvider>
-                    <Footer description='good' title='morning'></Footer>
+                    {/* <Footer description='good' title='morning'></Footer> */}
                 </Box>
             </Box>
 

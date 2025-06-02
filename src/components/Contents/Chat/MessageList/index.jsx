@@ -99,9 +99,9 @@ export default function ChatContainer(props) {
           alignItems: 'center',
           p: isMobile ? 2 : 4,
           backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb',
-          borderRadius: isMobile ? 0 : 2,
           width: "100%",
           height: "100%",
+          borderRadius:1
         }}
       >
         <Typography variant={isMobile ? "body1" : "h6"} color="text.secondary" gutterBottom>
@@ -122,7 +122,7 @@ export default function ChatContainer(props) {
         flexDirection: 'column',
         width: "100%",
         height: isMobile ? "calc(100vh - 64px - 66px)" : "calc(100vh - 64px - 66px)",
-        borderRadius: 0,
+        borderRadius: 2,
         position: 'relative',
         backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb'
       }}
@@ -167,7 +167,8 @@ export default function ChatContainer(props) {
             alignItems: 'center',
             flexGrow: 1,
             p: isMobile ? 2 : 3,
-            height: isMobile ? 'calc(100vh - 120px)' : 'auto'
+            height: isMobile ? 'calc(100vh - 120px)' : 'auto',
+            borderRadius: "8px",
           }}
         >
           <Typography color="error.main">{error}</Typography>
@@ -192,8 +193,9 @@ export default function ChatContainer(props) {
             overflow: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            height: isMobile ? 'calc(100vh - 120px)' : 'auto',
-            paddingBottom: isMobile ? '20px' : '0'
+            height: isMobile ? 'calc(100vh - 240px)' : 'auto',
+            paddingBottom: isMobile ? '20px' : '0',
+            borderRadius: "8px",
           }}
         >
           <MessageList
@@ -210,7 +212,7 @@ export default function ChatContainer(props) {
       <Box sx={{ 
         flexShrink: 0, 
         p: isMobile ? 1 : 2,
-        backgroundColor: mode === 'dark' ? '#1e1e1e' : '#ffffff',
+        backgroundColor: 'transparent', // 或者 'rgba(255, 255, 255, 0.5)' 之类的透明色
         borderTop: isMobile ? '1px solid rgba(0,0,0,0.08)' : 'none'
       }}>
         <InputBox

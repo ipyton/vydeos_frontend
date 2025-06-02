@@ -1,7 +1,6 @@
 import TextField from '@mui/material/TextField';
 import * as React from 'react';
 import { Button, IconButton, Menu, MenuItem, Paper, Stack } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
@@ -12,41 +11,6 @@ import localforage from 'localforage';
 import DatabaseManipulator from '../../../../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
-// Styled components
-const StyledPaper = styled(Paper)(({ theme, isMobile }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: 0,
-  borderRadius: 20,
-  boxShadow: theme => theme.palette.mode === 'dark' ? '0 2px 5px rgba(255,255,255,0.05)' : '0 2px 5px rgba(0,0,0,0.1)',
-  width: '100%',
-  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
-  borderTop: isMobile ? `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}` : 'none'
-}));
-
-const StyledTextField = styled(TextField)({
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      border: 'none',
-    },
-    '&:hover fieldset': {
-      border: 'none',
-    },
-    '&.Mui-focused fieldset': {
-      border: 'none',
-    },
-  },
-  flexGrow: 1,
-});
-
-const SendButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
-  color: 'white',
-  '&:hover': {
-    backgroundColor: theme.palette.primary.dark,
-  },
-  marginLeft: theme.spacing(1),
-}));
 
 export default function InputBox(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -56,7 +20,91 @@ export default function InputBox(props) {
   const open = Boolean(anchorEl);
   const inputRef = React.useRef(null);
   const { showNotification } = useNotification();
-  const theme = useThemeMode();
+  const { mode } = useThemeMode();
+
+  // Dynamic styles based on mode
+  const paperStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '4px 8px',
+    borderRadius: 20,
+    boxShadow: mode === 'dark' 
+      ? '0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(255,255,255,0.05)' 
+      : '0 2px 8px rgba(0,0,0,0.1)',
+    width: '100%',
+    backgroundColor: mode === 'dark' ? '#2a2a2a' : '#ffffff',
+    border: mode === 'dark' 
+      ? '1px solid rgba(255,255,255,0.12)' 
+      : '1px solid rgba(0,0,0,0.08)',
+    transition: 'all 0.2s ease-in-out',
+    '&:hover': {
+      backgroundColor: mode === 'dark' ? '#323232' : '#fafafa',
+      borderColor: mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.12)',
+    }
+  };
+
+  const textFieldStyles = {
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        border: 'none',
+      },
+      '&:hover fieldset': {
+        border: 'none',
+      },
+      '&.Mui-focused fieldset': {
+        border: 'none',
+      },
+      '& .MuiInputBase-input': {
+        color: mode === 'dark' ? '#ffffff' : '#000000',
+        '&::placeholder': {
+          color: mode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+          opacity: 1,
+        },
+      },
+    },
+    flexGrow: 1,
+  };
+
+  const iconButtonStyles = {
+    color: mode === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
+    '&:hover': {
+      backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+      color: mode === 'dark' ? '#ffffff' : '#1976d2',
+    },
+    transition: 'all 0.2s ease-in-out',
+  };
+
+  const sendButtonStyles = {
+    backgroundColor: mode === 'dark' ? '#1565c0' : '#1976d2',
+    color: 'white',
+    marginLeft: 1,
+    '&:hover': {
+      backgroundColor: mode === 'dark' ? '#1976d2' : '#1565c0',
+      transform: 'scale(1.05)',
+    },
+    '&:disabled': {
+      backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+      color: mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.26)',
+    },
+    transition: 'all 0.2s ease-in-out',
+  };
+
+  const menuStyles = {
+    '& .MuiPaper-root': {
+      backgroundColor: mode === 'dark' ? '#2a2a2a' : '#ffffff',
+      border: mode === 'dark' ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(0,0,0,0.12)',
+      boxShadow: mode === 'dark' 
+        ? '0 8px 32px rgba(0,0,0,0.5)' 
+        : '0 8px 32px rgba(0,0,0,0.15)',
+    },
+    '& .MuiMenuItem-root': {
+      color: mode === 'dark' ? '#ffffff' : '#000000',
+      '&:hover': {
+        backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+      },
+    },
+  };
+
   const handleOpenAttachmentMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -122,10 +170,10 @@ export default function InputBox(props) {
   };
 
   return (
-    <Stack direction="row" sx={{ width: "100%", padding: 0 }} alignItems="center" spacing={1} >
-      <StyledPaper elevation={0} isMobile={window.innerWidth <= 768} sx={{ backgroundColor: theme.mode === 'dark' ? '#1e1e1e' : '#ffffff' }}>
+    <Stack direction="row" sx={{ width: "100%", padding: 0 }} alignItems="center" spacing={1}>
+      <Paper elevation={0} sx={paperStyles}>
         <IconButton
-          color="primary"
+          sx={iconButtonStyles}
           aria-label="Attach files"
           aria-controls={open ? 'attachment-menu' : undefined}
           aria-haspopup="true"
@@ -135,7 +183,8 @@ export default function InputBox(props) {
           <AttachFileIcon />
         </IconButton>
         
-        <StyledTextField
+        <TextField
+          sx={textFieldStyles}
           placeholder="Type a message..."
           multiline
           maxRows={4}
@@ -144,16 +193,18 @@ export default function InputBox(props) {
           onKeyDown={handleKeyPress}
           inputRef={inputRef}
           fullWidth
+          variant="outlined"
         />
         
-        <SendButton
+        <IconButton
+          sx={sendButtonStyles}
           onClick={handleSend}
           disabled={isLoading || !text.trim()}
           size="medium"
         >
           <SendIcon />
-        </SendButton>
-      </StyledPaper>
+        </IconButton>
+      </Paper>
 
       <Menu
         id="attachment-menu"
@@ -168,7 +219,7 @@ export default function InputBox(props) {
           vertical: 'bottom',
           horizontal: 'center',
         }}
-
+        sx={menuStyles}
       >
         <input id="uploadPic" type="file" accept="image/*" onChange={() => handleFileUpload('picture')} hidden />
         <input id="uploadVid" type="file" accept="video/*" onChange={() => handleFileUpload('video')} hidden />

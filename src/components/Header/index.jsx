@@ -442,6 +442,7 @@ export default function Header(props) {
       boxShadow: mode === 'dark'
         ? '0px 2px 4px rgba(0,0,0,0.6)'
         : '0px 2px 4px rgba(0,0,0,0.1)',
+        height: '64px',
     }}
   >
     <Toolbar>
