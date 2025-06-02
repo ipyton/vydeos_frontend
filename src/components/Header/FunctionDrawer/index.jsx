@@ -10,6 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip'; // 添加Tooltip导入
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import AuthUtil from '../../../util/io_utils/AuthUtil';
@@ -204,43 +205,57 @@ export default function FunctionDrawer(props) {
         },
       }}>
         {navigationItems.map((item) => (
-          <ListItem 
-            onClick={() => handleNavigation(item.route)} 
-            key={item.name} 
-            disablePadding 
-            sx={{ display: 'block' }}
+          <Tooltip 
+            title={item.iconName} 
+            placement="right" 
+            arrow
+            // 只在drawer关闭时显示tooltip，避免与文字重叠
+            disableHoverListener={open}
+            // 修复快速移动时不显示的问题
+            enterDelay={100}
+            leaveDelay={0}
+            enterNextDelay={50}
+            disableInteractive={false}
+            followCursor={false}
+            key={item.name}
           >
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: open ? 'initial' : 'center',
-                px: 2.5,
-                '&:hover': {
-                  backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                },
-              }}
+            <ListItem 
+              onClick={() => handleNavigation(item.route)} 
+              disablePadding 
+              sx={{ display: 'block' }}
             >
-              <ListItemIcon
+              <ListItemButton
                 sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : 'auto',
-                  justifyContent: 'center',
-                  color: mode === 'dark' ? '#ffffff' : 'inherit',
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                  '&:hover': {
+                    backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                  },
                 }}
               >
-                <DynamicIcon iconName={item.iconName} />
-              </ListItemIcon>
-              <ListItemText 
-                primary={item.name} 
-                sx={{ 
-                  opacity: open ? 1 : 0,
-                  '& .MuiTypography-root': {
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
                     color: mode === 'dark' ? '#ffffff' : 'inherit',
-                  }
-                }} 
-              />
-            </ListItemButton>
-          </ListItem>
+                  }}
+                >
+                  <DynamicIcon iconName={item.iconName} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.name} 
+                  sx={{ 
+                    opacity: open ? 1 : 0,
+                    '& .MuiTypography-root': {
+                      color: mode === 'dark' ? '#ffffff' : 'inherit',
+                    }
+                  }} 
+                />
+              </ListItemButton>
+            </ListItem>
+          </Tooltip>
         ))}
       </List>
     </Drawer>
