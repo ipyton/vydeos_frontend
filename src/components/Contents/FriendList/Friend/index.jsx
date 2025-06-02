@@ -154,7 +154,7 @@ const handleChange = (event, newValue) => {
           value={value}
           onChange={handleChange}
           indicatorColor="secondary"
-          textColor="primary"
+          textColor={mode === 'dark' ? 'inherit' : 'primary'}
           variant={isMobile ? "scrollable" : "fullWidth"}
           scrollButtons={isMobile ? "auto" : false}
           aria-label="Relationship tabs"
@@ -168,9 +168,30 @@ const handleChange = (event, newValue) => {
               minWidth: 120,
               maxWidth: isMobile ? 160 : 'none',
               transition: 'all 0.2s ease',
-              '&:hover': {
-                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+              // Enhanced text visibility for dark mode
+              color: mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.7)',
+              '&.Mui-selected': {
+                color: mode === 'dark' ? '#ffffff' : theme.palette.primary.main,
+                fontWeight: 600,
               },
+              '&:hover': {
+                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
+              },
+              // Ensure icons are also visible in dark mode
+              '& .MuiSvgIcon-root': {
+                color: 'inherit',
+                opacity: mode === 'dark' ? 0.9 : 0.8,
+              },
+              '&.Mui-selected .MuiSvgIcon-root': {
+                opacity: 1,
+              }
+            },
+            // Enhanced tab indicator for dark mode
+            '& .MuiTabs-indicator': {
+              height: 3,
+              borderRadius: '2px 2px 0 0',
+              backgroundColor: mode === 'dark' ? theme.palette.secondary.main : theme.palette.secondary.main,
             }
           }}
         >
@@ -246,8 +267,19 @@ const handleChange = (event, newValue) => {
                   gap: 2,
                   opacity: 0.7
                 }}>
-                  {tabConfigs[tabIndex].icon}
-                  <Typography align="center">
+                  <Box sx={{ 
+                    color: mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+                    '& .MuiSvgIcon-root': {
+                      fontSize: '2rem'
+                    }
+                  }}>
+                    {tabConfigs[tabIndex].icon}
+                  </Box>
+                  <Typography 
+                    align="center"
+                    color={mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary'}
+                    sx={{ fontWeight: 400 }}
+                  >
                     No {tabConfigs[tabIndex].label.toLowerCase()} to display
                   </Typography>
                 </Box>
