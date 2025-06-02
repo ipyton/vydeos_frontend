@@ -16,7 +16,7 @@ export default function InputBox(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [text, setText] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const { select, setChatRecords } = props;
+  const { select, setChatRecords,isMobile } = props;
   const open = Boolean(anchorEl);
   const inputRef = React.useRef(null);
   const { showNotification } = useNotification();
@@ -26,8 +26,10 @@ export default function InputBox(props) {
   const paperStyles = {
     display: 'flex',
     alignItems: 'center',
-    padding: '4px 8px',
-    borderRadius: 20,
+  padding: isMobile ? '0px 6px' : '4px 8px',
+  borderRadius: isMobile ? 16 : 20,
+    minHeight: isMobile ? 36 : 'auto',
+
     boxShadow: mode === 'dark' 
       ? '0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(255,255,255,0.05)' 
       : '0 2px 8px rgba(0,0,0,0.1)',
@@ -43,27 +45,35 @@ export default function InputBox(props) {
     }
   };
 
-  const textFieldStyles = {
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        border: 'none',
-      },
-      '&:hover fieldset': {
-        border: 'none',
-      },
-      '&.Mui-focused fieldset': {
-        border: 'none',
-      },
-      '& .MuiInputBase-input': {
-        color: mode === 'dark' ? '#ffffff' : '#000000',
-        '&::placeholder': {
-          color: mode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
-          opacity: 1,
-        },
+const textFieldStyles = {
+  '& .MuiOutlinedInput-root': {
+    minHeight: isMobile ? '32px' : '40px',
+    // Add padding control for the root
+    padding: isMobile ? '3px 5px' : '4px 8px',
+    '& fieldset': {
+      border: 'none',
+    },
+    // ... rest of fieldset styles
+    '& .MuiInputBase-input': {
+      color: mode === 'dark' ? '#ffffff' : '#000000',
+      // This targets the textarea specifically
+      padding: isMobile ? '2px 2px' : '4px 0', // Reduce this even more
+      margin: 0, // Remove any margin
+      lineHeight: isMobile ? '1.1' : '1.4',
+      '&::placeholder': {
+        color: mode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+        opacity: 1,
       },
     },
-    flexGrow: 1,
-  };
+    // Target the multiline input specifically
+    '& .MuiInputBase-inputMultiline': {
+      padding: isMobile ? '10px 0' : '16px 0',
+      minHeight: isMobile ? '16px' : '20px',
+      resize: 'none',
+    }
+  },
+  flexGrow: 1,
+}
 
   const iconButtonStyles = {
     color: mode === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
@@ -170,7 +180,9 @@ export default function InputBox(props) {
   };
 
   return (
-    <Stack direction="row" sx={{ width: "100%", padding: 0 }} alignItems="center" spacing={1}>
+    <Stack direction="row" sx={{ width: "100%", padding: isMobile ? '4px' : 0, // Reduce padding
+ }} alignItems="center"   spacing={isMobile ? 0.5 : 1} // Reduce spacing between elements
+>
       <Paper elevation={0} sx={paperStyles}>
         <IconButton
           sx={iconButtonStyles}
@@ -179,15 +191,17 @@ export default function InputBox(props) {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
           onClick={handleOpenAttachmentMenu}
+            size={isMobile ? "small" : "medium"} // Add this line
+
         >
-          <AttachFileIcon />
+          <AttachFileIcon   size={isMobile ? "small" : "medium"}   />
         </IconButton>
         
         <TextField
           sx={textFieldStyles}
           placeholder="Type a message..."
           multiline
-          maxRows={4}
+          maxRows={isMobile?1 : 4}
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={handleKeyPress}
@@ -200,9 +214,9 @@ export default function InputBox(props) {
           sx={sendButtonStyles}
           onClick={handleSend}
           disabled={isLoading || !text.trim()}
-          size="medium"
+          size={isMobile ? "small" : "medium"} 
         >
-          <SendIcon />
+          <SendIcon size={isMobile ? "small" : "medium"} />
         </IconButton>
       </Paper>
 

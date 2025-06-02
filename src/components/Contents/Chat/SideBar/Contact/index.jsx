@@ -49,7 +49,7 @@ export default function Contact(props) {
         },
         '&.Mui-selected': {
           backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(25, 118, 210, 0.08)',
-          borderLeft: isMobile ? '4px solid #1976d2' : 'none',
+          borderLeft: isMobile ? `4px solid ${mode === 'dark' ? '#90caf9' : '#1976d2'}` : 'none',
           '&:hover': {
             backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(25, 118, 210, 0.18)',
           }
@@ -69,11 +69,13 @@ export default function Contact(props) {
             }}
             sx={{
               '& .MuiBadge-badge': {
-                boxShadow: mode === 'dark' ? '0 0 0 2px #121212' : '0 0 0 2px #fff',
+                boxShadow: mode === 'dark' ? '0 0 0 2px #1e1e1e' : '0 0 0 2px #fff',
                 fontWeight: 'bold',
                 fontSize: isMobile ? '0.6rem' : '0.75rem',
                 height: isMobile ? '16px' : '20px',
                 minWidth: isMobile ? '16px' : '20px',
+                backgroundColor: mode === 'dark' ? '#f44336' : '#d32f2f',
+                color: '#ffffff'
               }
             }}
           >
@@ -82,10 +84,14 @@ export default function Contact(props) {
               sx={{ 
                 width: isMobile ? 40 : 48, 
                 height: isMobile ? 40 : 48,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                boxShadow: mode === 'dark' ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
+                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
               }}
             >
-              {props.content.type === "groupId" ? <GroupIcon /> : <PersonIcon />}
+              {props.content.type === "groupId" ? 
+                <GroupIcon sx={{ color: mode === 'dark' ? '#ffffff' : 'inherit' }} /> : 
+                <PersonIcon sx={{ color: mode === 'dark' ? '#ffffff' : 'inherit' }} />
+              }
             </Avatar>
           </Badge>
         </ListItemAvatar>
@@ -104,7 +110,9 @@ export default function Contact(props) {
             noWrap
             sx={{ 
               fontWeight: unreadCount ? 700 : 500,
-              color: isSelected ? (mode === 'dark' ? '#90caf9' : 'primary.main') : (mode === 'dark' ? '#ffffff' : 'text.primary'),
+              color: isSelected 
+                ? (mode === 'dark' ? '#90caf9' : '#1976d2') 
+                : (mode === 'dark' ? '#ffffff' : '#000000'),
               fontSize: isMobile ? '0.9rem' : '1rem'
             }}
           >
@@ -116,7 +124,9 @@ export default function Contact(props) {
             component="span"
             noWrap
             sx={{ 
-              color: unreadCount ? 'text.primary' : 'text.secondary',
+              color: unreadCount 
+                ? (mode === 'dark' ? '#e0e0e0' : '#424242')
+                : (mode === 'dark' ? '#b0b0b0' : '#757575'),
               fontWeight: unreadCount ? 500 : 400,
               opacity: 0.85,
               mt: 0.5,
@@ -124,7 +134,7 @@ export default function Contact(props) {
             }}
           >
             {lastMessage || "No messages yet"}
-          </Typography>
+          </Typography>        
         </Box>
         
         {lastMessageTime && (
@@ -138,7 +148,9 @@ export default function Contact(props) {
             <Typography
               variant="caption"
               sx={{
-                color: unreadCount ? 'primary.main' : 'text.secondary',
+                color: unreadCount 
+                  ? (mode === 'dark' ? '#90caf9' : '#1976d2') 
+                  : (mode === 'dark' ? '#b0b0b0' : '#757575'),
                 fontWeight: unreadCount ? 600 : 400,
                 whiteSpace: 'nowrap',
                 fontSize: isMobile ? '0.7rem' : '0.75rem'
@@ -151,8 +163,8 @@ export default function Contact(props) {
               <Box
                 sx={{
                   mt: 0.5,
-                  backgroundColor: 'primary.main',
-                  color: 'white',
+                  backgroundColor: mode === 'dark' ? '#90caf9' : '#1976d2',
+                  color: mode === 'dark' ? '#000000' : '#ffffff',
                   borderRadius: '50%',
                   width: isMobile ? 18 : 22,
                   height: isMobile ? 18 : 22,
@@ -160,7 +172,8 @@ export default function Contact(props) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: isMobile ? '0.65rem' : '0.75rem',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  boxShadow: mode === 'dark' ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.2)'
                 }}
               >
                 {unreadCount}

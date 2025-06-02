@@ -34,6 +34,7 @@ import VideoUtil from "../../../../util/io_utils/VideoUtil";
 import { useNotification } from "../../../../Providers/NotificationProvider";
 import { useThemeMode } from "../../../../Themes/ThemeContext";
 import {ArrowBack as ArrowBackIcon} from "@mui/icons-material";
+
 // Image component with consistent styling
 function MovieImage({ src, alt }) {
   const { mode } = useThemeMode();
@@ -84,6 +85,21 @@ export default function MovieDetails(props) {
     },
     divider: mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)",
     icon: mode === "dark" ? "#90caf9" : "#1976d2",
+  };
+
+  // Common button styles for consistency
+  const buttonStyles = {
+    minWidth: { xs: "100%", sm: "140px" },
+    height: { xs: "48px", sm: "40px" },
+    fontSize: { xs: "0.875rem", sm: "0.875rem" },
+    fontWeight: "medium",
+    textTransform: "none",
+    borderRadius: 1,
+    "&.Mui-disabled": {
+      color: mode === "dark" ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.26)",
+      bgcolor: mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)",
+      borderColor: mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)",
+    }
   };
 
   // Handle initialization from props or route state
@@ -242,7 +258,7 @@ export default function MovieDetails(props) {
       <Paper elevation={3} sx={{ 
         borderRadius: 2, 
         overflow: "hidden", 
-        bgcolor: themeColors.paper,
+        bgcolor: 'transparent',
         color: themeColors.text.primary
       }}>
         {/* Movie Details Section */}
@@ -270,38 +286,46 @@ export default function MovieDetails(props) {
             <Box sx={{ width: { xs: "100%", sm: "30%" }, mb: { xs: 2, sm: 0 } }}>
               <MovieImage src={details.poster} alt={details.movie_name} />
               
-              {/* Action Buttons */}
-              <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
-                <ButtonGroup variant="contained"   orientation="vertical"  sx={{ 
-                  boxShadow: mode === "dark" ? '0px 3px 5px rgba(0, 0, 0, 0.5)' : 2 
-                }}>
+              {/* Action Buttons - Optimized for consistency */}
+              <Box sx={{ mt: 2 }}>
+                <Stack 
+                  direction={{ xs: "column", sm: "column" }} 
+                  spacing={1.5}
+                  sx={{ width: "100%" }}
+                >
                   <Button 
                     color={isStared ? "warning" : "primary"}
+                    variant="contained"
                     onClick={isStared ? handleRemove : handleStar}
                     startIcon={isStared ? <StarIcon /> : <StarBorderIcon />}
                     sx={{
-                      "&.Mui-disabled": {
-                        color: mode === "dark" ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.26)"
+                      ...buttonStyles,
+                      boxShadow: mode === "dark" ? '0px 3px 5px rgba(0, 0, 0, 0.5)' : 2,
+                      "&:hover": {
+                        boxShadow: mode === "dark" ? '0px 4px 8px rgba(0, 0, 0, 0.7)' : 4,
                       }
                     }}
                   >
-                    {isStared ? "Unstar" : "Star"}
+                    {isStared ? "Remove Star" : "Add Star"}
                   </Button>
+                  
                   <Button 
                     color="secondary"
+                    variant="contained"
                     onClick={sendRequest} 
                     disabled={isDisabled}
                     startIcon={<MovieIcon />}
                     sx={{
-                      "&.Mui-disabled": {
-                        color: mode === "dark" ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.26)",
-                        bgcolor: mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)"
+                      ...buttonStyles,
+                      boxShadow: mode === "dark" ? '0px 3px 5px rgba(0, 0, 0, 0.5)' : 2,
+                      "&:hover": {
+                        boxShadow: !isDisabled ? (mode === "dark" ? '0px 4px 8px rgba(0, 0, 0, 0.7)' : 4) : undefined,
                       }
                     }}
                   >
-                    Request
+                    {isDisabled ? "Requested" : "Request Movie"}
                   </Button>
-                </ButtonGroup>
+                </Stack>
               </Box>
             </Box>
             
@@ -342,7 +366,8 @@ export default function MovieDetails(props) {
                 )}
               </Box>
               
-              <Divider sx={{ borderColor: themeColors.divider }} />
+              <Divider sx={{ borderColor: themeColors.divider, padding: "0 16px"
+               }} />
               
               {/* Movie Details */}
               <Stack spacing={2}>
@@ -463,9 +488,9 @@ export default function MovieDetails(props) {
           </Stack>
         </Box>
         
-        <Divider sx={{ borderColor: themeColors.divider }} />
+        <Divider sx={{ borderColor: themeColors.divider, padding:"5px"}} />
         
-        {/* Cast Section */}
+        {/* Cast Section - Optimized for mobile */}
         <Box sx={{ p: 3 }}>
           <Typography variant="h5" component="h2" gutterBottom sx={{ 
             display: "flex", 
@@ -480,12 +505,13 @@ export default function MovieDetails(props) {
           <ImageList
             sx={{
               gridTemplateColumns: {
-                xs: "repeat(auto-fill, minmax(140px, 1fr))",
+                xs: "repeat(auto-fill, minmax(140px, 1fr))", // Increased from 140px for mobile
                 sm: "repeat(auto-fill, minmax(200px, 1fr))",
+                md: "repeat(auto-fill, minmax(220px, 1fr))", // Better spacing on larger screens
               },
-              gap: 2,
+              gap: { xs: 1.5, sm: 2 }, // Responsive gap
             }}
-            cols={5}
+            cols={0} // Let CSS Grid handle the columns
           >
             {details.actressList.map((actor) => (
               <ImageListItem 
@@ -495,6 +521,7 @@ export default function MovieDetails(props) {
                   borderRadius: 2,
                   boxShadow: mode === "dark" ? "0px 3px 8px rgba(0, 0, 0, 0.5)" : 2,
                   transition: "transform 0.3s, box-shadow 0.3s",
+                  minHeight: { xs: "280px", sm: "320px" }, // Ensure consistent height
                   "&:hover": {
                     transform: "translateY(-4px)",
                     boxShadow: mode === "dark" ? "0px 6px 12px rgba(0, 0, 0, 0.7)" : 4,
@@ -508,19 +535,27 @@ export default function MovieDetails(props) {
                   sx={{
                     "& .MuiImageListItemBar-title": { 
                       fontWeight: "bold",
-                      color: "#ffffff"
+                      color: "#ffffff",
+                      fontSize: { xs: "0.875rem", sm: "1rem" }, // Responsive font size
                     },
                     "& .MuiImageListItemBar-subtitle": {
-                      color: "rgba(255, 255, 255, 0.8)"
+                      color: "rgba(255, 255, 255, 0.8)",
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" }, // Responsive font size
                     },
                     background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0) 100%)",
+                    "& .MuiImageListItemBar-titleWrap": {
+                      padding: { xs: "8px 12px", sm: "12px 16px" }, // More padding on mobile
+                    }
                   }}
                   actionIcon={
                     <IconButton
-                      sx={{ color: "rgba(255, 255, 255, 0.8)" }}
+                      sx={{ 
+                        color: "rgba(255, 255, 255, 0.8)",
+                        size: { xs: "small", sm: "medium" }, // Responsive icon button size
+                      }}
                       aria-label={`info about ${actor.name}`}
                     >
-                      <InfoIcon />
+                      <InfoIcon sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />
                     </IconButton>
                   }
                 />

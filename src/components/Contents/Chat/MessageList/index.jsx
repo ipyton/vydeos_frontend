@@ -167,7 +167,7 @@ export default function ChatContainer(props) {
             alignItems: 'center',
             flexGrow: 1,
             p: isMobile ? 2 : 3,
-            height: isMobile ? 'calc(100vh - 120px)' : 'auto',
+            height: isMobile ? 'calc(100vh - 180px)' : 'auto',
             borderRadius: "8px",
           }}
         >
@@ -219,6 +219,7 @@ export default function ChatContainer(props) {
           chatRecords={chatRecords}
           setChatRecords={setChatRecords}
           select={select}
+          isMobile={isMobile}
           onSendError={(error) => {
             showNotification("Failed to send message: " + error.message, "error");
           }}

@@ -33,8 +33,8 @@ export default function Trends() {
     mx: 'auto',
     borderRadius: 3,
     border: 'none',
-    backgroundColor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
-    boxShadow: mode === 'dark' ? '0 8px 24px rgba(255, 255, 255, 0.08)' : '0 8px 24px rgba(0, 0, 0, 0.08)',
+    backgroundColor: mode === 'dark' ? '#2a2a2a' : 'background.paper',
+    boxShadow: mode === 'dark' ? '0 8px 24px rgba(0, 0, 0, 0.4)' : '0 8px 24px rgba(0, 0, 0, 0.08)',
   };
 
   const handleChange = (event, newValue) => {
@@ -103,7 +103,16 @@ export default function Trends() {
     <List sx={style}>
       {items.map((item, idx) => (
         <React.Fragment key={idx}>
-          {idx > 0 && <Divider variant="fullWidth" component="li" sx={{ my: 3 }} />}
+          {idx > 0 && (
+            <Divider 
+              variant="fullWidth" 
+              component="li" 
+              sx={{ 
+                my: 3,
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.12)'
+              }} 
+            />
+          )}
           <ListItem
             disablePadding
             sx={{ mb: 2 }}
@@ -113,9 +122,9 @@ export default function Trends() {
                 borderRadius: 2,
                 transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 '&:hover': {
-                  backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.01)',
+                  backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.01)',
                   transform: 'translateY(-4px)',
-                  boxShadow: mode === 'dark' ? '0 12px 20px rgba(255, 255, 255, 0.05)' : '0 12px 20px rgba(0, 0, 0, 0.1)'
+                  boxShadow: mode === 'dark' ? '0 12px 20px rgba(0, 0, 0, 0.6)' : '0 12px 20px rgba(0, 0, 0, 0.1)'
                 }
               }}
             >
@@ -128,8 +137,9 @@ export default function Trends() {
                   overflow: 'hidden',
                   boxShadow: 'none',
                   borderRadius: 3,
-                  bgcolor: mode === 'dark' ? '#1e1e1e' : 'background.paper',
-                  position: 'relative'
+                  bgcolor: mode === 'dark' ? '#2a2a2a' : 'background.paper',
+                  position: 'relative',
+                  border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : 'none'
                 }}
               >
                 {item.pic && (
@@ -142,7 +152,7 @@ export default function Trends() {
                         borderRadius: { xs: '8px 8px 0 0', sm: '8px 0 0 8px' },
                         transition: 'all 0.3s ease',
                         '&:hover': {
-                          filter: 'brightness(1.05)'
+                          filter: mode === 'dark' ? 'brightness(1.1)' : 'brightness(1.05)'
                         }
                       }}
                       image={item.pic}
@@ -159,10 +169,12 @@ export default function Trends() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: type === "post" ? theme.palette.primary.main : theme.palette.secondary.main,
-                        color: '#fff',
+                        backgroundColor: type === "post" 
+                          ? (mode === 'dark' ? '#ff6b35' : theme.palette.primary.main)
+                          : (mode === 'dark' ? '#ffd700' : theme.palette.secondary.main),
+                        color: mode === 'dark' ? '#000000' : '#ffffff',
                         fontWeight: 'bold',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+                        boxShadow: mode === 'dark' ? '0 2px 8px rgba(0, 0, 0, 0.5)' : '0 2px 8px rgba(0, 0, 0, 0.2)'
                       }}
                     >
                       {idx + 1}
@@ -181,9 +193,17 @@ export default function Trends() {
                   <Stack spacing={2}>
                     <Stack direction="row" spacing={1.5} alignItems="center">
                       {type === "post" ? (
-                        <LocalFireDepartmentIcon sx={{ color: theme.palette.primary.main }} />
+                        <LocalFireDepartmentIcon 
+                          sx={{ 
+                            color: mode === 'dark' ? '#ff6b35' : theme.palette.primary.main 
+                          }} 
+                        />
                       ) : (
-                        <StarIcon sx={{ color: theme.palette.secondary.main }} />
+                        <StarIcon 
+                          sx={{ 
+                            color: mode === 'dark' ? '#ffd700' : theme.palette.secondary.main 
+                          }} 
+                        />
                       )}
                       <Typography 
                         variant="h5" 
@@ -191,19 +211,21 @@ export default function Trends() {
                         sx={{ 
                           fontWeight: 700,
                           letterSpacing: '-0.02em',
-                          color: type === "post" ? theme.palette.primary.dark : theme.palette.secondary.dark,
+                          color: mode === 'dark' 
+                            ? '#ffffff' 
+                            : (type === "post" ? theme.palette.primary.dark : theme.palette.secondary.dark),
                         }}
                       >
                         {item.title}
                       </Typography>
                     </Stack>
                     <Typography 
-                      color="text.secondary" 
                       variant="body1"
                       sx={{ 
                         lineHeight: 1.6,
                         fontWeight: 400,
-                        letterSpacing: '0.01em'
+                        letterSpacing: '0.01em',
+                        color: mode === 'dark' ? '#e0e0e0' : 'text.secondary'
                       }}
                     >
                       {item.introduction}
@@ -213,13 +235,26 @@ export default function Trends() {
                   <Chip
                     label={type === "post" ? "Trending Article" : "Trending Movie"}
                     size="small"
-                    color={type === "post" ? "primary" : "secondary"}
-                    variant="outlined"
+                    variant={mode === 'dark' ? "filled" : "outlined"}
                     sx={{ 
                       mt: 2,
                       alignSelf: 'flex-start',
                       fontWeight: 500,
-                      borderRadius: '16px'
+                      borderRadius: '16px',
+                      backgroundColor: mode === 'dark' 
+                        ? (type === "post" ? '#ff6b35' : '#ffd700')
+                        : 'transparent',
+                      color: mode === 'dark' 
+                        ? '#000000'
+                        : (type === "post" ? theme.palette.primary.main : theme.palette.secondary.main),
+                      borderColor: mode === 'dark' 
+                        ? 'transparent'
+                        : (type === "post" ? theme.palette.primary.main : theme.palette.secondary.main),
+                      '&:hover': {
+                        backgroundColor: mode === 'dark' 
+                          ? (type === "post" ? '#ff8555' : '#ffdc33')
+                          : 'rgba(25, 118, 210, 0.04)'
+                      }
                     }}
                   />
                 </Box>
@@ -238,7 +273,9 @@ export default function Trends() {
         px: 3, 
         backgroundColor: mode === 'dark' ? '#121212' : '#f8f9fa', 
         minHeight: '100vh',
-        background: mode === 'dark' ? 'linear-gradient(135deg, #121212 0%, #1e1e1e 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+        background: mode === 'dark' 
+          ? 'linear-gradient(135deg, #121212 0%, #1a1a1a 100%)' 
+          : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
       }}
     >
       <Typography 
@@ -259,7 +296,7 @@ export default function Trends() {
         sx={{ 
           mb: 5, 
           textAlign: 'center', 
-          color: 'text.secondary',
+          color: mode === 'dark' ? '#b0b0b0' : 'text.secondary',
           maxWidth: 600,
           mx: 'auto'
         }}
@@ -270,11 +307,12 @@ export default function Trends() {
       <Box 
         sx={{ 
           borderRadius: 3,
-          backgroundColor: mode === 'dark' ? '#333333' : '#fff',
+          backgroundColor: mode === 'dark' ? '#2a2a2a' : '#fff',
           width: '100%', 
           maxWidth: 500, 
           mx: 'auto',
-          boxShadow: mode === 'dark' ? '0 4px 12px rgba(255, 255, 255, 0.03)' : '0 4px 12px rgba(0, 0, 0, 0.05)'
+          boxShadow: mode === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.4)' : '0 4px 12px rgba(0, 0, 0, 0.05)',
+          border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : 'none'
         }}
       >
         <Tabs 
@@ -289,7 +327,21 @@ export default function Trends() {
               fontWeight: 600,
               fontSize: '1rem',
               py: 2,
-              textTransform: 'none'
+              textTransform: 'none',
+              color: mode === 'dark' ? '#b0b0b0' : 'inherit',
+              '&.Mui-selected': {
+                color: mode === 'dark' ? '#ffffff' : theme.palette.primary.main
+              },
+              '& .MuiSvgIcon-root': {
+                color: mode === 'dark' ? '#b0b0b0' : 'inherit'
+              },
+              '&.Mui-selected .MuiSvgIcon-root': {
+                color: mode === 'dark' ? '#ffffff' : theme.palette.primary.main
+              }
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: mode === 'dark' ? '#90caf9' : theme.palette.primary.main,
+              height: 3
             }
           }}
         >
