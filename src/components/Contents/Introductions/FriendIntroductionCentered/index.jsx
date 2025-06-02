@@ -20,6 +20,7 @@ import AccountUtil from "../../../../util/io_utils/AccountUtil";
 import DatabaseManipulator from "../../../../util/io_utils/DatabaseManipulator";
 import { update } from '../../../redux/refresh';
 import { useNotification } from '../../../../Providers/NotificationProvider';
+import { useThemeMode } from '../../../../Themes/ThemeContext';
 
 //this is used to show the user information.
 export default function (props) {
@@ -29,24 +30,16 @@ export default function (props) {
     const [followButtonText, setFollowButtonText] = useState("")
     const [extraInformation, setExtraInformation] = useState("")
     const { userId, isMobile } = props
+    const { mode } = useThemeMode();
 
-    let position = "center";
-    // if (location.state ) {
-    //     position = location.state.position
-    // }
-
-    position = (!props.position ? position : props.position)
-
-  const { showNotification } = useNotification();
-
+    let position = (!props.position ? "center" : props.position)
+    const { showNotification } = useNotification();
     let navigate = useNavigate()
     let dispatch = useDispatch()
 
-
-    React.useEffect(()=>{
+    React.useEffect(() => {
         if (!details || details.relationship == null || details.relationship == undefined) {
             console.log("updating")
-
         } else {
             if (details.relationship === 0) {
                 setFollowButtonText("Follow")
@@ -71,55 +64,29 @@ export default function (props) {
         }
     }, [details])
 
-
-
-    console.log(extraInformation)
     React.useEffect(() => {
         console.log("changing")
         MessageUtil.requestUserInfo(userId, setDetails)
         localforage.getItem("userId").then(response => {
             setUserID(response)
         })
-        // localforage.getItem("userIntro").then(async (res) => {
-        //     if (!res) {
-        //         console.log("does not have userIntro")
-        //         return
-        //     }
-        //     setDetails(res)
-        //     setRelationship(res.relationship)
-
-        // })
     }, [userId])
-
-    console.log(details)
 
     if (!details) {
         return <div>loading</div>
     }
-
-    //console.log(details.relationship)
-    //01: you do not follow him/ but he follow you.
-    //10: you follow him but he does not follow you.
-    //,etc.
 
     const handleContact = async () => {
         if (details.userId === await localforage.getItem("userId")) {
             return
         }
         let contact = { type: "single", userId: userId, name: details.userName }
-            
-        DatabaseManipulator.addRecentContact(contact).then(
-            ()=>{
-                navigate("/chat", { ...contact })
-                dispatch(update())
-            }
-        )
 
-
+        DatabaseManipulator.addRecentContact(contact).then(() => {
+            navigate("/chat", { ...contact })
+            dispatch(update())
+        })
     }
-    console.log(details)
-
-
 
     let handleFollow = () => {
         if (Math.floor(details.relationship / 10) === 1) {
@@ -133,124 +100,101 @@ export default function (props) {
         }
     }
 
-    let imageData = [
-        {
-            img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-            title: 'Breakfast',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-            title: 'Burger',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-            title: 'Camera',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-            title: 'Coffee',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-            title: 'Hats',
-        },
-        {
-            img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
-            title: 'Honey',
-        }
-    ];
+    const textColor = mode === 'dark' ? '#fff' : '#000'
 
-    if (true) {
-        return (
-            <Stack
-                direction="column"
-                // justifyContent="center"
-                alignItems="center"
-                spacing={0.5} sx={{ width: "100%", overflow: "scroll", boxShadow: 0,height:"100%"}}>
-                <Stack direction={isMobile ? "column" : "row"} justifyContent="end" sx={{ width: "70%" }}>
-                    <ListItem alignItems="flex-start" >
-                        <ListItemAvatar>
-                            <Avatar alt={details.userName} src={details.avatar} />
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={details.userName}
-
-                            secondary={
-                                <React.Fragment>
-                                    <Typography
-                                        sx={{ display: 'inline' }}
-                                        component="span"
-                                        variant="body2"
-                                        color="text.primary"
-                                    >
-                                    </Typography>
-                                    {details.introduction}
-                                </React.Fragment>
-                            }
-                        />
-
-                    </ListItem>
-
-
-                    <ButtonGroup sx={{ marginTop: "3%", height: "50%" }} aria-label="Basic button group" >
-                        {followButtonText.length === 0 ? <div></div> : <Button onClick={handleFollow}> {followButtonText}</Button>}
-                        {contactButtonText.length === 0 ? <div></div> : <Button onClick={handleContact}>{contactButtonText}</Button>}
-                    </ButtonGroup>
-                </Stack>
-
-                <Stack>
-                    {extraInformation}
-                </Stack>
-                <Stack sx={{ width: "60%", }}>
-                    <TextField
-                        id="outlined-required"
-                        label="Gender"
-                        defaultValue={details.gender ? "female": "male"}
-                        variant="standard"
-                        focused
-                        InputProps={{
-                            readOnly: true,
-                        }}
+    return (
+        <Stack
+            direction="column"
+            alignItems="center"
+            spacing={0.5}
+            sx={{ width: "100%", overflow: "scroll", boxShadow: 0, height: "100%" }}
+        >
+            <Stack direction={isMobile ? "column" : "row"} justifyContent="end" sx={{ width: "70%" }}>
+                <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                        <Avatar alt={details.userName} src={details.avatar} />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary={
+                            <Typography sx={{ color: textColor }}>
+                                {details.userName}
+                            </Typography>
+                        }
+                        secondary={
+                            <Typography
+                                sx={{ display: 'inline', color: textColor }}
+                                component="span"
+                                variant="body2"
+                            >
+                                {details.introduction}
+                            </Typography>
+                        }
                     />
-                    <TextField
-                        id="outlined-required"
-                        label="Birthdate"
-                        defaultValue={details.birthdate}
-                        variant="standard"
-                        focused
-                        InputProps={{
-                            readOnly: true,
-                        }}
-                    />
-                    <TextField
-                        id="outlined-required"
-                        label="Location"
-                        defaultValue={details.location}
-                        variant="standard"
-                        focused
-                        InputProps={{
-                            readOnly: true,
-                        }}
+                </ListItem>
 
-                    />
+                <ButtonGroup sx={{ marginTop: "3%", height: "50%" }} aria-label="Basic button group">
+                    {followButtonText.length === 0 ? <div></div> : <Button onClick={handleFollow}>{followButtonText}</Button>}
+                    {contactButtonText.length === 0 ? <div></div> : <Button onClick={handleContact}>{contactButtonText}</Button>}
+                </ButtonGroup>
+            </Stack>
 
-                    {details.nickname === undefined ? <div></div> : <TextField
+            <Stack>
+                <Typography sx={{ color: textColor }}>{extraInformation}</Typography>
+            </Stack>
+
+            <Stack sx={{ width: "60%" }}>
+                <TextField
+                    id="outlined-required"
+                    label="Gender"
+                    defaultValue={details.gender ? "female" : "male"}
+                    variant="standard"
+                    focused
+                    InputProps={{
+                        readOnly: true,
+                        style: { color: textColor }
+                    }}
+                    InputLabelProps={{ style: { color: textColor } }}
+                />
+                <TextField
+                    id="outlined-required"
+                    label="Birthdate"
+                    defaultValue={details.birthdate}
+                    variant="standard"
+                    focused
+                    InputProps={{
+                        readOnly: true,
+                        style: { color: textColor }
+                    }}
+                    InputLabelProps={{ style: { color: textColor } }}
+                />
+                <TextField
+                    id="outlined-required"
+                    label="Location"
+                    defaultValue={details.location}
+                    variant="standard"
+                    focused
+                    InputProps={{
+                        readOnly: true,
+                        style: { color: textColor }
+                    }}
+                    InputLabelProps={{ style: { color: textColor } }}
+                />
+                {details.nickname === undefined ? <div></div> : (
+                    <TextField
                         id="outlined-required"
                         label="NickName"
                         defaultValue={details.nickname}
-                        variant="standard" type="search" />}
-
-                </Stack>
-
-
+                        variant="standard"
+                        type="search"
+                        focused
+                        InputProps={{
+                            readOnly: true,
+                            style: { color: textColor }
+                        }}
+                        InputLabelProps={{ style: { color: textColor } }}
+                    />
+                )}
             </Stack>
-        )
-
-
-
-    }
-
-
-
-
+        </Stack>
+    )
 }

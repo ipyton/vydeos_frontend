@@ -14,7 +14,9 @@ import {
   CircularProgress,
   Chip,
   Fade,
-  Slide
+  Slide,
+  IconButton,
+  Toolbar
 } from '@mui/material';
 import SwipeableViews from 'react-swipeable-views';
 import { useLocation } from 'react-router-dom';
@@ -34,25 +36,32 @@ import { useNotification } from '../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../Themes/ThemeContext';
 import SearchUtil from '../../../util/io_utils/SearchUtil';
 
-// Dark mode color configurations
+// Enhanced dark mode color configurations with much better contrast
 const getDarkModeColors = (mode) => ({
   background: {
-    primary: mode === 'dark' ? '#121212' : '#ffffff',
-    secondary: mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
-    paper: mode === 'dark' ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-    hover: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-    active: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)'
+    primary: mode === 'dark' ? '#0a0a0a' : '#ffffff',
+    secondary: mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
+    paper: mode === 'dark' ? 'rgba(26, 26, 26, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    hover: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.06)',
+    active: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.1)',
+    elevated: mode === 'dark' ? '#242424' : '#ffffff'
   },
   text: {
-    primary: mode === 'dark' ? '#ffffff' : '#000000',
-    secondary: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
-    disabled: mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+    // Much improved text colors for dark mode
+    primary: mode === 'dark' ? '#f5f5f5' : '#1a1a1a',        // Brighter white for dark mode
+    secondary: mode === 'dark' ? '#e0e0e0' : 'rgba(26, 26, 26, 0.7)',  // Much brighter secondary text
+    disabled: mode === 'dark' ? '#a0a0a0' : 'rgba(26, 26, 26, 0.4)',   // Improved disabled text
+    muted: mode === 'dark' ? '#c0c0c0' : 'rgba(26, 26, 26, 0.6)'       // New muted text level
   },
-  divider: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+  border: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',  // Slightly more visible borders
+  divider: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.12)',
+  shadow: mode === 'dark' 
+    ? '0 4px 20px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2)' 
+    : '0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06)',
   scrollbar: {
-    track: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
-    thumb: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-    thumbHover: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'
+    track: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
+    thumb: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.25)',
+    thumbHover: mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.35)'
   }
 });
 
@@ -157,6 +166,7 @@ export default function SearchResults() {
 
   const performSearch = (tabIndex, searchQuery) => {
     if (tabIndex === 0) {
+      console.log("Searching contacts by ID:", searchQuery);
       SearchUtil.searchChatContactById(searchQuery, handleSearchResults).then(() => {
         setIsLoading(false);
       })
@@ -174,6 +184,7 @@ export default function SearchResults() {
   };
 
   const handleSearchResults = (data) => {
+    console.log("Search results:", data);
     setList(data);
     setIsLoading(false);
     
@@ -198,33 +209,35 @@ export default function SearchResults() {
 
   // Calculate optimal list height for different devices
   const listHeight = isMobile ? 
-    viewHeight  : // Smaller height on mobile
-    viewHeight;  // Larger height on desktop
+    viewHeight - 120 : // Account for header and controls on mobile
+    viewHeight - 80;   // Account for tabs on desktop
 
   // Tab configurations with icons
   const tabConfigs = [
-    { label: "USERS", icon: <PeopleIcon />, index: 0 },
-    { label: "CHATS", icon: <ChatIcon />, index: 1 },
-    { label: "VIDEOS", icon: <VideocamIcon />, index: 2 },
-    { label: "MUSIC", icon: <MusicNoteIcon />, index: 3 },
-    { label: "POSTS", icon: <ArticleIcon />, index: 4 }
+    { label: "Users", icon: <PeopleIcon />, index: 0 },
+    { label: "Chats", icon: <ChatIcon />, index: 1 },
+    { label: "Videos", icon: <VideocamIcon />, index: 2 },
+    { label: "Music", icon: <MusicNoteIcon />, index: 3 },
+    { label: "Posts", icon: <ArticleIcon />, index: 4 }
   ];
 
-  // Common scroll style for lists
+  // Enhanced scroll style for lists
   const scrollbarStyle = {
     overflowY: 'auto',
     WebkitOverflowScrolling: 'touch',
     msOverflowStyle: 'none',
     scrollbarWidth: 'thin',
     '&::-webkit-scrollbar': { 
-      width: '4px',
+      width: '6px',
     },
     '&::-webkit-scrollbar-track': {
       background: colors.scrollbar.track,
+      borderRadius: '3px',
     },
     '&::-webkit-scrollbar-thumb': {
       background: colors.scrollbar.thumb,
-      borderRadius: '4px',
+      borderRadius: '3px',
+      transition: 'background 0.2s ease',
     },
     '&::-webkit-scrollbar-thumb:hover': {
       background: colors.scrollbar.thumbHover,
@@ -235,81 +248,96 @@ export default function SearchResults() {
     <Stack 
       sx={{ 
         width: isMobile ? '100%' : '90%',
-         marginLeft: isMobile ? '0px' : '5%',
         height: viewHeight,
-        gap: 2
+        gap: 2,
+        p: isMobile ? 1 : 0
       }} 
       direction={isMobile ? 'column' : 'row'} 
-      //justifyContent="center"
       spacing={0}
     >
-      {/* Mobile Detail View as Dialog/Slide */}
+      {/* Enhanced Mobile Detail View */}
       {isMobile && showMobileDetail && (
         <Box
           sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: colors.background.secondary,
-            zIndex: 1200,
-            display: 'flex',
-            flexDirection: 'column'
+            backgroundColor: colors.background.primary,
           }}
         >
+          {/* Improved Mobile Header with better back button */}
+          <AppBar
+            position="static"
+            sx={{ 
+              backgroundColor: colors.background.elevated,
+              borderBottom: `1px solid ${colors.border}`,
+              boxShadow: colors.shadow,
+            }}
+          >
+            <Toolbar>
+              <IconButton 
+                onClick={handleBackToList}
+                edge="start"
+                sx={{ 
+                  mr: 2,
+                  p: 1,
+                  backgroundColor: colors.background.hover,
+                  color: colors.text.primary,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  color: colors.text.primary,
+                  fontWeight: 600,
+                  flex: 1
+                }}
+              >
+                Details
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          
           <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            p: 2,
-            borderBottom: 1,
-            borderColor: colors.divider
+            height: 'calc(100vh - 56px)', 
+            backgroundColor: colors.background.secondary,
+            ...scrollbarStyle 
           }}>
-            <Typography variant="h6" sx={{ color: colors.text.primary }}>Item Details</Typography>
-            <Box 
-              onClick={handleBackToList}
-              sx={{ 
-                cursor: 'pointer',
-                padding: 1,
-                display: 'flex',
-                alignItems: 'center',
-                borderRadius: '50%',
-                bgcolor: colors.background.hover,
-                '&:hover': {
-                  bgcolor: colors.background.active,
-                }
-              }}
-            >
-              <ArrowBackIcon sx={{ color: colors.text.primary, mr: 0.5 }} />
-              <Typography variant="body1" sx={{ color: colors.text.primary }}>Back</Typography>
-            </Box>
-          </Box>
-          <Box sx={{ height: 'calc(100vh - 56px)', overflow: 'auto', ...scrollbarStyle }}>
-            <Introductions selector={selector} handleBack={handleBackToList} isMobile={isMobile} onBack={onBackToList} />
+            <Introductions 
+              selector={selector} 
+              handleBack={handleBackToList} 
+              isMobile={isMobile} 
+              onBack={onBackToList} 
+            />
           </Box>
         </Box>
       )}
 
-      {/* Search Results List */}
+      {/* Enhanced Search Results List */}
       <Fade in={true} timeout={500}>
-        <Paper elevation={3} sx={{ 
-          width: isMobile ? '100%' : '40%',
-          height: '100%',
-          borderRadius: 2,
-          overflow: 'hidden',
-          backgroundColor: colors.background.paper,
-          backdropFilter: 'blur(10px)',
-          transition: 'all 0.3s ease-in-out'
-        }}>
+        <Paper 
+          elevation={8} 
+          sx={{ 
+            width: isMobile ? '100%' : '40%',
+            height: '100%',
+            borderRadius: 3,
+            overflow: 'hidden',
+            backgroundColor: colors.background.elevated,
+            backdropFilter: 'blur(15px)',
+            border: `1px solid ${colors.border}`,
+            boxShadow: colors.shadow,
+            transition: 'all 0.3s ease-in-out'
+          }}
+        >
           <AppBar 
             position="static" 
             color="default" 
             elevation={0}
             sx={{ 
-              backgroundColor: 'transparent',
-              borderBottom: 1, 
-              borderColor: colors.divider
+              backgroundColor: colors.background.elevated,
+              borderBottom: `1px solid ${colors.border}`
             }}
           >
             <Tabs
@@ -322,49 +350,60 @@ export default function SearchResults() {
               textColor="primary"
               aria-label="Search result tabs"
               sx={{
-                backgroundColor: colors.background.secondary,
+                backgroundColor: colors.background.elevated,
+                minHeight: 64,
 
-                // Scroll button styles
+                // Enhanced scroll button styles
                 '& .MuiTabs-scrollButtons': {
-                  color: colors.text.secondary,
-                  backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                  borderRadius: '50%',
-                  mx: 0.5,
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.hover,
+                  borderRadius: '8px',
+                  mx: 1,
+                  width: 36,
+                  height: 36,
                   '&:hover': {
-                    backgroundColor: colors.background.hover,
+                    backgroundColor: colors.background.active,
+                    transform: 'scale(1.05)',
                   },
                   '&.Mui-disabled': {
                     opacity: 0.3,
                   },
+                  transition: 'all 0.2s ease',
                 },
 
-                // Tab styles
+                // Enhanced tab styles with better text visibility
                 '& .MuiTab-root': {
                   px: 3,
-                  py: 1.5,
-                  fontSize: '0.9rem',
-                  letterSpacing: '0.05rem',
-                  fontWeight: 500,
+                  py: 2,
+                  fontSize: '0.875rem',
+                  letterSpacing: '0.02rem',
+                  fontWeight: 600,
                   minWidth: 120,
-                  color: colors.text.primary,
+                  color: colors.text.secondary, // Using improved secondary text color
+                  borderRadius: '8px 8px 0 0',
+                  margin: '0 2px',
                   transition: 'all 0.2s ease',
                   '&:hover': {
                     backgroundColor: colors.background.hover,
+                    color: colors.text.primary, // Using improved primary text color
+                    transform: 'translateY(-1px)',
                   },
                 },
 
-                // Selected tab text
+                // Enhanced selected tab with better visibility
                 '& .Mui-selected': {
-                  color: mode === 'dark'
-                    ? theme.palette.secondary.light
-                    : theme.palette.secondary.main,
+                  color: `${mode === 'dark' ? '#ffffff' : theme.palette.secondary.main} !important`, // Force white in dark mode
+                  backgroundColor: colors.background.hover,
+                  fontWeight: 700,
                 },
 
-                // Tab indicator
+                // Enhanced tab indicator
                 '& .MuiTabs-indicator': {
                   backgroundColor: mode === 'dark'
                     ? theme.palette.secondary.light
                     : theme.palette.secondary.main,
+                  height: 3,
+                  borderRadius: '2px 2px 0 0',
                 },
               }}
             >
@@ -372,9 +411,31 @@ export default function SearchResults() {
                 <Tab
                   key={tab.index}
                   icon={React.cloneElement(tab.icon, { 
-                    sx: { color: 'inherit' } 
+                    sx: { 
+                      color: 'inherit',
+                      fontSize: '1.2rem'
+                    } 
                   })}
-                  label={tab.label}
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {tab.label}
+                      {counts[tab.index] > 0 && (
+                        <Chip 
+                          label={counts[tab.index]} 
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                            backgroundColor: mode === 'dark' 
+                              ? 'rgba(255,255,255,0.2)' // More visible chip background
+                              : 'rgba(0,0,0,0.1)',
+                            color: mode === 'dark' ? '#ffffff' : 'inherit' // Ensure chip text is visible
+                          }}
+                        />
+                      )}
+                    </Box>
+                  }
                   {...a11yProps(tab.index)}
                   sx={{
                     '& .MuiTab-iconWrapper': {
@@ -407,12 +468,24 @@ export default function SearchResults() {
                       alignItems: 'center',
                       height: '100%',
                       flexDirection: 'column',
-                      gap: 2
+                      gap: 3
                     }}>
-                      <CircularProgress color="secondary" size={40} />
+                      <CircularProgress 
+                        color="secondary" 
+                        size={48} 
+                        thickness={4}
+                        sx={{
+                          '& .MuiCircularProgress-circle': {
+                            strokeLinecap: 'round',
+                          }
+                        }}
+                      />
                       <Typography 
-                        variant="body2" 
-                        sx={{ color: colors.text.primary }}
+                        variant="body1" 
+                        sx={{ 
+                          color: colors.text.primary, // Using improved primary text
+                          fontWeight: 500
+                        }}
                       >
                         Searching {tabConfigs[tabIndex].label.toLowerCase()}...
                       </Typography>
@@ -424,18 +497,42 @@ export default function SearchResults() {
                       alignItems: 'center',
                       height: '100%',
                       flexDirection: 'column',
-                      gap: 2,
-                      opacity: 0.7
+                      gap: 3,
+                      opacity: 0.8,
+                      p: 4
                     }}>
-                      {React.cloneElement(tabConfigs[tabIndex].icon, { 
-                        sx: { color: colors.text.secondary, fontSize: '2rem' } 
-                      })}
+                      <Box
+                        sx={{
+                          p: 3,
+                          borderRadius: '50%',
+                          backgroundColor: colors.background.hover,
+                          border: `2px solid ${colors.border}`
+                        }}
+                      >
+                        {React.cloneElement(tabConfigs[tabIndex].icon, { 
+                          sx: { color: colors.text.muted, fontSize: '2.5rem' } // Using new muted color
+                        })}
+                      </Box>
+                      <Typography 
+                        align="center" 
+                        variant="h6" 
+                        sx={{ 
+                          color: colors.text.primary, // Improved primary text
+                          fontWeight: 600,
+                          mb: 1
+                        }}
+                      >
+                        No {tabConfigs[tabIndex].label.toLowerCase()} found
+                      </Typography>
                       <Typography 
                         align="center" 
                         variant="body2" 
-                        sx={{ color: colors.text.secondary }}
+                        sx={{ 
+                          color: colors.text.secondary, // Improved secondary text
+                          maxWidth: 280
+                        }}
                       >
-                        No {tabConfigs[tabIndex].label.toLowerCase()} found
+                        Try adjusting your search terms or explore other categories
                       </Typography>
                     </Box>
                   ) : (
@@ -444,8 +541,7 @@ export default function SearchResults() {
                         disablePadding
                         sx={{
                           '& > *:not(:last-child)': {
-                            borderBottom: '1px solid',
-                            borderColor: colors.divider
+                            borderBottom: `1px solid ${colors.border}`
                           }
                         }}
                       >
@@ -465,74 +561,85 @@ export default function SearchResults() {
               </TabPanel>
             ))}
           </SwipeableViews>
-          
-          {/* Count indicator */}
-          {!isLoading && counts[value] > 0 && (
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              mt: 1, 
-              mb: 0.5 
-            }}>
-              <Chip 
-                label={`${counts[value]} ${tabConfigs[value].label.toLowerCase()} found`}
-                size="small"
-                color="secondary"
-                sx={{ 
-                  fontSize: '0.75rem', 
-                  fontWeight: 500, 
-                  bgcolor: colors.background.hover,
-                  color: colors.text.primary
-                }}
-              />
-            </Box>
-          )}
         </Paper>
       </Fade>
 
-      {/* Detail Panel */}
+      {/* Enhanced Detail Panel */}
       {!isMobile && selector.type && (
         <Slide
           direction="left"
           in={true}
           mountOnEnter
           unmountOnExit
-          timeout={300}
+          timeout={400}
         >
-          <Stack 
+          <Paper
+            elevation={8}
             sx={{
-              width: '70%',
+              width: '60%',
               height: '100%',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-              borderRadius: 2,
+              borderRadius: 3,
               overflow: 'auto',
-              bgcolor: colors.background.secondary,
-              ...scrollbarStyle}}
-              
+              backgroundColor: colors.background.elevated,
+              border: `1px solid ${colors.border}`,
+              boxShadow: colors.shadow,
+              ...scrollbarStyle
+            }}
           >
-            <Introductions selector={selector} position="right"  />
-          </Stack>
+            <Introductions selector={selector} position="right" />
+          </Paper>
         </Slide>
       )}
       
-      {/* Empty state when no item is selected */}
+      {/* Enhanced Empty state when no item is selected */}
       {!isMobile && !selector.type && (
-        <Box 
+        <Paper
+          elevation={4}
           sx={{ 
             display: 'flex', 
             justifyContent: 'center', 
             alignItems: 'center', 
-            width: '70%',
+            width: '60%',
             height: '100%',
-            borderRadius: 2,
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            backgroundColor: colors.background.secondary,
+            borderRadius: 3,
+            backgroundColor: colors.background.elevated,
+            border: `1px solid ${colors.border}`,
+            boxShadow: colors.shadow,
+            flexDirection: 'column',
+            gap: 2
           }}
         >
-          <Typography variant="body1" sx={{ color: colors.text.primary }}>
-            Select an item to view details
+          <Box
+            sx={{
+              p: 4,
+              borderRadius: '50%',
+              backgroundColor: colors.background.hover,
+              border: `2px dashed ${colors.border}`
+            }}
+          >
+            <ChatIcon sx={{ color: colors.text.muted, fontSize: '3rem' }} />
+          </Box>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: colors.text.primary, // Improved primary text
+              fontWeight: 600,
+              mb: 1
+            }}
+          >
+            Ready to explore
           </Typography>
-        </Box>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: colors.text.secondary, // Improved secondary text
+              textAlign: 'center',
+              maxWidth: 300
+            }}
+          >
+            Select an item from the search results to view detailed information
+          </Typography>
+        </Paper>
       )}
     </Stack>
   );
@@ -543,7 +650,7 @@ function getTypeForTab(tabIndex) {
   switch (tabIndex) {
     case 0: return 'contact';
     case 1: return 'chatRecords';
-    case 2: return tabIndex === 2 ? 'movie' : 'tv'; // You can differentiate here if needed
+    case 2: return tabIndex === 2 ? 'movie' : 'tv';
     case 3: return 'music';
     case 4: return 'posts';
     default: return '';

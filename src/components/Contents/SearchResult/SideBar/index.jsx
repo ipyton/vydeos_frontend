@@ -57,6 +57,9 @@ export default function SearchResults(props) {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     React.useEffect(() => {
+        console.log("SearchResults: searchType changed to", searchType);
+        console.log("list", list)
+        console.log(list)
         states[value] = list;
         setState(states);
     }, [list]);
@@ -66,6 +69,7 @@ export default function SearchResults(props) {
     }, [searchType]);
 
     React.useEffect(() => {
+        console.log("SearchResults: search changed to", search);
         if (searchType === -1) {
             // Do nothing
         } else if (searchType === 0) {
@@ -85,7 +89,6 @@ export default function SearchResults(props) {
         if (states[value]) {
             if (states[value].length === 0) {
                 if (value === -1) {
-                    // Do nothing
                 } else if (value === 0) {
                     SearchUtil.searchChatContactById(search, setList);
                 } else if (value === 1) {

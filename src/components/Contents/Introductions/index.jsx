@@ -18,7 +18,7 @@ export default function Introductions(props) {
                 textAlign: "center", 
                 pt: 4,
                 height: "100%",
-                display: "flex",
+                // display: "flex",
                 justifyContent: "center",
                 alignItems: "center" 
             }}>

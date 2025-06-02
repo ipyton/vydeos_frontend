@@ -16,7 +16,7 @@ export default class SearchUtil {
   }
 
   static searchChatContactById(keyword, setList) {
-    return flaskClient({
+    return apiClient({
       url: "/search/contactById",
       method: 'post',
       data: { userId: keyword },
@@ -24,10 +24,6 @@ export default class SearchUtil {
         console.log(Qs.stringify(data))
         return Qs.stringify(data)
       }],
-    }).catch(error => {
-      if ("Network Error" === error.message) {
-        console.log(error)
-      }
     }).then(function (response) {
       if (response === undefined) {
         console.log("did not get message")
@@ -37,6 +33,8 @@ export default class SearchUtil {
         console.log("did not get meesage")
         return
       }
+      console.log("searchContactById response")
+      console.log(response)
       let responseData = response.data
       if (responseData.code === -1) {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
