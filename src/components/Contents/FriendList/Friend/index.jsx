@@ -94,8 +94,6 @@ function a11yProps(index) {
   };
 }
 
-
-// Create Group Dialog Component
 function CreateGroupDialog({ open, onClose, mode, theme }) {
   const [groupData, setGroupData] = useState({
     name: '',
@@ -156,22 +154,22 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
         sx: {
           borderRadius: 3,
           background: mode === 'dark' 
-            ? 'linear-gradient(145deg, rgba(30, 30, 30, 0.95) 0%, rgba(45, 45, 45, 0.95) 100%)'
+            ? '#1a1a1a'
             : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
           backdropFilter: 'blur(20px)',
           boxShadow: mode === 'dark'
-            ? '0 24px 38px 3px rgba(0, 0, 0, 0.6), 0 9px 46px 8px rgba(0, 0, 0, 0.4)'
+            ? '0 24px 38px 3px rgba(0, 0, 0, 0.9), 0 9px 46px 8px rgba(0, 0, 0, 0.8)'
             : '0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12)',
-          border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.05)',
+          border: mode === 'dark' ? '1px solid #404040' : '1px solid rgba(0, 0, 0, 0.05)',
         }
       }}
     >
       <DialogTitle
         sx={{
           background: mode === 'dark'
-            ? 'linear-gradient(90deg, rgba(156, 39, 176, 0.1) 0%, rgba(63, 81, 181, 0.1) 100%)'
+            ? '#242424'
             : 'linear-gradient(90deg, rgba(156, 39, 176, 0.05) 0%, rgba(63, 81, 181, 0.05) 100%)',
-          borderBottom: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+          borderBottom: `1px solid ${mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.1)'}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -195,12 +193,7 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
             variant="h5"
             sx={{
               fontWeight: 600,
-              background: mode === 'dark'
-                ? 'linear-gradient(45deg, #ffffff, #e0e0e0)'
-                : 'linear-gradient(45deg, #333333, #666666)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: mode === 'dark' ? '#ffffff' : '#333333',
             }}
           >
             Create New Group
@@ -209,9 +202,9 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
         <IconButton
           onClick={handleClose}
           sx={{
-            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+            color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.7)',
             '&:hover': {
-              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
             }
           }}
         >
@@ -219,7 +212,7 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ px: 3, py: 3 }}>
+      <DialogContent sx={{ px: 3, py: 3, backgroundColor: mode === 'dark' ? '#1a1a1a' : 'transparent' }}>
         <Stack spacing={3}>
           {/* Group Avatar */}
           <Box sx={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
@@ -227,17 +220,21 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
               sx={{
                 width: 80,
                 height: 80,
-                bgcolor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                border: `2px dashed ${mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`,
+                bgcolor: mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.1)',
+                border: `2px dashed ${mode === 'dark' ? '#666666' : 'rgba(0, 0, 0, 0.3)'}`,
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.05)',
                   borderColor: theme.palette.secondary.main,
+                  bgcolor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.15)',
                 }
               }}
             >
-              <PhotoCameraIcon sx={{ fontSize: 30, opacity: 0.6 }} />
+              <PhotoCameraIcon sx={{ 
+                fontSize: 30, 
+                color: mode === 'dark' ? '#cccccc' : 'rgba(0, 0, 0, 0.6)'
+              }} />
             </Avatar>
           </Box>
 
@@ -252,13 +249,32 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
-                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                backgroundColor: mode === 'dark' ? '#2a2a2a' : 'rgba(0, 0, 0, 0.02)',
+                '& fieldset': {
+                  borderColor: mode === 'dark' ? '#555555' : 'rgba(0, 0, 0, 0.23)',
+                },
                 '&:hover': {
-                  backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                  backgroundColor: mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.04)',
+                  '& fieldset': {
+                    borderColor: mode === 'dark' ? '#777777' : 'rgba(0, 0, 0, 0.23)',
+                  },
                 },
                 '&.Mui-focused': {
-                  backgroundColor: 'transparent',
+                  backgroundColor: mode === 'dark' ? '#2a2a2a' : 'transparent',
+                  '& fieldset': {
+                    borderColor: theme.palette.secondary.main,
+                    borderWidth: '2px',
+                  },
                 }
+              },
+              '& .MuiInputLabel-root': {
+                color: mode === 'dark' ? '#cccccc' : 'rgba(0, 0, 0, 0.6)',
+                '&.Mui-focused': {
+                  color: theme.palette.secondary.main,
+                }
+              },
+              '& .MuiOutlinedInput-input': {
+                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
               }
             }}
           />
@@ -276,48 +292,127 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
-                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                backgroundColor: mode === 'dark' ? '#2a2a2a' : 'rgba(0, 0, 0, 0.02)',
+                '& fieldset': {
+                  borderColor: mode === 'dark' ? '#555555' : 'rgba(0, 0, 0, 0.23)',
+                },
                 '&:hover': {
-                  backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                  backgroundColor: mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.04)',
+                  '& fieldset': {
+                    borderColor: mode === 'dark' ? '#777777' : 'rgba(0, 0, 0, 0.23)',
+                  },
                 },
                 '&.Mui-focused': {
-                  backgroundColor: 'transparent',
+                  backgroundColor: mode === 'dark' ? '#2a2a2a' : 'transparent',
+                  '& fieldset': {
+                    borderColor: theme.palette.secondary.main,
+                    borderWidth: '2px',
+                  },
+                }
+              },
+              '& .MuiInputLabel-root': {
+                color: mode === 'dark' ? '#cccccc' : 'rgba(0, 0, 0, 0.6)',
+                '&.Mui-focused': {
+                  color: theme.palette.secondary.main,
+                }
+              },
+              '& .MuiOutlinedInput-input': {
+                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
+                '&::placeholder': {
+                  color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.6)',
+                  opacity: 1,
                 }
               }
             }}
           />
 
-          <Divider sx={{ my: 1, opacity: 0.3 }} />
+          <Divider sx={{ 
+            my: 1, 
+            borderColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.12)'
+          }} />
 
           {/* Privacy Settings */}
           <FormControl fullWidth>
-            <InputLabel>Privacy</InputLabel>
+            <InputLabel sx={{ 
+              color: mode === 'dark' ? '#cccccc' : 'rgba(0, 0, 0, 0.6)',
+              '&.Mui-focused': {
+                color: theme.palette.secondary.main,
+              }
+            }}>
+              Privacy
+            </InputLabel>
             <Select
               value={groupData.privacy}
               onChange={handleInputChange('privacy')}
               label="Privacy"
               sx={{
                 borderRadius: 2,
-                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                backgroundColor: mode === 'dark' ? '#2a2a2a' : 'rgba(0, 0, 0, 0.02)',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: mode === 'dark' ? '#555555' : 'rgba(0, 0, 0, 0.23)',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: mode === 'dark' ? '#777777' : 'rgba(0, 0, 0, 0.23)',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.secondary.main,
+                  borderWidth: '2px',
+                },
+                '& .MuiSelect-select': {
+                  color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
+                },
+                '& .MuiSvgIcon-root': {
+                  color: mode === 'dark' ? '#cccccc' : 'rgba(0, 0, 0, 0.54)',
+                }
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    backgroundColor: mode === 'dark' ? '#2a2a2a' : '#ffffff',
+                    border: mode === 'dark' ? '1px solid #555555' : 'none',
+                  }
+                }
               }}
             >
-              <MenuItem value="public">
+              <MenuItem value="public" sx={{ 
+                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
+                '&:hover': {
+                  backgroundColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.04)',
+                }
+              }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <PublicIcon fontSize="small" />
+                  <PublicIcon fontSize="small" sx={{ color: mode === 'dark' ? '#cccccc' : 'inherit' }} />
                   <Box>
-                    <Typography variant="body2">Public</Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="body2" sx={{ 
+                      color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)'
+                    }}>
+                      Public
+                    </Typography>
+                    <Typography variant="caption" sx={{
+                      color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.6)'
+                    }}>
                       Anyone can find and join
                     </Typography>
                   </Box>
                 </Box>
               </MenuItem>
-              <MenuItem value="private">
+              <MenuItem value="private" sx={{ 
+                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
+                '&:hover': {
+                  backgroundColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.04)',
+                }
+              }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LockIcon fontSize="small" />
+                  <LockIcon fontSize="small" sx={{ color: mode === 'dark' ? '#cccccc' : 'inherit' }} />
                   <Box>
-                    <Typography variant="body2">Private</Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="body2" sx={{ 
+                      color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)'
+                    }}>
+                      Private
+                    </Typography>
+                    <Typography variant="caption" sx={{
+                      color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.6)'
+                    }}>
                       Invite only
                     </Typography>
                   </Box>
@@ -330,8 +425,8 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
           <Box sx={{ 
             p: 2, 
             borderRadius: 2, 
-            backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`
+            backgroundColor: mode === 'dark' ? '#2a2a2a' : 'rgba(0, 0, 0, 0.02)',
+            border: `1px solid ${mode === 'dark' ? '#555555' : 'rgba(0, 0, 0, 0.1)'}`
           }}>
             <FormControlLabel
               control={
@@ -343,8 +438,14 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
               }
               label={
                 <Box>
-                  <Typography variant="body2">Allow member invites</Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)'
+                  }}>
+                    Allow member invites
+                  </Typography>
+                  <Typography variant="caption" sx={{
+                    color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.6)'
+                  }}>
                     Let members invite their friends
                   </Typography>
                 </Box>
@@ -358,10 +459,8 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
         sx={{
           px: 3,
           py: 2,
-          borderTop: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
-          background: mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.02)'
-            : 'rgba(0, 0, 0, 0.02)',
+          borderTop: `1px solid ${mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.1)'}`,
+          background: mode === 'dark' ? '#242424' : 'rgba(0, 0, 0, 0.02)',
         }}
       >
         <Button
@@ -369,9 +468,11 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
           sx={{
             borderRadius: 2,
             px: 3,
-            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+            color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.7)',
+            border: mode === 'dark' ? '1px solid #555555' : 'none',
             '&:hover': {
               backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              borderColor: mode === 'dark' ? '#777777' : 'transparent',
             }
           }}
         >
@@ -385,14 +486,19 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
             borderRadius: 2,
             px: 4,
             background: 'linear-gradient(45deg, #9c27b0, #3f51b5)',
-            boxShadow: '0 4px 15px rgba(156, 39, 176, 0.3)',
+            boxShadow: mode === 'dark' 
+              ? '0 4px 15px rgba(156, 39, 176, 0.6)' 
+              : '0 4px 15px rgba(156, 39, 176, 0.3)',
             '&:hover': {
               background: 'linear-gradient(45deg, #8e24aa, #3949ab)',
-              boxShadow: '0 6px 20px rgba(156, 39, 176, 0.4)',
+              boxShadow: mode === 'dark' 
+                ? '0 6px 20px rgba(156, 39, 176, 0.7)' 
+                : '0 6px 20px rgba(156, 39, 176, 0.4)',
               transform: 'translateY(-1px)',
             },
             '&:disabled': {
-              background: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              background: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.1)',
+              color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.26)',
               boxShadow: 'none',
             },
             transition: 'all 0.3s ease',
@@ -404,12 +510,12 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
     </Dialog>
   );
 }
-
 // Main Component
 export default function Friend(props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { mode } = useThemeMode();
+  console.log("Friend component rendered with mode:", mode);
   const { setSelector } = props;
   const { showNotification } = useNotification();
   // States
@@ -608,7 +714,7 @@ export default function Friend(props) {
       </AppBar>
 
       {/* Create Group Button - Only show for Groups tab and non-mobile */}
-      {value === 3 && !isMobile && (
+      {value === 3  && (
         <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
           <Button
             fullWidth
@@ -707,28 +813,6 @@ export default function Friend(props) {
                   >
                     No {tabConfigs[tabIndex].label.toLowerCase()} to display
                   </Typography>
-                  {/* Show create group button for empty groups on mobile */}
-                  {tabIndex === 3 && isMobile && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<AddIcon />}
-                      onClick={() => setCreateGroupOpen(true)}
-                      sx={{
-                        mt: 2,
-                        borderRadius: 2,
-                        borderColor: theme.palette.secondary.main,
-                        color: theme.palette.secondary.main,
-                        '&:hover': {
-                          borderColor: theme.palette.secondary.dark,
-                          backgroundColor: mode === 'dark' 
-                            ? 'rgba(156, 39, 176, 0.1)' 
-                            : 'rgba(156, 39, 176, 0.05)',
-                        }
-                      }}
-                    >
-                      Create Group
-                    </Button>
-                  )}
                 </Box>
               ) : (
                 <Fade in={!isLoading} timeout={500}>
