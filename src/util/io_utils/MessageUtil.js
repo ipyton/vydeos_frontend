@@ -246,4 +246,14 @@ export default class MessageUtil {
             //setNetworkErr(false)
         });
     }
+
+    static markAsRead(userId, type) {
+        return apiClient.post("/chat/markAsRead", Qs.stringify({ userId: userId, type: type }), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+    }
 }

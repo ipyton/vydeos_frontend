@@ -18,7 +18,6 @@ export default function ChatContainer(props) {
   const { select, setSelect, isMobile } = props;
   const [chatRecords, setChatRecords] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const location = useLocation();
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   const { mode, toggleMode } = useThemeMode();
@@ -28,45 +27,43 @@ export default function ChatContainer(props) {
     setSelect(null);
   };
 
-      const fetchMessages = async () => {
-      // Validate if we have a valid selection
-      if (!select || !select.type || !select.userId || select.type === "" || select.userId === "") {
-        return;
+  const fetchMessages = async () => {
+    // Validate if we have a valid selection
+    if (!select || !select.type || !select.userId || select.type === "" || select.userId === "") {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Fetch message history
+      const history = await DatabaseManipulator.getContactHistory(select.type, select.userId);
+      setChatRecords(history);
+
+      // Mark messages as read
+      if (history.length > 0) {
+        await MessageUtil.markAsRead(select.type, select.userId);
       }
-      
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Fetch message history
-        const history = await DatabaseManipulator.getContactHistory(select.type, select.userId);
-        setChatRecords(history);
-        
-        // Mark messages as read
-        if (history.length > 0) {
-          await MessageUtil.markAsRead(select.type, select.userId);
-        }
-      } catch (err) {
-        console.error("Error fetching messages:", err);
-        setError("Failed to load messages. Please try again.");
-        
-        // Show appropriate notification based on error type
-        if (err.name === 'NetworkError' || err.message?.includes('network')) {
-          showNotification("Network Error: Please check your connection", "error");
-        } else if (err.name === 'DatabaseError' || err.message?.includes('database')) {
-          showNotification("Database Error: Could not retrieve messages", "error");
-        } else if (err.name === 'AuthorizationError' || err.message?.includes('permission')) {
-          showNotification("Authorization Error: You don't have permission to view these messages", "error");
-        } else {
-          showNotification("Error loading messages. Please try again later.", "error");
-        }
-      } finally {
-        setLoading(false);
+    } catch (err) {
+      console.log("Error fetching messages:", err);
+
+      // Show appropriate notification based on error type
+      if (err.name === 'NetworkError' || err.message?.includes('network')) {
+        showNotification("Network Error: Please check your connection", "error");
+      } else if (err.name === 'DatabaseError' || err.message?.includes('database')) {
+        showNotification("Database Error: Could not retrieve messages", "error");
+      } else if (err.name === 'AuthorizationError' || err.message?.includes('permission')) {
+        showNotification("Authorization Error: You don't have permission to view these messages", "error");
+      } else {
+        showNotification("Error loading messages. Please try again later.", "error");
       }
-    };
+      setSelect(null); // Clear selection on error
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    
     fetchMessages();
   }, [select, refresh, showNotification]);
 
@@ -88,7 +85,7 @@ export default function ChatContainer(props) {
       showNotification("Failed to delete message. Please try again.", "error");
     }
   };
-  
+
   if (!select || !select.type || !select.userId) {
     return (
       <Box
@@ -101,7 +98,7 @@ export default function ChatContainer(props) {
           backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb',
           width: "100%",
           height: "100%",
-          borderRadius:1
+          borderRadius: 1
         }}
       >
         <Typography variant={isMobile ? "body1" : "h6"} color="text.secondary" gutterBottom>
@@ -128,10 +125,7 @@ export default function ChatContainer(props) {
         backgroundColor: mode === 'dark' ? '#121212' : '#f5f7fb'
       }}
     >
-
-      
       <Header selected={select} onBack={handleBackClick} />
-      
       {loading ? (
         <Box
           sx={{
@@ -144,37 +138,10 @@ export default function ChatContainer(props) {
         >
           <CircularProgress />
         </Box>
-      ) : error ? (
+      ) : (
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
             flexGrow: 1,
-            p: isMobile ? 2 : 3,
-            height: isMobile ? 'calc(100vh - 64px)' : 'auto',
-            borderRadius: "8px",
-          }}
-        >
-          <Typography color="error.main">{error}</Typography>
-          <Box sx={{ mt: 2 }}>
-            <IconButton 
-              onClick={() => {
-                setLoading(true);
-                setError(null);
-                // Retry loading messages
-                fetchMessages();
-              }}
-              color="primary"
-            >
-              <RefreshIcon />
-            </IconButton>
-          </Box>
-        </Box>
-      ) : (
-        <Box 
-          sx={{ 
-            flexGrow: 1, 
             overflow: 'auto',
             display: 'flex',
             flexDirection: 'column',
@@ -193,9 +160,8 @@ export default function ChatContainer(props) {
           />
         </Box>
       )}
-      
-      <Box sx={{ 
-        flexShrink: 0, 
+      <Box sx={{
+        flexShrink: 0,
         p: isMobile ? 1 : 2,
         backgroundColor: 'transparent', // 或者 'rgba(255, 255, 255, 0.5)' 之类的透明色
         borderTop: isMobile ? '1px solid rgba(0,0,0,0.08)' : 'none'
