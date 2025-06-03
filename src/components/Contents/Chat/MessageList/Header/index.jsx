@@ -130,7 +130,7 @@ export default function Header(props) {
   const isOnline = selected.status === "online";
   
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box >
       <AppBar 
         position="static" 
         elevation={0}

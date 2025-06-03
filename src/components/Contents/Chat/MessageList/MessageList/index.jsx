@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import { MessageBox } from "react-chat-elements";
 import { useThemeMode } from "../../../../../Themes/ThemeContext";
+import MessageBubble from "./ImprovedMessage";
 export default function MessageList({ chatRecords, setChatRecords, select }) {
   const messagesEndRef = useRef(null);
   const { mode, toggleMode } = useThemeMode();
@@ -14,6 +15,16 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     scrollToBottom();
   }, [chatRecords]);
 
+  const handleDelete = (message) => {
+    console.log("MessageList: handleDelete", message);
+  }
+
+  const handleWithdraw = (message) => {
+    console.log("MessageList: handleWithdraw", message);
+  }
+
+
+  console.log("MessageList: chatRecords", chatRecords);
   return (
     <Box
       sx={{
@@ -37,16 +48,23 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
         },
       }}
     >
+      {/* //  message, 
+  isOwn = false, 
+  timestamp, 
+  senderName,
+  darkMode = false,
+  onDelete,
+  onWithdraw */}
       {chatRecords.map((message, index) => (
-        <MessageBox
+        <MessageBubble
           key={index}
-          position={message.position}
-          type={message.type}
-          text={message.text}
-          date={new Date(message.date)}
-          title={message.title}
-          data={message.data}
-          status={message.status}
+          message={message}
+          timestamp={message.timestamp}
+          isOwn={message.userId !== select.userId}
+          onDelete={handleDelete}
+          onWithdraw={handleWithdraw}
+          senderName={message.userId}
+          darkMode={mode === 'dark'}
         />
       ))}
       <div ref={messagesEndRef} />
