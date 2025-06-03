@@ -19,8 +19,11 @@ export default function FriendItem(props) {
 
     const handleClick = (idx) => {
         return () => {
-            if (idx === 0 || idx === 1 || idx === 2) {
+            if (idx === 0 || idx === 1) {
                 setSelector({ type: "contact", userId: content.friendId });
+            }
+            else if (idx === 2){
+                setSelector({ type: "contact", userId: content.userId });
             } else if (idx === 3) {
                 setSelector({ type: "groupId", content: content.groupId });
             } else if (idx === 4) {
@@ -136,9 +139,13 @@ export default function FriendItem(props) {
     );
 
     // Handle different tab types
-    if (idx === 0 || idx === 1 || idx === 2) {
+    if (idx === 0 || idx === 1) {
+
         return renderListItem(content.friendId, content.friendId || "User");
-    } else if (idx === 3) {
+    } else if (idx ===2) {
+        console.log(content)
+            return renderListItem(content.userId, content.userId || "User");
+    }else if (idx === 3) {
         return renderListItem(content.groupName, content.groupName || "Group");
     } else if (idx === 4 || idx === 5) {
         return renderListItem(content.friendId || "Tim", "User");

@@ -50,6 +50,7 @@ import PublicIcon from '@mui/icons-material/Public';
 import FriendItem from './FriendItem';
 import SocialMediaUtil from '../../../../util/io_utils/SocialMediaUtil';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
+import { useNotification } from '../../../../Providers/NotificationProvider';
 
 // Transition for dialog
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -92,6 +93,7 @@ function a11yProps(index) {
     'aria-controls': `relationship-tabpanel-${index}`,
   };
 }
+
 
 // Create Group Dialog Component
 function CreateGroupDialog({ open, onClose, mode, theme }) {
@@ -409,7 +411,7 @@ export default function Friend(props) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { mode } = useThemeMode();
   const { setSelector } = props;
-  
+  const { showNotification } = useNotification();
   // States
   const [value, setValue] = useState(0);
   const [list, setList] = useState([]);
@@ -444,7 +446,49 @@ export default function Friend(props) {
         setIsLoading(false);
       });
   }, [value]);
+  // Handle group creation
+  // const handleCreateGroup = () => {
+  //   if (!validateGroupData()) return;
 
+  //   // setLoading(true);
+  //   axios({
+  //     url: API_BASE_URL + "/group_chat/create",
+  //     method: "post",
+  //     data: {
+  //       groupName: groupName,
+  //       members: selectedFriends
+  //     },
+  //     headers: {
+  //       "token": localStorage.getItem("token"),
+  //     }
+  //   })
+  //   .then((res) => {
+  //     if (res.data && res.data.success) {
+  //       setOpenDialog(false);
+  //       setGroupName("");
+  //       setSelectedFriends([]);
+  //       showNotification("Group created successfully", "success");
+  //     } else {
+  //       showNotification(res.data?.message || "Failed to create group", "error");
+  //     }
+  //   })
+  //   .catch(err => {
+  //     console.error("Group creation error:", err);
+  //     if (err.response) {
+  //       // Server responded with an error status
+  //       showNotification(`Error: ${err.response.data?.message || "Failed to create group"}`, "error");
+  //     } else if (err.request) {
+  //       // Request made but no response received
+  //       showNotification("Network error - please check your connection", "error");
+  //     } else {
+  //       // Error setting up the request
+  //       showNotification("Failed to create group", "error");
+  //     }
+  //   })
+  //   .finally(() => {
+  //     setLoading(false);
+  //   });
+  // };
   const handleChange = (event, newValue) => {
     setValue(newValue);
     // The useEffect will handle the data fetching when value changes
