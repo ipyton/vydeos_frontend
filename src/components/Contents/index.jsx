@@ -111,6 +111,7 @@ export default function Contents(props) {
             if (action ==="setToken") {
                 const token = localStorage.getItem("token")
                 const userId = localStorage.getItem("userId")
+                console.log("setting token", token, userId)
                 worker.postMessage({action:"setToken", key: userId, value: token})
             } else if (action === "updateNotification") {
                 console.log("updating notification")
@@ -127,7 +128,9 @@ export default function Contents(props) {
         //worker.postMessage({ num: 5 });
 
         // 清理 Worker 实例
-        return () => worker.terminate();
+        return () => {
+            console.log("cleaning up worker")
+            worker.terminate();}
     }, [])
 
     useEffect(() => {
