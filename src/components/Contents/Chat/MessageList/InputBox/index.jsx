@@ -16,7 +16,7 @@ export default function InputBox(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [text, setText] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const { select, setChatRecords,isMobile } = props;
+  const { select, setChatRecords,isMobile, chatRecords} = props;
   const open = Boolean(anchorEl);
   const inputRef = React.useRef(null);
   const { showNotification } = useNotification();
@@ -156,8 +156,8 @@ const textFieldStyles = {
           timestamp: response.data.timestamp
         };
         
-        const records = await DatabaseManipulator.addContactHistory(message);
-        setChatRecords(records);
+        await DatabaseManipulator.addContactHistory(message);
+        setChatRecords([...chatRecords, message]); // Update chat records
         setText("");
         
         // Focus back on input

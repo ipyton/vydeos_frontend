@@ -101,37 +101,43 @@ export default function Contents(props) {
         register()
     }, [])
     const dispatcher = useDispatch()
-    useEffect(() => {
-        const worker = new Worker("/webworkers/NotificationReceiver.js");
+useEffect(() => {
+    const worker = new Worker("/webworkers/NotificationReceiver.js");
 
-        // 主线程接收 Worker 消息
-        worker.onmessage = (event) => {
-            const {action, key, value} = event.data
-            console.log(event.data)
-            if (action ==="setToken") {
-                const token = localStorage.getItem("token")
-                const userId = localStorage.getItem("userId")
-                console.log("setting token", token, userId)
-                worker.postMessage({action:"setToken", key: userId, value: token})
-            } else if (action === "updateNotification") {
-                console.log("updating notification")
-                dispatcher(update())
-            } 
-            console.log("Main thread received:", event.data);
-            //setResult(event.data.result);
-        };
-        worker.onerror = (event) => {
-            console.log(event)
+    // 1. 一启动就设置 token（发送给 Worker）
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    if (token && userId) {
+        worker.postMessage({ action: "setToken", key: userId, value: token });
+        console.log("Sent token and userId to worker");
+    }
+
+    // 2. 监听消息
+    worker.onmessage = (event) => {
+        const { action } = event.data;
+        console.log("Main thread received:", event.data);
+
+        if (action === "updateNotification") {
+            console.log("Updating notification");
+            dispatcher(update());
+        } else if (action === "workerReady") {
+            console.log("Worker is ready");
+        } else if (action === "connectionFailed") {
+            console.warn("WebSocket connection failed");
         }
+    };
 
-        // 向 Worker 发送消息
-        //worker.postMessage({ num: 5 });
+    // 3. 错误处理
+    worker.onerror = (event) => {
+        console.error("Worker error:", event);
+    };
 
-        // 清理 Worker 实例
-        return () => {
-            console.log("cleaning up worker")
-            worker.terminate();}
-    }, [])
+    // 4. 清理
+    return () => {
+        console.log("Cleaning up worker");
+        worker.terminate();
+    };
+}, []);
 
     useEffect(() => {
 

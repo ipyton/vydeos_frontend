@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
+
 export default function SideBar(props) {
   let { select, setSelect, isMobile } = props;
   const [userRecords, setUserRecords] = useState([]);
@@ -18,7 +19,6 @@ export default function SideBar(props) {
   const [loading, setLoading] = useState(true);
   const { showNotification } = useNotification();
   const { mode } = useThemeMode();
-
 
   let location = useLocation();
   const refresh = useSelector((state) => state.refresh.value.refresh);
@@ -31,7 +31,7 @@ export default function SideBar(props) {
 
   useEffect(() => {
     setLoading(true);
-    DatabaseManipulator.getRecentContact()
+    DatabaseManipulator.getRecentContacts()
       .then((res) => {
         setUserRecords(res || []); // Ensure this is always an array
         setLoading(false);
@@ -89,52 +89,58 @@ export default function SideBar(props) {
         alignItems: 'center', // 关键点：垂直居中
         height: '70px',
       }}>
-  <Paper
-    elevation={1}
-    sx={{
-      // p: '8px 16px', // Increased padding for more space around input
-      display: 'flex',
-      alignItems: 'center',
-      borderRadius: 8,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-      backgroundColor: mode === 'dark' ? '#333333' : '#ffffff',
-      width: '90%', // Changed from fixed pixel value to percentage
-      maxWidth: '300px', // Added max-width for larger screens
-      height: '70%',
-      transition: 'all 0.2s ease-in-out',
-      '&:hover': {
-        boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-      },
-      border: mode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.03)'
-    }}
-  >
-    <SearchIcon sx={{ 
-      color: 'text.secondary', 
-      mr: 1, // Added margin right for better spacing from text
-      ml: 1.5,
-      color: mode === 'dark' ? 'white' : 'black',
-      fontSize: isMobile ? '1.2rem' : '1.4rem' 
-    }} />
-    <InputBase
-      sx={{ 
-        flex: 1,
-        fontSize: isMobile ? '0.95rem' : '1rem',
-        ml: 0.2, // Reduced margin left from 0.5 to 0.2
-        '& .MuiInputBase-input': {
-          py: 0.75,
-          pl: 0.2, // Reduced padding left from 0.5 to 0.2
-          overflow: 'hidden', // Prevent text overflow
-          textOverflow: 'ellipsis', // Add ellipsis for overflowing text
-          whiteSpace: 'nowrap' // Keep text on one line
-        },
-        color: mode === 'dark' ? 'white' : 'black',
-      }}
-      placeholder="Search contacts..."
-      value={searchQuery}
-      onChange={handleSearchChange}
-    />
-  </Paper>
-</Box>
+        <Paper
+          elevation={1}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: 8,
+            boxShadow: mode === 'dark' 
+              ? '0 2px 8px rgba(0,0,0,0.3)' 
+              : '0 2px 8px rgba(0,0,0,0.08)',
+            backgroundColor: mode === 'dark' ? '#333333' : '#ffffff',
+            width: '90%', // Changed from fixed pixel value to percentage
+            maxWidth: '300px', // Added max-width for larger screens
+            height: '70%',
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+              boxShadow: mode === 'dark' 
+                ? '0 4px 12px rgba(0,0,0,0.4)' 
+                : '0 4px 12px rgba(0,0,0,0.12)',
+            },
+            border: mode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.03)'
+          }}
+        >
+          <SearchIcon sx={{ 
+            color: mode === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
+            mr: 1, // Added margin right for better spacing from text
+            ml: 1.5,
+            fontSize: isMobile ? '1.2rem' : '1.4rem' 
+          }} />
+          <InputBase
+            sx={{ 
+              flex: 1,
+              fontSize: isMobile ? '0.95rem' : '1rem',
+              ml: 0.2, // Reduced margin left from 0.5 to 0.2
+              '& .MuiInputBase-input': {
+                py: 0.75,
+                pl: 0.2, // Reduced padding left from 0.5 to 0.2
+                overflow: 'hidden', // Prevent text overflow
+                textOverflow: 'ellipsis', // Add ellipsis for overflowing text
+                whiteSpace: 'nowrap', // Keep text on one line
+                color: mode === 'dark' ? '#ffffff' : '#000000',
+                '&::placeholder': {
+                  color: mode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+                  opacity: 1,
+                }
+              },
+            }}
+            placeholder="Search contacts..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+        </Paper>
+      </Box>
       
       <Box sx={{ 
         flexGrow: 1, 
@@ -145,14 +151,14 @@ export default function SideBar(props) {
           width: '4px',
         },
         '&::-webkit-scrollbar-track': {
-          background: '#f1f1f1',
+          background: mode === 'dark' ? '#1e1e1e' : '#f1f1f1',
         },
         '&::-webkit-scrollbar-thumb': {
-          background: '#c1c1c1',
+          background: mode === 'dark' ? '#555555' : '#c1c1c1',
           borderRadius: '4px',
         },
         '&::-webkit-scrollbar-thumb:hover': {
-          background: '#a8a8a8',
+          background: mode === 'dark' ? '#666666' : '#a8a8a8',
         },
       }}>
         {loading ? (
@@ -163,7 +169,12 @@ export default function SideBar(props) {
             minHeight: isMobile ? 'calc(100vh - 64px - 66px - 70px)' : 'auto',
             width: '100%'
           }}>
-            <CircularProgress size={isMobile ? 30 : 40} />
+            <CircularProgress 
+              size={isMobile ? 30 : 40} 
+              sx={{
+                color: mode === 'dark' ? '#ffffff' : '#1976d2'
+              }}
+            />
           </Box>
         ) : !Array.isArray(userRecords) || userRecords.length === 0 ? (
           <Box sx={{ 
@@ -176,7 +187,12 @@ export default function SideBar(props) {
             minHeight: isMobile ? 'calc(100vh - 64px - 66px - 70px)' : 'auto',
             width: '100%'
           }}>
-            <Typography variant={isMobile ? "body2" : "body1"} color="text.secondary">
+            <Typography 
+              variant={isMobile ? "body2" : "body1"} 
+              sx={{
+                color: mode === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'
+              }}
+            >
               Start making some friends first
             </Typography>
           </Box>
@@ -191,7 +207,12 @@ export default function SideBar(props) {
             minHeight: isMobile ? '60vh' : 'auto',
             width: '100%'
           }}>
-            <Typography variant={isMobile ? "body2" : "body1"} color="text.secondary">
+            <Typography 
+              variant={isMobile ? "body2" : "body1"} 
+              sx={{
+                color: mode === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'
+              }}
+            >
               No contacts found matching "{searchQuery}"
             </Typography>
           </Box>

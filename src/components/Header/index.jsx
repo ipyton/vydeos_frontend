@@ -487,7 +487,7 @@ export default function Header(props) {
         }}>
           <SearchInput
             id="searchInput"
-            placeholder="Search anything..."
+            placeholder="Search Everything"
             inputProps={{ 'aria-label': 'search' }}
             onChange={handleSearchChange}
             onBlur={handleTextBlur}

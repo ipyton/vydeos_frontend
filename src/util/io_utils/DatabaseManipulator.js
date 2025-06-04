@@ -7,9 +7,9 @@ class ChatDatabase extends Dexie {
         
         this.version(1).stores({
             settings: 'key, value',
-            contacts: '++id, userId, name, avatar, type, timestamp, remain, *tags',
-            messages: '++id, messageId, senderId, receiverId, groupId, type, time, content, status, *tags',
-            mailbox: '++id, messageId, senderId, receiverId, groupId, type, time, content, status, *tags'
+            contacts: '++id, [userId+type], userId, type, timestamp, remain, *tags',
+            messages: '++id, messageId, [type+receiverId], [type+groupId], type, time, timestamp, *tags',
+            mailbox: '++id, messageId, [type+receiverId], [type+groupId], type, time, timestamp, *tags'
         });
 
         // Add hooks for auto-updating timestamps
@@ -49,7 +49,7 @@ export default class DatabaseManipulator {
         try {
             // Check if contact already exists
             const existingContact = await db.contacts
-                .where(['userId', 'type'])
+                .where('[userId+type]')
                 .equals([contact.userId, contact.type])
                 .first();
 
@@ -84,7 +84,7 @@ export default class DatabaseManipulator {
     static async contactComeFirst(type, id) {
         try {
             const contact = await db.contacts
-                .where(['userId', 'type'])
+                .where('[userId+type]')
                 .equals([id, type])
                 .first();
             
@@ -102,7 +102,7 @@ export default class DatabaseManipulator {
     static async addRemain(type, id, count) {
         try {
             const contact = await db.contacts
-                .where(['userId', 'type'])
+                .where('[userId+type]')
                 .equals([id, type])
                 .first();
             
@@ -122,7 +122,7 @@ export default class DatabaseManipulator {
     static async setRemain(type, id, count) {
         try {
             const contact = await db.contacts
-                .where(['userId', 'type'])
+                .where('[userId+type]')
                 .equals([id, type])
                 .first();
             
@@ -140,7 +140,7 @@ export default class DatabaseManipulator {
     static async getRemain(type, id) {
         try {
             const contact = await db.contacts
-                .where(['userId', 'type'])
+                .where('[userId+type]')
                 .equals([id, type])
                 .first();
             
@@ -164,7 +164,7 @@ export default class DatabaseManipulator {
     static async getRecentContactByTypeAndId(type, id) {
         try {
             return db.contacts
-                .where(['userId', 'type'])
+                .where('[userId+type]')
                 .equals([id, type])
                 .first();
         } catch (error) {
@@ -190,7 +190,7 @@ export default class DatabaseManipulator {
     static async setRecentContact(recentContact) {
         try {
             const contact = await db.contacts
-                .where(['userId', 'type'])
+                .where('[userId+type]')
                 .equals([recentContact.userId, recentContact.type])
                 .first();
             
@@ -270,40 +270,47 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async getContactHistory(type, receiverId, limit = 50, offset = 0) {
-        try {
-            const query = db.messages.where('type').equals(type);
-            
-            let filteredQuery;
-            if (type === 'group') {
-                filteredQuery = query.and(msg => msg.groupId === receiverId);
-            } else {
-                filteredQuery = query.and(msg => 
-                    msg.receiverId === receiverId || msg.senderId === receiverId
-                );
-            }
+static async getContactHistory(type, receiverId, limit = 50, offset = 0) {
+    try {
+        console.log(`Getting contact history for type: ${type}, receiverId: ${receiverId}, limit: ${limit}, offset: ${offset}`);
+        let messages;
 
-            return filteredQuery
-                .reverse()
+        if (type === 'group') {
+            messages = await db.messages
+                .orderBy('id')
+                .filter(message => message.type === type && message.groupId === receiverId)
                 .offset(offset)
                 .limit(limit)
                 .toArray();
-        } catch (error) {
-            console.error('Error getting contact history:', error);
-            return [];
+        } else {
+            messages = await db.messages
+                .orderBy('id')
+                .filter(message => message.type === type && message.receiverId === receiverId)
+                .offset(offset)
+                .limit(limit)
+                .toArray();
         }
+
+        return messages;
+
+    } catch (error) {
+        console.error('Error getting contact history:', error);
+        return [];
     }
+}
 
     static async getContactHistoryCount(type, receiverId) {
         try {
-            const query = db.messages.where('type').equals(type);
-            
             if (type === 'group') {
-                return query.and(msg => msg.groupId === receiverId).count();
+                return db.messages
+                    .where('[type+groupId]')
+                    .equals([type, receiverId])
+                    .count();
             } else {
-                return query.and(msg => 
-                    msg.receiverId === receiverId || msg.senderId === receiverId
-                ).count();
+                return db.messages
+                    .where('[type+receiverId]')
+                    .equals([type, receiverId])
+                    .count();
             }
         } catch (error) {
             console.error('Error getting contact history count:', error);
@@ -334,20 +341,23 @@ export default class DatabaseManipulator {
 
     static async getMailbox(type, receiverId, limit = 50, offset = 0) {
         try {
-            const query = db.mailbox.where('type').equals(type);
-            
-            let filteredQuery;
             if (type === 'group') {
-                filteredQuery = query.and(msg => msg.groupId === receiverId);
+                return db.mailbox
+                    .where('[type+groupId]')
+                    .equals([type, receiverId])
+                    .reverse()
+                    .offset(offset)
+                    .limit(limit)
+                    .toArray();
             } else {
-                filteredQuery = query.and(msg => msg.receiverId === receiverId);
+                return db.mailbox
+                    .where('[type+receiverId]')
+                    .equals([type, receiverId])
+                    .reverse()
+                    .offset(offset)
+                    .limit(limit)
+                    .toArray();
             }
-
-            return filteredQuery
-                .reverse()
-                .offset(offset)
-                .limit(limit)
-                .toArray();
         } catch (error) {
             console.error('Error getting mailbox:', error);
             return [];
@@ -356,12 +366,16 @@ export default class DatabaseManipulator {
 
     static async getMailboxCount(type, receiverId) {
         try {
-            const query = db.mailbox.where('type').equals(type);
-            
             if (type === 'group') {
-                return query.and(msg => msg.groupId === receiverId).count();
+                return db.mailbox
+                    .where('[type+groupId]')
+                    .equals([type, receiverId])
+                    .count();
             } else {
-                return query.and(msg => msg.receiverId === receiverId).count();
+                return db.mailbox
+                    .where('[type+receiverId]')
+                    .equals([type, receiverId])
+                    .count();
             }
         } catch (error) {
             console.error('Error getting mailbox count:', error);
