@@ -247,13 +247,11 @@ export default class MessageUtil {
         });
     }
 
-    static markAsRead(userId, type) {
-        return apiClient.post("/chat/markAsRead", Qs.stringify({ userId: userId, type: type }), {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        }).catch(error => {
-            console.log(error);
-        });
+    static markAsRead() {
+        return apiClient.post("/chat/markUnread")
+    }
+
+    static getUnreadMessages(){
+        return apiClient.post("/chat/getUnreadFromAllUsers")
     }
 }
