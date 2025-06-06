@@ -239,7 +239,7 @@ onmessage = (event) => {
             case "setToken":
                 token = value;
                 userId = key;
-                
+                connectWebSocket(WebSocket_URL + "/notification/" + token);
                 // getNewestMessages()
                 //     .then(() => {
                 //         connectWebSocket(WebSocket_URL + "/notification/" + token);
