@@ -183,40 +183,40 @@ const sendMessage = (message) => {
 };
 
 function getNewestMessages() {
-    return DatabaseManipulator.getTimestamp().then((timestamp) => {
-        if (!timestamp) {
-            timestamp = -1;
-        }
+    // return DatabaseManipulator.getTimestamp().then((timestamp) => {
+    //     if (!timestamp) {
+    //         timestamp = -1;
+    //     }
 
-        return fetch(API_BASE_URL + "/chat/getNewestMessages", {
-            method: 'POST',
-            headers: {
-                'token': token,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                timestamp: timestamp
-            })
-        })
-        .catch(err => {
-            console.error('Error fetching newest messages:', err);
-            throw err;
-        })
-        .then(async response => {
-            if (!response || !response.ok) {
-                throw new Error(`HTTP error! status: ${response?.status}`);
-            }
+    //     return fetch(API_BASE_URL + "/chat/getNewestMessages", {
+    //         method: 'POST',
+    //         headers: {
+    //             'token': token,
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({
+    //             timestamp: timestamp
+    //         })
+    //     })
+    //     .catch(err => {
+    //         console.error('Error fetching newest messages:', err);
+    //         throw err;
+    //     })
+    //     .then(async response => {
+    //         if (!response || !response.ok) {
+    //             throw new Error(`HTTP error! status: ${response?.status}`);
+    //         }
 
-            const data = await response.json();
+    //         const data = await response.json();
 
-            if (!data || !data.message) {
-                console.log('No new messages available');
-                return;
-            }
+    //         if (!data || !data.message) {
+    //             console.log('No new messages available');
+    //             return;
+    //         }
 
-            return DatabaseManipulator.batchAddContactHistory(JSON.parse(data.message));
-        });
-    });
+    //         return DatabaseManipulator.batchAddContactHistory(JSON.parse(data.message));
+    //     });
+    // });
 }
 
 // Graceful cleanup
@@ -240,14 +240,14 @@ onmessage = (event) => {
                 token = value;
                 userId = key;
                 
-                getNewestMessages()
-                    .then(() => {
-                        connectWebSocket(WebSocket_URL + "/notification/" + token);
-                    })
-                    .catch(error => {
-                        console.error('Error during initialization:', error);
-                        postMessage({action: "initializationError", message: error.message});
-                    });
+                // getNewestMessages()
+                //     .then(() => {
+                //         connectWebSocket(WebSocket_URL + "/notification/" + token);
+                //     })
+                //     .catch(error => {
+                //         console.error('Error during initialization:', error);
+                //         postMessage({action: "initializationError", message: error.message});
+                //     });
                 break;
                 
             case "sendMessage":
