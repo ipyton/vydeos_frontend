@@ -18,6 +18,7 @@ import MuiAppBar from '@mui/material/AppBar';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import localforage from 'localforage';
+import { useSelector } from 'react-redux';
 
 // Icons
 import MenuIcon from '@mui/icons-material/Menu';
@@ -166,6 +167,7 @@ export default function Header(props) {
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl);
   const languageMenuOpen = Boolean(languageAnchorEl);
   const notificationsOpen = Boolean(notificationsAnchorEl);
+  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
 
   const { showNotification } = useNotification();
   
@@ -191,8 +193,10 @@ export default function Header(props) {
   
 
   useEffect(() => {
+    console.log("refreshing unread message count");
     DatabaseManipulator.getTotalUnreadCount()
       .then((count) => {
+        console.log("Unread message count:", count);
         setMessageCount(count);
       })
       .catch((error) => {
@@ -201,7 +205,7 @@ export default function Header(props) {
         showNotification("Failed to fetch unread message count", "error");
       })
 
-  },[])
+  },[refresh])
 
 
   

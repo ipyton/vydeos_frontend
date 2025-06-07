@@ -195,12 +195,15 @@ useEffect(() => {
                 // Update the notifications state to remove the read message
                 DatabaseManipulator.changeCountOfRecentContact(type, userId, 0).then(() => {
                     DatabaseManipulator.deleteUnreadMessage(type, userId).then(() => {
-                        dispatcher(update())
                         const updatedList = notifications.filter(notification => {
-                            return !(notification.userId === userId && notification.type === type);
+                            console.log("Filtering notification:", notification, "with userId:", userId, "and type:", type);
+                            return !(notification.senderId === userId && notification.type === type);
                         });
-
+                        console.log("Updated notifications list:", updatedList);
                         setNotifications(updatedList);
+                        dispatcher(update())
+
+
                     })
                 })
 
@@ -220,12 +223,8 @@ useEffect(() => {
                 const messages = JSON.parse(res.data.message)
                 DatabaseManipulator.insertUnreadMessages(messages).then(() => {
                     DatabaseManipulator.addRecentContacts(messages).then(() => {
-                        DatabaseManipulator.getUnreadMessages().then((messages) => {
-                            setNotifications(messages)
-                        }).catch((err) => {
-                            console.error("Failed to fetch unread messages from database", err)
-                            showNotification("Failed to fetch unread messages from database", "error")
-                        })
+                        setNotifications(messages)
+                        dispatcher(update())
                     })
                 })
             })
@@ -234,10 +233,6 @@ useEffect(() => {
            }
 
         })
-        
-
-
-
     },[])
 
 

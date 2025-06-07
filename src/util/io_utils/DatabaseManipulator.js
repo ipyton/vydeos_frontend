@@ -8,7 +8,7 @@ import Dexie from 'dexie';
             settings: 'key, value',
             contacts: 'id++,[type+userId], userId, type, timestamp',
             messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
-            unreadMessages: '[type+senderId],[type+groupId], userId, senderId, sessionMessageId, messageId'
+            unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
         });
 
         // Add hooks for auto-updating timestamps
@@ -200,7 +200,7 @@ export default class DatabaseManipulator {
     }
 
 
-    // Message history management
+    //Message history management
     // static async batchAddContactHistory(messages) {
     //     try {
     //         let timestamp = -1;
@@ -222,47 +222,31 @@ export default class DatabaseManipulator {
     //     }
     // }
 
-    // static async addContactHistory(message) {
-    //     try {
-    //         console.log(message);
+    static async addContactHistory(message) {
+        try {
+            console.log(message);
             
-    //         if ((!message.receiverId && !message.groupId) || !message.type) {
-    //             return;
-    //         }
+            if ((!message.receiverId && !message.groupId) || !message.type) {
+                return;
+            }
 
-    //         const receiverId = message.groupId ? message.groupId : message.receiverId;
+            const receiverId = message.groupId ? message.groupId : message.receiverId;
             
-    //         const messageData = {
-    //             ...message,
-    //             messageId: message.id || message.messageId,
-    //             timestamp: message.time ? new Date(message.time).getTime() : Date.now()
-    //         };
+            const messageData = {
+                ...message,
+                messageId: message.id || message.messageId,
+                timestamp: message.time ? new Date(message.time).getTime() : Date.now()
+            };
 
-    //         // Use put() to handle duplicates automatically based on messageId
-    //         await db.messages.put(messageData);
+            // Use put() to handle duplicates automatically based on messageId
+            await db.messages.put(messageData);
 
-    //         // Update contact info
-    //         const recentContact = await this.getRecentContactByTypeAndId(message.type, receiverId);
-    //         if (recentContact && message.time) {
-    //             const timestamp = new Date(message.time).getTime();
-    //             const updatedTimestamp = Math.max(timestamp, recentContact.timestamp || 0);
-                
-    //             await db.contacts.put({
-    //                 ...recentContact,
-    //                 timestamp: updatedTimestamp
-    //             });
-    //         }
-
-    //         // Update remain count and move contact to first
-    //         await this.addRemain(message.type, receiverId, 1);
-    //         await this.contactComeFirst(message.type, receiverId);
-
-    //         return true;
-    //     } catch (error) {
-    //         console.error('Error adding contact history:', error);
-    //         return false;
-    //     }
-    // }
+            return true;
+        } catch (error) {
+            console.error('Error adding contact history:', error);
+            return false;
+        }
+    }
 
     static async getContactHistory(type, receiverId, limit = 15, offset = 0) {
         try {
@@ -416,7 +400,8 @@ export default class DatabaseManipulator {
         try {
             const unreadMessages = await db.unreadMessages
                 .toArray();
-            
+                console.log(unreadMessages);
+                console.log("unreadMessages", unreadMessages);
             return unreadMessages.reduce((total, unread) => total + (unread.count || 0), 0);
         } catch (error) {
             console.error('Error getting total unread count:', error);
@@ -473,26 +458,26 @@ export default class DatabaseManipulator {
     }
     static changeCountOfRecentContact(type, id, count) {
         return db.contacts
-            .where('[userId+type]')
-            .equals([id, type])
+            .where('[type+userId]')
+            .equals([type, id])
             .modify(contact => {
                 contact.count = count;
             });
     }
     
-    static async deleteUnreadMessage(type, senderId) {
-        try {
-            const index = type === 'single' ? '[type+senderId]' : '[type+groupId]';
-
-            const deletedCount = await db.unreadMessages
-                .where(index)
-                .equals([type, senderId])
-                .delete(); // 直接批量删除所有匹配的
-
-            return deletedCount > 0;
-        } catch (error) {
-            console.error('Error deleting unread message:', error);
-            return false;
-        }
+static async deleteUnreadMessage(type, senderId) {
+    try {
+        console.log(`Deleting unread message for type: ${type}, senderId: ${senderId}`);
+        const deletedCount = await db.unreadMessages
+            .where('[type+senderId]')
+            .equals([type, senderId])
+            .delete();
+            
+        console.log(`Deleted ${deletedCount} messages`);
+        return deletedCount > 0;
+    } catch (error) {
+        console.error('Error deleting unread message:', error);
+        return false;
     }
+}
 }
