@@ -1,230 +1,482 @@
+import Dexie from 'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.mjs'; // 注意这只能用于 type="module" worker
+// Database schema definition
+class ChatDatabase extends Dexie {
+    constructor() {
+        super('ChatDatabase');
+        this.version(1).stores({
+            settings: 'key, value',
+            contacts: 'id++,[type+userId], userId, type, timestamp',
+            messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
+            unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
+        });
 
-importScripts("./localforage.min.js") 
-class DatabaseManipulator {
+        // Add hooks for auto-updating timestamps
+        this.messages.hook('creating', (primKey, obj, trans) => {
+            if (obj.time) {
+                obj.timestamp = new Date(obj.time).getTime();
+            }
+        });
 
+        // this.mailbox.hook('creating', (primKey, obj, trans) => {
+        //     if (obj.time) {
+        //         obj.timestamp = new Date(obj.time).getTime();
+        //     }
+        // });
+
+        this.unreadMessages.hook('creating', (primKey, obj, trans) => {
+            if (obj.sendTime) {
+                obj.timestamp = new Date(obj.sendTime).getTime();
+            }
+        });
+    }
+}
+
+const db = new ChatDatabase();
+
+export default class DatabaseManipulator {
+    
+    // Settings management
     static async updateTimestamp(timestamp) {
         if (!timestamp || timestamp === -1) {
             return;
         }
-        return localforage.setItem("timestamp", timestamp);
+        return db.settings.put({ key: 'timestamp', value: timestamp });
+    }
+
+    static async clearUnreadMessages() {
+        try {
+            await db.unreadMessages.clear();
+            console.log("All unread messages cleared.");
+        } catch (error) {
+            console.error("Failed to clear unread messages:", error);
+        }
     }
 
     static async getTimestamp() {
-        return localforage.getItem("timestamp");
+        const result = await db.settings.get('timestamp');
+        return result ? result.value : null;
     }
 
-    static async addRecentContact(contact) {
-        let res = await localforage.getItem("recent_contacts");
-        if (!res) res = [];
-        for (let i = 0; i < res.length; i++) {
-            let ele = res[i];
-            if (!ele || !ele.userId) {
-                return;
-            }
-            if (ele.userId === contact.userId && ele.type === contact.type) {
-                // already in the friends list. then put it in the first order.
-                res = [res[i], ...res.slice(0, i), ...res.slice(i + 1)];
-                localforage.setItem("recent_contacts", res);
-                return res;
-            }
-
+    // Contact management
+    static async addRecentContacts(messages) {
+        if (!messages || messages.length === 0) {
+            return [];
         }
-        // do not exist: add it to the first place.
-        // and add user empty chat records
-        if (contact.type === "group") {
-            res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "group", "remain":0}, ...res];
-            localforage.setItem("group_" + contact.userId, []);
-        } else if (contact.type === "single") {
-            res = [{ "userId": contact.userId, "name": contact.name, "avatar": contact.avatar, new: false, "type": "single", "remain":0}, ...res];
-            localforage.setItem("single_" + contact.userId, []);
-        } else {
+
+        try {
+            //console.log(messages[0].senderId, messages[0].type);
+            const contactList = messages.map(message => ({
+                userId: message.senderId || message.userId,
+                name: message.name||"",
+                avatar: message.avatar||"",
+                type: message.type,
+                timestamp: message.sendTime|| Date.now(),
+                content: message.content||"",
+                count: message.count || 0
+            }));
+
+            await db.contacts.bulkPut(contactList); // 批量 upsert
+        } catch (error) {
+            console.error('Error adding recent contacts:', error);
             return null;
         }
-        // do not exist: add it to the first place.
-        // and add user empty chat records
-        localforage.setItem("recent_contacts", res);
-        return res;
     }
+
+    static async deleteRecentContact(type, id) {
+        try {
+            await db.contacts
+                .where('[type+userId]')
+                .equals([type, id])
+                .delete(); // 直接批量删除所有匹配项
+        } catch (error) {
+            console.error('Error deleting recent contact:', error);
+        }
+    }
+
 
     static async contactComeFirst(type, id) {
-        let res = await localforage.getItem("recent_contacts");
-        if (!res) res = [];
-        for (let i = 0; i < res.length; i++) {
-            let ele = res[i];
-            if (!ele || !ele.userId) {
+        try {
+            const contact = await db.contacts
+                .where('[userId+type]')
+                .equals([id, type])
+                .first();
+            
+            if (contact) {
+                await db.contacts.put({
+                    ...contact,
+                    timestamp: Date.now()
+                });
+            }
+            
+            return this.getRecentContacts();
+        } catch (error) {
+            console.error('Error moving contact to first:', error);
+            return [];
+        }
+    }
+
+    // static async addRemain(type, id, count) {
+    //     try {
+    //         const contact = await db.contacts
+    //             .where('[userId+type]')
+    //             .equals([id, type])
+    //             .first();
+            
+    //         if (contact) {
+    //             await db.contacts.put({
+    //                 ...contact,
+    //                 remain: (contact.remain || 0) + count
+    //             });
+    //         }
+            
+    //         return this.getRecentContacts();
+    //     } catch (error) {
+    //         console.error('Error adding remain count:', error);
+    //         return [];
+    //     }
+    // }
+
+    static async setRemain(type, id, count) {
+        try {
+            const contact = await db.contacts
+                .where('[userId+type]')
+                .equals([id, type])
+                .first();
+            
+            if (contact) {
+                await db.contacts.put({
+                    ...contact,
+                    remain: count
+                });
+            }
+            
+            return this.getRecentContacts();
+        } catch (error) {
+            console.error('Error setting remain count:', error);
+            return [];
+        }
+    }
+
+    static async getRemain(type, id) {
+        try {
+            const contact = await db.contacts
+                .where('[userId+type]')
+                .equals([id, type])
+                .first();
+            
+            return contact ? contact.remain : -1;
+        } catch (error) {
+            console.error('Error getting remain count:', error);
+            return -1;
+        }
+    }
+
+
+    static async getRecentContactByTypeAndId(type, id) {
+        try {
+            return db.contacts
+                .where('[userId+type]')
+                .equals([id, type])
+                .first();
+        } catch (error) {
+            console.error('Error getting recent contact:', error);
+            return null;
+        }
+    }
+
+    static async getRecentContacts(limit = 50, offset = 0) {
+        try {
+            return db.contacts
+                .orderBy('timestamp')
+                .reverse()
+                .offset(offset)
+                .limit(limit)
+                .toArray();
+        } catch (error) {
+            console.error('Error getting recent contacts:', error);
+            return [];
+        }
+    }
+
+
+    //Message history management
+    static async batchAddContactHistory(messages) {
+        try {
+            let timestamp = -1;
+            console.log(messages);
+            
+            await db.transaction('rw', db.messages, db.contacts, async () => {
+                for (const message of messages) {
+                    console.log(message);
+                    timestamp = Math.max(new Date(message.time).getTime(), timestamp);
+                    await this.addContactHistory(message);
+                }
+            });
+            
+            await this.updateTimestamp(timestamp);
+            return true;
+        } catch (error) {
+            console.error('Error batch adding contact history:', error);
+            return false;
+        }
+    }
+
+    static async addContactHistory(message) {
+        try {
+            console.log(message);
+            
+            if ((!message.receiverId && !message.groupId) || !message.type) {
                 return;
             }
-            if (ele.userId === id && ele.type === type) {
-                // already in the friends list. then put it in the first order.
-                res = [res[i], ...res.slice(0, i), ...res.slice(i + 1)];
-                localforage.setItem("recent_contacts", res);
-                return res;
-            }
+
+            const receiverId = message.groupId ? message.groupId : message.receiverId;
+            
+            const messageData = {
+                ...message,
+                messageId: message.id || message.messageId,
+                timestamp: message.time ? new Date(message.time).getTime() : Date.now()
+            };
+
+            // Use put() to handle duplicates automatically based on messageId
+            await db.messages.put(messageData);
+
+            return true;
+        } catch (error) {
+            console.error('Error adding contact history:', error);
+            return false;
         }
-        localforage.setItem("recent_contacts", res);
-        return res;
     }
 
-    static addRemain(type, id, count) {
-        return localforage.getItem("recent_contacts").then(res => {
-            for (let i = 0; i < res.length; i++) {
-                if (res[i].userId === id && res[i].type === type) {
-                    res[i].remain += count
-                }
+    static async getContactHistory(type, receiverId, limit = 15, offset = 0) {
+        try {
+            console.log(`Getting contact history for type: ${type}, receiverId: ${receiverId}, limit: ${limit}, offset: ${offset}`);
+            let messages;
+
+            if (type === 'group') {
+                messages = await db.messages
+                    .orderBy('messageId')
+                    .filter(message => message.type === type && message.groupId === receiverId)
+                    .offset(offset)
+                    .limit(limit)
+                    .toArray();
+            } else {
+                messages = await db.messages
+                    .orderBy('messageId')
+                    .filter(message => message.type === type && message.receiverId === receiverId)
+                    .offset(offset)
+                    .limit(limit)
+                    .toArray();
             }
-            localforage.setItem("recent_contacts", res)
-            return res
-        })
-    }
 
-    static setRemain(type, id, count) {
-        return localforage.getItem("recent_contacts").then(res => {
-            for (let i = 0; i < res.length; i++) {
-                if (res[i].userId === id && res[i].type === type) {
-                    res[i].remain = count
-                }
-            }
-            localforage.setItem("recent_contacts", res)
-            return res
-        })
-    }
-    static getRemain(type, id){
-        return localforage.getItem("recent_contacts").then(res => {
-            for (let i = 0; i < res.length; i++) {
-                if (res[i].userId === id && res[i].type === type) {
-                    return res[i].remain
-                }
-            }
-            return -1
-        })
-    }
+            return messages;
 
-    static getTotalRemain() {
-        return localforage.getItem("recent_contacts").then(res => {
-            let total = 0
-            for (let i = 0; i < res.length; i++) {
-                total += res[i].remain
-            }
-            return total
-        })
-    }
-
-    static getRecentContactByTypeAndId(type, id) {
-        return localforage.getItem("recent_contacts").then(res => {
-            for (let i = 0; i < res.length; i++) {
-                if (res[i].userId === id && res[i].type === type) {
-                    return res[i]
-                }
-            }
-            return null
-        })
-    }
-
-    static getRecentContact() {
-        return localforage.getItem("recent_contacts")
-    }
-
-    static async batchAddContactHistory(messages) {
-        let result = null;
-        let timestamp = -1;
-        for (let i = 0; i < messages.length; i++) {
-            timestamp = Math.max(new Date(messages[i].time).getTime(), timestamp);
-            result = this.addContactHistory(messages[i])
-        }
-        this.updateTimestamp(timestamp)
-        return result
-    }
-
-
-    static addContactHistory(message) {
-        if ((!message.receiverId && !message.groupId) || !message.type) {
-            return;    
-        }
-        let receiverId = message.groupId ? message.groupId : message.receiverId
-        return localforage.getItem("userId").then(res=>{
-            if (receiverId === res) {
-                receiverId = message.senderId
-            }
-            return localforage.getItem(message.type + "_" + receiverId).then(res => {
-                console.log("加入" + message.type + "_" + receiverId)
-                if (!res) res = []
-                res = [message, ...res]
-                // console.log(message)
-                // console.log(res)
-                const timestamp = new Date(message.time).getTime();
-                this.updateTimestamp(timestamp)
-
-                // this.getRecentContactByTypeAndId(message.type, receiverId).then(recent_contact => {
-                //     if (recent_contact && message.time) {
-                //         const timestamp = new Date(message.time).getTime();
-                //         if (timestamp > recent_contact.timestamp) {
-                //             //console.log(timestamp + " +++++++" + recent_contact.timestamp)
-                //             //recent_contact.timestamp = Math.max(timestamp,recent_contact.timestamp)
-                //             this.updateTimestamp(timestamp)
-                //         }
-
-                //     }
-                // })
-                localforage.setItem(message.type + "_" + receiverId, res)
-                this.addRemain(message.type, receiverId,1)
-                this.contactComeFirst(message.type, receiverId)
-                return res
-        })
-        })
-
-    }
-    static setRecentContact(recent_contact) {
-        return localforage.getItem("recent_contacts").then(res => {
-            for (let i = 0; i < res.length; i++) {
-                if (res[i].userId === recent_contact.userId && res[i].type === recent_contact.type) {
-                    res[i].timestamp = recent_contact.timestamp
-                    res[i].remain = recent_contact.remain
-                }
-            }
-            localforage.setItem("recent_contacts", res)
-            return res
-        })
-    }
-    static getContactHistory(type, receiverId) {
-        return localforage.getItem(type + "_" + receiverId).then(res => {
-            return res||[]
-        })
-    }
-
-    static addMailbox(message) {
-        if (!message.receiverId || !message.type) {
-            return;    
-        }
-        const receiverId = message.type === "group" ? message.groupId : message.receiverId
-
-        return localforage.getItem("mailbox" + "_" + message.type + "_" + receiverId).then(res => {
-            res = [message, ...res]
-            localforage.setItem("mailbox" + message.type + "_" + receiverId, res)
-            return res
-        })
-    }
-
-    static getMailbox(type, receiverId) {
-        return localforage.getItem("mailbox" + "_" + type + "_" + receiverId).then(res => {
-            return res
-        })
-    }
-
-    static deleteMailbox(messageId, type, receiverId) {
-        const mailboxKey = `mailbox_${type}_${receiverId}`;
-        return localforage.getItem(mailboxKey).then(res => {
-            if (res) {
-                // 过滤掉与 messageId 匹配的消息
-                const updatedMailbox = res.filter(message => message.id !== messageId);
-                // 更新存储
-                return localforage.setItem(mailboxKey, updatedMailbox).then(() => updatedMailbox);
-            }
+        } catch (error) {
+            console.error('Error getting contact history:', error);
             return [];
-        });
+        }
     }
 
-    static addMessage(message) {
-        this.addContactHistory(message)
-        this.addMailbox(message)
+    static async getContactHistoryCount(type, receiverId) {
+        try {
+            if (type === 'group') {
+                return db.messages
+                    .where('[type+groupId]')
+                    .equals([type, receiverId])
+                    .count();
+            } else {
+                return db.messages
+                    .where('[type+receiverId]')
+                    .equals([type, receiverId])
+                    .count();
+            }
+        } catch (error) {
+            console.error('Error getting contact history count:', error);
+            return 0;
+        }
     }
+
+
+
+
+    // static async addMessage(message) {
+    //     try {
+    //         await this.addContactHistory(message);
+    //         //await this.addMailbox(message);
+    //         return true;
+    //     } catch (error) {
+    //         console.error('Error adding message:', error);
+    //         return false;
+    //     }
+    // }
+
+
+
+    static async insertUnreadMessages(unreadMessages) {
+        try {
+            const dataToInsert = unreadMessages.map((unreadMessage) => ({
+                userId: unreadMessage.userId,
+                senderId: unreadMessage.senderId,
+                sessionMessageId: unreadMessage.sessionMessageId,
+                type: unreadMessage.type,
+                messageType: unreadMessage.messageType,
+                content: unreadMessage.content,
+                messageId: unreadMessage.messageId,
+                count: unreadMessage.count || 1,
+                sendTime: unreadMessage.sendTime
+                    ? new Date(unreadMessage.sendTime).getTime()
+                    : Date.now()
+            }));
+            await db.unreadMessages.bulkPut(dataToInsert);
+            return true;
+        } catch (error) {
+            console.error('Error adding unread messages:', error);
+            return false;
+        }
+    }
+    
+    static async countAllUnreadMessages() {
+        let total = 0;
+        try {
+            await db.unreadMessages.each(msg => {
+                total += (msg.count || 0);
+            });
+            return total;
+        } catch (error) {
+            console.error("Failed to calculate total unread count:", error);
+            return 0;
+        }
+    }
+
+    static async getUnreadMessages(limit = 5, offset = 0) {
+        try {
+            return db.unreadMessages
+                .orderBy('messageId')
+                .reverse()
+                .offset(offset)
+                .limit(limit)
+                .toArray();
+        } catch (error) {
+            console.error('Error getting unread messages:', error);
+            return [];
+        }
+    }
+
+    static async getUnreadMessagesBySender(userId, type, senderId) {
+        try {
+            return db.unreadMessages
+                .where('[userId+type+senderId]')
+                .equals([userId, type, senderId])
+                .first();
+        } catch (error) {
+            console.error('Error getting unread messages by sender:', error);
+            return null;
+        }
+    }
+
+    static async updateUnreadMessageCount(userId, type, senderId, count) {
+        try {
+            const unreadMessage = await db.unreadMessages
+                .where('[userId+type+senderId]')
+                .equals([userId, type, senderId])
+                .first();
+
+            if (unreadMessage) {
+                await db.unreadMessages.put({
+                    ...unreadMessage,
+                    count: count
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error updating unread message count:', error);
+            return false;
+        }
+    }
+
+
+    static async getTotalUnreadCount() {
+        try {
+            const unreadMessages = await db.unreadMessages
+                .toArray();
+                console.log(unreadMessages);
+                console.log("unreadMessages", unreadMessages);
+            return unreadMessages.reduce((total, unread) => total + (unread.count || 0), 0);
+        } catch (error) {
+            console.error('Error getting total unread count:', error);
+            return 0;
+        }
+    }
+
+    static async getUnreadCountByType(type, userId) {
+        try {
+            const unreadMessages = await db.unreadMessages
+                .where('userId')
+                .equals(userId)
+                .filter(unread => unread.type === type)
+                .toArray();
+            
+            return unreadMessages.reduce((total, unread) => total + (unread.count || 0), 0);
+        } catch (error) {
+            console.error('Error getting unread count by type:', error);
+            return 0;
+        }
+    }
+
+    // Utility methods for paging
+    static async searchMessages(searchTerm, limit = 50, offset = 0) {
+        try {
+            return db.messages
+                .filter(msg => 
+                    msg.content && msg.content.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .offset(offset)
+                .limit(limit)
+                .toArray();
+        } catch (error) {
+            console.error('Error searching messages:', error);
+            return [];
+        }
+    }
+
+    static async getMessagesByDateRange(startDate, endDate, limit = 50, offset = 0) {
+        try {
+            const startTimestamp = new Date(startDate).getTime();
+            const endTimestamp = new Date(endDate).getTime();
+
+            return db.messages
+                .where('timestamp')
+                .between(startTimestamp, endTimestamp)
+                .offset(offset)
+                .limit(limit)
+                .toArray();
+        } catch (error) {
+            console.error('Error getting messages by date range:', error);
+            return [];
+        }
+    }
+    static changeCountOfRecentContact(type, id, count) {
+        return db.contacts
+            .where('[type+userId]')
+            .equals([type, id])
+            .modify(contact => {
+                contact.count = count;
+            });
+    }
+    
+static async deleteUnreadMessage(type, senderId) {
+    try {
+        console.log(`Deleting unread message for type: ${type}, senderId: ${senderId}`);
+        const deletedCount = await db.unreadMessages
+            .where('[type+senderId]')
+            .equals([type, senderId])
+            .delete();
+            
+        console.log(`Deleted ${deletedCount} messages`);
+        return deletedCount > 0;
+    } catch (error) {
+        console.error('Error deleting unread message:', error);
+        return false;
+    }
+}
 }

@@ -3,8 +3,7 @@ const FLASK_API_BASE_URL = "https://apis.vydeo.xyz/py"
 const DOWNLOAD_BASE_URL = "https://localhost:5000"
 const WebSocket_URL = "wss://apis.vydeo.xyz/ws"
 
-importScripts("/webworkers/DatabaseManipulator.js");
-importScripts('https://cdn.jsdelivr.net/npm/qs/dist/qs.min.js');
+import DatabaseManipulator from "./DatabaseManipulator.js";
 
 let socket;
 let token;

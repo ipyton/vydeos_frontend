@@ -99,7 +99,7 @@ export default function Contents(props) {
     // }, [])
 const dispatcher = useDispatch()
 useEffect(() => {
-    const worker = new Worker("/webworkers/NotificationReceiver.js");
+    const worker = new Worker("/webworkers/NotificationReceiver.js",{ type: 'module' });
 
     // 1. 一启动就设置 token（发送给 Worker）
     const token = localStorage.getItem("token");
