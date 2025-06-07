@@ -8,20 +8,15 @@ import { useState } from 'react';
 import { useThemeMode } from '../../../Themes/ThemeContext';
 
 export default function MessageBox(props) {
-  let {refresh, notificationsAnchorEl, menuId, notificationsOpen, setNotificationsAnchorEl} = props
+  let {refresh, notificationsAnchorEl, menuId, notificationsOpen, setNotificationsAnchorEl,notifications,setNotifications} = props
   let [message, setMessage] = useState([])
   const { mode } = useThemeMode();
   const handleNotificationClose = () => {
     setNotificationsAnchorEl(null)
   }
-  React.useEffect(()=> {
-    let listToShow = []
-  localforage.getItem("mailBox", (unreadList)=> {
-    setMessage(unreadList)
-  }).catch(err=> {
-    console.log("messages set error")
-  })
-  },[refresh])
+
+  console.log(notifications)
+
 
   let onclick = (idx) => {
     localforage.setItem(message[idx].userId + "_lastRead")

@@ -166,15 +166,6 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async getTotalRemain() {
-        try {
-            const contacts = await db.contacts.toArray();
-            return contacts.reduce((total, contact) => total + (contact.remain || 0), 0);
-        } catch (error) {
-            console.error('Error getting total remain:', error);
-            return 0;
-        }
-    }
 
     static async getRecentContactByTypeAndId(type, id) {
         try {
@@ -457,11 +448,9 @@ export default class DatabaseManipulator {
     }
 
 
-    static async getTotalUnreadCount(userId) {
+    static async getTotalUnreadCount() {
         try {
             const unreadMessages = await db.unreadMessages
-                .where('userId')
-                .equals(userId)
                 .toArray();
             
             return unreadMessages.reduce((total, unread) => total + (unread.count || 0), 0);

@@ -35,6 +35,8 @@ import MessageBox from './MessageBox';
 // Redux actions
 import { set } from "../redux/Search";
 import { useThemeMode } from '../../Themes/ThemeContext';
+import DatabaseManipulator from '../../util/io_utils/DatabaseManipulator';
+import { useNotification } from '../../Providers/NotificationProvider';
 // Constants
 const DRAWER_WIDTH = 240;
 
@@ -155,7 +157,6 @@ export default function Header(props) {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState(false);
   const [categorySelected, setCategorySelected] = useState([false, false, false, false, false]);
-  const [notificationList, setNotificationList] = useState([]);
   const [changed, setChanged] = useState(false);
   const [messageCount, setMessageCount] = useState(0); 
   const { mode } = useThemeMode();
@@ -165,6 +166,8 @@ export default function Header(props) {
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl);
   const languageMenuOpen = Boolean(languageAnchorEl);
   const notificationsOpen = Boolean(notificationsAnchorEl);
+
+  const { showNotification } = useNotification();
   
   // Hooks
   const dispatch = useDispatch();
@@ -185,7 +188,20 @@ export default function Header(props) {
       window.removeEventListener("click", handleDocumentClick);
     };
   }, [categorySelected]);
+  
 
+  useEffect(() => {
+    DatabaseManipulator.getTotalUnreadCount()
+      .then((count) => {
+        setMessageCount(count);
+      })
+      .catch((error) => {
+        console.error("Error fetching unread message count:", error);
+        setMessageCount(0); // Fallback to 0 on error
+        showNotification("Failed to fetch unread message count", "error");
+      })
+
+  },[])
 
 
   
@@ -351,6 +367,8 @@ export default function Header(props) {
       notificationsAnchorEl={notificationsAnchorEl} 
       setNotificationsAnchorEl={setNotificationsAnchorEl} 
       notificationsOpen={notificationsOpen}
+      notifications={notifications}
+      setNotifications={setNotifications}
     />
   );
   
@@ -405,7 +423,7 @@ export default function Header(props) {
       aria-label="show new notifications"
       sx={{ color: mode === 'dark' ? '#ffffff' : '#000000' }}
     >
-      <StyledBadge badgeContent={17} color="error">
+      <StyledBadge badgeContent={messageCount} color="error">
         <NotificationsIcon />
       </StyledBadge>
     </IconButton>
@@ -536,7 +554,7 @@ export default function Header(props) {
             }
           }}
         >
-          <StyledBadge badgeContent={17} color="error">
+          <StyledBadge badgeContent={messageCount} color="error">
             <NotificationsIcon />
           </StyledBadge>
         </IconButton>

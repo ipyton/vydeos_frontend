@@ -205,7 +205,6 @@ useEffect(() => {
                     })
                 })
             })
-
            } else {
             showNotification("Failed to fetch unread messages", "error")
            }
@@ -223,7 +222,7 @@ useEffect(() => {
     return (
         < ThemeProvider theme={defaultTheme} >
             <Box sx={{ display: 'flex' }}>
-                <Header avatar={avatar} setAvatar={setAvatar} badgeContent={notifications} setLogin={setLogin} setBadgeContent={setNotifications}></Header>
+                <Header avatar={avatar} setAvatar={setAvatar}  setLogin={setLogin}  notifications={notifications} setNotifications={setNotifications}></Header>
                 <Box width="calc(100% - 64px)" justifyContent="center" alignItems="center" marginTop="64px">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <div>
