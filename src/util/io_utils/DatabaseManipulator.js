@@ -8,8 +8,8 @@ import Dexie from 'dexie';
         this.version(1).stores({
             settings: 'key, value',
             contacts: '[userId+type], userId, type, timestamp, remain, *tags',
-            messages: 'messageId, [type+receiverId], [type+groupId], type, time, timestamp, *tags',
-            mailbox: 'messageId, [type+receiverId], [type+groupId], type, time, timestamp, *tags',
+            messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+session_message_id]',
+            //mailbox: 'messageId, [type+receiverId], [type+groupId], type, time, timestamp, *tags',
             unread_messages: '[user_id+type+sender_id], user_id, sender_id, member_id, type, messageType, content, send_time, message_id, count'
         });
 
@@ -20,11 +20,11 @@ import Dexie from 'dexie';
             }
         });
 
-        this.mailbox.hook('creating', (primKey, obj, trans) => {
-            if (obj.time) {
-                obj.timestamp = new Date(obj.time).getTime();
-            }
-        });
+        // this.mailbox.hook('creating', (primKey, obj, trans) => {
+        //     if (obj.time) {
+        //         obj.timestamp = new Date(obj.time).getTime();
+        //     }
+        // });
 
         this.unread_messages.hook('creating', (primKey, obj, trans) => {
             if (obj.send_time) {
@@ -281,7 +281,7 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async getContactHistory(type, receiverId, limit = 50, offset = 0) {
+    static async getContactHistory(type, receiverId, limit = 15, offset = 0) {
         try {
             console.log(`Getting contact history for type: ${type}, receiverId: ${receiverId}, limit: ${limit}, offset: ${offset}`);
             let messages;

@@ -153,7 +153,9 @@ const textFieldStyles = {
           receiverId: select.userId,
           content: text,
           type: select.type,
-          timestamp: response.data.timestamp
+          timestamp: response.data.timestamp,
+          messageId:response.data.messageId,
+          sessionMessageId: response.data.sessionMessageId,
         };
         
         await DatabaseManipulator.addContactHistory(message);

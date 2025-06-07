@@ -5,7 +5,7 @@ import Search from './Search'
 import  refreshReducer  from './refresh'
 import  refreshMessagesReducer  from './refreshMessages'
 import authReducer from './authSlice' // Import the auth slice
-
+import scrollCursorReducer from './scrollCursorSlice' // Import the scroll cursor slice
 
 export default configureStore({
   reducer: {
@@ -14,7 +14,7 @@ export default configureStore({
     search:Search,
     refresh:refreshReducer,
     refreshMessages:refreshMessagesReducer,
-    auth: authReducer, // This is the key part - make sure 'auth' is here
-
+    auth: authReducer, 
+    scrollCursor: scrollCursorReducer
   },
 })

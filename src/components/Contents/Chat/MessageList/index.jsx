@@ -22,6 +22,7 @@ export default function ChatContainer(props) {
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   const { mode, toggleMode } = useThemeMode();
   const { showNotification } = useNotification();
+  const cursor = useSelector(state => state.scrollCursor.cursors[select.type + "_" + select.userId]);
 
   const handleBackClick = () => {
     setSelect(null);
@@ -37,7 +38,8 @@ export default function ChatContainer(props) {
 
     try {
       // Fetch message history
-      const history = await DatabaseManipulator.getContactHistory(select.type, select.userId);
+      
+      const history = await DatabaseManipulator.getContactHistory(select.type, select.userId, 15, cursor);
       setChatRecords(history);
 
       // Mark messages as read

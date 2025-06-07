@@ -43,7 +43,7 @@ import ApproveMovieRequest from "./DownloadRequestManager"
 import DownloadRequestManager from "./DownloadRequestManager"
 import Iridescence from "../../Animations/Iridescence/Iridescence"
 import UpdateLog from "./UpdateLog"
-
+import MessageUtil from "../../util/io_utils/MessageUtil"
 import { useNotification } from '../../Providers/NotificationProvider';
 
 const defaultTheme = createTheme();
@@ -100,7 +100,7 @@ export default function Contents(props) {
         UserInitializer.init()
         register()
     }, [])
-    const dispatcher = useDispatch()
+const dispatcher = useDispatch()
 useEffect(() => {
     const worker = new Worker("/webworkers/NotificationReceiver.js");
 
@@ -189,6 +189,17 @@ useEffect(() => {
         //     //update notificationList
         // }
     }, [sideBarSelector, notifications])
+
+    useState(()=> {
+        MessageUtil.getUnreadMessages().then((res)=> {
+            console.log(res)
+        })
+        
+
+
+
+    },[])
+
 
     console.log(sideBarSelector)
     //state = {articles:[{id:1},{id:2},{id:3},], pagesize:5}
