@@ -45,6 +45,7 @@ import Iridescence from "../../Animations/Iridescence/Iridescence"
 import UpdateLog from "./UpdateLog"
 import MessageUtil from "../../util/io_utils/MessageUtil"
 import { useNotification } from '../../Providers/NotificationProvider';
+import DatabaseManipulator from "../../util/io_utils/DatabaseManipulator"
 
 const defaultTheme = createTheme();
 
@@ -84,22 +85,22 @@ export default function Contents(props) {
 
     // },[location])
 
-    const register = async () => {
-        await localforage.getItem(
-            "recent_contacts"
-        ).then(res => {
-            if (!res) res = []
-            //refractor this, just add hitory user.
-            setUserRecords(res)
-        }
-        ).then(() => {
-        })
-    }
+    // const register = async () => {
+    //     await localforage.getItem(
+    //         "recent_contacts"
+    //     ).then(res => {
+    //         if (!res) res = []
+    //         //refractor this, just add hitory user.
+    //         setUserRecords(res)
+    //     }
+    //     ).then(() => {
+    //     })
+    // }
 
-    useLayoutEffect(() => {
-        UserInitializer.init()
-        register()
-    }, [])
+    // useLayoutEffect(() => {
+    //     UserInitializer.init()
+    //     register()
+    // }, [])
 const dispatcher = useDispatch()
 useEffect(() => {
     const worker = new Worker("/webworkers/NotificationReceiver.js");
@@ -192,7 +193,23 @@ useEffect(() => {
 
     useState(()=> {
         MessageUtil.getUnreadMessages().then((res)=> {
-            console.log(res)
+           if (res && res.data && res.data.code === 0) {
+            console.log(res.data.message)
+            DatabaseManipulator.clearUnreadMessages().then(() => {
+                DatabaseManipulator.insertUnreadMessages(JSON.parse(res.data.message)).then(() => {
+                    DatabaseManipulator.getUnreadMessages().then((messages) => {
+                        setNotifications(messages)
+                    }).catch((err) => {
+                        console.error("Failed to fetch unread messages from database", err)
+                        showNotification("Failed to fetch unread messages from database", "error")
+                    })
+                })
+            })
+
+           } else {
+            showNotification("Failed to fetch unread messages", "error")
+           }
+
         })
         
 

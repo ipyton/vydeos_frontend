@@ -95,7 +95,7 @@ downloadClient.interceptors.response.use(
     if (
       error.response?.status === 401 || 
       error.response?.data?.message === 'token expired' ||
-      error.response?.data?.code === -1
+      error.response?.data?.code === 401
     ) {
       console.log('Token expired, logging out user');
       

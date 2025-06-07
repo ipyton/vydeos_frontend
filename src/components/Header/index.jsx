@@ -157,6 +157,7 @@ export default function Header(props) {
   const [categorySelected, setCategorySelected] = useState([false, false, false, false, false]);
   const [notificationList, setNotificationList] = useState([]);
   const [changed, setChanged] = useState(false);
+  const [messageCount, setMessageCount] = useState(0); 
   const { mode } = useThemeMode();
   // UI state booleans
   const isMenuOpen = Boolean(anchorEl);
@@ -184,6 +185,9 @@ export default function Header(props) {
       window.removeEventListener("click", handleDocumentClick);
     };
   }, [categorySelected]);
+
+
+
   
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);

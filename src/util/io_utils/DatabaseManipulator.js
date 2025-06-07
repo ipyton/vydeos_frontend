@@ -4,13 +4,11 @@ import Dexie from 'dexie';
  class ChatDatabase extends Dexie {
     constructor() {
         super('ChatDatabase');
-        
         this.version(1).stores({
             settings: 'key, value',
             contacts: '[userId+type], userId, type, timestamp, remain, *tags',
-            messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+session_message_id]',
-            //mailbox: 'messageId, [type+receiverId], [type+groupId], type, time, timestamp, *tags',
-            unread_messages: '[user_id+type+sender_id], user_id, sender_id, member_id, type, messageType, content, send_time, message_id, count'
+            messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
+            unreadMessages: '[userId+type+senderId], userId, senderId, sessionMessageId, messageId'
         });
 
         // Add hooks for auto-updating timestamps
@@ -26,9 +24,9 @@ import Dexie from 'dexie';
         //     }
         // });
 
-        this.unread_messages.hook('creating', (primKey, obj, trans) => {
-            if (obj.send_time) {
-                obj.timestamp = new Date(obj.send_time).getTime();
+        this.unreadMessages.hook('creating', (primKey, obj, trans) => {
+            if (obj.sendTime) {
+                obj.timestamp = new Date(obj.sendTime).getTime();
             }
         });
     }
@@ -44,6 +42,15 @@ export default class DatabaseManipulator {
             return;
         }
         return db.settings.put({ key: 'timestamp', value: timestamp });
+    }
+
+    static async clearUnreadMessages() {
+        try {
+            await db.unreadMessages.clear();
+            console.log("All unread messages cleared.");
+        } catch (error) {
+            console.error("Failed to clear unread messages:", error);
+        }
     }
 
     static async getTimestamp() {
@@ -329,97 +336,36 @@ export default class DatabaseManipulator {
         }
     }
 
-    // Mailbox management
-    static async addMailbox(message) {
-        try {
-            if (!message.receiverId || !message.type) {
-                return;
-            }
 
-            const mailboxData = {
-                ...message,
-                messageId: message.id || message.messageId,
-                timestamp: message.time ? new Date(message.time).getTime() : Date.now()
-            };
 
-            // Use put() to handle duplicates automatically based on messageId
-            await db.mailbox.put(mailboxData);
-            return true;
-        } catch (error) {
-            console.error('Error adding to mailbox:', error);
-            return false;
-        }
-    }
+    //Todo:::
+    // static async getUnreadCount(type, receiverId) {
+    //     try {
+    //         if (type === 'group') {
+    //             return db.unread_messages
+    //                 .where('[type+groupId]')
+    //                 .equals([type, receiverId])
+    //                 .count();
+    //         } else {
+    //             return db.unread_messages
+    //                 .where('[type+receiverId]')
+    //                 .equals([type, receiverId])
+    //                 .count();
+    //         }
+    //     } catch (error) {
+    //         console.error('Error getting mailbox count:', error);
+    //         return 0;
+    //     }
+    // }
 
-    static async getMailbox(type, receiverId, limit = 50, offset = 0) {
-        try {
-            if (type === 'group') {
-                return db.mailbox
-                    .where('[type+groupId]')
-                    .equals([type, receiverId])
-                    .reverse()
-                    .offset(offset)
-                    .limit(limit)
-                    .toArray();
-            } else {
-                return db.mailbox
-                    .where('[type+receiverId]')
-                    .equals([type, receiverId])
-                    .reverse()
-                    .offset(offset)
-                    .limit(limit)
-                    .toArray();
-            }
-        } catch (error) {
-            console.error('Error getting mailbox:', error);
-            return [];
-        }
-    }
+    static async markAsRead(messageId, type, receiverId) {
 
-    static async getMailboxCount(type, receiverId) {
-        try {
-            if (type === 'group') {
-                return db.mailbox
-                    .where('[type+groupId]')
-                    .equals([type, receiverId])
-                    .count();
-            } else {
-                return db.mailbox
-                    .where('[type+receiverId]')
-                    .equals([type, receiverId])
-                    .count();
-            }
-        } catch (error) {
-            console.error('Error getting mailbox count:', error);
-            return 0;
-        }
-    }
-
-    static async deleteMailbox(messageId, type, receiverId) {
-        try {
-            const query = db.mailbox
-                .where('messageId').equals(messageId)
-                .and(msg => msg.type === type);
-            
-            let filteredQuery;
-            if (type === 'group') {
-                filteredQuery = query.and(msg => msg.groupId === receiverId);
-            } else {
-                filteredQuery = query.and(msg => msg.receiverId === receiverId);
-            }
-
-            await filteredQuery.delete();
-            return true;
-        } catch (error) {
-            console.error('Error deleting from mailbox:', error);
-            return false;
-        }
     }
 
     static async addMessage(message) {
         try {
             await this.addContactHistory(message);
-            await this.addMailbox(message);
+            //await this.addMailbox(message);
             return true;
         } catch (error) {
             console.error('Error adding message:', error);
@@ -427,52 +373,46 @@ export default class DatabaseManipulator {
         }
     }
 
-    // Unread messages management
-    static async addUnreadMessage(unreadMessage) {
+    static async insertUnreadMessages(unreadMessages) {
         try {
-            const unreadData = {
-                user_id: unreadMessage.user_id,
-                sender_id: unreadMessage.sender_id,
-                member_id: unreadMessage.member_id,
+            const dataToInsert = unreadMessages.map((unreadMessage) => ({
+                userId: unreadMessage.userId,
+                senderId: unreadMessage.senderId,
+                sessionMessageId: unreadMessage.sessionMessageId,
                 type: unreadMessage.type,
                 messageType: unreadMessage.messageType,
                 content: unreadMessage.content,
-                send_time: unreadMessage.send_time,
-                message_id: unreadMessage.message_id,
+                messageId: unreadMessage.messageId,
                 count: unreadMessage.count || 1,
-                timestamp: unreadMessage.send_time ? new Date(unreadMessage.send_time).getTime() : Date.now()
-            };
-
-            // Check if unread message already exists
-            const existingUnread = await db.unread_messages
-                .where('[user_id+type+sender_id]')
-                .equals([unreadMessage.user_id, unreadMessage.type, unreadMessage.sender_id])
-                .first();
-
-            if (existingUnread) {
-                // Update existing unread message
-                await db.unread_messages.put({
-                    ...unreadData,
-                    count: existingUnread.count + (unreadMessage.count || 1)
-                });
-            } else {
-                // Add new unread message
-                await db.unread_messages.put(unreadData);
-            }
-
+                sendTime: unreadMessage.sendTime
+                    ? new Date(unreadMessage.sendTime).getTime()
+                    : Date.now()
+            }));
+            await db.unreadMessages.bulkPut(dataToInsert);
             return true;
         } catch (error) {
-            console.error('Error adding unread message:', error);
+            console.error('Error adding unread messages:', error);
             return false;
         }
     }
-
-    static async getUnreadMessages(userId, limit = 50, offset = 0) {
+    
+    static async countAllUnreadMessages() {
+        let total = 0;
         try {
-            return db.unread_messages
-                .where('user_id')
-                .equals(userId)
-                .orderBy('timestamp')
+            await db.unreadMessages.each(msg => {
+                total += (msg.count || 0);
+            });
+            return total;
+        } catch (error) {
+            console.error("Failed to calculate total unread count:", error);
+            return 0;
+        }
+    }
+
+    static async getUnreadMessages(limit = 5, offset = 0) {
+        try {
+            return db.unreadMessages
+                .orderBy('messageId')
                 .reverse()
                 .offset(offset)
                 .limit(limit)
@@ -485,8 +425,8 @@ export default class DatabaseManipulator {
 
     static async getUnreadMessagesBySender(userId, type, senderId) {
         try {
-            return db.unread_messages
-                .where('[user_id+type+sender_id]')
+            return db.unreadMessages
+                .where('[userId+type+senderId]')
                 .equals([userId, type, senderId])
                 .first();
         } catch (error) {
@@ -497,13 +437,13 @@ export default class DatabaseManipulator {
 
     static async updateUnreadMessageCount(userId, type, senderId, count) {
         try {
-            const unreadMessage = await db.unread_messages
-                .where('[user_id+type+sender_id]')
+            const unreadMessage = await db.unreadMessages
+                .where('[userId+type+senderId]')
                 .equals([userId, type, senderId])
                 .first();
 
             if (unreadMessage) {
-                await db.unread_messages.put({
+                await db.unreadMessages.put({
                     ...unreadMessage,
                     count: count
                 });
@@ -516,23 +456,11 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async clearUnreadMessages(userId, type, senderId) {
-        try {
-            await db.unread_messages
-                .where('[user_id+type+sender_id]')
-                .equals([userId, type, senderId])
-                .delete();
-            return true;
-        } catch (error) {
-            console.error('Error clearing unread messages:', error);
-            return false;
-        }
-    }
 
     static async getTotalUnreadCount(userId) {
         try {
-            const unreadMessages = await db.unread_messages
-                .where('user_id')
+            const unreadMessages = await db.unreadMessages
+                .where('userId')
                 .equals(userId)
                 .toArray();
             
@@ -545,8 +473,8 @@ export default class DatabaseManipulator {
 
     static async getUnreadCountByType(userId, type) {
         try {
-            const unreadMessages = await db.unread_messages
-                .where('user_id')
+            const unreadMessages = await db.unreadMessages
+                .where('userId')
                 .equals(userId)
                 .filter(unread => unread.type === type)
                 .toArray();
@@ -592,41 +520,41 @@ export default class DatabaseManipulator {
     }
 
     // Database maintenance
-    static async clearOldMessages(daysToKeep = 30) {
-        try {
-            const cutoffDate = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
+    // static async clearOldMessages(daysToKeep = 30) {
+    //     try {
+    //         const cutoffDate = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
             
-            await db.transaction('rw', db.messages, db.mailbox, db.unread_messages, async () => {
-                await db.messages.where('timestamp').below(cutoffDate).delete();
-                await db.mailbox.where('timestamp').below(cutoffDate).delete();
-                await db.unread_messages.where('timestamp').below(cutoffDate).delete();
-            });
+    //         await db.transaction('rw', db.messages, db.unread_messages, async () => {
+    //             await db.messages.where('timestamp').below(cutoffDate).delete();
+    //             //await db.mailbox.where('timestamp').below(cutoffDate).delete();
+    //             await db.unread_messages.where('timestamp').below(cutoffDate).delete();
+    //         });
             
-            return true;
-        } catch (error) {
-            console.error('Error clearing old messages:', error);
-            return false;
-        }
-    }
+    //         return true;
+    //     } catch (error) {
+    //         console.error('Error clearing old messages:', error);
+    //         return false;
+    //     }
+    // }
 
-    static async getDatabaseStats() {
-        try {
-            const [contactCount, messageCount, mailboxCount, unreadCount] = await Promise.all([
-                db.contacts.count(),
-                db.messages.count(),
-                db.mailbox.count(),
-                db.unread_messages.count()
-            ]);
+    // static async getDatabaseStats() {
+    //     try {
+    //         const [contactCount, messageCount, mailboxCount, unreadCount] = await Promise.all([
+    //             db.contacts.count(),
+    //             db.messages.count(),
+    //             db.mailbox.count(),
+    //             db.unread_messages.count()
+    //         ]);
 
-            return {
-                contacts: contactCount,
-                messages: messageCount,
-                mailbox: mailboxCount,
-                unread_messages: unreadCount
-            };
-        } catch (error) {
-            console.error('Error getting database stats:', error);
-            return { contacts: 0, messages: 0, mailbox: 0, unread_messages: 0 };
-        }
-    }
+    //         return {
+    //             contacts: contactCount,
+    //             messages: messageCount,
+    //             mailbox: mailboxCount,
+    //             unread_messages: unreadCount
+    //         };
+    //     } catch (error) {
+    //         console.error('Error getting database stats:', error);
+    //         return { contacts: 0, messages: 0, mailbox: 0, unread_messages: 0 };
+    //     }
+    // }
 }
