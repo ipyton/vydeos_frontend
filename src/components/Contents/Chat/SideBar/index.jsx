@@ -13,7 +13,7 @@ import { useNotification } from '../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
 
 export default function SideBar(props) {
-  let { select, setSelect, isMobile,notifications,setNotifications } = props;
+  let { select, setSelect, isMobile,notifications,setNotifications,markAsRead } = props;
   const [userRecords, setUserRecords] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -59,6 +59,7 @@ export default function SideBar(props) {
   const onClick = (idx) => {
     return () => {
       let mid = filteredContacts[idx];
+      markAsRead(mid.userId,mid.type)
       setSelect({ "userId": mid.userId, "type": mid.type });
     }
   };

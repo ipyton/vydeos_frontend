@@ -15,22 +15,18 @@ import LongVideos from "./LongVideos"
 import UploadFile from "./UploadFile"
 import VideoList from "./VideoList"
 import SearchResult from "./SearchResult"
-import FriendIntro from "./FriendList/FriendIntro"
 import FriendIntroductionCentered from "./Introductions/FriendIntroductionCentered"
 import "../../App.css"
 import Header from "../Header"
 import { useEffect, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import Footer from "../Footer"
 import {update} from "../redux/refreshMessages"
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import UserInitializer from "../../util/io_utils/UserInitializer"
 import LongVideoIntroduction from "./Introductions/LongVideoIntroduction"
-import localforage from "localforage"
-import { useLayoutEffect } from "react"
+
 import Trends from "./Trends"
 import Downloads from "./Downloads"
 import About from "./About"
@@ -39,13 +35,13 @@ import ResetPassword from "./ResetPassword"
 import RolePermissionPage from "./RolePermissionPage"
 import UserManagementPage from "./UserManagementService"
 import { useDispatch } from "react-redux"
-import ApproveMovieRequest from "./DownloadRequestManager"
 import DownloadRequestManager from "./DownloadRequestManager"
-import Iridescence from "../../Animations/Iridescence/Iridescence"
 import UpdateLog from "./UpdateLog"
 import MessageUtil from "../../util/io_utils/MessageUtil"
 import { useNotification } from '../../Providers/NotificationProvider';
 import DatabaseManipulator from "../../util/io_utils/DatabaseManipulator"
+// import {update} from "../redux/refresh"
+
 
 const defaultTheme = createTheme();
 
@@ -191,6 +187,30 @@ useEffect(() => {
         // }
     }, [sideBarSelector, notifications])
 
+    const markAsRead = (userId, type) => {
+        MessageUtil.markAsRead(userId, type).then((res) => {
+            if (res && res.data && res.data.code === 0) {
+                console.log("Marked as read successfully")
+                // Update the notifications state to remove the read message
+                DatabaseManipulator.changeCountOfRecentContact(type, userId, 0).then(() => {
+                    DatabaseManipulator.deleteUnreadMessage(type, userId).then(() => {
+                        dispatcher(update())
+                        const updatedList = notifications.filter(notification => {
+                            return !(notification.userId === userId && notification.type === type);
+                        });
+
+                        setNotifications(updatedList);
+                    })
+                })
+
+            } else {
+                showNotification("Failed to mark as read", "error")
+            }
+        })
+
+
+    }
+
     useState(()=> {
         MessageUtil.getUnreadMessages().then((res)=> {
            if (res && res.data && res.data.code === 0) {
@@ -225,7 +245,7 @@ useEffect(() => {
     return (
         < ThemeProvider theme={defaultTheme} >
             <Box sx={{ display: 'flex' }}>
-                <Header avatar={avatar} setAvatar={setAvatar}  setLogin={setLogin}  notifications={notifications} setNotifications={setNotifications}></Header>
+                <Header avatar={avatar} setAvatar={setAvatar}  setLogin={setLogin}  notifications={notifications} setNotifications={setNotifications} markAsRead ={markAsRead}></Header>
                 <Box width="calc(100% - 64px)" justifyContent="center" alignItems="center" marginTop="64px">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <div>
@@ -237,7 +257,8 @@ useEffect(() => {
                                     <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
                                     <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
                                     <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} 
-                                    sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} notifications={notifications} setNotifications={setNotifications} ></Chat>}></Route>
+                                    sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} notifications={notifications} 
+                                    setNotifications={setNotifications} markAsRead={markAsRead}></Chat>}></Route>
                                     <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                                     <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
                                     <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>

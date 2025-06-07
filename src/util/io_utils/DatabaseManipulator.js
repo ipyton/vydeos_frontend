@@ -8,7 +8,7 @@ import Dexie from 'dexie';
             settings: 'key, value',
             contacts: '[userId+type], userId, type, timestamp',
             messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
-            unreadMessages: '[userId+type+senderId], userId, senderId, sessionMessageId, messageId'
+            unreadMessages: '[type+senderId],[type+groupId], userId, senderId, sessionMessageId, messageId'
         });
 
         // Add hooks for auto-updating timestamps
@@ -430,7 +430,7 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async getUnreadCountByType(userId, type) {
+    static async getUnreadCountByType(type, userId) {
         try {
             const unreadMessages = await db.unreadMessages
                 .where('userId')
@@ -475,6 +475,32 @@ export default class DatabaseManipulator {
         } catch (error) {
             console.error('Error getting messages by date range:', error);
             return [];
+        }
+    }
+    static changeCountOfRecentContact(type, id, count) {
+        return db.contacts
+            .where('[userId+type]')
+            .equals([id, type])
+            .modify(contact => {
+                contact.count = count;
+            });
+    }
+    
+    static async deleteUnreadMessage(type, senderId) {
+        try {
+            const unreadMessage = await db.unreadMessages
+                .where('[type+senderId]')
+                .equals([type, senderId])
+                .first();
+            
+            if (unreadMessage) {
+                await db.unreadMessages.delete(unreadMessage.id);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error deleting unread message:', error);
+            return false;
         }
     }
 
