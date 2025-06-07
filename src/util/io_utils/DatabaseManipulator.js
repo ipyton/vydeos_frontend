@@ -6,7 +6,7 @@ import Dexie from 'dexie';
         super('ChatDatabase');
         this.version(1).stores({
             settings: 'key, value',
-            contacts: '[type+userId], userId, type, timestamp',
+            contacts: 'id++,[type+userId], userId, type, timestamp',
             messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
             unreadMessages: '[type+senderId],[type+groupId], userId, senderId, sessionMessageId, messageId'
         });
@@ -65,13 +65,14 @@ export default class DatabaseManipulator {
         }
 
         try {
+            //console.log(messages[0].senderId, messages[0].type);
             const contactList = messages.map(message => ({
-                userId: message.senderId,
-                name: message.name,
-                avatar: message.avatar,
+                userId: message.senderId || message.userId,
+                name: message.name||"",
+                avatar: message.avatar||"",
                 type: message.type,
-                timestamp: message.sendTime,
-                content: message.content,
+                timestamp: message.sendTime|| Date.now(),
+                content: message.content||"",
                 count: message.count || 0
             }));
 
@@ -115,26 +116,26 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async addRemain(type, id, count) {
-        try {
-            const contact = await db.contacts
-                .where('[userId+type]')
-                .equals([id, type])
-                .first();
+    // static async addRemain(type, id, count) {
+    //     try {
+    //         const contact = await db.contacts
+    //             .where('[userId+type]')
+    //             .equals([id, type])
+    //             .first();
             
-            if (contact) {
-                await db.contacts.put({
-                    ...contact,
-                    remain: (contact.remain || 0) + count
-                });
-            }
+    //         if (contact) {
+    //             await db.contacts.put({
+    //                 ...contact,
+    //                 remain: (contact.remain || 0) + count
+    //             });
+    //         }
             
-            return this.getRecentContacts();
-        } catch (error) {
-            console.error('Error adding remain count:', error);
-            return [];
-        }
-    }
+    //         return this.getRecentContacts();
+    //     } catch (error) {
+    //         console.error('Error adding remain count:', error);
+    //         return [];
+    //     }
+    // }
 
     static async setRemain(type, id, count) {
         try {
@@ -200,68 +201,68 @@ export default class DatabaseManipulator {
 
 
     // Message history management
-    static async batchAddContactHistory(messages) {
-        try {
-            let timestamp = -1;
-            console.log(messages);
+    // static async batchAddContactHistory(messages) {
+    //     try {
+    //         let timestamp = -1;
+    //         console.log(messages);
             
-            await db.transaction('rw', db.messages, db.contacts, async () => {
-                for (const message of messages) {
-                    console.log(message);
-                    timestamp = Math.max(new Date(message.time).getTime(), timestamp);
-                    await this.addContactHistory(message);
-                }
-            });
+    //         await db.transaction('rw', db.messages, db.contacts, async () => {
+    //             for (const message of messages) {
+    //                 console.log(message);
+    //                 timestamp = Math.max(new Date(message.time).getTime(), timestamp);
+    //                 await this.addContactHistory(message);
+    //             }
+    //         });
             
-            await this.updateTimestamp(timestamp);
-            return true;
-        } catch (error) {
-            console.error('Error batch adding contact history:', error);
-            return false;
-        }
-    }
+    //         await this.updateTimestamp(timestamp);
+    //         return true;
+    //     } catch (error) {
+    //         console.error('Error batch adding contact history:', error);
+    //         return false;
+    //     }
+    // }
 
-    static async addContactHistory(message) {
-        try {
-            console.log(message);
+    // static async addContactHistory(message) {
+    //     try {
+    //         console.log(message);
             
-            if ((!message.receiverId && !message.groupId) || !message.type) {
-                return;
-            }
+    //         if ((!message.receiverId && !message.groupId) || !message.type) {
+    //             return;
+    //         }
 
-            const receiverId = message.groupId ? message.groupId : message.receiverId;
+    //         const receiverId = message.groupId ? message.groupId : message.receiverId;
             
-            const messageData = {
-                ...message,
-                messageId: message.id || message.messageId,
-                timestamp: message.time ? new Date(message.time).getTime() : Date.now()
-            };
+    //         const messageData = {
+    //             ...message,
+    //             messageId: message.id || message.messageId,
+    //             timestamp: message.time ? new Date(message.time).getTime() : Date.now()
+    //         };
 
-            // Use put() to handle duplicates automatically based on messageId
-            await db.messages.put(messageData);
+    //         // Use put() to handle duplicates automatically based on messageId
+    //         await db.messages.put(messageData);
 
-            // Update contact info
-            const recentContact = await this.getRecentContactByTypeAndId(message.type, receiverId);
-            if (recentContact && message.time) {
-                const timestamp = new Date(message.time).getTime();
-                const updatedTimestamp = Math.max(timestamp, recentContact.timestamp || 0);
+    //         // Update contact info
+    //         const recentContact = await this.getRecentContactByTypeAndId(message.type, receiverId);
+    //         if (recentContact && message.time) {
+    //             const timestamp = new Date(message.time).getTime();
+    //             const updatedTimestamp = Math.max(timestamp, recentContact.timestamp || 0);
                 
-                await db.contacts.put({
-                    ...recentContact,
-                    timestamp: updatedTimestamp
-                });
-            }
+    //             await db.contacts.put({
+    //                 ...recentContact,
+    //                 timestamp: updatedTimestamp
+    //             });
+    //         }
 
-            // Update remain count and move contact to first
-            await this.addRemain(message.type, receiverId, 1);
-            await this.contactComeFirst(message.type, receiverId);
+    //         // Update remain count and move contact to first
+    //         await this.addRemain(message.type, receiverId, 1);
+    //         await this.contactComeFirst(message.type, receiverId);
 
-            return true;
-        } catch (error) {
-            console.error('Error adding contact history:', error);
-            return false;
-        }
-    }
+    //         return true;
+    //     } catch (error) {
+    //         console.error('Error adding contact history:', error);
+    //         return false;
+    //     }
+    // }
 
     static async getContactHistory(type, receiverId, limit = 15, offset = 0) {
         try {
@@ -314,16 +315,16 @@ export default class DatabaseManipulator {
 
 
 
-    static async addMessage(message) {
-        try {
-            await this.addContactHistory(message);
-            //await this.addMailbox(message);
-            return true;
-        } catch (error) {
-            console.error('Error adding message:', error);
-            return false;
-        }
-    }
+    // static async addMessage(message) {
+    //     try {
+    //         await this.addContactHistory(message);
+    //         //await this.addMailbox(message);
+    //         return true;
+    //     } catch (error) {
+    //         console.error('Error adding message:', error);
+    //         return false;
+    //     }
+    // }
 
 
 

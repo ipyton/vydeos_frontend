@@ -33,6 +33,7 @@ export default function SideBar(props) {
     setLoading(true);
     DatabaseManipulator.getRecentContacts()
       .then((res) => {
+        console.log("Fetched contacts:", res);
         setUserRecords(res || []); // Ensure this is always an array
         setLoading(false);
       })

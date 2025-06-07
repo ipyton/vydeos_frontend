@@ -162,7 +162,8 @@ export default function UserInformation(props) {
         name: details.userName 
       };
 
-      await DatabaseManipulator.addRecentContact(contact);
+
+      await DatabaseManipulator.addRecentContacts([contact]);
       navigate('/chat', { ...contact });
       dispatch(update());
       showNotification(`Started conversation with ${details.userName}`, 'success');
