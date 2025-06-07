@@ -13,7 +13,7 @@ import { useNotification } from '../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
 
 export default function SideBar(props) {
-  let { select, setSelect, isMobile } = props;
+  let { select, setSelect, isMobile,notifications,setNotifications } = props;
   const [userRecords, setUserRecords] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -41,6 +41,8 @@ export default function SideBar(props) {
         setUserRecords([]); // Set to empty array on error
         setLoading(false);
       });
+
+
   }, [refresh]);
 
   const handleSearchChange = (event) => {

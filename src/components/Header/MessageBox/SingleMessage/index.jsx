@@ -7,6 +7,8 @@ import { useState } from "react";
 import ListItemText from '@mui/material/ListItemText';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
+import CheckIcon from '@mui/icons-material/Check';
+
 
 export function SingleMessage(props) {
     const navigate = useNavigate();
@@ -64,10 +66,10 @@ export function SingleMessage(props) {
             </ListItemAvatar>
             
             <ListItemText 
-                primary="Sam Smith"
+                primary = {notification.senderId}
                 secondary={
                     <React.Fragment>
-                        {" — I'll be in your neighborhood doing"}
+                        {notification.content}
                     </React.Fragment>
                 }
                 primaryTypographyProps={{
@@ -103,7 +105,7 @@ export function SingleMessage(props) {
                         transition: 'all 0.2s ease',
                     }}
                 >
-                    <DeleteIcon fontSize="small" />
+                    <CheckIcon fontSize="small" />
                 </IconButton>
             </Box>
         </MenuItem>

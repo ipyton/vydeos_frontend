@@ -13,7 +13,7 @@ export default function Chat(props) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   let height = window.innerHeight * 0.8;
   
-  let { refresh, sideBarSelector, setSideBarSelector } = props;
+  let { refresh, sideBarSelector, setSideBarSelector, notifications,setNotifications } = props;
 
   return (
     <Stack
@@ -53,6 +53,8 @@ export default function Chat(props) {
               setSelect={setSideBarSelector}
               refresh={refresh}
               isMobile={isMobile}
+              setNotifications={setNotifications}
+              notifications={notifications}
             />
           </div>
         </Slide>

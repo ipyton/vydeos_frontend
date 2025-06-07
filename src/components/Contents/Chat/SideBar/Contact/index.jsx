@@ -5,9 +5,11 @@ import GroupIcon from '@mui/icons-material/Group';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
 
 export default function Contact(props) {
-  const { userId, name, avatar, unreadCount, lastMessage, lastMessageTime } = props.content;
+  const { userId, name, avatar, count, timestamp,content } = props.content;
   const { selected, onClick, isMobile } = props;
   const { mode } = useThemeMode();
+  
+  console.log("Contact", props.content);
 
   const isSelected = React.useMemo(() => {
     if (!selected) {
@@ -60,8 +62,7 @@ export default function Contact(props) {
         <ListItemAvatar>
           <Badge
             color="error"
-            badgeContent={unreadCount || 0}
-            invisible={!unreadCount}
+            invisible={!count}
             overlap="circular"
             anchorOrigin={{
               vertical: 'bottom',
@@ -109,7 +110,7 @@ export default function Contact(props) {
             component="span"
             noWrap
             sx={{ 
-              fontWeight: unreadCount ? 700 : 500,
+              fontWeight: count ? 700 : 500,
               color: isSelected 
                 ? (mode === 'dark' ? '#90caf9' : '#1976d2') 
                 : (mode === 'dark' ? '#ffffff' : '#000000'),
@@ -124,20 +125,20 @@ export default function Contact(props) {
             component="span"
             noWrap
             sx={{ 
-              color: unreadCount 
+              color: count 
                 ? (mode === 'dark' ? '#e0e0e0' : '#424242')
                 : (mode === 'dark' ? '#b0b0b0' : '#757575'),
-              fontWeight: unreadCount ? 500 : 400,
+              fontWeight: count ? 500 : 400,
               opacity: 0.85,
               mt: 0.5,
               fontSize: isMobile ? '0.8rem' : '0.875rem'
             }}
           >
-            {lastMessage || "No messages yet"}
+            {content || "No messages yet"}
           </Typography>        
         </Box>
         
-        {lastMessageTime && (
+        {timestamp && (
           <Box sx={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -148,18 +149,18 @@ export default function Contact(props) {
             <Typography
               variant="caption"
               sx={{
-                color: unreadCount 
+                color: count 
                   ? (mode === 'dark' ? '#90caf9' : '#1976d2') 
                   : (mode === 'dark' ? '#b0b0b0' : '#757575'),
-                fontWeight: unreadCount ? 600 : 400,
+                fontWeight: count ? 600 : 400,
                 whiteSpace: 'nowrap',
                 fontSize: isMobile ? '0.7rem' : '0.75rem'
               }}
             >
-              {getTimeString(lastMessageTime)}
+              {getTimeString(timestamp)}
             </Typography>
             
-            {unreadCount > 0 && (
+            {count > 0 && (
               <Box
                 sx={{
                   mt: 0.5,
@@ -176,7 +177,7 @@ export default function Contact(props) {
                   boxShadow: mode === 'dark' ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.2)'
                 }}
               >
-                {unreadCount}
+                {count}
               </Box>
             )}
           </Box>

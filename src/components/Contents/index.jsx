@@ -196,12 +196,15 @@ useEffect(() => {
            if (res && res.data && res.data.code === 0) {
             console.log(res.data.message)
             DatabaseManipulator.clearUnreadMessages().then(() => {
-                DatabaseManipulator.insertUnreadMessages(JSON.parse(res.data.message)).then(() => {
-                    DatabaseManipulator.getUnreadMessages().then((messages) => {
-                        setNotifications(messages)
-                    }).catch((err) => {
-                        console.error("Failed to fetch unread messages from database", err)
-                        showNotification("Failed to fetch unread messages from database", "error")
+                const messages = JSON.parse(res.data.message)
+                DatabaseManipulator.insertUnreadMessages(messages).then(() => {
+                    DatabaseManipulator.addRecentContacts(messages).then(() => {
+                        DatabaseManipulator.getUnreadMessages().then((messages) => {
+                            setNotifications(messages)
+                        }).catch((err) => {
+                            console.error("Failed to fetch unread messages from database", err)
+                            showNotification("Failed to fetch unread messages from database", "error")
+                        })
                     })
                 })
             })
@@ -233,7 +236,8 @@ useEffect(() => {
                                     <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
                                     <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
                                     <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
-                                    <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} ></Chat>}></Route>
+                                    <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} 
+                                    sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} notifications={notifications} setNotifications={setNotifications} ></Chat>}></Route>
                                     <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                                     <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
                                     <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>

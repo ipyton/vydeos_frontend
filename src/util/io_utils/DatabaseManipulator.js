@@ -6,7 +6,7 @@ import Dexie from 'dexie';
         super('ChatDatabase');
         this.version(1).stores({
             settings: 'key, value',
-            contacts: '[userId+type], userId, type, timestamp, remain, *tags',
+            contacts: '[userId+type], userId, type, timestamp',
             messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
             unreadMessages: '[userId+type+senderId], userId, senderId, sessionMessageId, messageId'
         });
@@ -59,33 +59,44 @@ export default class DatabaseManipulator {
     }
 
     // Contact management
-    static async addRecentContact(contact) {
+    static async addRecentContacts(messages) {
+        if (!messages || messages.length === 0) {
+            return [];
+        }
+
         try {
-            // Use put() instead of add() to handle upsert behavior
-            const newContact = {
-                userId: contact.userId,
-                name: contact.name,
-                avatar: contact.avatar,
-                type: contact.type,
-                timestamp: Date.now(),
-                remain: 0
-            };
+            const contactList = messages.map(message => ({
+                userId: message.senderId,
+                name: message.name,
+                avatar: message.avatar,
+                type: message.type,
+                timestamp: message.sendTime,
+                content: message.content,
+                count: message.count || 0
+            }));
 
-            // Check if contact exists to preserve remain count
-            const existingContact = await db.contacts
-                .where('[userId+type]')
-                .equals([contact.userId, contact.type])
-                .first();
-
-            if (existingContact) {
-                newContact.remain = existingContact.remain || 0;
-            }
-
-            await db.contacts.put(newContact);
-            return this.getRecentContacts();
+            await db.contacts.bulkPut(contactList); // 批量 upsert
         } catch (error) {
-            console.error('Error adding recent contact:', error);
+            console.error('Error adding recent contacts:', error);
             return null;
+        }
+    }
+
+    static async deleteRecentContact(type,id) {
+        try {
+            const contact = await db.contacts
+                .where('[userId+type]')
+                .equals([id, type])
+                .first();
+            
+            if (contact) {
+                await db.contacts.delete(contact.id);
+            }
+            
+            //return this.getRecentContacts();
+        } catch (error) {
+            console.error('Error deleting recent contact:', error);
+            //return [];
         }
     }
 
@@ -193,27 +204,6 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async setRecentContact(recentContact) {
-        try {
-            const contact = await db.contacts
-                .where('[userId+type]')
-                .equals([recentContact.userId, recentContact.type])
-                .first();
-            
-            if (contact) {
-                await db.contacts.put({
-                    ...contact,
-                    timestamp: recentContact.timestamp,
-                    remain: recentContact.remain
-                });
-            }
-            
-            return this.getRecentContacts();
-        } catch (error) {
-            console.error('Error setting recent contact:', error);
-            return [];
-        }
-    }
 
     // Message history management
     static async batchAddContactHistory(messages) {
@@ -328,26 +318,6 @@ export default class DatabaseManipulator {
     }
 
 
-
-    //Todo:::
-    // static async getUnreadCount(type, receiverId) {
-    //     try {
-    //         if (type === 'group') {
-    //             return db.unread_messages
-    //                 .where('[type+groupId]')
-    //                 .equals([type, receiverId])
-    //                 .count();
-    //         } else {
-    //             return db.unread_messages
-    //                 .where('[type+receiverId]')
-    //                 .equals([type, receiverId])
-    //                 .count();
-    //         }
-    //     } catch (error) {
-    //         console.error('Error getting mailbox count:', error);
-    //         return 0;
-    //     }
-    // }
 
     static async markAsRead(messageId, type, receiverId) {
 
@@ -508,42 +478,4 @@ export default class DatabaseManipulator {
         }
     }
 
-    // Database maintenance
-    // static async clearOldMessages(daysToKeep = 30) {
-    //     try {
-    //         const cutoffDate = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
-            
-    //         await db.transaction('rw', db.messages, db.unread_messages, async () => {
-    //             await db.messages.where('timestamp').below(cutoffDate).delete();
-    //             //await db.mailbox.where('timestamp').below(cutoffDate).delete();
-    //             await db.unread_messages.where('timestamp').below(cutoffDate).delete();
-    //         });
-            
-    //         return true;
-    //     } catch (error) {
-    //         console.error('Error clearing old messages:', error);
-    //         return false;
-    //     }
-    // }
-
-    // static async getDatabaseStats() {
-    //     try {
-    //         const [contactCount, messageCount, mailboxCount, unreadCount] = await Promise.all([
-    //             db.contacts.count(),
-    //             db.messages.count(),
-    //             db.mailbox.count(),
-    //             db.unread_messages.count()
-    //         ]);
-
-    //         return {
-    //             contacts: contactCount,
-    //             messages: messageCount,
-    //             mailbox: mailboxCount,
-    //             unread_messages: unreadCount
-    //         };
-    //     } catch (error) {
-    //         console.error('Error getting database stats:', error);
-    //         return { contacts: 0, messages: 0, mailbox: 0, unread_messages: 0 };
-    //     }
-    // }
 }
