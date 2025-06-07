@@ -12,7 +12,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 export function SingleMessage(props) {
     const navigate = useNavigate();
-    const { notification,  onDelete } = props;
+    const { notification, marksAsRead } = props;
     console.log(notification)
     const [unreadCount,setUnreadCount] = useState(notification.count)
 
@@ -27,9 +27,7 @@ export function SingleMessage(props) {
 
     const handleDelete = (event) => {
         event.stopPropagation(); // Prevent the menu item click
-        if (onDelete) {
-            onDelete(notification?.id || notification);
-        }
+        marksAsRead(notification.type, notification.senderId)
     }
 
     const { mode } = useThemeMode();

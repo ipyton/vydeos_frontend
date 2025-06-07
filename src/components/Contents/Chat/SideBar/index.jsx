@@ -21,7 +21,7 @@ export default function SideBar(props) {
   const { mode } = useThemeMode();
 
   let location = useLocation();
-  const refresh = useSelector((state) => state.refresh.value.refresh);
+  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   
   useEffect(() => {
     if (location && location.type && location.userId) {
@@ -59,7 +59,7 @@ export default function SideBar(props) {
   const onClick = (idx) => {
     return () => {
       let mid = filteredContacts[idx];
-      markAsRead(mid.userId,mid.type)
+      markAsRead(mid.type,mid.userId)
       setSelect({ "userId": mid.userId, "type": mid.type });
     }
   };
@@ -239,6 +239,7 @@ export default function SideBar(props) {
                 content={content} 
                 selected={select}
                 isMobile={isMobile}
+                markAsRead={markAsRead}
               />
             ))}
           </List>

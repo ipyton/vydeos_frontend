@@ -6,7 +6,7 @@ import Dexie from 'dexie';
         super('ChatDatabase');
         this.version(1).stores({
             settings: 'key, value',
-            contacts: '[userId+type], userId, type, timestamp',
+            contacts: '[type+userId], userId, type, timestamp',
             messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
             unreadMessages: '[type+senderId],[type+groupId], userId, senderId, sessionMessageId, messageId'
         });
@@ -82,23 +82,17 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async deleteRecentContact(type,id) {
+    static async deleteRecentContact(type, id) {
         try {
-            const contact = await db.contacts
-                .where('[userId+type]')
-                .equals([id, type])
-                .first();
-            
-            if (contact) {
-                await db.contacts.delete(contact.id);
-            }
-            
-            //return this.getRecentContacts();
+            await db.contacts
+                .where('[type+userId]')
+                .equals([type, id])
+                .delete(); // 直接批量删除所有匹配项
         } catch (error) {
             console.error('Error deleting recent contact:', error);
-            //return [];
         }
     }
+
 
     static async contactComeFirst(type, id) {
         try {
@@ -319,9 +313,6 @@ export default class DatabaseManipulator {
 
 
 
-    static async markAsRead(messageId, type, receiverId) {
-
-    }
 
     static async addMessage(message) {
         try {
@@ -333,6 +324,8 @@ export default class DatabaseManipulator {
             return false;
         }
     }
+
+
 
     static async insertUnreadMessages(unreadMessages) {
         try {
@@ -488,20 +481,17 @@ export default class DatabaseManipulator {
     
     static async deleteUnreadMessage(type, senderId) {
         try {
-            const unreadMessage = await db.unreadMessages
-                .where('[type+senderId]')
+            const index = type === 'single' ? '[type+senderId]' : '[type+groupId]';
+
+            const deletedCount = await db.unreadMessages
+                .where(index)
                 .equals([type, senderId])
-                .first();
-            
-            if (unreadMessage) {
-                await db.unreadMessages.delete(unreadMessage.id);
-                return true;
-            }
-            return false;
+                .delete(); // 直接批量删除所有匹配的
+
+            return deletedCount > 0;
         } catch (error) {
             console.error('Error deleting unread message:', error);
             return false;
         }
     }
-
 }

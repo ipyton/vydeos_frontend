@@ -34,6 +34,7 @@ export default function Chat(props) {
               select={sideBarSelector}
               setSelect={setSideBarSelector}
               isMobile={isMobile}
+              markAsRead={markAsRead}
             />
           </div>
         </Fade>
@@ -55,7 +56,7 @@ export default function Chat(props) {
               isMobile={isMobile}
               setNotifications={setNotifications}
               notifications={notifications}
-              markAsRead={markAsRead}
+
             />
           </div>
         </Slide>

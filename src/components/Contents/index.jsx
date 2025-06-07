@@ -187,8 +187,9 @@ useEffect(() => {
         // }
     }, [sideBarSelector, notifications])
 
-    const markAsRead = (userId, type) => {
-        MessageUtil.markAsRead(userId, type).then((res) => {
+    const markAsRead = (type,userId) => {
+        MessageUtil.markAsRead(type, userId).then((res) => {
+            console.log(res)
             if (res && res.data && res.data.code === 0) {
                 console.log("Marked as read successfully")
                 // Update the notifications state to remove the read message
