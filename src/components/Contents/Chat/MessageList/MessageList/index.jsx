@@ -4,18 +4,26 @@ import { KeyboardArrowUp } from "@mui/icons-material";
 import { MessageBox } from "react-chat-elements";
 import { useThemeMode } from "../../../../../Themes/ThemeContext";
 import MessageBubble from "./ImprovedMessage";
+import DatabaseManipulator from "../../../../../util/io_utils/DatabaseManipulator";
+import { useSelector } from "react-redux";
+import { Database } from "lucide-react";
+import { useNotification } from "../../../../../Providers/NotificationProvider";
+import MessageMiddleware from "../../../../../util/io_utils/MessageMiddleware";
 
 export default function MessageList({ chatRecords, setChatRecords, select }) {
   const messagesEndRef = useRef(null);
   const messagesStartRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const { mode, toggleMode } = useThemeMode();
-  
+  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
+
   // State for scroll position tracking
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isNearTop, setIsNearTop] = useState(false);
   const [isNearBottom, setIsNearBottom] = useState(true);
-
+  const [lastSessionMessageId, setLastSessionMessageId] = useState(0);
+  const { showNotification } = useNotification();
+  const limit = 15
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -50,14 +58,31 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     }
   }, [chatRecords, isNearBottom]);
 
-  // Load more messages when user scrolls to top
-  useEffect(() => {
-    if (isNearTop && chatRecords.length > 0) {
-      // You can add logic here to load more historical messages
-      console.log("Near top - could load more messages");
-      // Example: loadMoreMessages();
+
+  useEffect(()=>{
+    if (isNearTop) {
+      setLastSessionMessageId(lastSessionMessageId - limit)
     }
-  }, [isNearTop, chatRecords.length]);
+  }, [isNearTop])
+
+  // only once
+  useEffect(()=>{
+          DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId)
+        .then((newestSessionMessageId) => {
+            setLastSessionMessageId(newestSessionMessageId)
+        })
+  },[])
+
+  useEffect(()=>{
+    if (lastSessionMessageId == -1 ) {
+      showNotification("No more messages to load", "info");
+      return 
+    }
+    MessageMiddleware.getContactHistory(select.type, select.userId, limit, lastSessionMessageId).then((res)=>{
+      setChatRecords([...res, ...chatRecords])
+    })
+  }, [lastSessionMessageId])
+
 
   const handleDelete = (message) => {
     console.log("MessageList: handleDelete", message);

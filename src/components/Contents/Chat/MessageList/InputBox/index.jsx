@@ -149,8 +149,9 @@ const textFieldStyles = {
       
       if (response.data.result === true) {
         const message = {
-          userId: userId,
-          receiverId: select.userId,
+          userId1: userId,
+          userId2: select.userId,
+          direction:true,
           content: text,
           type: select.type,
           timestamp: response.data.timestamp,

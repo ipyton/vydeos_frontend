@@ -26,31 +26,31 @@ export default class MessageUtil {
         }
     }
 
-    static getMessageById(type, receiverId) {
-        return DatabaseManipulator.getRecentContactByTypeAndId(type, receiverId).then((res) => {
-            return DatabaseManipulator.getTimestamp().then((timestamp) => {
-                if (!timestamp) {
-                    timestamp = 0;
-                }
+    // static getMessageById(type, receiverId) {
+    //     return DatabaseManipulator.getRecentContactByTypeAndId(type, receiverId).then((res) => {
+    //         return DatabaseManipulator.getTimestamp().then((timestamp) => {
+    //             if (!timestamp) {
+    //                 timestamp = 0;
+    //             }
                 
-                const requestData = Qs.stringify({
-                    type: type,
-                    ...(type === "group" ? { groupId: receiverId } : { receiverId: receiverId }),
-                    timestamp: timestamp
-                });
+    //             const requestData = Qs.stringify({
+    //                 type: type,
+    //                 ...(type === "group" ? { groupId: receiverId } : { receiverId: receiverId }),
+    //                 timestamp: timestamp
+    //             });
 
-                return apiClient.post("/chat/get_messages", requestData, {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                }).catch(error => {
-                    console.log(error);
-                });
-            }).then((response) => {
-                return DatabaseManipulator.batchAddContactHistory(response.data);
-            });
-        });
-    }
+    //             return apiClient.post("/chat/get_messages", requestData, {
+    //                 headers: {
+    //                     'Content-Type': 'application/x-www-form-urlencoded'
+    //                 }
+    //             }).catch(error => {
+    //                 console.log(error);
+    //             });
+    //         }).then((response) => {
+    //             return DatabaseManipulator.batchAddContactHistory(response.data);
+    //         });
+    //     });
+    // }
 
     static setCheckTime(key) {
         localforage.setItem("chatLastUpdate");
@@ -77,7 +77,7 @@ export default class MessageUtil {
         });
     }
     
-    static getNewestMessages(friendId, setSelect) {
+    static getNewestMessages(type,friendId, limit, lastSessionMessageId) {
         let checkKey = "chatLastUpdate";
         localforage.getItem(checkKey).then(async timestamp => {
             if (!timestamp) {
@@ -86,7 +86,9 @@ export default class MessageUtil {
             
             const requestData = Qs.stringify({
                 "userId": friendId, 
-                "timestamp": timestamp
+                "timestamp": timestamp,
+                "limit":limit,
+                "lastSessionMessageId":lastSessionMessageId
             });
 
             apiClient.post("/chat/getNewestMessages", requestData, {

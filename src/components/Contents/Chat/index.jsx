@@ -13,7 +13,7 @@ export default function Chat(props) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   let height = window.innerHeight * 0.8;
   
-  let { refresh, sideBarSelector, setSideBarSelector, notifications,setNotifications, markAsRead } = props;
+  let { sideBarSelector, setSideBarSelector, notifications,setNotifications, markAsRead } = props;
 
   return (
     <Stack
@@ -52,7 +52,6 @@ export default function Chat(props) {
             <MessageList
               select={sideBarSelector}
               setSelect={setSideBarSelector}
-              refresh={refresh}
               isMobile={isMobile}
               setNotifications={setNotifications}
               notifications={notifications}

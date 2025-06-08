@@ -1,136 +1,79 @@
 import localforeage from 'localforage';
 import { Database } from 'lucide-react';
 import MessageUtil from './MessageUtil';
+import DatabaseManipulator from './DatabaseManipulator';
 
 export default class MessageMiddleware {
-  
-    static isOverlapping(networkMessageList, localMessageList) {
-        // 1. networkMessageList 为空 → 返回 true
-        if (!networkMessageList || networkMessageList.length === 0) {
-            return true;
-        }
 
-        // 2. networkMessageList 有内容，但 localMessageList 为空 → 返回 "no"
-        if (!localMessageList || localMessageList.length === 0) {
-            return false;
-        }
+    static async isSessionMessageIdContinuous(startId, messages) {
+        if (!Array.isArray(messages) || messages.length === 0) return true;
 
-        // 3. 构建 localMessageList 的 messageId Set，提高查重效率
-        const localIds = new Set(localMessageList.map(msg => msg.messageId));
-
-        // 4. 检查是否有重合的 messageId
-        for (const netMsg of networkMessageList) {
-            if (localIds.has(netMsg.messageId)) {
-            return true;
+        for (let i = 0; i < messages.length; i++) {
+            const expectedId = startId - i;
+            if (messages[i].sessionMessageId !== expectedId) {
+                console.log(`Not continuous at index ${i}: expected ${expectedId}, got ${messages[i].sessionMessageId}`);
+                return false;
             }
         }
 
-        // 没有重合
-        return false;
+        return true;
     }
 
-    static deletedFilter(messageList) {
-        if (!Array.isArray(messageList)) return [];
+        /**
+     * 补全 sessionMessageId 的缺失消息
+     * @param {number} startId 起始 sessionMessageId（递减方向）
+     * @param {number} limit 总共需要多少条
+     * @param {Array<Object>} from_network 网络获取的数据（包含 sessionMessageId）
+     * @param {Array<Object>} from_local 本地已有的数据（包含 sessionMessageId）
+     * @returns {{
+     *   filled: Array<Object>,      // 最终补足后 limit 条数据
+     *   missingFromLocal: Array<Object> // 补进来的那些 from_network 中的
+     * }}
+     */
 
-        return messageList.filter(msg => msg.delete === false || msg.delete == null);
-    }
 
-  static getMessageListByUserId(type, userId, lastMessageId) {
-    // everytime query local message then compare with network message. no better way.
-    //last messageId is the previous message id.
-    if (!type || !userId) {
-      return [];
-    }
-    if(!lastMessageId) {
-        DatabaseManipulator.getUnreadMessages(userId).then((res) => {
-            if (res == null || res.length === 0) {
-                // 如果没有未读消息，访问本地
-                DatabaseManipulator.getContactHistory(type, userId).then((history) => {
-                    if (history && history.length > 0) {
-                        // 如果有历史记录，返回最新的消息列表
-                        return this.deletedFilter(history);
-                    } else {
-                        // 如果没有历史记录，返回空数组
-                        return [];
-                    }
-                })
+    static async fillMissingMessages(lastMessageSessionId, limit, from_network, from_local) {
+        const localMap = new Map(from_local.map(m => [m.sessionMessageId, m]));
+        const networkMap = new Map(from_network.map(m => [m.sessionMessageId, m]));
+
+        const filled = [];
+        const missingFromLocal = [];
+
+        for (let i = 0; i < limit; i++) {
+            const targetId = lastMessageSessionId - i;
+
+            if (localMap.has(targetId)) {
+                filled.push(localMap.get(targetId));
+            } else if (networkMap.has(targetId)) {
+                const fromNet = networkMap.get(targetId);
+                filled.push(fromNet);
+                missingFromLocal.push(fromNet);
             } else {
-                // 如果有未读消息，外访网络
-                MessageUtil.getContactHistory(type, userId).then((history) => {
-                    if (history && history.length > 0) {
-                        // 如果有历史记录，返回最新的消息列表
-                        return this.deletedFilter(history);
-                    } else {
-                        // 如果没有历史记录，返回空数组
-                        return [];
-                    }
+                // 不存在于任一来源，可选：跳过或填 null
+                break; // 如果你希望“必须连续”，这里可以 return 失败
+            }
+        }
+
+        return {
+            filled,
+            missingFromLocal
+        };
+    }
+
+
+    static async getContactHistory(type, userId, limit = 15, lastSessionMessageId = 0) {
+        return DatabaseManipulator.getContactHistory(type, userId, limit, lastSessionMessageId).then(localRes=>{
+            if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes)) {
+                return localRes;
+            }
+            else {
+                return MessageUtil.getNewestMessages(type,userId, limit, lastSessionMessageId).then(async networkRes=> {
+                    const result = MessageMiddleware.fillMissingMessages(lastSessionMessageId, limit, networkRes, localRes)
+                    DatabaseManipulator.addContactHistories(result.missingFromLocal)
+                    return result.filled
                 })
             }
         })
-    } else {
-        //分页模式
-
-        DatabaseManipulator.getContactHistory(type, userId, lastMessageId).then((history) => {
-            if (history && history.length > 0) {
-                // 如果有历史记录，外访一下对比一下
-                MessageUtil.getContactHistory(type, userId, lastMessageId).then((networkHistory) => {
-                    if (networkHistory && networkHistory.length > 0) {
-                        this.isOverlapping(networkHistory, history).then((overlap) => {
-                            if (overlap) {
-                                // 如果有重合，返回本地消息列表
-                                return this.deletedFilter(history);
-                            } else {
-                                // 如果没有重合，返回网络消息列表
-                                return this.deletedFilter(networkHistory);
-                            }
-                        });
-                    } else {
-                        // 如果没有网络历史记录，返回本地消息列表
-                        return this.deletedFilter(history);
-                    }})
-                return this.deletedFilter(history);
-            } else {
-                // 如果没有历史记录，直接外访
-                MessageUtil.getContactHistory(type, userId, lastMessageId).then((networkHistory) => {
-                    if (networkHistory && networkHistory.length > 0) {
-                        // 如果有网络历史记录，返回最新的消息列表
-                        return this.deletedFilter(networkHistory);
-                    } else {
-                        // 如果没有网络历史记录，返回空数组
-                        return [];
-                    }
-                });
-            }
-        });
     }
 
-    let localMessageList = DatabaseManipulator.getMessageListByUserId(type, userId);
- 
-
-    localforage.getItem("newwork_results").then((useNetwork) => {
-
-    })
-    if (useNetwork) {
-      // 如果使用网络数据，说明上次使用的是本地或者是网络
-      setUseNetwork(false);
-    } else {
-        //如果使用的是本地，上一次也有可能是网络或者本地
-
-
-    }
-
-    // 1. 获取网络消息列表
-    let networkMessageList = MessageUtil.getMessageListByUserId(type, userId);
-
-    // 3. 检查是否有重合的消息
-    if (this.isOverlapping(networkMessageList, localMessageList)) {
-      // 4. 如果有重合，返回本地消息列表
-      return this.deletedFilter(localMessageList);
-    } else {
-      // 5. 如果没有重合，返回网络消息列表
-      return this.deletedFilter(networkMessageList);
-    }
-  }
-
-  // Additional methods for searching messages can be added here
 }

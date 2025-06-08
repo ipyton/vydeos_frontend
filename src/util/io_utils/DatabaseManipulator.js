@@ -7,7 +7,7 @@ import Dexie from 'dexie';
         this.version(1).stores({
             settings: 'key, value',
             contacts: '[type+userId], userId, type, timestamp',
-            messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
+            messages: '&messageId, [userId1+userId2], [type+receiverId], [type+groupId], [type+receiverId+sessionMessageId],[type+groupId+sessionMessageId]',
             unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
         });
 
@@ -110,7 +110,8 @@ static async addRecentContacts(messages) {
                 type: message.type,
                 timestamp: message.sendTime|| Date.now(),
                 content: message.content||"",
-                count: message.count || 0
+                count: message.count || 0,
+                sessionMessageId: message.sessionMessageId || -1,
             }));
 
             await db.contacts.bulkPut(contactList); // 批量 upsert
@@ -118,6 +119,18 @@ static async addRecentContacts(messages) {
             console.error('Error adding recent contacts:', error);
             return null;
         }
+    }
+
+    static async getNewestSessionMessageId(type, userId) {
+
+        try {
+            const contact = await db.contacts.get({ type, userId });
+            return contact ? contact.sessionMessageId || -1 : -1; // 返回 sessionMessageId 或 -1
+        } catch (error) {
+            console.error('Error getting newest session message ID:', error);
+            return -1;
+        }
+
     }
 
     static async deleteRecentContact(type, id) {
@@ -131,83 +144,6 @@ static async addRecentContacts(messages) {
         }
     }
 
-
-    static async contactComeFirst(type, id) {
-        try {
-            const contact = await db.contacts
-                .where('[userId+type]')
-                .equals([id, type])
-                .first();
-            
-            if (contact) {
-                await db.contacts.put({
-                    ...contact,
-                    timestamp: Date.now()
-                });
-            }
-            
-            return this.getRecentContacts();
-        } catch (error) {
-            console.error('Error moving contact to first:', error);
-            return [];
-        }
-    }
-
-    // static async addRemain(type, id, count) {
-    //     try {
-    //         const contact = await db.contacts
-    //             .where('[userId+type]')
-    //             .equals([id, type])
-    //             .first();
-            
-    //         if (contact) {
-    //             await db.contacts.put({
-    //                 ...contact,
-    //                 remain: (contact.remain || 0) + count
-    //             });
-    //         }
-            
-    //         return this.getRecentContacts();
-    //     } catch (error) {
-    //         console.error('Error adding remain count:', error);
-    //         return [];
-    //     }
-    // }
-
-    static async setRemain(type, id, count) {
-        try {
-            const contact = await db.contacts
-                .where('[userId+type]')
-                .equals([id, type])
-                .first();
-            
-            if (contact) {
-                await db.contacts.put({
-                    ...contact,
-                    remain: count
-                });
-            }
-            
-            return this.getRecentContacts();
-        } catch (error) {
-            console.error('Error setting remain count:', error);
-            return [];
-        }
-    }
-
-    static async getRemain(type, id) {
-        try {
-            const contact = await db.contacts
-                .where('[userId+type]')
-                .equals([id, type])
-                .first();
-            
-            return contact ? contact.remain : -1;
-        } catch (error) {
-            console.error('Error getting remain count:', error);
-            return -1;
-        }
-    }
 
 
     static async getRecentContactByTypeAndId(type, id) {
@@ -237,28 +173,6 @@ static async addRecentContacts(messages) {
     }
 
 
-    //Message history management
-    // static async batchAddContactHistory(messages) {
-    //     try {
-    //         let timestamp = -1;
-    //         console.log(messages);
-            
-    //         await db.transaction('rw', db.messages, db.contacts, async () => {
-    //             for (const message of messages) {
-    //                 console.log(message);
-    //                 timestamp = Math.max(new Date(message.time).getTime(), timestamp);
-    //                 await this.addContactHistory(message);
-    //             }
-    //         });
-            
-    //         await this.updateTimestamp(timestamp);
-    //         return true;
-    //     } catch (error) {
-    //         console.error('Error batch adding contact history:', error);
-    //         return false;
-    //     }
-    // }
-
     static async addContactHistory(message) {
         try {
             console.log(message);
@@ -266,8 +180,6 @@ static async addRecentContacts(messages) {
             if ((!message.receiverId && !message.groupId) || !message.type) {
                 return;
             }
-
-            const receiverId = message.groupId ? message.groupId : message.receiverId;
             
             const messageData = {
                 ...message,
@@ -285,34 +197,34 @@ static async addRecentContacts(messages) {
         }
     }
 
-    static async getContactHistory(type, receiverId, limit = 15, offset = 0) {
-        try {
-            console.log(`Getting contact history for type: ${type}, receiverId: ${receiverId}, limit: ${limit}, offset: ${offset}`);
-            let messages;
+static async getContactHistory(type, receiverId, beforeSessionMessageId = Infinity, limit = 10) {
+    try {
+        // console.log(`Getting contact history for type: ${type}, receiverId: ${receiverId}, beforeSessionMessageId: ${beforeSessionMessageId}, limit: ${limit}`);
+        let messages;
 
-            if (type === 'group') {
-                messages = await db.messages
-                    .orderBy('messageId')
-                    .filter(message => message.type === type && message.groupId === receiverId)
-                    .offset(offset)
-                    .limit(limit)
-                    .toArray();
-            } else {
-                messages = await db.messages
-                    .orderBy('sessionMessageId')
-                    .filter(message => message.type === type && message.receiverId === receiverId)
-                    .offset(offset)
-                    .limit(limit)
-                    .toArray();
-            }
-
-            return messages;
-
-        } catch (error) {
-            console.error('Error getting contact history:', error);
-            return [];
+        if (type === 'group') {
+            messages = await db.messages
+                .where('[type+groupId+sessionMessageId]')
+                .below([type, receiverId, beforeSessionMessageId])
+                .reverse() // 最近的在前
+                .limit(limit)
+                .toArray();
+        } else {
+            messages = await db.messages
+                .where('[type+receiverId+sessionMessageId]')
+                .below([type, receiverId, beforeSessionMessageId])
+                .reverse()
+                .limit(limit)
+                .toArray();
         }
+
+        return messages;
+
+    } catch (error) {
+        console.error('Error getting contact history:', error);
+        return [];
     }
+}
 
     static async getContactHistoryCount(type, receiverId) {
         try {
@@ -333,19 +245,6 @@ static async addRecentContacts(messages) {
         }
     }
 
-
-
-
-    // static async addMessage(message) {
-    //     try {
-    //         await this.addContactHistory(message);
-    //         //await this.addMailbox(message);
-    //         return true;
-    //     } catch (error) {
-    //         console.error('Error adding message:', error);
-    //         return false;
-    //     }
-    // }
 
 
 
