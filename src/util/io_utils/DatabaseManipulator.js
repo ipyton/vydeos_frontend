@@ -218,17 +218,16 @@ static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity
             messages = await db.messages
                 .where('[type+groupId+sessionMessageId]')
                 .below([type, senderId, beforeSessionMessageId ])
-                .reverse() // 最近的在前
+                //.reverse() // 最近的在前
                 .limit(limit)
                 .toArray();
         } else {
-            console.log("-00000000000")
             console.log([type, result.smaller, result.larger, beforeSessionMessageId ])
 
             messages = await db.messages
                 .where('[type+userId1+userId2+sessionMessageId]')
                 .below([type, result.smaller, result.larger, beforeSessionMessageId ])
-                .reverse()
+                //.reverse()
                 .limit(limit)
                 .toArray();
         }
