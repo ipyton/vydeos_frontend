@@ -32,7 +32,7 @@ export default class MessageMiddleware {
      */
 
 
-    static async fillMissingMessages(lastMessageSessionId, limit, from_network, from_local) {
+    static fillMissingMessages(lastMessageSessionId, limit, from_network, from_local) {
         const localMap = new Map(from_local.map(m => [m.sessionMessageId, m]));
         const networkMap = new Map(from_network.map(m => [m.sessionMessageId, m]));
 
@@ -54,6 +54,13 @@ export default class MessageMiddleware {
             }
         }
 
+        console.log(from_network)
+        console.log("]]]]]]]]]]]]]]]]]]]]]")
+        console.log(filled)
+        console.log(from_local)
+        console.log("fr")
+        console.log(missingFromLocal)
+
         return {
             filled,
             missingFromLocal
@@ -61,15 +68,18 @@ export default class MessageMiddleware {
     }
 
 
-    static async getContactHistory(type, userId, limit = 15, lastSessionMessageId = 0) {
-        return DatabaseManipulator.getContactHistory(type, userId, limit, lastSessionMessageId).then(localRes=>{
-            if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes)) {
+    static async getContactHistory(type, userId, limit = 15, lastSessionMessageId) {
+        return DatabaseManipulator.getContactHistory(type, userId, lastSessionMessageId,limit).then(localRes=>{
+            if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes)&& localRes.length >= 15) {
                 return localRes;
             }
             else {
                 return MessageUtil.getMessageRecords(type,userId, limit, lastSessionMessageId).then(async networkRes=> {
-                    const result = MessageMiddleware.fillMissingMessages(lastSessionMessageId, limit, networkRes, localRes)
-                    DatabaseManipulator.addContactHistories(result.missingFromLocal)
+                    const result =  MessageMiddleware.fillMissingMessages(lastSessionMessageId, limit, JSON.parse(networkRes.data.message) , localRes||[])
+                    console.log("--------------------------------------")
+                    console.log(result)
+                    await DatabaseManipulator.addContactHistories(result.missingFromLocal)
+
                     return result.filled
                 })
             }

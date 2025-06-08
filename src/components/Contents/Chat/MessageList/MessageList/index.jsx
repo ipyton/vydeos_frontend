@@ -16,7 +16,6 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   const scrollContainerRef = useRef(null);
   const { mode, toggleMode } = useThemeMode();
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
-  console.log(select)
   // State for scroll position tracking
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isNearTop, setIsNearTop] = useState(false);
@@ -79,11 +78,15 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   },[select])
 
   useEffect(()=>{
-    if (lastSessionMessageId == -1 ) {
+    console.log("lastSessionMessageId" + lastSessionMessageId)
+    if (lastSessionMessageId === 0) return
+    if (lastSessionMessageId === -1 ) {
       showNotification("No more messages to load", "info");
       return 
     }
     MessageMiddleware.getContactHistory(select.type, select.userId, limit, lastSessionMessageId).then((res)=>{
+      console.log("----===================")
+      console.log(res)
       setChatRecords([...res, ...chatRecords])
     })
   }, [lastSessionMessageId])
@@ -97,7 +100,6 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     console.log("MessageList: handleWithdraw", message);
   };
 
-  console.log("MessageList: chatRecords", chatRecords);
   
   return (
     <Box sx={{ position: "relative", height: "100%" }}>

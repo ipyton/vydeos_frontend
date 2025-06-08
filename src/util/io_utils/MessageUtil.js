@@ -93,11 +93,7 @@ export default class MessageUtil {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-        }).then(async (response) => {
-            console.log(response)
-        }).then(() => {
-            //setSelect(friendId)
-        });
+        })
 
     }
 

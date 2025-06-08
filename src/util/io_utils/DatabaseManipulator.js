@@ -7,7 +7,7 @@ import Dexie from 'dexie';
         this.version(1).stores({
             settings: 'key, value',
             contacts: '[type+userId], userId, type, timestamp',
-            messages: '&messageId, [userId1+userId2], [type+receiverId], [type+groupId], [type+receiverId+sessionMessageId],[type+groupId+sessionMessageId]',
+            messages: '&messageId, [type+userId1+userId2+sessionMessageId], [type+groupId],[type+groupId+sessionMessageId]',
             unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
         });
 
@@ -34,6 +34,18 @@ import Dexie from 'dexie';
 
 const db = new ChatDatabase();
 
+function compareStrings(str1, str2) {
+  if (typeof str1 !== 'string' || typeof str2 !== 'string') {
+    throw new Error('Both inputs must be strings');
+  }
+
+  if (str1 < str2) {
+    return { smaller: str1, larger: str2 };
+  } else {
+    return { smaller: str2, larger: str1 };
+  }
+}
+
 export default class DatabaseManipulator {
     
     // Settings management
@@ -47,7 +59,6 @@ export default class DatabaseManipulator {
     static async clearUnreadMessages() {
         try {
             await db.unreadMessages.clear();
-            console.log("All unread messages cleared.");
         } catch (error) {
             console.error("Failed to clear unread messages:", error);
         }
@@ -105,7 +116,6 @@ static async addRecentContacts(messages) {
         }
         
         try {
-            //console.log(messages[0].senderId, messages[0].type);
             const contactList = messages.map(message => ({
                 userId: message.senderId || message.userId,
                 name: message.name||"",
@@ -178,7 +188,6 @@ static async addRecentContacts(messages) {
 
     static async addContactHistory(message) {
         try {
-            console.log(message);
             
             if ((!message.receiverId && !message.groupId) || !message.type) {
                 return;
@@ -200,22 +209,25 @@ static async addRecentContacts(messages) {
         }
     }
 
-static async getContactHistory(type, receiverId, beforeSessionMessageId = Infinity, limit = 10) {
+static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
+    const own = localStorage.getItem("userId")
     try {
-        // console.log(`Getting contact history for type: ${type}, receiverId: ${receiverId}, beforeSessionMessageId: ${beforeSessionMessageId}, limit: ${limit}`);
         let messages;
-
+        const result = compareStrings(own, senderId)
         if (type === 'group') {
             messages = await db.messages
                 .where('[type+groupId+sessionMessageId]')
-                .below([type, receiverId, beforeSessionMessageId])
+                .below([type, senderId, beforeSessionMessageId ])
                 .reverse() // 最近的在前
                 .limit(limit)
                 .toArray();
         } else {
+            console.log("-00000000000")
+            console.log([type, result.smaller, result.larger, beforeSessionMessageId ])
+
             messages = await db.messages
-                .where('[type+receiverId+sessionMessageId]')
-                .below([type, receiverId, beforeSessionMessageId])
+                .where('[type+userId1+userId2+sessionMessageId]')
+                .below([type, result.smaller, result.larger, beforeSessionMessageId ])
                 .reverse()
                 .limit(limit)
                 .toArray();
@@ -381,8 +393,6 @@ static async getContactHistory(type, receiverId, beforeSessionMessageId = Infini
         try {
             const unreadMessages = await db.unreadMessages
                 .toArray();
-                console.log(unreadMessages);
-                console.log("unreadMessages", unreadMessages);
             return unreadMessages.reduce((total, unread) => total + (unread.count || 0), 0);
         } catch (error) {
             console.error('Error getting total unread count:', error);
@@ -484,13 +494,11 @@ static async getContactHistory(type, receiverId, beforeSessionMessageId = Infini
     
     static async deleteUnreadMessage(type, senderId) {
         try {
-            console.log(`Deleting unread message for type: ${type}, senderId: ${senderId}`);
             const deletedCount = await db.unreadMessages
                 .where('[type+senderId]')
                 .equals([type, senderId])
                 .delete();
                 
-            console.log(`Deleted ${deletedCount} messages`);
             return deletedCount > 0;
         } catch (error) {
             console.error('Error deleting unread message:', error);
