@@ -77,7 +77,7 @@ export default class MessageUtil {
         });
     }
     
-    static getNewestMessages(type,friendId, limit, lastSessionMessageId) {
+    static getMessageRecords(type,friendId, limit, lastSessionMessageId) {
         let checkKey = "chatLastUpdate";
         localforage.getItem(checkKey).then(async timestamp => {
             if (!timestamp) {
@@ -91,7 +91,7 @@ export default class MessageUtil {
                 "lastSessionMessageId":lastSessionMessageId
             });
 
-            apiClient.post("/chat/getNewestMessages", requestData, {
+            apiClient.post("/chat/getMessageRecords", requestData, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }

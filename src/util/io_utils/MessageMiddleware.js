@@ -67,7 +67,7 @@ export default class MessageMiddleware {
                 return localRes;
             }
             else {
-                return MessageUtil.getNewestMessages(type,userId, limit, lastSessionMessageId).then(async networkRes=> {
+                return MessageUtil.getMessageRecords(type,userId, limit, lastSessionMessageId).then(async networkRes=> {
                     const result = MessageMiddleware.fillMissingMessages(lastSessionMessageId, limit, networkRes, localRes)
                     DatabaseManipulator.addContactHistories(result.missingFromLocal)
                     return result.filled
