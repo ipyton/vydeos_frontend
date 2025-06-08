@@ -174,7 +174,7 @@ export default function Header(props) {
   // Hooks
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { notifications, setNotifications, setLogin, avatar, setBadgeContent } = props;
+  const { notifications, setNotifications, setLogin, avatar, setBadgeContent, markAsRead } = props;
 
   // Event handlers
   function handleDocumentClick(event) {
@@ -373,6 +373,7 @@ export default function Header(props) {
       notificationsOpen={notificationsOpen}
       notifications={notifications}
       setNotifications={setNotifications}
+      markAsRead={markAsRead}
     />
   );
   

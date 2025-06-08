@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useThemeMode } from '../../../Themes/ThemeContext';
 import MenuItem from '@mui/material/MenuItem';
 export default function MessageBox(props) {
-  let {refresh, notificationsAnchorEl, menuId, notificationsOpen, setNotificationsAnchorEl,notifications,setNotifications} = props
+  let {refresh, notificationsAnchorEl, menuId, notificationsOpen, setNotificationsAnchorEl,notifications,setNotifications, markAsRead} = props
   let [message, setMessage] = useState([])
   const { mode } = useThemeMode();
   const handleNotificationClose = () => {
@@ -60,7 +60,7 @@ export default function MessageBox(props) {
     </MenuItem>
   ) : (
     notifications.map((notification, idx) => (
-      <SingleMessage key={idx} notification={notification} />
+      <SingleMessage key={idx} notification={notification} markAsRead={markAsRead}/>
     ))
   )}
 </Menu>

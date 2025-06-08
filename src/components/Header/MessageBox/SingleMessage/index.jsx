@@ -12,7 +12,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 export function SingleMessage(props) {
     const navigate = useNavigate();
-    const { notification, marksAsRead } = props;
+    const { notification, markAsRead } = props;
     console.log("------" + JSON.stringify(notification))
 
     let handleMessageJump = (event, target) => {
@@ -25,7 +25,7 @@ export function SingleMessage(props) {
 
     const handleDelete = (event) => {
         event.stopPropagation(); // Prevent the menu item click
-        marksAsRead(notification.type, notification.senderId)
+        markAsRead(notification.type, notification.senderId)
     }
 
     const { mode } = useThemeMode();
