@@ -3,7 +3,6 @@ const FLASK_API_BASE_URL = "https://apis.vydeo.xyz/py"
 const DOWNLOAD_BASE_URL = "https://localhost:5000"
 const WebSocket_URL = "wss://apis.vydeo.xyz/ws"
 
-import DatabaseManipulator from "./DatabaseManipulator.js";
 
 let socket;
 let token;
@@ -14,6 +13,7 @@ let reconnectDelay = 1000; // Start with 1 second
 let heartbeatInterval;
 let connectionTimeout;
 let isConnecting = false;
+
 
 const connectWebSocket = (url) => {
     if (isConnecting) {
@@ -50,7 +50,7 @@ const connectWebSocket = (url) => {
             isConnecting = false;
             reconnectAttempts = 0;
             reconnectDelay = 1000;
-            
+
             if (connectionTimeout) {
                 clearTimeout(connectionTimeout);
             }
@@ -61,7 +61,7 @@ const connectWebSocket = (url) => {
 
         socket.onmessage = (event) => {
             console.log('Message received:', event.data);
-            
+
             try {
                 if (event.data === "success") {
                     console.log("Connection successful!");
@@ -69,22 +69,24 @@ const connectWebSocket = (url) => {
                     console.log("Heartbeat pong received");
                 } else {
                     // Handle notification messages
-                    const data = JSON.parse(event.data);
-                    if (Array.isArray(data)) {
-                        // Handle array of messages
-                        data.forEach(message => {
-                            if (message && typeof message === 'object') {
-                                DatabaseManipulator.addContactHistory(message).then(() => {
-                                    postMessage({action: "updateNotification"});
-                                });
-                            }
-                        });
-                    } else if (data && typeof data === 'object') {
-                        // Handle single message
-                        DatabaseManipulator.addContactHistory(data).then(() => {
-                            postMessage({action: "updateNotification"});
-                        });
-                    }
+                    // const data = JSON.parse(event.data);
+                    // console.log("Parsed data:", data);
+
+                    // if (Array.isArray(data)) {
+                    //     // Handle array of messages
+                    //     data.forEach(message => {
+                    //         if (message && typeof message === 'object') {
+                    //             handleMessage(message);
+                    //         }
+                    //         else {
+                    //             console.warn('Received invalid message format:', message);
+                    //         }
+                    //     });
+                    // } else if (data && typeof data === 'object') {
+                    //     // Handle single message object
+                    //     handleMessage(data);
+                    // }
+                    postMessage({ action: "messageReceived", data: event.data });
                 }
             } catch (error) {
                 console.error('Error processing message:', error);
@@ -101,7 +103,7 @@ const connectWebSocket = (url) => {
             console.log('WebSocket connection closed:', event.code, event.reason);
             isConnecting = false;
             stopHeartbeat();
-            
+
             if (connectionTimeout) {
                 clearTimeout(connectionTimeout);
             }
@@ -111,7 +113,7 @@ const connectWebSocket = (url) => {
                 scheduleReconnect(url);
             } else if (reconnectAttempts >= maxReconnectAttempts) {
                 console.error('Max reconnection attempts reached');
-                postMessage({action: "connectionFailed", message: "Failed to establish WebSocket connection"});
+                postMessage({ action: "connectionFailed", message: "Failed to establish WebSocket connection" });
             }
         };
 
@@ -130,9 +132,9 @@ const scheduleReconnect = (url) => {
 
     reconnectAttempts++;
     const delay = Math.min(reconnectDelay * Math.pow(2, reconnectAttempts - 1), 30000); // Max 30 seconds
-    
+
     console.log(`Scheduling reconnection attempt ${reconnectAttempts} in ${delay}ms`);
-    
+
     setTimeout(() => {
         if (!socket || socket.readyState === WebSocket.CLOSED) {
             connectWebSocket(url);
@@ -181,42 +183,6 @@ const sendMessage = (message) => {
     }
 };
 
-function getNewestMessages() {
-    // return DatabaseManipulator.getTimestamp().then((timestamp) => {
-    //     if (!timestamp) {
-    //         timestamp = -1;
-    //     }
-
-    //     return fetch(API_BASE_URL + "/chat/getNewestMessages", {
-    //         method: 'POST',
-    //         headers: {
-    //             'token': token,
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({
-    //             timestamp: timestamp
-    //         })
-    //     })
-    //     .catch(err => {
-    //         console.error('Error fetching newest messages:', err);
-    //         throw err;
-    //     })
-    //     .then(async response => {
-    //         if (!response || !response.ok) {
-    //             throw new Error(`HTTP error! status: ${response?.status}`);
-    //         }
-
-    //         const data = await response.json();
-
-    //         if (!data || !data.message) {
-    //             console.log('No new messages available');
-    //             return;
-    //         }
-
-    //         return DatabaseManipulator.batchAddContactHistory(JSON.parse(data.message));
-    //     });
-    // });
-}
 
 // Graceful cleanup
 const cleanup = () => {
@@ -230,9 +196,9 @@ const cleanup = () => {
 };
 
 onmessage = (event) => {
-    const {action, key, value} = event.data;
+    const { action, key, value } = event.data;
     console.log('Worker received message:', event.data);
-    
+
     try {
         switch (action) {
             case "setToken":
@@ -248,29 +214,29 @@ onmessage = (event) => {
                 //         postMessage({action: "initializationError", message: error.message});
                 //     });
                 break;
-                
+
             case "sendMessage":
                 const success = sendMessage(value);
-                postMessage({action: "messageSent", success: success});
+                postMessage({ action: "messageSent", success: success });
                 break;
-                
+
             case "requestMessages":
                 // Send a request for pending messages
-                const requestSuccess = sendMessage({userID: userId, action: "getMessages"});
-                postMessage({action: "messagesRequested", success: requestSuccess});
+                const requestSuccess = sendMessage({ userID: userId, action: "getMessages" });
+                postMessage({ action: "messagesRequested", success: requestSuccess });
                 break;
-                
+
             case "disconnect":
                 cleanup();
-                postMessage({action: "disconnected"});
+                postMessage({ action: "disconnected" });
                 break;
-                
+
             default:
                 console.warn('Unknown action received:', action);
         }
     } catch (error) {
         console.error('Error handling message:', error);
-        postMessage({action: "error", message: error.message});
+        postMessage({ action: "error", message: error.message });
     }
 };
 
@@ -279,4 +245,4 @@ self.addEventListener('beforeunload', cleanup);
 self.addEventListener('unload', cleanup);
 
 // Initial setup message
-postMessage({action: "workerReady"});
+postMessage({ action: "workerReady" });

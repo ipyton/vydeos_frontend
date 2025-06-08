@@ -6,7 +6,7 @@ import Dexie from 'dexie';
         super('ChatDatabase');
         this.version(1).stores({
             settings: 'key, value',
-            contacts: 'id++,[type+userId], userId, type, timestamp',
+            contacts: '[type+userId], userId, type, timestamp',
             messages: '&messageId,[type+receiverId], [type+groupId], [type+receiverId+sessionMessageId]',
             unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
         });
@@ -314,19 +314,32 @@ export default class DatabaseManipulator {
 
     static async insertUnreadMessages(unreadMessages) {
         try {
-            const dataToInsert = unreadMessages.map((unreadMessage) => ({
-                userId: unreadMessage.userId,
-                senderId: unreadMessage.senderId,
-                sessionMessageId: unreadMessage.sessionMessageId,
-                type: unreadMessage.type,
-                messageType: unreadMessage.messageType,
-                content: unreadMessage.content,
-                messageId: unreadMessage.messageId,
-                count: unreadMessage.count || 1,
-                sendTime: unreadMessage.sendTime
-                    ? new Date(unreadMessage.sendTime).getTime()
-                    : Date.now()
+            const dataToInsert = await Promise.all(unreadMessages.map(async (unreadMessage) => {
+                const key = `${unreadMessage.type}+${unreadMessage.senderId}`;
+
+                // 查询是否存在已读消息
+                const existing = await db.unreadMessages
+                    .where('[type+senderId]')
+                    .equals([unreadMessage.type, unreadMessage.senderId])
+                    .first();
+
+                const previousCount = existing?.count || 0;
+
+                return {
+                    userId: unreadMessage.userId,
+                    senderId: unreadMessage.senderId,
+                    sessionMessageId: unreadMessage.sessionMessageId,
+                    type: unreadMessage.type,
+                    messageType: unreadMessage.messageType,
+                    content: unreadMessage.content,
+                    messageId: unreadMessage.messageId,
+                    count: previousCount + 1, // 累加
+                    sendTime: unreadMessage.sendTime
+                        ? new Date(unreadMessage.sendTime).getTime()
+                        : Date.now()
+                };
             }));
+
             await db.unreadMessages.bulkPut(dataToInsert);
             return true;
         } catch (error) {
@@ -334,6 +347,7 @@ export default class DatabaseManipulator {
             return false;
         }
     }
+
     
     static async countAllUnreadMessages() {
         let total = 0;
@@ -456,6 +470,42 @@ export default class DatabaseManipulator {
             return [];
         }
     }
+
+
+    static async addContactHistories(messages) {
+        try {
+            if (!Array.isArray(messages) || messages.length === 0) {
+                return;
+            }
+
+            const messageDataList = [];
+
+            for (const message of messages) {
+                if ((!message.receiverId && !message.groupId) || !message.type) {
+                    continue; // skip invalid message
+                }
+
+                const messageData = {
+                    ...message,
+                    messageId: message.id || message.messageId,
+                    timestamp: message.time ? new Date(message.time).getTime() : Date.now()
+                };
+
+                messageDataList.push(messageData);
+            }
+
+            if (messageDataList.length > 0) {
+                await db.messages.bulkPut(messageDataList); // Use bulkPut for efficiency
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Error adding contact histories:', error);
+            return false;
+        }
+    }
+
+
     static changeCountOfRecentContact(type, id, count) {
         return db.contacts
             .where('[type+userId]')

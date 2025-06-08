@@ -17,7 +17,6 @@ import GroupIcon from '@mui/icons-material/Group';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
-import { type } from '@testing-library/user-event/dist/cjs/utility/type.js';
 
 export default function Contact(props) {
   const { userId, name, avatar, count, timestamp, content } = props.content;

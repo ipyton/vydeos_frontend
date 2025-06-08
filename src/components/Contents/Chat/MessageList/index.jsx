@@ -11,7 +11,6 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useThemeMode } from "../../../../Themes/ThemeContext";
 import { useNotification } from "../../../../Providers/NotificationProvider";
-import RefreshIcon from '@mui/icons-material/Refresh';
 
 
 export default function ChatContainer(props) {

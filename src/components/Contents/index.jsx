@@ -21,11 +21,12 @@ import Header from "../Header"
 import { useEffect, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import {update} from "../redux/refreshMessages"
+import { update } from "../redux/refreshMessages"
 import Box from '@mui/material/Box';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import UserInitializer from "../../util/io_utils/UserInitializer"
 import LongVideoIntroduction from "./Introductions/LongVideoIntroduction"
+import { useSelector } from 'react-redux';
 
 import Trends from "./Trends"
 import Downloads from "./Downloads"
@@ -60,13 +61,14 @@ export default function Contents(props) {
     const [badgeContent, setBadgeContent] = useState([])
     const [networkStatus, setNetworkStatus] = useState(false)
 
+  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
 
     const { vertical, horizontal, open, message } = state;
     const handleClose = () => {
         setState({ ...state, open: false });
     };
 
-    const [refresh, setRefresh] = useState(false)
+    
     const [notifications, setNotifications] = useState([])
     //const [chatRecords, setChatRecords] = useState([])
     const [userRecords, setUserRecords] = useState([])
@@ -97,97 +99,78 @@ export default function Contents(props) {
     //     UserInitializer.init()
     //     register()
     // }, [])
-const dispatcher = useDispatch()
-useEffect(() => {
-    const worker = new Worker("/webworkers/NotificationReceiver.js",{ type: 'module' });
+    const dispatcher = useDispatch()
 
-    // 1. 一启动就设置 token（发送给 Worker）
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
-    if (token && userId) {
-        worker.postMessage({ action: "setToken", key: userId, value: token });
-        console.log("Sent token and userId to worker");
+
+    const singleMessageHandler = (message) => {
+        //single chat, not single message
+        const senderId = message.direction === true ? message.userId1 : message.userId2;
+        const receiverId = message.direction === true ? message.userId2 : message.userId1;
+        message.senderId = senderId;
+        message.receiverId = receiverId;
+        DatabaseManipulator.addContactHistories([message]).then(() => {
+            DatabaseManipulator.insertUnreadMessages([message]).then(() => {
+                DatabaseManipulator.addRecentContacts([message]).then(() => {
+                    dispatcher(update())
+                });
+
+            })
+        });
     }
 
-    // 2. 监听消息
-    worker.onmessage = (event) => {
-        const { action } = event.data;
-        console.log("Main thread received:", event.data);
+    const groupMessageHandler = (message) => {
 
-        if (action === "updateNotification") {
-            console.log("Updating notification");
-            dispatcher(update());
-        } else if (action === "workerReady") {
-            console.log("Worker is ready");
-        } else if (action === "connectionFailed") {
-            console.warn("WebSocket connection failed");
+
+    }
+
+    const handleMessage = (message) => {
+        if (message.type === "single") {
+            singleMessageHandler(message);
+        } else if (message.type === "group") {
+            groupMessageHandler(message);
         }
-    };
-
-    // 3. 错误处理
-    worker.onerror = (event) => {
-        console.error("Worker error:", event);
-    };
-
-    // 4. 清理
-    return () => {
-        console.log("Cleaning up worker");
-        worker.terminate();
-    };
-}, []);
-
+    }
     useEffect(() => {
+        const worker = new Worker("/webworkers/NotificationReceiver.js", { type: 'module' });
 
-        // if (! worker ) return 
-        // worker.onmessage = (e) => {
-        //     //setRefresh(!refresh)
-        //     //update userList
-        //     let flag = false
-        //     for (let i = 0; i < userRecords.length; i++) {
-        //         if (userRecords[i].userId === e.data.userId) {
-        //             //in the list 
-        //             flag = true
-        //             if (sideBarSelector === e.data.userId) {
-        //                 //selected, no ops
-        //                 break
-        //             }
-        //             else {
-        //                 // not selected but in the list
-        //                 // todo :change the order to first
-        //                 userRecords[i].new = true
-        //                 setUserRecords([userRecords[i], ...userRecords.slice(0, i), ...userRecords.slice(i + 1)])
-        //                 break
-        //             }
+        // 1. 一启动就设置 token（发送给 Worker）
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("userId");
+        if (token && userId) {
+            worker.postMessage({ action: "setToken", key: userId, value: token });
+            console.log("Sent token and userId to worker");
+        }
 
-        //         }
-        //     }
-        //     if (!flag) {
-        //         //not in the list, not selcted, add to the first one 
-        //         localforage.getItem("friendList").then(list => {
-        //             if (!list) return
-        //             let contact = { "userId": list[e.data.userId].userId, "name": list[e.data.userId].name, "avatar": list[e.data.userId].avatar, new: true }
-        //             localforage.setItem("recent_contacts", [contact, ...userRecords]).then(() => {
-        //             }).then(() => {
-        //                 setUserRecords([contact, ...userRecords])
-        //             })
-        //         })
-        //     }
+        // 2. 监听消息
+        worker.onmessage = (event) => {
+            const { action, data } = event.data;
+            console.log("Main thread received:", event.data);
 
+            if (action === "updateNotification") {
+                console.log("Updating notification");
+            } else if (action === "workerReady") {
+                console.log("Worker is ready");
+            } else if (action === "connectionFailed") {
+                console.warn("WebSocket connection failed");
+            } else if (action === "messageReceived") {
+                handleMessage(JSON.parse(data));
+            }
+        };
 
-        //     //update messageList
+        // 3. 错误处理
+        worker.onerror = (event) => {
+            console.error("Worker error:", event);
+        };
+
+        // 4. 清理
+        return () => {
+            console.log("Cleaning up worker");
+            worker.terminate();
+        };
+    }, []);
 
 
-        //     if (sideBarSelector === e.data.userId) {
-        //         setChatRecords([...chatRecords, e.data])
-        //     }
-        //     if (sideBarSelector !== e.data.userId) {
-        //         setNotifications([e.data, ...notifications])
-        //     }
-        //     //update notificationList
-        // }
-    }, [sideBarSelector, notifications])
-
-    const markAsRead = (type,userId) => {
+    const markAsRead = (type, userId) => {
         MessageUtil.markAsRead(type, userId).then((res) => {
             console.log(res)
             if (res && res.data && res.data.code === 0) {
@@ -215,25 +198,33 @@ useEffect(() => {
 
     }
 
-    useState(()=> {
-        MessageUtil.getUnreadMessages().then((res)=> {
-           if (res && res.data && res.data.code === 0) {
-            console.log(res.data.message)
-            DatabaseManipulator.clearUnreadMessages().then(() => {
-                const messages = JSON.parse(res.data.message)
-                DatabaseManipulator.insertUnreadMessages(messages).then(() => {
-                    DatabaseManipulator.addRecentContacts(messages).then(() => {
-                        setNotifications(messages)
-                        dispatcher(update())
+    useState(() => {
+        MessageUtil.getUnreadMessages().then((res) => {
+            if (res && res.data && res.data.code === 0) {
+                console.log(res.data.message)
+                DatabaseManipulator.clearUnreadMessages().then(() => {
+                    const messages = JSON.parse(res.data.message)
+                    DatabaseManipulator.insertUnreadMessages(messages).then(() => {
+                        DatabaseManipulator.addRecentContacts(messages).then(() => {
+                            setNotifications(messages)
+                            dispatcher(update())
+                        })
                     })
                 })
-            })
-           } else {
-            showNotification("Failed to fetch unread messages", "error")
-           }
+            } else {
+                showNotification("Failed to fetch unread messages", "error")
+            }
 
         })
-    },[])
+    }, [])
+
+    useEffect(() => {
+        DatabaseManipulator.getUnreadMessages().then((res) => {
+            console.log("Fetched unread messages:", res);
+            setNotifications(res || []); // Ensure this is always an array
+        })
+
+    }, [refresh])
 
 
     console.log(sideBarSelector)
@@ -241,7 +232,7 @@ useEffect(() => {
     return (
         < ThemeProvider theme={defaultTheme} >
             <Box sx={{ display: 'flex' }}>
-                <Header avatar={avatar} setAvatar={setAvatar}  setLogin={setLogin}  notifications={notifications} setNotifications={setNotifications} markAsRead ={markAsRead}></Header>
+                <Header avatar={avatar} setAvatar={setAvatar} setLogin={setLogin} notifications={notifications} setNotifications={setNotifications} markAsRead={markAsRead}></Header>
                 <Box width="calc(100% - 64px)" justifyContent="center" alignItems="center" marginTop="64px">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <div>
@@ -252,9 +243,9 @@ useEffect(() => {
                                     <Route path="/userinfo" element={<UserInfo barState={state} setBarState={setState} status={props}></UserInfo>}></Route>
                                     <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
                                     <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
-                                    <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props} 
-                                    sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} notifications={notifications} 
-                                    setNotifications={setNotifications} markAsRead={markAsRead}></Chat>}></Route>
+                                    <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}
+                                        sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} notifications={notifications}
+                                        setNotifications={setNotifications} markAsRead={markAsRead}></Chat>}></Route>
                                     <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                                     <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
                                     <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>
