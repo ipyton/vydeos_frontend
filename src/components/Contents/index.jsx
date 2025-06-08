@@ -61,14 +61,14 @@ export default function Contents(props) {
     const [badgeContent, setBadgeContent] = useState([])
     const [networkStatus, setNetworkStatus] = useState(false)
 
-  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
+    const refresh = useSelector((state) => state.refreshMessages.value.refresh);
 
     const { vertical, horizontal, open, message } = state;
     const handleClose = () => {
         setState({ ...state, open: false });
     };
 
-    
+
     const [notifications, setNotifications] = useState([])
     //const [chatRecords, setChatRecords] = useState([])
     const [userRecords, setUserRecords] = useState([])
@@ -108,6 +108,7 @@ export default function Contents(props) {
         const receiverId = message.direction === true ? message.userId2 : message.userId1;
         message.senderId = senderId;
         message.receiverId = receiverId;
+        console.log("Received single message:", message);
         DatabaseManipulator.addContactHistories([message]).then(() => {
             DatabaseManipulator.insertUnreadMessages([message]).then(() => {
                 DatabaseManipulator.addRecentContacts([message]).then(() => {
@@ -204,8 +205,8 @@ export default function Contents(props) {
                 console.log(res.data.message)
                 DatabaseManipulator.clearUnreadMessages().then(() => {
                     const messages = JSON.parse(res.data.message)
-                    DatabaseManipulator.insertUnreadMessages(messages).then(() => {
-                        DatabaseManipulator.addRecentContacts(messages).then(() => {
+                    DatabaseManipulator.initUnreadMessages(messages).then(() => {
+                        DatabaseManipulator.initRecentContacts(messages).then(() => {
                             setNotifications(messages)
                             dispatcher(update())
                         })

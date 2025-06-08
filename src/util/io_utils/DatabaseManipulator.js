@@ -58,12 +58,49 @@ export default class DatabaseManipulator {
         return result ? result.value : null;
     }
 
-    // Contact management
-    static async addRecentContacts(messages) {
+static async addRecentContacts(messages) {
+    if (!messages || messages.length === 0) {
+        return [];
+    }
+
+    try {
+        for (const message of messages) {
+            const userId = message.senderId || message.userId;
+            const type = message.type;
+            const key = [type, userId]; // 用于索引查找
+
+            const existing = await db.contacts.get(key);
+
+            if (existing) {
+                await db.contacts.update(key, {
+                    name: message.name || existing.name,
+                    avatar: message.avatar || existing.avatar,
+                    content: message.content || existing.content,
+                    timestamp: message.sendTime || Date.now(),
+                    count: (existing.count || 0) + 1,
+                });
+            } else {
+                await db.contacts.add({
+                    userId,
+                    name: message.name || "",
+                    avatar: message.avatar || "",
+                    type,
+                    timestamp: message.sendTime || Date.now(),
+                    content: message.content || "",
+                    count: message.count || 1,
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error adding recent contacts:', error);
+        return null;
+    }
+}
+    static async initRecentContacts(messages) {
         if (!messages || messages.length === 0) {
             return [];
         }
-
+        
         try {
             //console.log(messages[0].senderId, messages[0].type);
             const contactList = messages.map(message => ({
@@ -348,6 +385,34 @@ export default class DatabaseManipulator {
         }
     }
 
+
+        static async initUnreadMessages(unreadMessages) {
+        try {
+            const dataToInsert = await Promise.all(unreadMessages.map(async (unreadMessage) => {
+                const key = `${unreadMessage.type}+${unreadMessage.senderId}`;
+                return {
+                    userId: unreadMessage.userId,
+                    senderId: unreadMessage.senderId,
+                    sessionMessageId: unreadMessage.sessionMessageId,
+                    type: unreadMessage.type,
+                    messageType: unreadMessage.messageType,
+                    content: unreadMessage.content,
+                    messageId: unreadMessage.messageId,
+                    count: unreadMessage.count, // 累加
+                    sendTime: unreadMessage.sendTime
+                        ? new Date(unreadMessage.sendTime).getTime()
+                        : Date.now()
+                };
+            }));
+
+            await db.unreadMessages.bulkPut(dataToInsert);
+            return true;
+        } catch (error) {
+            console.error('Error adding unread messages:', error);
+            return false;
+        }
+    }
+
     
     static async countAllUnreadMessages() {
         let total = 0;
@@ -515,19 +580,41 @@ export default class DatabaseManipulator {
             });
     }
     
-static async deleteUnreadMessage(type, senderId) {
+    static async deleteUnreadMessage(type, senderId) {
+        try {
+            console.log(`Deleting unread message for type: ${type}, senderId: ${senderId}`);
+            const deletedCount = await db.unreadMessages
+                .where('[type+senderId]')
+                .equals([type, senderId])
+                .delete();
+                
+            console.log(`Deleted ${deletedCount} messages`);
+            return deletedCount > 0;
+        } catch (error) {
+            console.error('Error deleting unread message:', error);
+            return false;
+        }
+    }
+
+static async addCountToRecentContact(type, id,timestamp) {
     try {
-        console.log(`Deleting unread message for type: ${type}, senderId: ${senderId}`);
-        const deletedCount = await db.unreadMessages
-            .where('[type+senderId]')
-            .equals([type, senderId])
-            .delete();
-            
-        console.log(`Deleted ${deletedCount} messages`);
-        return deletedCount > 0;
+        const contact = await db.contacts.get({ type, userId: id });
+
+        if (contact) {
+            const newCount = (contact.count === 0 || contact.count == null)
+                ? 1
+                : contact.count + 1;
+
+            await db.contacts.update([type, id], {
+                count: newCount,
+                timestamp: timestamp || Date.now(), // 可选更新时间
+            });
+        } else {
+            // 如果找不到，是否新建？视业务逻辑而定，这里暂不处理
+            console.warn('Contact not found:', type, id);
+        }
     } catch (error) {
-        console.error('Error deleting unread message:', error);
-        return false;
+        console.error('Failed to update count:', error);
     }
 }
 }

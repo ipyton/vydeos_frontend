@@ -19,6 +19,7 @@ import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
 
 export default function Contact(props) {
+  console.log("Contact props", props.content);
   const { userId, name, avatar, count, timestamp, content } = props.content;
   const { selected, onClick, isMobile, onDelete, markAsRead } = props;
   const { mode } = useThemeMode();

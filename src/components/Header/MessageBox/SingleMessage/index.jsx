@@ -13,10 +13,8 @@ import CheckIcon from '@mui/icons-material/Check';
 export function SingleMessage(props) {
     const navigate = useNavigate();
     const { notification, marksAsRead } = props;
-    console.log(notification)
-    const [unreadCount,setUnreadCount] = useState(notification.count)
+    console.log("------" + JSON.stringify(notification))
 
-    console.log("SingleMessage", unreadCount)
     let handleMessageJump = (event, target) => {
         // Prevent navigation when delete button is clicked
         if (event.target.closest('.delete-button')) {
@@ -48,9 +46,9 @@ export function SingleMessage(props) {
         >
             <ListItemAvatar>
                 <Badge 
-                    badgeContent={unreadCount} 
+                    badgeContent={notification.count} 
                     color="error"
-                    invisible={unreadCount === 0}
+                    invisible={notification.count === 0}
                     sx={{
                         '& .MuiBadge-badge': {
                             fontSize: '0.75rem',
@@ -73,13 +71,13 @@ export function SingleMessage(props) {
                 primaryTypographyProps={{
                     sx: { 
                         color: mode === 'dark' ? '#fff' : '#000',
-                        fontWeight: unreadCount > 0 ? 'bold' : 'normal', // Bold if unread
+                        fontWeight: notification.count > 0 ? 'bold' : 'normal', // Bold if unread
                     },
                 }}
                 secondaryTypographyProps={{
                     sx: { 
                         color: mode === 'dark' ? '#ccc' : '#555',
-                        fontWeight: unreadCount > 0 ? 'bold' : 'normal', // Bold if unread
+                        fontWeight: notification.count > 0 ? 'bold' : 'normal', // Bold if unread
                     },
                 }}
                 sx={{ flex: 1 }}
