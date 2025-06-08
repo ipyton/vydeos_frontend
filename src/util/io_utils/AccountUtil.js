@@ -20,7 +20,6 @@ export default class AccountUtil {
         return
       }
       if (response.data.code === -1) {
-        console.log(response.data.message)
         return
       }
       let content = response.data
@@ -168,7 +167,6 @@ export default class AccountUtil {
         // Error already handled by interceptor
         throw err; // Re-throw for caller to handle if needed
       }).then(response => {
-        console.log(response)
         return response;
       })
     })
@@ -184,7 +182,6 @@ export default class AccountUtil {
         }],
       });
       
-      console.log(response)
       setAvatar(response.data)
       return response;
     } catch (error) {

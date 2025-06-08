@@ -299,7 +299,7 @@ static async addRecentContacts(messages) {
                     .toArray();
             } else {
                 messages = await db.messages
-                    .orderBy('messageId')
+                    .orderBy('sessionMessageId')
                     .filter(message => message.type === type && message.receiverId === receiverId)
                     .offset(offset)
                     .limit(limit)

@@ -152,7 +152,6 @@ export default function SignUp(props) {
   if (loginState === true) {
     return <Navigate to="/" replace />;
   }
-  console.log("[[")
 
   const validate = (nickname, username, password) => {
     return true;
@@ -179,7 +178,6 @@ export default function SignUp(props) {
         return
       }).then(
         (response) => {
-          console.log(response);
           if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
             console.log(emailValue)
             AccountUtil.sendVerificationCode(emailValue).catch((err) => {
@@ -187,7 +185,6 @@ export default function SignUp(props) {
               return
             }).then(
               (response) => {
-                console.log(response);
                 if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
                   console.log("Verification code sent")
                   setIsLoading(false);
@@ -224,7 +221,6 @@ export default function SignUp(props) {
     // Simulate API delay for demo purposes
       AccountUtil.registerStep2(email, codeValue).then(
         (response) => { 
-          console.log(response);
           if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
             setActiveStep(2);
             setIsLoading(false);
@@ -266,13 +262,10 @@ export default function SignUp(props) {
 
     AccountUtil.registerStep3(email, password, step3Tokens).then(
       (response) => {
-        console.log(response)
         if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
           setActiveStep(activeStep + 1)
         }
         else {
-          console.log("Please check your input")
-          console.log(response.data.message)
           setBarState({ ...barState, open: true, message:response.data.message})
 
         }

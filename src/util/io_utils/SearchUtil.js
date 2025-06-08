@@ -34,14 +34,12 @@ export default class SearchUtil {
         return
       }
       console.log("searchContactById response")
-      console.log(response)
       let responseData = response.data
       if (responseData.code === -1) {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
       }
       else if (responseData.code === 0) {
         let result = JSON.parse(responseData.message)
-        console.log(result)
         let adder = []
         result.forEach(element => {
           adder.push({ name: element.userName, intro: element.introduction, pic: element.avatar, type: "contact", userId: element.userId, })
@@ -70,7 +68,6 @@ export default class SearchUtil {
       if (response === undefined) {
         console.log("errror")
       }
-      console.log(response)
       let responseData = response.data
       if (responseData.code === -1) {
         //props.setBarState({...props.barState, message:responseData.message, open:true})
@@ -104,7 +101,6 @@ export default class SearchUtil {
         return Qs.stringify(data)
       }],
     }).then(function (response) {
-      console.log(response)
       if (response === undefined) {
         console.log("errror")
       }

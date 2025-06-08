@@ -379,7 +379,6 @@ const handleOpenDetails = (row) => {
 
   // Load data on component mount
   useEffect(() => {
-    console.log("Download Requests Manager");
     VideoUtil.getRequests()
       .then((res) => {
         if (res.data.code !== 0) {

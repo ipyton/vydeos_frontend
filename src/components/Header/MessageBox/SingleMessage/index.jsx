@@ -13,7 +13,6 @@ import CheckIcon from '@mui/icons-material/Check';
 export function SingleMessage(props) {
     const navigate = useNavigate();
     const { notification, markAsRead } = props;
-    console.log("------" + JSON.stringify(notification))
 
     let handleMessageJump = (event, target) => {
         // Prevent navigation when delete button is clicked

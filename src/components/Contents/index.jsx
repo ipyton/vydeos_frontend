@@ -173,7 +173,6 @@ export default function Contents(props) {
 
     const markAsRead = (type, userId) => {
         MessageUtil.markAsRead(type, userId).then((res) => {
-            console.log(res)
             if (res && res.data && res.data.code === 0) {
                 console.log("Marked as read successfully")
                 // Update the notifications state to remove the read message
@@ -202,7 +201,6 @@ export default function Contents(props) {
     useState(() => {
         MessageUtil.getUnreadMessages().then((res) => {
             if (res && res.data && res.data.code === 0) {
-                console.log(res.data.message)
                 DatabaseManipulator.clearUnreadMessages().then(() => {
                     const messages = JSON.parse(res.data.message)
                     DatabaseManipulator.initUnreadMessages(messages).then(() => {

@@ -189,7 +189,6 @@ export default function MovieDetails(props) {
           VideoUtil.isPlayable(videoIdentifier)
             .then((res) => {
               try {
-                console.log(res.data);
                 if (res.data && res.data.code === 0) {
                   if (res.data.message === "true") {
                     setPlayable(true);

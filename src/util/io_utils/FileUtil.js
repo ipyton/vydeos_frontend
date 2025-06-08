@@ -16,7 +16,6 @@ export default class PictureUtil {
                 }
             );
             let responseData = response.data;
-            console.log(response);
             return responseData.code === 0;
         } catch (error) {
             console.error('Upload article pics error:', error);
@@ -37,7 +36,6 @@ export default class PictureUtil {
                     }
                 );
                 let responseData = response.data;
-                console.log(responseData);
                 return responseData.code === 0;
             } catch (error) {
                 console.error('Download article pics error:', error);

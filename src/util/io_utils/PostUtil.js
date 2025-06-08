@@ -41,7 +41,6 @@ export default class PostUtil {
         }).then(response => {
             if (response) {
                 setList([data, ...list]);
-                console.log(response);
             }
         });
     }
@@ -58,7 +57,6 @@ export default class PostUtil {
         }).catch(exception => {
             console.log(exception);
         }).then(response => {
-            console.log(response);
             if (!response || !response.data || !response.data.posts) {
                 console.log("connection error");
                 return;
@@ -77,7 +75,6 @@ export default class PostUtil {
         }).catch(exception => {
             console.log(exception);
         }).then(response => {
-            console.log(response);
             if (!response || !response.data || !response.data.posts) {
                 console.log("connection error");
                 return;

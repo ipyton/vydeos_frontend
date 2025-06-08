@@ -35,11 +35,9 @@ export default function VideoGallery() {
     
     VideoUtil.getGallery().then(function (response) {
       if (!response || !response.data) {
-        console.log(response);
         return;
       }
       
-      console.log(response);
       let rows = [];
       const body = response.data;
       console.log(Math.floor(body.length / size) + 1);

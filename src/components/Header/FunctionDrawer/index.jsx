@@ -140,9 +140,7 @@ export default function FunctionDrawer(props) {
     // Initialize with default navigation
     localforage.getItem("paths").then(
       (response) => {
-        console.log(response)
         let tmp = []
-        console.log(response)
         if (!response || response.length === 0) {
           setNavigationItems([]);
           return;

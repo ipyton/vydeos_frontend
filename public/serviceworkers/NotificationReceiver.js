@@ -3,8 +3,6 @@ let socket;
 
 
 self.addEventListener('install', (event) => {
-    console.log('Service Worker 安装完成');
-
     event.waitUntil(self.skipWaiting());
 });
 
@@ -28,7 +26,6 @@ function urlBase64ToUint8Array(base64String) {
 
 
 self.addEventListener('activate', (event) => {
-    console.log("activated")
 
     event.waitUntil(self.clients.claim());  // 控制当前客户端，立即生效
 

@@ -275,7 +275,6 @@ export default function Login(props) {
         showNotification(responseData.message, "error");
       }
     } catch (error) {
-      console.log("aaaaaaaaaaaaa")
       if (error.message === "Network Error") {
         setNetworkErr(true);
       } else {

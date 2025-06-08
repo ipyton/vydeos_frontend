@@ -47,7 +47,6 @@ export default class MessageUtil {
                     console.log(error);
                 });
             }).then((response) => {
-                console.log(response);
                 return DatabaseManipulator.batchAddContactHistory(response.data);
             });
         });
@@ -97,7 +96,6 @@ export default class MessageUtil {
             }).then(async (response) => {
                 // All the commented code remains the same
                 //MessageUtil.updateMessage(response)
-                // //console.log(response)
 
                 // if (!response) {
                 //     return

@@ -149,7 +149,6 @@ export default class VideoUtil {
                             if (response.data.code === 0) {
                                 console.log(`Chunk ${i} uploaded successfully`);
                             } else {
-                                console.log(response.data.message)
                                 continueUpload = false
                             }
                         }).catch(error => {
@@ -379,12 +378,10 @@ export default class VideoUtil {
                     console.log(error)
                     return
                 }).then(function (response) {
-                    console.log(response)
                     if (!response || !response.data) {
                         console.log("errror")
                         return
                     }
-                    console.log(response)
                     if (response.data.status === "getting") {
                         return
                     }

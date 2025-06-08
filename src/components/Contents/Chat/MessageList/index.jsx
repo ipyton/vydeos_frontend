@@ -46,8 +46,6 @@ export default function ChatContainer(props) {
         await MessageUtil.markAsRead(select.type, select.userId);
       }
     } catch (err) {
-      console.log("Error fetching messages:", err);
-
       // Show appropriate notification based on error type
       if (err.name === 'NetworkError' || err.message?.includes('network')) {
         showNotification("Network Error: Please check your connection", "error");

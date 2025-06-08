@@ -65,7 +65,6 @@ export default class SocialMediaUtil {
         }).catch(() => {
             console.log("follow error")
         }).then((response) => {
-            console.log(response.data)
             this.dispath(updateFollowState(response.data))
         }).catch(() => {
 
@@ -99,7 +98,6 @@ export default class SocialMediaUtil {
                 return qs.stringify(data);
             }],
         }).then((response) => {
-            console.log(response);
             if (!response || !response.data) {
                 console.log("Internal Error");
                 throw new Error("Internal Error");
