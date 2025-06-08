@@ -10,6 +10,7 @@ import { StrictMode } from 'react';
 import { useNotification } from './Providers/NotificationProvider';
 import { ThemeContextProvider } from './Themes/ThemeContext';
 import { login, logout } from './components/redux/authSlice'; // Adjust path to your auth slice
+import AuthUtil from './util/io_utils/AuthUtil';
 
 function checkNetworkStatus() {
   return navigator.onLine;
@@ -50,6 +51,19 @@ function App() {
         await localforage.removeItem("userId");
         dispatch(logout());
       }
+        localforage.getItem("paths").then(res=>{
+            if (res === null) {
+            AuthUtil.getPaths().then(
+              (response1) => {
+                if (response1.data.code === 0) {
+                  localforage.setItem("paths", JSON.parse(response1.data.message))
+                }
+              }
+            )
+            }
+
+        })
+
       
       setIsInitialized(true);
     };
