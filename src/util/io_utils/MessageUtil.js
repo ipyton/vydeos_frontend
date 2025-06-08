@@ -77,12 +77,16 @@ export default class MessageUtil {
         });
     }
     
-    static getMessageRecords(type,friendId, limit, lastSessionMessageId) {
-            
+    static getMessageRecords(type,friendId, limit, lastSessionMessageId, groupId) {
+        if (!groupId) {
+            groupId = 0
+        }
         const requestData = Qs.stringify({
             "userId": friendId, 
             "limit":limit,
-            "lastSessionMessageId":lastSessionMessageId
+            "lastSessionMessageId":lastSessionMessageId,
+            "type":type,
+            "groupId": groupId
         });
 
         return apiClient.post("/chat/getMessageRecords", requestData, {

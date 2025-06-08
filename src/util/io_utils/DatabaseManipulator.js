@@ -78,6 +78,7 @@ static async addRecentContacts(messages) {
                     content: message.content || existing.content,
                     timestamp: message.sendTime || Date.now(),
                     count: (existing.count || 0) + 1,
+                    sessionMessageId: message.sessionMessageId || -1
                 });
             } else {
                 await db.contacts.add({
@@ -88,6 +89,8 @@ static async addRecentContacts(messages) {
                     timestamp: message.sendTime || Date.now(),
                     content: message.content || "",
                     count: message.count || 1,
+                    sessionMessageId: message.sessionMessageId || -1
+
                 });
             }
         }

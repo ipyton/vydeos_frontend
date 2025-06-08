@@ -16,7 +16,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   const scrollContainerRef = useRef(null);
   const { mode, toggleMode } = useThemeMode();
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
-
+  console.log(select)
   // State for scroll position tracking
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isNearTop, setIsNearTop] = useState(false);
@@ -67,11 +67,16 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
 
   // only once
   useEffect(()=>{
+    if(select){
+      console.log("sdsdfsdfsdfdsfdsfdsfdsfdsfdsfsdfds")
           DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId)
         .then((newestSessionMessageId) => {
+          console.log(newestSessionMessageId + "1234232342342423423")
             setLastSessionMessageId(newestSessionMessageId)
         })
-  },[])
+    }
+
+  },[select])
 
   useEffect(()=>{
     if (lastSessionMessageId == -1 ) {

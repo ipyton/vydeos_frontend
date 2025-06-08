@@ -27,54 +27,10 @@ export default function ChatContainer(props) {
     setSelect(null);
   };
 
-  const fetchMessages = async () => {
-    // Validate if we have a valid selection
-    if (!select || !select.type || !select.userId || select.type === "" || select.userId === "") {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // Fetch message history
-      
-      const history = await DatabaseManipulator.getContactHistory(select.type, select.userId, 15, cursor);
-      setChatRecords(history);
-
-      // Mark messages as read
-      if (history.length > 0) {
-        await MessageUtil.markAsRead(select.type, select.userId);
-      }
-    } catch (err) {
-      // Show appropriate notification based on error type
-      if (err.name === 'NetworkError' || err.message?.includes('network')) {
-        showNotification("Network Error: Please check your connection", "error");
-      } else if (err.name === 'DatabaseError' || err.message?.includes('database')) {
-        showNotification("Database Error: Could not retrieve messages", "error");
-      } else if (err.name === 'AuthorizationError' || err.message?.includes('permission')) {
-        showNotification("Authorization Error: You don't have permission to view these messages", "error");
-      } else {
-        showNotification("Error loading messages. Please try again later.", "error");
-      }
-      setSelect(null); // Clear selection on error
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMessages();
+  useEffect( () => {
+    MessageUtil.markAsRead(select.type, select.userId);
   }, [select, refresh, showNotification]);
 
-  const handleSendMessage = async (message) => {
-    try {
-      // Sending message logic here
-      // This would be passed to your InputBox component
-    } catch (error) {
-      console.error("Error sending message:", error);
-      showNotification("Failed to send message. Please try again.", "error");
-    }
-  };
 
   const handleDeleteMessage = async (messageId) => {
     try {
