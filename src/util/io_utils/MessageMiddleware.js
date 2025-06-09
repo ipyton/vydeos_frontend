@@ -33,6 +33,9 @@ export default class MessageMiddleware {
 
 
     static fillMissingMessages(lastMessageSessionId, limit, from_network, from_local) {
+        if (lastMessageSessionId <= 0) {
+            return { filled: [], missingFromLocal: [] };
+        }
         const localMap = new Map(from_local.map(m => [m.sessionMessageId, m]));
         const networkMap = new Map(from_network.map(m => [m.sessionMessageId, m]));
 
@@ -62,7 +65,7 @@ export default class MessageMiddleware {
 
     static async getContactHistory(type, userId, limit = 15, lastSessionMessageId) {
         return DatabaseManipulator.getContactHistory(type, userId, lastSessionMessageId,limit).then(localRes=>{
-            if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes)&& localRes.length >= 15) {
+if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes) && localRes.length >= limit) {
                 return localRes;
             }
             else {
