@@ -19,7 +19,7 @@ export default class MessageMiddleware {
         return true;
     }
 
-        /**
+    /**
      * 补全 sessionMessageId 的缺失消息
      * @param {number} startId 起始 sessionMessageId（递减方向）
      * @param {number} limit 总共需要多少条
@@ -41,7 +41,6 @@ export default class MessageMiddleware {
 
         for (let i = 0; i < limit; i++) {
             const targetId = lastMessageSessionId - i;
-
             if (localMap.has(targetId)) {
                 filled.push(localMap.get(targetId));
             } else if (networkMap.has(targetId)) {
@@ -53,13 +52,6 @@ export default class MessageMiddleware {
                 break; // 如果你希望“必须连续”，这里可以 return 失败
             }
         }
-
-        console.log(from_network)
-        console.log("]]]]]]]]]]]]]]]]]]]]]")
-        console.log(filled)
-        console.log(from_local)
-        console.log("fr")
-        console.log(missingFromLocal)
 
         return {
             filled,

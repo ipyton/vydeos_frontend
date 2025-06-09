@@ -11,6 +11,21 @@ import localforage from 'localforage';
 import DatabaseManipulator from '../../../../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
+import { useSelector, useDispatch } from 'react-redux';
+import {update} from "../../../../redux/refreshMessages"
+
+
+function compareStrings(str1, str2) {
+  if (typeof str1 !== 'string' || typeof str2 !== 'string') {
+    throw new Error('Both inputs must be strings');
+  }
+
+  if (str1 < str2) {
+    return { smaller: str1, larger: str2 };
+  } else {
+    return { smaller: str2, larger: str1 };
+  }
+}
 
 export default function InputBox(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -21,6 +36,7 @@ export default function InputBox(props) {
   const inputRef = React.useRef(null);
   const { showNotification } = useNotification();
   const { mode } = useThemeMode();
+  const dispatcher = useDispatch()
 
   // Dynamic styles based on mode
   const paperStyles = {
@@ -146,20 +162,31 @@ const textFieldStyles = {
       }
       
       const response = await MessageUtil.sendMessage(userId, select, text, "text");
-      
+
       if (response.data.result === true) {
+  
+        let direction = true
+        const result = compareStrings(userId, select.userId)
+        if (result.larger === userId) {
+          direction = false
+        }
         const message = {
-          userId1: userId,
-          userId2: select.userId,
-          direction:true,
+          userId1: result.smaller,
+          userId2: select.larger,
+          direction:direction,
           content: text,
           type: select.type,
           timestamp: response.data.timestamp,
           messageId:response.data.messageId,
           sessionMessageId: response.data.sessionMessageId,
         };
-        
         await DatabaseManipulator.addContactHistory(message);
+        const senderId = direction ? result.larger : result.smaller
+        message.senderId = senderId
+        message.count = 0
+        await DatabaseManipulator.addRecentContacts([message])
+        dispatcher(update())
+
         setChatRecords([...chatRecords, message]); // Update chat records
         setText("");
         

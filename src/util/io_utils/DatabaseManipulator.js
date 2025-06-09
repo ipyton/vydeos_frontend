@@ -1,7 +1,7 @@
 import Dexie from 'dexie';
 
 // Database schema definition
- class ChatDatabase extends Dexie {
+class ChatDatabase extends Dexie {
     constructor() {
         super('ChatDatabase');
         this.version(1).stores({
@@ -35,19 +35,19 @@ import Dexie from 'dexie';
 const db = new ChatDatabase();
 
 function compareStrings(str1, str2) {
-  if (typeof str1 !== 'string' || typeof str2 !== 'string') {
-    throw new Error('Both inputs must be strings');
-  }
+    if (typeof str1 !== 'string' || typeof str2 !== 'string') {
+        throw new Error('Both inputs must be strings');
+    }
 
-  if (str1 < str2) {
-    return { smaller: str1, larger: str2 };
-  } else {
-    return { smaller: str2, larger: str1 };
-  }
+    if (str1 < str2) {
+        return { smaller: str1, larger: str2 };
+    } else {
+        return { smaller: str2, larger: str1 };
+    }
 }
 
 export default class DatabaseManipulator {
-    
+
     // Settings management
     static async updateTimestamp(timestamp) {
         if (!timestamp || timestamp === -1) {
@@ -69,60 +69,60 @@ export default class DatabaseManipulator {
         return result ? result.value : null;
     }
 
-static async addRecentContacts(messages) {
-    if (!messages || messages.length === 0) {
-        return [];
-    }
 
-    try {
-        for (const message of messages) {
-            const userId = message.senderId || message.userId;
-            const type = message.type;
-            const key = [type, userId]; // 用于索引查找
-
-            const existing = await db.contacts.get(key);
-
-            if (existing) {
-                await db.contacts.update(key, {
-                    name: message.name || existing.name,
-                    avatar: message.avatar || existing.avatar,
-                    content: message.content || existing.content,
-                    timestamp: message.sendTime || Date.now(),
-                    count: (existing.count || 0) + 1,
-                    sessionMessageId: message.sessionMessageId || -1
-                });
-            } else {
-                await db.contacts.add({
-                    userId,
-                    name: message.name || "",
-                    avatar: message.avatar || "",
-                    type,
-                    timestamp: message.sendTime || Date.now(),
-                    content: message.content || "",
-                    count: message.count || 1,
-                    sessionMessageId: message.sessionMessageId || -1
-
-                });
-            }
+    static async addRecentContacts(messages) {
+        if (!messages || messages.length === 0) {
+            return [];
         }
-    } catch (error) {
-        console.error('Error adding recent contacts:', error);
-        return null;
+
+        try {
+            for (const message of messages) {
+                const userId = message.senderId || message.userId;
+                const type = message.type;
+                const key = [type, userId]; // 用于索引查找
+
+                const existing = await db.contacts.get(key);
+
+                if (existing) {
+                    await db.contacts.update(key, {
+                        name: message.name || existing.name,
+                        avatar: message.avatar || existing.avatar,
+                        content: message.content || existing.content,
+                        timestamp: message.sendTime ||message.timestamp || Date.now(),
+                        count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
+                        sessionMessageId: message.sessionMessageId || -1
+                    });
+                } else {
+                    await db.contacts.add({
+                        userId,
+                        name: message.name || "",
+                        avatar: message.avatar || "",
+                        type,
+                        timestamp: message.sendTime || message.timestamp || Date.now(),
+                        content: message.content || "",
+                        count: message.count || 1,
+                        sessionMessageId: message.sessionMessageId || -1
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error adding recent contacts:', error);
+            return null;
+        }
     }
-}
     static async initRecentContacts(messages) {
         if (!messages || messages.length === 0) {
             return [];
         }
-        
+
         try {
             const contactList = messages.map(message => ({
                 userId: message.senderId || message.userId,
-                name: message.name||"",
-                avatar: message.avatar||"",
+                name: message.name || "",
+                avatar: message.avatar || "",
                 type: message.type,
-                timestamp: message.sendTime|| Date.now(),
-                content: message.content||"",
+                timestamp: message.sendTime || Date.now(),
+                content: message.content || "",
                 count: message.count || 0,
                 sessionMessageId: message.sessionMessageId || -1,
             }));
@@ -135,7 +135,6 @@ static async addRecentContacts(messages) {
     }
 
     static async getNewestSessionMessageId(type, userId) {
-
         try {
             const contact = await db.contacts.get({ type, userId });
             return contact ? contact.sessionMessageId || -1 : -1; // 返回 sessionMessageId 或 -1
@@ -143,7 +142,6 @@ static async addRecentContacts(messages) {
             console.error('Error getting newest session message ID:', error);
             return -1;
         }
-
     }
 
     static async deleteRecentContact(type, id) {
@@ -188,11 +186,15 @@ static async addRecentContacts(messages) {
 
     static async addContactHistory(message) {
         try {
-            
-            if ((!message.receiverId && !message.groupId) || !message.type) {
+
+            if (
+                (message.type === 'group' && (!message.groupId || !message.userId1 || !message.userId2)) ||
+                (message.type === 'single' && (!message.userId1 || !message.userId2)) ||
+                !message.type
+            ) {
                 return;
             }
-            
+
             const messageData = {
                 ...message,
                 messageId: message.id || message.messageId,
@@ -209,36 +211,36 @@ static async addRecentContacts(messages) {
         }
     }
 
-static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
-    const own = localStorage.getItem("userId")
-    try {
-        let messages;
-        const result = compareStrings(own, senderId)
-        if (type === 'group') {
-            messages = await db.messages
-                .where('[type+groupId+sessionMessageId]')
-                .below([type, senderId, beforeSessionMessageId ])
-                //.reverse() // 最近的在前
-                .limit(limit)
-                .toArray();
-        } else {
-            console.log([type, result.smaller, result.larger, beforeSessionMessageId ])
+    static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
+        const own = localStorage.getItem("userId")
+        try {
+            let messages;
+            const result = compareStrings(own, senderId)
+            if (type === 'group') {
+                messages = await db.messages
+                    .where('[type+groupId+sessionMessageId]')
+                    .belowOrEqual([type, senderId, beforeSessionMessageId])
+                    //.reverse() // 最近的在前
+                    .limit(limit)
+                    .toArray();
+            } else {
+                console.log([type, result.smaller, result.larger, beforeSessionMessageId])
 
-            messages = await db.messages
-                .where('[type+userId1+userId2+sessionMessageId]')
-                .below([type, result.smaller, result.larger, beforeSessionMessageId ])
-                //.reverse()
-                .limit(limit)
-                .toArray();
+                messages = await db.messages
+                    .where('[type+userId1+userId2+sessionMessageId]')
+                    .belowOrEqual([type, result.smaller, result.larger, beforeSessionMessageId])
+                    //.reverse()
+                    .limit(limit)
+                    .toArray();
+            }
+
+            return messages;
+
+        } catch (error) {
+            console.error('Error getting contact history:', error);
+            return [];
         }
-
-        return messages;
-
-    } catch (error) {
-        console.error('Error getting contact history:', error);
-        return [];
     }
-}
 
     static async getContactHistoryCount(type, receiverId) {
         try {
@@ -299,7 +301,7 @@ static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity
     }
 
 
-        static async initUnreadMessages(unreadMessages) {
+    static async initUnreadMessages(unreadMessages) {
         try {
             const dataToInsert = await Promise.all(unreadMessages.map(async (unreadMessage) => {
                 const key = `${unreadMessage.type}+${unreadMessage.senderId}`;
@@ -326,7 +328,7 @@ static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity
         }
     }
 
-    
+
     static async countAllUnreadMessages() {
         let total = 0;
         try {
@@ -406,7 +408,7 @@ static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity
                 .equals(userId)
                 .filter(unread => unread.type === type)
                 .toArray();
-            
+
             return unreadMessages.reduce((total, unread) => total + (unread.count || 0), 0);
         } catch (error) {
             console.error('Error getting unread count by type:', error);
@@ -418,7 +420,7 @@ static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity
     static async searchMessages(searchTerm, limit = 50, offset = 0) {
         try {
             return db.messages
-                .filter(msg => 
+                .filter(msg =>
                     msg.content && msg.content.toLowerCase().includes(searchTerm.toLowerCase())
                 )
                 .offset(offset)
@@ -490,14 +492,14 @@ static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity
                 contact.count = count;
             });
     }
-    
+
     static async deleteUnreadMessage(type, senderId) {
         try {
             const deletedCount = await db.unreadMessages
                 .where('[type+senderId]')
                 .equals([type, senderId])
                 .delete();
-                
+
             return deletedCount > 0;
         } catch (error) {
             console.error('Error deleting unread message:', error);
@@ -505,25 +507,25 @@ static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity
         }
     }
 
-static async addCountToRecentContact(type, id,timestamp) {
-    try {
-        const contact = await db.contacts.get({ type, userId: id });
+    static async addCountToRecentContact(type, id, timestamp) {
+        try {
+            const contact = await db.contacts.get({ type, userId: id });
 
-        if (contact) {
-            const newCount = (contact.count === 0 || contact.count == null)
-                ? 1
-                : contact.count + 1;
+            if (contact) {
+                const newCount = (contact.count === 0 || contact.count == null)
+                    ? 1
+                    : contact.count + 1;
 
-            await db.contacts.update([type, id], {
-                count: newCount,
-                timestamp: timestamp || Date.now(), // 可选更新时间
-            });
-        } else {
-            // 如果找不到，是否新建？视业务逻辑而定，这里暂不处理
-            console.warn('Contact not found:', type, id);
+                await db.contacts.update([type, id], {
+                    count: newCount,
+                    timestamp: timestamp || Date.now(), // 可选更新时间
+                });
+            } else {
+                // 如果找不到，是否新建？视业务逻辑而定，这里暂不处理
+                console.warn('Contact not found:', type, id);
+            }
+        } catch (error) {
+            console.error('Failed to update count:', error);
         }
-    } catch (error) {
-        console.error('Failed to update count:', error);
     }
-}
 }

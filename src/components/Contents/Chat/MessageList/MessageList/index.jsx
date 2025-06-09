@@ -16,7 +16,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   const scrollContainerRef = useRef(null);
   const animationFrameRef = useRef(null);
   const { mode, toggleMode } = useThemeMode();
-  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
+  //const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   
   // State for scroll position tracking
   const [showScrollToTop, setShowScrollToTop] = useState(false);
@@ -25,6 +25,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   const [lastSessionMessageId, setLastSessionMessageId] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [previousScrollHeight, setPreviousScrollHeight] = useState(0);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true); // New state to track if more messages are available
   
   // 阻尼相关状态
   const [pullDistance, setPullDistance] = useState(0);
@@ -94,8 +95,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     const atTop = scrollTop <= 0;
     const atBottom = scrollTop >= scrollHeight - clientHeight - 1;
 
-    // 在顶部向上滚动时增加阻尼
-    if (atTop && e.deltaY < 0) {
+    // 在顶部向上滚动时增加阻尼 (only if has more messages)
+    if (atTop && e.deltaY < 0 && hasMoreMessages) {
       e.preventDefault();
       const dampedDelta = e.deltaY * MOUSE_WHEEL_DAMPING;
       const newPullDistance = Math.min(
@@ -108,6 +109,12 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       if (newPullDistance >= RELEASE_THRESHOLD && !isLoading) {
         handleLoadMoreMessages();
       }
+      return;
+    }
+
+    // 在顶部向上滚动但没有更多消息时，允许正常滚动
+    if (atTop && e.deltaY < 0 && !hasMoreMessages) {
+      // Allow normal scroll behavior
       return;
     }
 
@@ -125,17 +132,26 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       const dampedDelta = e.deltaY * (0.8 + MOUSE_WHEEL_DAMPING * 0.2);
       container.scrollTop += dampedDelta;
     }
-  }, [pullDistance, isLoading]);
+  }, [pullDistance, isLoading, hasMoreMessages]);
 
   // 处理鼠标按下事件
   const handleMouseDown = useCallback((e) => {
     if (isLoading) return;
     
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollTop } = container;
+    const atTop = scrollTop <= 0;
+
+    // Only prevent mouse down if at top and no more messages
+    if (atTop && !hasMoreMessages) return;
+    
     setIsMousePressed(true);
     setStartMouseY(e.clientY);
     setLastMouseY(e.clientY);
     setVelocity(0);
-  }, [isLoading]);
+  }, [isLoading, hasMoreMessages]);
 
   // 处理鼠标移动事件
   const handleMouseMove = useCallback((e) => {
@@ -148,8 +164,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     const totalDelta = e.clientY - startMouseY;
     const { scrollTop } = container;
 
-    // 只在顶部且向下拖拽时应用阻尼
-    if (scrollTop <= 0 && totalDelta > 0) {
+    // 只在顶部且向下拖拽时应用阻尼 (only if has more messages)
+    if (scrollTop <= 0 && totalDelta > 0 && hasMoreMessages) {
       e.preventDefault();
       setIsDragging(true);
       
@@ -163,7 +179,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     }
 
     setLastMouseY(e.clientY);
-  }, [isMousePressed, lastMouseY, startMouseY, isLoading]);
+  }, [isMousePressed, lastMouseY, startMouseY, isLoading, hasMoreMessages]);
 
   // 处理鼠标释放事件
   const handleMouseUp = useCallback(() => {
@@ -172,8 +188,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     setIsMousePressed(false);
     setIsDragging(false);
 
-    // 如果下拉距离足够，触发加载
-    if (pullDistance >= RELEASE_THRESHOLD && !isLoading) {
+    // 如果下拉距离足够且还有更多消息，触发加载
+    if (pullDistance >= RELEASE_THRESHOLD && !isLoading && hasMoreMessages) {
       handleLoadMoreMessages();
     } else {
       // 回弹动画
@@ -189,11 +205,11 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       };
       bounceBack();
     }
-  }, [pullDistance, isLoading]);
+  }, [pullDistance, isLoading, hasMoreMessages]);
 
   // 处理加载更多消息
   const handleLoadMoreMessages = async () => {
-    if (isLoading || lastSessionMessageId <= 0) return;
+    if (isLoading || lastSessionMessageId <= 0 || !hasMoreMessages) return;
     
     setIsLoading(true);
     setPullDistance(0);
@@ -207,7 +223,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       const newMessageId = lastSessionMessageId - limit;
       
       if (newMessageId === -1) {
-        showNotification("No more messages to load", "info");
+        setHasMoreMessages(false); // No more messages available
         setLastSessionMessageId(-1);
         return;
       }
@@ -219,16 +235,25 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
         lastSessionMessageId
       );
       
+      // Check if response is null, empty, or has no messages
       if (res && res.length > 0) {
         setChatRecords(prevRecords => [...res, ...prevRecords]);
         setLastSessionMessageId(newMessageId);
+        
+        // If we got fewer messages than requested, we've reached the end
+        if (res.length < limit) {
+          setHasMoreMessages(false);
+        }
       } else {
-        showNotification("No more messages to load", "info");
+        // No more messages to load
+        setHasMoreMessages(false);
         setLastSessionMessageId(-1);
       }
     } catch (error) {
       console.error("Error loading more messages:", error);
       showNotification("Failed to load messages", "error");
+      // On error, disable further loading attempts
+      setHasMoreMessages(false);
     } finally {
       setIsLoading(false);
     }
@@ -302,9 +327,12 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     }
   }, [chatRecords, isLoading]);
 
-  // 初始化
+  // 初始化 - Reset hasMoreMessages when select changes
   useEffect(() => {
     if (select) {
+      setHasMoreMessages(true); // Reset to true for new conversation
+      setPullDistance(0); // Reset pull distance
+      
       DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId)
         .then((newestSessionMessageId) => {
           setLastSessionMessageId(newestSessionMessageId);
@@ -319,17 +347,27 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     if (lastSessionMessageId === 0) return;
     
     if (lastSessionMessageId === -1) {
-      showNotification("No more messages to load", "info");
+      setHasMoreMessages(false);
       return;
     }
 
     if (chatRecords.length === 0) {
       MessageMiddleware.getContactHistory(select.type, select.userId, limit, lastSessionMessageId)
         .then((res) => {
-          setChatRecords(res || []);
+          if (res && res.length > 0) {
+            setChatRecords(res);
+            // If initial load returns fewer than limit, no more messages
+            if (res.length < limit) {
+              setHasMoreMessages(false);
+            }
+          } else {
+            setChatRecords([]);
+            setHasMoreMessages(false);
+          }
         })
         .catch(error => {
           console.error("Error loading initial messages:", error);
+          setHasMoreMessages(false);
         });
     }
   }, [lastSessionMessageId]);
@@ -378,8 +416,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
         {/* Invisible element to scroll to top */}
         <div ref={messagesStartRef} />
         
-        {/* Pull to refresh indicator */}
-        {(pullDistance > 0 || isLoading) && (
+        {/* Pull to refresh indicator - only show if has more messages */}
+        {(pullDistance > 0 || isLoading) && hasMoreMessages && (
           <Box
             sx={{
               display: "flex",
@@ -427,6 +465,23 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
           </Box>
         )}
 
+        {/* Show "No more messages" indicator when at the top and no more messages */}
+        {!hasMoreMessages && chatRecords.length > 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "10px",
+              color: mode === 'dark' ? '#666' : '#999',
+              fontSize: "0.75rem",
+              fontStyle: "italic"
+            }}
+          >
+            No more messages to load
+          </Box>
+        )}
+
         {chatRecords.map((message, index) => (
           <MessageBubble
             key={`${message.id || index}-${message.timestamp}`}
@@ -444,7 +499,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
         <div ref={messagesEndRef} />
       </Box>
 
-      {/* Scroll to Top Button */}
+      {/* Scroll to Top Button - Centered */}
       {showScrollToTop && (
         <Fab
           size="small"
@@ -454,8 +509,10 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
           sx={{
             position: "absolute",
             top: 16,
-            right: 16,
+            left: "50%",
+            transform: "translateX(-50%)",
             opacity: 0.8,
+            zIndex: 1000,
             "&:hover": {
               opacity: 1,
             },
@@ -467,7 +524,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
         </Fab>
       )}
 
-      {/* Scroll to Bottom Button */}
+      {/* Scroll to Bottom Button - Centered */}
       {!isNearBottom && (
         <Fab
           size="small"
@@ -477,8 +534,10 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
           sx={{
             position: "absolute",
             bottom: 16,
-            right: 16,
+            left: "50%",
+            transform: "translateX(-50%)",
             opacity: 0.8,
+            zIndex: 1000,
             "&:hover": {
               opacity: 1,
             },
@@ -486,7 +545,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
             color: '#fff',
           }}
         >
-          <KeyboardArrowUp sx={{ transform: 'rotate(180deg)' }} />
+          <KeyboardArrowDown />
         </Fab>
       )}
     </Box>
