@@ -66,7 +66,6 @@ export default function Friends(props) {
   // Cleanup on component unmount
   useEffect(() => {
     return () => {
-      console.log("Friends component deregistered");
       setSelector(null);
     };
   }, []);

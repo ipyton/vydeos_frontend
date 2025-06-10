@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Typography, CircularProgress, Paper, List, InputBase, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, CircularProgress, Paper, List, InputBase, useMediaQuery, useTheme, selectClasses } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Header from './Header';
 // If you have the enhanced Contact component, import it
@@ -34,7 +34,16 @@ export default function SideBar(props) {
     DatabaseManipulator.getRecentContacts()
       .then((res) => {
         console.log("Fetched contacts:", res);
+        if(select && select.userId){
+          const user = res.find(item=>item.userId === select.userId)
+          if (user) {
+            user.count = 0;
+            select.count = 0
+            DatabaseManipulator.addRecentContacts([select])
+          }
+        }
         setUserRecords(res || []); // Ensure this is always an array
+
         setLoading(false);
       })
       .catch((error) => {
@@ -139,7 +148,7 @@ export default function SideBar(props) {
                 }
               },
             }}
-            placeholder="Search contacts..."
+            placeholder="Search recent contents."
             value={searchQuery}
             onChange={handleSearchChange}
           />

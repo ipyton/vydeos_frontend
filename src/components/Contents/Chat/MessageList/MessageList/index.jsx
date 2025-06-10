@@ -19,6 +19,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   //const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   const loadingTriggeredRef = useRef(false);
 
+  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
+  
   // State for scroll position tracking
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isNearTop, setIsNearTop] = useState(false);
@@ -330,9 +332,11 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       setHasMoreMessages(true);
       setPullDistance(0);
       loadingTriggeredRef.current = false; // Reset loading flag
-
+      console.log("-=-=-=-===-=-=-=-=-=-=-=-=-")
+      console.log(select)
       DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId)
         .then((newestSessionMessageId) => {
+          console.log("newestSessionId" + newestSessionMessageId)
           setLastSessionMessageId(newestSessionMessageId);
         })
         .catch(error => {
@@ -340,6 +344,34 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
         });
     }
   }, [select]);
+
+
+    useEffect(() => {
+    if (select) {
+      setPullDistance(0);
+      loadingTriggeredRef.current = false; // Reset loading flag
+      // DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId)
+      //   .then((newestSessionMessageId) => {
+      //     console.log("newestSessionId" + newestSessionMessageId)
+      //     //setLastSessionMessageId(newestSessionMessageId);
+
+      //   })
+      //   .catch(error => {
+      //     console.error("Error getting newest session message ID:", error);
+      //   });
+      DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId).then((res)=>{
+        if (res.count === 0) return
+        DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.count).then(messages=>{
+          console.log("99999999999")
+          console.log(messages)
+          select.count = 0
+          DatabaseManipulator.addRecentContacts([select]).then(()=>{
+            setChatRecords(prevRecords => [...prevRecords, ...messages])
+          })
+        })
+      })
+    }
+  }, [refresh]);
 
   useEffect(() => {
     if (lastSessionMessageId === 0) return;
@@ -353,6 +385,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       MessageMiddleware.getContactHistory(select.type, select.userId, limit, lastSessionMessageId)
         .then((res) => {
           if (res && res.length > 0) {
+            console.log("res")
+            console.log(res)
             setChatRecords(res);
             // If initial load returns fewer than limit, no more messages
             if (res.length < limit) {
@@ -482,7 +516,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
 
         {chatRecords.map((message, index) => (
           <MessageBubble
-            key={`${message.id || index}-${message.timestamp}`}
+            key={`${message.messageId}`}
             message={message}
             timestamp={message.timestamp}
             isOwn={(message.direction ? message.userId1 : message.userId2) !== select.userId}

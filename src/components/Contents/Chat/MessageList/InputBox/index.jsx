@@ -172,7 +172,7 @@ const textFieldStyles = {
         }
         const message = {
           userId1: result.smaller,
-          userId2: select.larger,
+          userId2: result.larger,
           direction:direction,
           content: text,
           type: select.type,
@@ -183,11 +183,12 @@ const textFieldStyles = {
         await DatabaseManipulator.addContactHistory(message);
         const senderId = direction ? result.larger : result.smaller
         message.senderId = senderId
-        message.count = 0
-        await DatabaseManipulator.addRecentContacts([message])
+        //message.count = 0
+        await DatabaseManipulator.initRecentContacts([message])
+        setChatRecords([...chatRecords, message]); // Update chat records
+
         dispatcher(update())
 
-        setChatRecords([...chatRecords, message]); // Update chat records
         setText("");
         
         // Focus back on input

@@ -29,9 +29,7 @@ export default function Header() {
       </Box>
       
       <Box>
-        <IconButton size="small" sx={{ color: 'white', mr: 1 }}>
-          <SearchIcon />
-        </IconButton>
+
         <IconButton size="small" sx={{ color: 'white' }}>
           <AddCircleOutlineIcon />
         </IconButton>

@@ -6,7 +6,7 @@ class ChatDatabase extends Dexie {
         super('ChatDatabase');
         this.version(1).stores({
             settings: 'key, value',
-            contacts: '[type+userId], userId, type, timestamp',
+            contacts: '[type+userId], [type+groupId], type, timestamp',
             messages: '&messageId, [type+userId1+userId2+sessionMessageId], [type+groupId],[type+groupId+sessionMessageId]',
             unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
         });
@@ -88,9 +88,9 @@ export default class DatabaseManipulator {
                         name: message.name || existing.name,
                         avatar: message.avatar || existing.avatar,
                         content: message.content || existing.content,
-                        timestamp: message.sendTime ||message.timestamp || Date.now(),
+                        timestamp: message.sendTime || message.timestamp || existing.timestamp|| Date.now(),
                         count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
-                        sessionMessageId: message.sessionMessageId || -1
+                        sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
                     });
                 } else {
                     await db.contacts.add({
@@ -110,33 +110,91 @@ export default class DatabaseManipulator {
             return null;
         }
     }
+
+
     static async initRecentContacts(messages) {
         if (!messages || messages.length === 0) {
             return [];
         }
 
         try {
-            const contactList = messages.map(message => ({
-                userId: message.senderId || message.userId,
-                name: message.name || "",
-                avatar: message.avatar || "",
-                type: message.type,
-                timestamp: message.sendTime || Date.now(),
-                content: message.content || "",
-                count: message.count || 0,
-                sessionMessageId: message.sessionMessageId || -1,
-            }));
+            // Create compound keys based on contact type
+            const compoundKeys = messages
+                .filter(msg => msg.type && (msg.senderId || msg.userId || msg.groupId))
+                .map(msg => {
+                    if (msg.type === 'group') {
+                        return [msg.type, msg.groupId];
+                    } else {
+                        // Single/direct contact
+                        return [msg.type, msg.senderId || msg.userId];
+                    }
+                })
+                .filter(key => key[1]); // Remove entries where second part is undefined
 
-            await db.contacts.bulkPut(contactList); // 批量 upsert
+            const existingContacts = await db.contacts.bulkGet(compoundKeys);
+
+            // Create a map using compound key string for O(1) lookup
+            const existingContactsMap = new Map();
+            existingContacts.forEach(contact => {
+                if (contact) {
+                    const key = contact.type === 'group'
+                        ? `${contact.type}:${contact.groupId}`
+                        : `${contact.type}:${contact.userId}`;
+                    existingContactsMap.set(key, contact);
+                }
+            });
+
+            const contactList = messages
+                .filter(message => {
+                    const type = message.type;
+                    if (type === 'group') {
+                        return message.groupId; // Group must have groupId
+                    } else {
+                        return message.senderId || message.userId; // Single must have userId
+                    }
+                })
+                .map(message => {
+                    const type = message.type;
+                    const isGroup = type === 'group';
+                    const id = isGroup ? message.groupId : (message.senderId || message.userId);
+                    const key = `${type}:${id}`;
+                    const existing = existingContactsMap.get(key) || {};
+
+                    const contact = {
+                        type: type,
+                        timestamp: message.sendTime ?? existing.timestamp ?? Date.now(),
+                        name: message.name ?? existing.name ?? "",
+                        avatar: message.avatar ?? existing.avatar ?? "",
+                        content: message.content ?? existing.content ?? "",
+                        count: message.hasOwnProperty('count') ? message.count : (existing.count ?? 0),
+                        sessionMessageId: message.sessionMessageId ?? existing.sessionMessageId ?? -1,
+                    };
+
+                    // Add the appropriate ID field based on type
+                    if (isGroup) {
+                        contact.groupId = id;
+                    } else {
+                        contact.userId = id;
+                    }
+
+                    return contact;
+                });
+
+            if (contactList.length > 0) {
+                await db.contacts.bulkPut(contactList);
+            }
+
+            return contactList;
         } catch (error) {
             console.error('Error adding recent contacts:', error);
-            return null;
+            return [];
         }
     }
 
     static async getNewestSessionMessageId(type, userId) {
         try {
             const contact = await db.contacts.get({ type, userId });
+            console.log(contact)
             return contact ? contact.sessionMessageId || -1 : -1; // 返回 sessionMessageId 或 -1
         } catch (error) {
             console.error('Error getting newest session message ID:', error);
@@ -160,8 +218,8 @@ export default class DatabaseManipulator {
     static async getRecentContactByTypeAndId(type, id) {
         try {
             return db.contacts
-                .where('[userId+type]')
-                .equals([id, type])
+                .where('[type+userId]')
+                .equals([type, id])
                 .first();
         } catch (error) {
             console.error('Error getting recent contact:', error);
@@ -192,13 +250,15 @@ export default class DatabaseManipulator {
                 (message.type === 'single' && (!message.userId1 || !message.userId2)) ||
                 !message.type
             ) {
+                console.log("eeeeeeeee")
+                console.log(message)
                 return;
             }
 
             const messageData = {
                 ...message,
                 messageId: message.id || message.messageId,
-                timestamp: message.time ? new Date(message.time).getTime() : Date.now()
+                timestamp: message.timestamp ? new Date(message.timestamp).getTime() : Date.now()
             };
 
             // Use put() to handle duplicates automatically based on messageId
@@ -211,7 +271,7 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
+    static async    getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
         const own = localStorage.getItem("userId")
         try {
             let messages;
@@ -220,22 +280,25 @@ export default class DatabaseManipulator {
                 messages = await db.messages
                     .where('[type+groupId+sessionMessageId]')
                     .belowOrEqual([type, senderId, beforeSessionMessageId])
-                    //.reverse() // 最近的在前
+                    .reverse() // This reverses the index traversal order
                     .limit(limit)
                     .toArray();
+                if (messages) messages = messages.reverse()
+
             } else {
                 console.log([type, result.smaller, result.larger, beforeSessionMessageId])
 
                 messages = await db.messages
                     .where('[type+userId1+userId2+sessionMessageId]')
                     .belowOrEqual([type, result.smaller, result.larger, beforeSessionMessageId])
-                    //.reverse()
+                    .reverse() // This reverses the index traversal order
                     .limit(limit)
-                    .toArray();
+                    .toArray()
+                if (messages) messages = messages.reverse()
             }
+        console.log(messages)
 
             return messages;
-
         } catch (error) {
             console.error('Error getting contact history:', error);
             return [];
@@ -458,13 +521,13 @@ export default class DatabaseManipulator {
             const messageDataList = [];
 
             for (const message of messages) {
-            if (
-                (message.type === 'group' && (!message.groupId || !message.userId1 || !message.userId2)) ||
-                (message.type === 'single' && (!message.userId1 || !message.userId2)) ||
-                !message.type
-            ) {
-                return;
-            }
+                if (
+                    (message.type === 'group' && (!message.groupId || !message.userId1 || !message.userId2)) ||
+                    (message.type === 'single' && (!message.userId1 || !message.userId2)) ||
+                    !message.type
+                ) {
+                    return;
+                }
 
 
                 const messageData = {
