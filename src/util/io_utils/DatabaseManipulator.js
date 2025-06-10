@@ -449,7 +449,6 @@ export default class DatabaseManipulator {
         }
     }
 
-
     static async addContactHistories(messages) {
         try {
             if (!Array.isArray(messages) || messages.length === 0) {
@@ -459,9 +458,14 @@ export default class DatabaseManipulator {
             const messageDataList = [];
 
             for (const message of messages) {
-                if ((!message.receiverId && !message.groupId) || !message.type) {
-                    continue; // skip invalid message
-                }
+            if (
+                (message.type === 'group' && (!message.groupId || !message.userId1 || !message.userId2)) ||
+                (message.type === 'single' && (!message.userId1 || !message.userId2)) ||
+                !message.type
+            ) {
+                return;
+            }
+
 
                 const messageData = {
                     ...message,

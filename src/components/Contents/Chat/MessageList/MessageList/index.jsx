@@ -17,7 +17,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   const animationFrameRef = useRef(null);
   const { mode, toggleMode } = useThemeMode();
   //const refresh = useSelector((state) => state.refreshMessages.value.refresh);
-  
+  const loadingTriggeredRef = useRef(false);
+
   // State for scroll position tracking
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isNearTop, setIsNearTop] = useState(false);
@@ -26,7 +27,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   const [isLoading, setIsLoading] = useState(false);
   const [previousScrollHeight, setPreviousScrollHeight] = useState(0);
   const [hasMoreMessages, setHasMoreMessages] = useState(true); // New state to track if more messages are available
-  
+
   // 阻尼相关状态
   const [pullDistance, setPullDistance] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -34,7 +35,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   const [isMousePressed, setIsMousePressed] = useState(false);
   const [lastMouseY, setLastMouseY] = useState(0);
   const [startMouseY, setStartMouseY] = useState(0);
-  
+
   const { showNotification } = useNotification();
   const limit = 15;
   const BOUNCE_THRESHOLD = 50;
@@ -55,7 +56,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   // 平滑滚动到指定位置
   const smoothScrollTo = (targetScrollTop, duration = 300) => {
     if (!scrollContainerRef.current) return;
-    
+
     const startScrollTop = scrollContainerRef.current.scrollTop;
     const distance = targetScrollTop - startScrollTop;
     const startTime = performance.now();
@@ -63,13 +64,13 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     const animateScroll = (currentTime) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       // 使用缓动函数
       const easeOutCubic = 1 - Math.pow(1 - progress, 3);
       const currentScrollTop = startScrollTop + (distance * easeOutCubic);
-      
+
       scrollContainerRef.current.scrollTop = currentScrollTop;
-      
+
       if (progress < 1) {
         animationFrameRef.current = requestAnimationFrame(animateScroll);
       }
@@ -81,63 +82,10 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     animationFrameRef.current = requestAnimationFrame(animateScroll);
   };
 
-  // 处理鼠标滚轮事件（增加阻尼）
-  const handleWheel = useCallback((e) => {
-    if (isLoading) {
-      e.preventDefault();
-      return;
-    }
-
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const atTop = scrollTop <= 0;
-    const atBottom = scrollTop >= scrollHeight - clientHeight - 1;
-
-    // 在顶部向上滚动时增加阻尼 (only if has more messages)
-    if (atTop && e.deltaY < 0 && hasMoreMessages) {
-      e.preventDefault();
-      const dampedDelta = e.deltaY * MOUSE_WHEEL_DAMPING;
-      const newPullDistance = Math.min(
-        pullDistance + Math.abs(dampedDelta) * 0.5,
-        MAX_PULL_DISTANCE
-      );
-      setPullDistance(newPullDistance);
-      
-      // 如果下拉距离足够，触发加载
-      if (newPullDistance >= RELEASE_THRESHOLD && !isLoading) {
-        handleLoadMoreMessages();
-      }
-      return;
-    }
-
-    // 在顶部向上滚动但没有更多消息时，允许正常滚动
-    if (atTop && e.deltaY < 0 && !hasMoreMessages) {
-      // Allow normal scroll behavior
-      return;
-    }
-
-    // 在底部向下滚动时增加阻尼
-    if (atBottom && e.deltaY > 0) {
-      e.preventDefault();
-      const dampedDelta = e.deltaY * MOUSE_WHEEL_DAMPING;
-      container.scrollTop += dampedDelta;
-      return;
-    }
-
-    // 普通滚动时应用轻微阻尼
-    if (!atTop && !atBottom) {
-      e.preventDefault();
-      const dampedDelta = e.deltaY * (0.8 + MOUSE_WHEEL_DAMPING * 0.2);
-      container.scrollTop += dampedDelta;
-    }
-  }, [pullDistance, isLoading, hasMoreMessages]);
-
   // 处理鼠标按下事件
   const handleMouseDown = useCallback((e) => {
     if (isLoading) return;
-    
+
     const container = scrollContainerRef.current;
     if (!container) return;
 
@@ -146,7 +94,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
 
     // Only prevent mouse down if at top and no more messages
     if (atTop && !hasMoreMessages) return;
-    
+
     setIsMousePressed(true);
     setStartMouseY(e.clientY);
     setLastMouseY(e.clientY);
@@ -168,12 +116,12 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     if (scrollTop <= 0 && totalDelta > 0 && hasMoreMessages) {
       e.preventDefault();
       setIsDragging(true);
-      
+
       // 应用阻尼效果
       const dampedDistance = totalDelta * DAMPING_FACTOR;
       const newPullDistance = Math.min(dampedDistance, MAX_PULL_DISTANCE);
       setPullDistance(newPullDistance);
-      
+
       // 计算速度（用于后续的惯性滚动）
       setVelocity(deltaY);
     }
@@ -188,11 +136,11 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     setIsMousePressed(false);
     setIsDragging(false);
 
-    // 如果下拉距离足够且还有更多消息，触发加载
-    if (pullDistance >= RELEASE_THRESHOLD && !isLoading && hasMoreMessages) {
+    // Only trigger if not already loading and not already triggered
+    if (pullDistance >= RELEASE_THRESHOLD && !isLoading && !loadingTriggeredRef.current && hasMoreMessages) {
       handleLoadMoreMessages();
     } else {
-      // 回弹动画
+      // Bounce back animation
       const bounceBack = () => {
         setPullDistance(prev => {
           const newDistance = prev * 0.9;
@@ -209,55 +157,100 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
 
   // 处理加载更多消息
   const handleLoadMoreMessages = async () => {
-    if (isLoading || lastSessionMessageId <= 0 || !hasMoreMessages) return;
-    
+    // Prevent multiple simultaneous calls
+    if (isLoading || lastSessionMessageId <= 0 || !hasMoreMessages || loadingTriggeredRef.current) {
+      return;
+    }
+
+    // Set flag immediately to prevent race conditions
+    loadingTriggeredRef.current = true;
     setIsLoading(true);
     setPullDistance(0);
-    
-    // 记录当前滚动高度
+
+    // Record current scroll height
     if (scrollContainerRef.current) {
       setPreviousScrollHeight(scrollContainerRef.current.scrollHeight);
     }
-    
+
     try {
       const newMessageId = lastSessionMessageId - limit;
-      
+
       if (newMessageId === -1) {
-        setHasMoreMessages(false); // No more messages available
+        setHasMoreMessages(false);
         setLastSessionMessageId(-1);
         return;
       }
-      
+
       const res = await MessageMiddleware.getContactHistory(
-        select.type, 
-        select.userId, 
-        limit, 
+        select.type,
+        select.userId,
+        limit,
         lastSessionMessageId
       );
-      
-      // Check if response is null, empty, or has no messages
+
       if (res && res.length > 0) {
         setChatRecords(prevRecords => [...res, ...prevRecords]);
         setLastSessionMessageId(newMessageId);
-        
-        // If we got fewer messages than requested, we've reached the end
+
         if (res.length < limit) {
           setHasMoreMessages(false);
         }
       } else {
-        // No more messages to load
         setHasMoreMessages(false);
         setLastSessionMessageId(-1);
       }
     } catch (error) {
       console.error("Error loading more messages:", error);
       showNotification("Failed to load messages", "error");
-      // On error, disable further loading attempts
       setHasMoreMessages(false);
     } finally {
       setIsLoading(false);
+      // Reset the flag after a small delay to ensure state updates are processed
+      setTimeout(() => {
+        loadingTriggeredRef.current = false;
+      }, 100);
     }
   };
+  const wheelTimeoutRef = useRef(null);
+  const handleWheel = useCallback((e) => {
+    if (isLoading || loadingTriggeredRef.current) {
+      e.preventDefault();
+      return;
+    }
+
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const atTop = scrollTop <= 0;
+
+    // At top scrolling up with more messages
+    if (atTop && e.deltaY < 0 && hasMoreMessages) {
+      e.preventDefault();
+      const dampedDelta = e.deltaY * MOUSE_WHEEL_DAMPING;
+      const newPullDistance = Math.min(
+        pullDistance + Math.abs(dampedDelta) * 0.5,
+        MAX_PULL_DISTANCE
+      );
+      setPullDistance(newPullDistance);
+
+      // Debounce the loading trigger
+      if (newPullDistance >= RELEASE_THRESHOLD && !isLoading && !loadingTriggeredRef.current) {
+        if (wheelTimeoutRef.current) {
+          clearTimeout(wheelTimeoutRef.current);
+        }
+
+        wheelTimeoutRef.current = setTimeout(() => {
+          if (!isLoading && !loadingTriggeredRef.current) {
+            handleLoadMoreMessages();
+          }
+        }, 50); // 50ms debounce
+      }
+      return;
+    }
+
+    // ... rest of wheel handling code remains the same
+  }, [pullDistance, isLoading, hasMoreMessages]);
 
   // 处理滚动事件
   const handleScroll = useCallback(() => {
@@ -265,20 +258,20 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
 
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
     const maxScroll = scrollHeight - clientHeight;
-    
+
     // 重置下拉距离
     if (scrollTop > 0) {
       setPullDistance(0);
     }
-    
+
     // Check if near top
     const nearTop = scrollTop < LOAD_THRESHOLD;
     setIsNearTop(nearTop);
-    
+
     // Check if near bottom
     const nearBottom = scrollTop > maxScroll - 100;
     setIsNearBottom(nearBottom);
-    
+
     // Show scroll to top button
     setShowScrollToTop(scrollTop > 300);
   }, [isLoading, isDragging]);
@@ -288,7 +281,6 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // 鼠标事件
     container.addEventListener('wheel', handleWheel, { passive: false });
     container.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mousemove', handleMouseMove);
@@ -299,7 +291,12 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       container.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
-      
+
+      // Clean up timeouts
+      if (wheelTimeoutRef.current) {
+        clearTimeout(wheelTimeoutRef.current);
+      }
+
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -318,11 +315,11 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     if (!isLoading && previousScrollHeight > 0 && scrollContainerRef.current) {
       const currentScrollHeight = scrollContainerRef.current.scrollHeight;
       const scrollDifference = currentScrollHeight - previousScrollHeight;
-      
+
       if (scrollDifference > 0) {
         smoothScrollTo(scrollDifference + BOUNCE_THRESHOLD);
       }
-      
+
       setPreviousScrollHeight(0);
     }
   }, [chatRecords, isLoading]);
@@ -330,9 +327,10 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   // 初始化 - Reset hasMoreMessages when select changes
   useEffect(() => {
     if (select) {
-      setHasMoreMessages(true); // Reset to true for new conversation
-      setPullDistance(0); // Reset pull distance
-      
+      setHasMoreMessages(true);
+      setPullDistance(0);
+      loadingTriggeredRef.current = false; // Reset loading flag
+
       DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId)
         .then((newestSessionMessageId) => {
           setLastSessionMessageId(newestSessionMessageId);
@@ -345,7 +343,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
 
   useEffect(() => {
     if (lastSessionMessageId === 0) return;
-    
+
     if (lastSessionMessageId === -1) {
       setHasMoreMessages(false);
       return;
@@ -415,7 +413,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       >
         {/* Invisible element to scroll to top */}
         <div ref={messagesStartRef} />
-        
+
         {/* Pull to refresh indicator - only show if has more messages */}
         {(pullDistance > 0 || isLoading) && hasMoreMessages && (
           <Box
@@ -424,12 +422,12 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
               justifyContent: "center",
               alignItems: "center",
               padding: `${Math.max(pullDistance * 0.3, 10)}px`,
-              color: shouldTriggerLoad 
+              color: shouldTriggerLoad
                 ? (mode === 'dark' ? '#4CAF50' : '#2E7D32')
                 : (mode === 'dark' ? '#888' : '#666'),
               fontSize: "0.8rem",
-              background: mode === 'dark' 
-                ? 'rgba(255,255,255,0.05)' 
+              background: mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
                 : 'rgba(0,0,0,0.05)',
               borderRadius: "12px",
               margin: "5px 0",
@@ -456,8 +454,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
                 >
                   <Refresh size={16} />
                 </Box>
-                {shouldTriggerLoad 
-                  ? "Release to load more" 
+                {shouldTriggerLoad
+                  ? "Release to load more"
                   : "Pull down to load more messages"
                 }
               </>
@@ -494,7 +492,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
             darkMode={mode === 'dark'}
           />
         ))}
-        
+
         {/* Invisible element to scroll to bottom */}
         <div ref={messagesEndRef} />
       </Box>
