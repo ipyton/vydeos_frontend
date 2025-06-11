@@ -94,6 +94,16 @@ export default class MessageUtil {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         })
+    }
+
+    static createGroup(name, introduction, memberIds, allowInvitesById ) {
+
+        let data = {name, introduction,memberIds,allowInvitesById}
+        return apiClient.post("/group_chat/create", Qs.stringify(data), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
 
     }
 
@@ -166,5 +176,9 @@ export default class MessageUtil {
 
     static getUnreadMessages(){
         return apiClient.post("/chat/getUnreadFromAllUsers")
+    }
+
+    static async getFriends() {
+        return apiClient.post("/friends/get_friends")
     }
 }

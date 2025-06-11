@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  List, 
-  AppBar, 
-  Tabs, 
-  Tab, 
-  Typography, 
+import {
+  Box,
+  List,
+  AppBar,
+  Tabs,
+  Tab,
+  Typography,
   useMediaQuery,
   CircularProgress,
   Chip,
@@ -51,6 +51,7 @@ import FriendItem from './FriendItem';
 import SocialMediaUtil from '../../../../util/io_utils/SocialMediaUtil';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
 import { useNotification } from '../../../../Providers/NotificationProvider';
+import UserInviteSelector from './UserInviteSelector';
 
 // Transition for dialog
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -60,7 +61,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 // TabPanel Component
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
-  
+
   return (
     <div
       role="tabpanel"
@@ -102,6 +103,9 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
     allowInvites: true,
     avatar: null
   });
+
+  const [selectedUsersToInvite, setSelectedUsersToInvite] = useState([]);
+
 
   const handleInputChange = (field) => (event) => {
     setGroupData(prev => ({
@@ -153,7 +157,7 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
       PaperProps={{
         sx: {
           borderRadius: 3,
-          background: mode === 'dark' 
+          background: mode === 'dark'
             ? '#1a1a1a'
             : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
           backdropFilter: 'blur(20px)',
@@ -214,29 +218,6 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
 
       <DialogContent sx={{ px: 3, py: 3, backgroundColor: mode === 'dark' ? '#1a1a1a' : 'transparent' }}>
         <Stack spacing={3}>
-          {/* Group Avatar */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
-            <Avatar
-              sx={{
-                width: 80,
-                height: 80,
-                bgcolor: mode === 'dark' ? '#333333' : 'rgba(0, 0, 0, 0.1)',
-                border: `2px dashed ${mode === 'dark' ? '#666666' : 'rgba(0, 0, 0, 0.3)'}`,
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  borderColor: theme.palette.secondary.main,
-                  bgcolor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.15)',
-                }
-              }}
-            >
-              <PhotoCameraIcon sx={{ 
-                fontSize: 30, 
-                color: mode === 'dark' ? '#cccccc' : 'rgba(0, 0, 0, 0.6)'
-              }} />
-            </Avatar>
-          </Box>
 
           {/* Group Name */}
           <TextField
@@ -326,14 +307,23 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
             }}
           />
 
-          <Divider sx={{ 
-            my: 1, 
+          <Divider sx={{
+            my: 1,
             borderColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.12)'
           }} />
-
+<UserInviteSelector
+  selectedUsers={selectedUsersToInvite}
+  onSelectionChange={setSelectedUsersToInvite}
+  mode={mode}
+  theme={theme}
+/>
+          <Divider sx={{
+            my: 1,
+            borderColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.12)'
+          }} />
           {/* Privacy Settings */}
           <FormControl fullWidth>
-            <InputLabel sx={{ 
+            <InputLabel sx={{
               color: mode === 'dark' ? '#cccccc' : 'rgba(0, 0, 0, 0.6)',
               '&.Mui-focused': {
                 color: theme.palette.secondary.main,
@@ -341,90 +331,13 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
             }}>
               Privacy
             </InputLabel>
-            <Select
-              value={groupData.privacy}
-              onChange={handleInputChange('privacy')}
-              label="Privacy"
-              sx={{
-                borderRadius: 2,
-                backgroundColor: mode === 'dark' ? '#2a2a2a' : 'rgba(0, 0, 0, 0.02)',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: mode === 'dark' ? '#555555' : 'rgba(0, 0, 0, 0.23)',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: mode === 'dark' ? '#777777' : 'rgba(0, 0, 0, 0.23)',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.secondary.main,
-                  borderWidth: '2px',
-                },
-                '& .MuiSelect-select': {
-                  color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
-                },
-                '& .MuiSvgIcon-root': {
-                  color: mode === 'dark' ? '#cccccc' : 'rgba(0, 0, 0, 0.54)',
-                }
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    backgroundColor: mode === 'dark' ? '#2a2a2a' : '#ffffff',
-                    border: mode === 'dark' ? '1px solid #555555' : 'none',
-                  }
-                }
-              }}
-            >
-              <MenuItem value="public" sx={{ 
-                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
-                '&:hover': {
-                  backgroundColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.04)',
-                }
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <PublicIcon fontSize="small" sx={{ color: mode === 'dark' ? '#cccccc' : 'inherit' }} />
-                  <Box>
-                    <Typography variant="body2" sx={{ 
-                      color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)'
-                    }}>
-                      Public
-                    </Typography>
-                    <Typography variant="caption" sx={{
-                      color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.6)'
-                    }}>
-                      Anyone can find and join
-                    </Typography>
-                  </Box>
-                </Box>
-              </MenuItem>
-              <MenuItem value="private" sx={{ 
-                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
-                '&:hover': {
-                  backgroundColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.04)',
-                }
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LockIcon fontSize="small" sx={{ color: mode === 'dark' ? '#cccccc' : 'inherit' }} />
-                  <Box>
-                    <Typography variant="body2" sx={{ 
-                      color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)'
-                    }}>
-                      Private
-                    </Typography>
-                    <Typography variant="caption" sx={{
-                      color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.6)'
-                    }}>
-                      Invite only
-                    </Typography>
-                  </Box>
-                </Box>
-              </MenuItem>
-            </Select>
+
           </FormControl>
 
           {/* Additional Settings */}
-          <Box sx={{ 
-            p: 2, 
-            borderRadius: 2, 
+          <Box sx={{
+            p: 2,
+            borderRadius: 2,
             backgroundColor: mode === 'dark' ? '#2a2a2a' : 'rgba(0, 0, 0, 0.02)',
             border: `1px solid ${mode === 'dark' ? '#555555' : 'rgba(0, 0, 0, 0.1)'}`
           }}>
@@ -486,13 +399,13 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
             borderRadius: 2,
             px: 4,
             background: 'linear-gradient(45deg, #9c27b0, #3f51b5)',
-            boxShadow: mode === 'dark' 
-              ? '0 4px 15px rgba(156, 39, 176, 0.6)' 
+            boxShadow: mode === 'dark'
+              ? '0 4px 15px rgba(156, 39, 176, 0.6)'
               : '0 4px 15px rgba(156, 39, 176, 0.3)',
             '&:hover': {
               background: 'linear-gradient(45deg, #8e24aa, #3949ab)',
-              boxShadow: mode === 'dark' 
-                ? '0 6px 20px rgba(156, 39, 176, 0.7)' 
+              boxShadow: mode === 'dark'
+                ? '0 6px 20px rgba(156, 39, 176, 0.7)'
                 : '0 6px 20px rgba(156, 39, 176, 0.4)',
               transform: 'translateY(-1px)',
             },
@@ -510,6 +423,7 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
     </Dialog>
   );
 }
+
 // Main Component
 export default function Friend(props) {
   const theme = useTheme();
@@ -536,12 +450,12 @@ export default function Friend(props) {
   // Initial data load
   useEffect(() => {
     setIsLoading(true);
-    
+
     SocialMediaUtil.getRelationships(value)
       .then(data => {
         setList(data);
         setIsLoading(false);
-        
+
         // Update counts - in a real app, you'd get these from your API
         const newCounts = [...counts];
         newCounts[value] = data.length;
@@ -599,13 +513,13 @@ export default function Friend(props) {
     setValue(newValue);
     // The useEffect will handle the data fetching when value changes
   };
-  
+
   const handleChangeIndex = (index) => {
     setValue(index);
   };
 
   // Calculate optimal list height for different devices
-  const listHeight = isMobile ? 
+  const listHeight = isMobile ?
     windowHeight * 0.7 : // Smaller height on mobile
     windowHeight * 0.75;  // Larger height on desktop
 
@@ -620,7 +534,7 @@ export default function Friend(props) {
   ];
 
   return (
-    <Paper elevation={3} sx={{ 
+    <Paper elevation={3} sx={{
       borderRadius: 2,
       maxHeight: '100%',
       overflow: 'hidden',
@@ -629,75 +543,75 @@ export default function Friend(props) {
       transition: 'all 0.3s ease-in-out',
       height: '100%',
     }}>
-      <AppBar 
-        position="static" 
-        color="default" 
+      <AppBar
+        position="static"
+        color="default"
         elevation={0}
-        sx={{ 
+        sx={{
           backgroundColor: 'transparent',
-          borderBottom: 1, 
-          borderColor: 'divider' 
+          borderBottom: 1,
+          borderColor: 'divider'
         }}
       >
-   <Tabs
-  value={value}
-  onChange={handleChange}
-  indicatorColor="secondary"
-  textColor={mode === 'dark' ? 'inherit' : 'primary'}
-  variant="scrollable"
-  scrollButtons
-  aria-label="Relationship tabs"
-  sx={{
-    '& .MuiTab-root': {
-      px: 3,
-      py: 1.5,
-      fontSize: '0.9rem',
-      letterSpacing: '0.05rem',
-      fontWeight: 500,
-      minWidth: 120,
-      maxWidth: isMobile ? 160 : 'none',
-      transition: 'all 0.2s ease',
-      // Enhanced text visibility for dark mode
-      color: mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.7)',
-      '&.Mui-selected': {
-        color: mode === 'dark' ? '#ffffff' : theme.palette.primary.main,
-        fontWeight: 600,
-      },
-      '&:hover': {
-        backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-        color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
-      },
-      // Ensure icons are also visible in dark mode
-      '& .MuiSvgIcon-root': {
-        color: 'inherit',
-        opacity: mode === 'dark' ? 0.9 : 0.8,
-      },
-      '&.Mui-selected .MuiSvgIcon-root': {
-        opacity: 1,
-      }
-    },
-    // Enhanced tab indicator for dark mode
-    '& .MuiTabs-indicator': {
-      height: 3,
-      borderRadius: '2px 2px 0 0',
-      backgroundColor: mode === 'dark' ? theme.palette.secondary.main : theme.palette.secondary.main,
-    },
-    // Enhanced scroll buttons for dark mode
-    '& .MuiTabs-scrollButtons': {
-      color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.54)',
-      '&:hover': {
-        backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-        color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
-      },
-      '&.Mui-disabled': {
-        color: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.26)',
-      }
-    }
-  }}
->
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          indicatorColor="secondary"
+          textColor={mode === 'dark' ? 'inherit' : 'primary'}
+          variant="scrollable"
+          scrollButtons
+          aria-label="Relationship tabs"
+          sx={{
+            '& .MuiTab-root': {
+              px: 3,
+              py: 1.5,
+              fontSize: '0.9rem',
+              letterSpacing: '0.05rem',
+              fontWeight: 500,
+              minWidth: 120,
+              maxWidth: isMobile ? 160 : 'none',
+              transition: 'all 0.2s ease',
+              // Enhanced text visibility for dark mode
+              color: mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.7)',
+              '&.Mui-selected': {
+                color: mode === 'dark' ? '#ffffff' : theme.palette.primary.main,
+                fontWeight: 600,
+              },
+              '&:hover': {
+                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
+              },
+              // Ensure icons are also visible in dark mode
+              '& .MuiSvgIcon-root': {
+                color: 'inherit',
+                opacity: mode === 'dark' ? 0.9 : 0.8,
+              },
+              '&.Mui-selected .MuiSvgIcon-root': {
+                opacity: 1,
+              }
+            },
+            // Enhanced tab indicator for dark mode
+            '& .MuiTabs-indicator': {
+              height: 3,
+              borderRadius: '2px 2px 0 0',
+              backgroundColor: mode === 'dark' ? theme.palette.secondary.main : theme.palette.secondary.main,
+            },
+            // Enhanced scroll buttons for dark mode
+            '& .MuiTabs-scrollButtons': {
+              color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.54)',
+              '&:hover': {
+                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)',
+              },
+              '&.Mui-disabled': {
+                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.26)',
+              }
+            }
+          }}
+        >
           {tabConfigs.map((tab) => (
             (!tab.hideMobile || !isMobile) && (
-              <Tab 
+              <Tab
                 key={tab.index}
                 icon={tab.icon}
                 label={tab.label}
@@ -714,7 +628,7 @@ export default function Friend(props) {
       </AppBar>
 
       {/* Create Group Button - Only show for Groups tab and non-mobile */}
-      {value === 3  && (
+      {value === 3 && (
         <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
           <Button
             fullWidth
@@ -741,14 +655,14 @@ export default function Friend(props) {
           </Button>
         </Box>
       )}
-      
+
       <SwipeableViews
         axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
         index={value}
         onChangeIndex={handleChangeIndex}
         enableMouseEvents={true}
         resistance={true}
-                scrollButtons="auto"
+        scrollButtons="auto"
 
         springConfig={{ duration: '0.35s', easeFunction: 'cubic-bezier(0.15, 0.3, 0.25, 1)', delay: '0s' }}
       >
@@ -760,7 +674,7 @@ export default function Friend(props) {
               WebkitOverflowScrolling: 'touch',
               msOverflowStyle: 'none',
               scrollbarWidth: 'thin',
-              '&::-webkit-scrollbar': { 
+              '&::-webkit-scrollbar': {
                 width: '4px',
               },
               '&::-webkit-scrollbar-track': {
@@ -775,9 +689,9 @@ export default function Friend(props) {
               }
             }}>
               {isLoading ? (
-                <Box sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
                   alignItems: 'center',
                   height: '100%',
                   flexDirection: 'column',
@@ -789,16 +703,16 @@ export default function Friend(props) {
                   </Typography>
                 </Box>
               ) : list.length === 0 ? (
-                <Box sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
                   alignItems: 'center',
                   height: '100%',
                   flexDirection: 'column',
                   gap: 2,
                   opacity: 0.7
                 }}>
-                  <Box sx={{ 
+                  <Box sx={{
                     color: mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
                     '& .MuiSvgIcon-root': {
                       fontSize: '2rem'
@@ -806,7 +720,7 @@ export default function Friend(props) {
                   }}>
                     {tabConfigs[tabIndex].icon}
                   </Box>
-                  <Typography 
+                  <Typography
                     align="center"
                     color={mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary'}
                     sx={{ fontWeight: 400 }}
@@ -816,7 +730,7 @@ export default function Friend(props) {
                 </Box>
               ) : (
                 <Fade in={!isLoading} timeout={500}>
-                  <List 
+                  <List
                     disablePadding
                     sx={{
                       '& > *:not(:last-child)': {
@@ -826,11 +740,11 @@ export default function Friend(props) {
                     }}
                   >
                     {list.map((res, idx) => (
-                      <FriendItem 
+                      <FriendItem
                         key={idx}
-                        setSelector={setSelector} 
-                        content={res} 
-                        idx={tabIndex} 
+                        setSelector={setSelector}
+                        content={res}
+                        idx={tabIndex}
                       />
                     ))}
                   </List>
@@ -840,16 +754,16 @@ export default function Friend(props) {
           </TabPanel>
         ))}
       </SwipeableViews>
-      
+
       {/* Count indicator */}
       {!isLoading && counts[value] > 0 && (
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          mt: 1, 
-          mb: 0.5 
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          mt: 1,
+          mb: 0.5
         }}>
-          <Chip 
+          <Chip
             label={`${counts[value]} ${tabConfigs[value].label.toLowerCase()}`}
             size="small"
             color="secondary"

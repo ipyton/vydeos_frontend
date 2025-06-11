@@ -22,6 +22,7 @@ import { useThemeMode } from '../../../Themes/ThemeContext';
 import CloseIcon from '@mui/icons-material/Close';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonIcon from '@mui/icons-material/Person';
+import MessageUtil from "../../../util/io_utils/MessageUtil";
 
 // Smooth slide transition for mobile fullscreen dialog
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -79,14 +80,7 @@ export default function Friends(props) {
       
       setLoading(true);
       try {
-        const response = await axios({
-          url: `${API_BASE_URL}/friends/get_friends`,
-          method: "post",
-          data: {},
-          headers: {
-            "token": localStorage.getItem("token"),
-          }
-        });
+        const response = await MessageUtil.getFriends()
         
         const friendsData = JSON.parse(response.data.message);
         console.log("Friends data loaded:", friendsData);
