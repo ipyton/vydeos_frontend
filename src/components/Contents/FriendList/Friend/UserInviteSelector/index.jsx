@@ -27,27 +27,28 @@ import MessageUtil from '../../../../../util/io_utils/MessageUtil';
 import { useNotification } from '../../../../../Providers/NotificationProvider';
 
 // Mock user data - replace with your actual user data source
-const mockUsers = [
-  { id: 1, name: 'Alice Johnson', friendId: 'alice@example.com', avatar: null, online: true },
-  { id: 2, name: 'Bob Smith', friendId: 'bob@example.com', avatar: null, online: false },
-  { id: 3, name: 'Carol Davis', friendId: 'carol@example.com', avatar: null, online: true },
-  { id: 4, name: 'David Wilson', friendId: 'david@example.com', avatar: null, online: true },
-  { id: 5, name: 'Eva Martinez', friendId: 'eva@example.com', avatar: null, online: false },
-  { id: 6, name: 'Frank Brown', friendId: 'frank@example.com', avatar: null, online: true },
-  { id: 7, name: 'Grace Lee', friendId: 'grace@example.com', avatar: null, online: false },
-  { id: 8, name: 'Henry Taylor', friendId: 'henry@example.com', avatar: null, online: true },
-];
+// const mockUsers = [
+//   { id: 1, name: 'Alice Johnson', friendId: 'alice@example.com', avatar: null, online: true },
+//   { id: 2, name: 'Bob Smith', friendId: 'bob@example.com', avatar: null, online: false },
+//   { id: 3, name: 'Carol Davis', friendId: 'carol@example.com', avatar: null, online: true },
+//   { id: 4, name: 'David Wilson', friendId: 'david@example.com', avatar: null, online: true },
+//   { id: 5, name: 'Eva Martinez', friendId: 'eva@example.com', avatar: null, online: false },
+//   { id: 6, name: 'Frank Brown', friendId: 'frank@example.com', avatar: null, online: true },
+//   { id: 7, name: 'Grace Lee', friendId: 'grace@example.com', avatar: null, online: false },
+//   { id: 8, name: 'Henry Taylor', friendId: 'henry@example.com', avatar: null, online: true },
+// ];
 
 export default function UserInviteSelector({ selectedUsers = [], onSelectionChange, mode = 'light', theme }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState(mockUsers);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [users, setUsers] = useState([])
   const {showNotification} = useNotification()
   useEffect(()=>{
     MessageUtil.getFriends().then((res)=> {
-        if (res && res.data === 0) {
+        if (res && res.data.code === 0) {
             const friends = JSON.parse(res.data.message)
-            
+            console.log(friends)
+            setUsers(friends)
         }
         else {
             showNotification("error fetch users","error")
@@ -59,12 +60,12 @@ export default function UserInviteSelector({ selectedUsers = [], onSelectionChan
 
 
   useEffect(() => {
-    const filtered = mockUsers.filter(user =>
+    const filtered = users.filter(user =>
       user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.friendId && user.friendId.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredUsers(filtered);
-  }, [searchQuery]);
+  }, [searchQuery,users]);
 
   const handleUserToggle = (user) => {
     const isSelected = selectedUsers.some(selected => selected.friendId === user.friendId);
@@ -152,7 +153,7 @@ export default function UserInviteSelector({ selectedUsers = [], onSelectionChan
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
             {selectedUsers.map(user => (
               <Chip
-                key={user.id}
+                key={user.friendId}
                 avatar={
                   <Avatar 
                     sx={{ 
@@ -162,11 +163,11 @@ export default function UserInviteSelector({ selectedUsers = [], onSelectionChan
                       bgcolor: theme?.palette?.secondary?.main || '#9c27b0'
                     }}
                   >
-                    {getInitials(user.name)}
+                    {getInitials(user.name || user.friendId)}
                   </Avatar>
                 }
-                label={user.name}
-                onDelete={() => handleRemoveUser(user.id)}
+                label={user.friendId}
+                onDelete={() => handleRemoveUser(user.friendId)}
                 deleteIcon={<CloseIcon sx={{ fontSize: '16px !important' }} />}
                 variant="outlined"
                 sx={{
@@ -216,8 +217,10 @@ export default function UserInviteSelector({ selectedUsers = [], onSelectionChan
             </ListItem>
           ) : (
             filteredUsers.map((user, index) => {
-              const isSelected = selectedUsers.some(selected => selected.id === user.id);
-              
+                console.log(selectedUsers)
+                console.log(user)
+              const isSelected = selectedUsers.some(selected => selected.friendId === user.friendId);
+              console.log(isSelected)
               return (
                 <React.Fragment key={user.id}>
                   <ListItemButton
@@ -321,16 +324,7 @@ export default function UserInviteSelector({ selectedUsers = [], onSelectionChan
         </List>
       </Paper>
 
-      {/* Summary */}
-      {selectedUsers.length > 0 && (
-        <Typography variant="caption" sx={{
-          color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.6)',
-          mt: 1,
-          display: 'block'
-        }}>
-          {selectedUsers.length} user{selectedUsers.length !== 1 ? 's' : ''} selected for invitation
-        </Typography>
-      )}
+
     </Box>
   );
 }

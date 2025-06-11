@@ -5,7 +5,7 @@ import qs from 'qs'
 import localforage from "localforage"
 import { SettingsSystemDaydreamTwoTone } from "@mui/icons-material"
 import { apiClient, downloadClient } from "./ApiClient";
-
+import MessageUtil from "./MessageUtil"
 export default class SocialMediaUtil {
 
     static follow(sender, receiver, details, setDetails) {
@@ -82,7 +82,7 @@ export default class SocialMediaUtil {
         } else if (2 === idx) {
             requestName = "get_followers";
         } else if (3 === idx) {
-            requestName = "get_groups";
+            requestName = "get";
             domain = "/group_chat/";
         } else if (4 === idx) {
             requestName = "get_invitations";
@@ -90,14 +90,8 @@ export default class SocialMediaUtil {
             requestName = "get_black_list";
         }
         
-        return apiClient({
-            url: domain + requestName,
-            method: "get",
-            data: {},
-            transformRequest: [function (data) {
-                return qs.stringify(data);
-            }],
-        }).then((response) => {
+        
+        return MessageUtil.getGroups().then((response) => {
             if (!response || !response.data) {
                 console.log("Internal Error");
                 throw new Error("Internal Error");

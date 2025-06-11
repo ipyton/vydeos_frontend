@@ -96,15 +96,22 @@ export default class MessageUtil {
         })
     }
 
-    static createGroup(name, introduction, memberIds, allowInvitesById ) {
-
-        let data = {name, introduction,memberIds,allowInvitesById}
-        return apiClient.post("/group_chat/create", Qs.stringify(data), {
+    static createGroup(name, introduction, memberIds, allowInvitesByToken ) {
+        let data = {name, introduction,memberIds,allowInvitesByToken}
+        return apiClient.post("/group_chat/create", Qs.stringify(data, { arrayFormat: 'repeat' }), {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         })
 
+    }
+
+    static getGroups() {
+        return apiClient.get("/group_chat/get_groups")
+    }
+
+    static getMemebers(groupId) {
+        return apiClient.get("/group_chat/get_members",{groupId})
     }
 
     static sendMessage(userId, sendTo, content, messageType) {

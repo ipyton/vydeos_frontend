@@ -53,6 +53,8 @@ import { useThemeMode } from '../../../../Themes/ThemeContext';
 import { useNotification } from '../../../../Providers/NotificationProvider';
 import UserInviteSelector from './UserInviteSelector';
 
+import MessageUtil from '../../../../util/io_utils/MessageUtil';
+
 // Transition for dialog
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -124,6 +126,11 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
   const handleSubmit = () => {
     // Handle group creation logic here
     console.log('Creating group:', groupData);
+    let userIdsToInvite = []
+    selectedUsersToInvite.forEach(user=> {
+      userIdsToInvite.push(user.friendId)
+    })
+    MessageUtil.createGroup(groupData.name, groupData.description,userIdsToInvite, groupData.allowInvites )
     onClose();
     // Reset form
     setGroupData({
@@ -133,6 +140,7 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
       allowInvites: true,
       avatar: null
     });
+    setSelectedUsersToInvite([])
   };
 
   const handleClose = () => {
@@ -311,12 +319,12 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
             my: 1,
             borderColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.12)'
           }} />
-<UserInviteSelector
-  selectedUsers={selectedUsersToInvite}
-  onSelectionChange={setSelectedUsersToInvite}
-  mode={mode}
-  theme={theme}
-/>
+          <UserInviteSelector
+            selectedUsers={selectedUsersToInvite}
+            onSelectionChange={setSelectedUsersToInvite}
+            mode={mode}
+            theme={theme}
+          />
           <Divider sx={{
             my: 1,
             borderColor: mode === 'dark' ? '#404040' : 'rgba(0, 0, 0, 0.12)'
@@ -354,12 +362,12 @@ function CreateGroupDialog({ open, onClose, mode, theme }) {
                   <Typography variant="body2" sx={{
                     color: mode === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.87)'
                   }}>
-                    Allow member invites
+                    Allow using invitation code/url to join.
                   </Typography>
                   <Typography variant="caption" sx={{
                     color: mode === 'dark' ? '#888888' : 'rgba(0, 0, 0, 0.6)'
                   }}>
-                    Let members invite their friends
+                    Let members invite their friends using invitation code/url to join.
                   </Typography>
                 </Box>
               }
