@@ -200,4 +200,11 @@ export default class MessageUtil {
         return apiClient.get("/group_chat/getDetails?groupId="  + groupId)
 
     }
+    static async updateGroupDetails(groupId,name,description) {
+        return apiClient.post("/group_chat/updateDetails", Qs.stringify({name, description,groupId}), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+    }
 }

@@ -15,13 +15,13 @@ import { useEffect } from "react";
 import axios from "axios"
 import AccountUtil from "../../../../util/io_utils/AccountUtil";
 import Qs from "qs"
-import { 
-    List, 
-    ListItemAvatar, 
-    Avatar, 
-    ListItemText, 
-    Card, 
-    CardContent, 
+import {
+    List,
+    ListItemAvatar,
+    Avatar,
+    ListItemText,
+    Card,
+    CardContent,
     CardHeader,
     Divider,
     Switch,
@@ -34,9 +34,9 @@ import {
     DialogContent,
     DialogActions
 } from '@mui/material';
-import { 
-    Settings as SettingsIcon, 
-    ExitToApp as ExitIcon, 
+import {
+    Settings as SettingsIcon,
+    ExitToApp as ExitIcon,
     Chat as ChatIcon,
     Edit as EditIcon,
     Save as SaveIcon,
@@ -52,9 +52,9 @@ export default function GroupDetailsComponent(props) {
     const { mode } = useThemeMode();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
+
     const isDark = mode === 'dark';
-    
+
     const [details, setDetails] = useState({
         groupId: "",
         groupName: "",
@@ -65,7 +65,7 @@ export default function GroupDetailsComponent(props) {
         ownerId: "",
         allow_invite_by_token: false
     });
-    
+
     const [members, setMembers] = useState([]);
     const [isOwner, setIsOwner] = useState(false);
     const [configDialogOpen, setConfigDialogOpen] = useState(false);
@@ -73,12 +73,12 @@ export default function GroupDetailsComponent(props) {
     const [editedDetails, setEditedDetails] = useState({});
 
     const handleChat = () => {
-        const contact = { 
-            type: "group", 
-            userId: details.groupId, 
-            name: details.groupName 
+        const contact = {
+            type: "group",
+            userId: details.groupId,
+            name: details.groupName
         };
-        
+
         DatabaseManipulator.addRecentContact(contact).then(() => {
             navigate("/chat", { ...contact });
             dispatch(update());
@@ -118,9 +118,9 @@ export default function GroupDetailsComponent(props) {
             const details = JSON.parse(response.data.message)
             setDetails(details);
             setEditedDetails(details);
-            
+
             // Check if current user is the owner
-            const currentUserEmail = localStorage.getItem("userEmail");
+            const currentUserEmail = localStorage.getItem("userId");
             setIsOwner(currentUserEmail === details.ownerId);
         });
     }, [props.groupId]);
@@ -162,39 +162,39 @@ export default function GroupDetailsComponent(props) {
             color: isDark ? 'rgba(255, 255, 255, 0.95)' : 'text.primary',
         },
         '& .MuiInputBase-input.Mui-disabled': {
-            color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)',
-            WebkitTextFillColor: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)',
+            color: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.6)',
+            WebkitTextFillColor: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.6)',
         }
     };
 
     return (
-        <Box sx={{ 
-            width: "100%", 
-            height: "100%", 
-            overflow: "auto", 
+        <Box sx={{
+            width: "100%",
+            height: "100%",
+            overflow: "auto",
             bgcolor: isDark ? "#0a0a0a" : "background.default",
             p: 2,
             minHeight: "100vh"
         }}>
             {/* Header Card */}
-            <Card sx={{ 
-                mb: 3, 
+            <Card sx={{
+                mb: 3,
                 ...cardStyles
             }}>
                 <CardHeader
                     avatar={
-                        <Avatar 
-                            src={details.avatar} 
-                            sx={{ 
-                                width: 80, 
+                        <Avatar
+                            src={details.avatar}
+                            sx={{
+                                width: 80,
                                 height: 80,
                                 bgcolor: isDark ? "#1976d2" : "primary.main",
                                 border: isDark ? "3px solid rgba(255, 255, 255, 0.3)" : "3px solid rgba(0, 0, 0, 0.1)",
                                 boxShadow: isDark ? '0 0 20px rgba(25, 118, 210, 0.3)' : 'none'
                             }}
                         >
-                            <Typography sx={{ 
-                                fontSize: '2rem', 
+                            <Typography sx={{
+                                fontSize: '2rem',
                                 fontWeight: 'bold',
                                 color: isDark ? 'white' : 'white'
                             }}>
@@ -203,10 +203,10 @@ export default function GroupDetailsComponent(props) {
                         </Avatar>
                     }
                     title={
-                        <Typography 
-                            variant="h4" 
-                            component="h1" 
-                            sx={{ 
+                        <Typography
+                            variant="h4"
+                            component="h1"
+                            sx={{
                                 fontWeight: 'bold',
                                 color: isDark ? "rgba(255, 255, 255, 0.95)" : "text.primary",
                                 textShadow: isDark ? '0 0 10px rgba(255, 255, 255, 0.1)' : 'none'
@@ -217,18 +217,18 @@ export default function GroupDetailsComponent(props) {
                     }
                     subheader={
                         <Box sx={{ mt: 1 }}>
-                            <Typography variant="body2" sx={{ 
+                            <Typography variant="body2" sx={{
                                 mb: 1,
                                 color: isDark ? "rgba(255, 255, 255, 0.7)" : "text.secondary",
                                 fontWeight: 500
                             }}>
-                                Group ID: 
+                                Group ID:
                             </Typography>
-                            <Chip 
-                                label={details.groupId || "N/A"} 
-                                variant="outlined" 
+                            <Chip
+                                label={details.groupId || "N/A"}
+                                variant="outlined"
                                 size="small"
-                                sx={{ 
+                                sx={{
                                     fontFamily: 'monospace',
                                     maxWidth: '100%',
                                     bgcolor: isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.05)",
@@ -249,7 +249,7 @@ export default function GroupDetailsComponent(props) {
                                 variant="contained"
                                 startIcon={<ChatIcon />}
                                 onClick={handleChat}
-                                sx={{ 
+                                sx={{
                                     bgcolor: isDark ? "#1976d2" : "primary.main",
                                     color: 'white',
                                     fontWeight: 600,
@@ -303,18 +303,18 @@ export default function GroupDetailsComponent(props) {
             </Card>
 
             {/* Description Card */}
-            <Card sx={{ 
-                mb: 3, 
+            <Card sx={{
+                mb: 3,
                 ...cardStyles
             }}>
                 <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ 
+                    <Typography variant="h6" gutterBottom sx={{
                         color: isDark ? "rgba(255, 255, 255, 0.9)" : "text.primary",
                         fontWeight: 600
                     }}>
                         Description
                     </Typography>
-                    <Typography variant="body1" sx={{ 
+                    <Typography variant="body1" sx={{
                         minHeight: 40,
                         color: isDark ? "rgba(255, 255, 255, 0.8)" : "text.secondary",
                         lineHeight: 1.6,
@@ -329,12 +329,12 @@ export default function GroupDetailsComponent(props) {
             </Card>
 
             {/* Group Info Card */}
-            <Card sx={{ 
-                mb: 3, 
+            <Card sx={{
+                mb: 3,
                 ...cardStyles
             }}>
                 <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ 
+                    <Typography variant="h6" gutterBottom sx={{
                         color: isDark ? "rgba(255, 255, 255, 0.9)" : "text.primary",
                         fontWeight: 600
                     }}>
@@ -361,8 +361,8 @@ export default function GroupDetailsComponent(props) {
                         />
                         <FormControlLabel
                             control={
-                                <Switch 
-                                    checked={details.allow_invite_by_token || false} 
+                                <Switch
+                                    checked={details.allow_invite_by_token || false}
                                     disabled
                                     sx={{
                                         '& .MuiSwitch-switchBase.Mui-checked': {
@@ -399,11 +399,11 @@ export default function GroupDetailsComponent(props) {
             </Card>
 
             {/* Members Card */}
-            <Card sx={{ 
+            <Card sx={{
                 ...cardStyles
             }}>
                 <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ 
+                    <Typography variant="h6" gutterBottom sx={{
                         color: isDark ? "rgba(255, 255, 255, 0.9)" : "text.primary",
                         fontWeight: 600
                     }}>
@@ -411,7 +411,7 @@ export default function GroupDetailsComponent(props) {
                     </Typography>
                     <List>
                         {members.map((user, index) => (
-                            <ListItem key={index} sx={{ 
+                            <ListItem key={index} sx={{
                                 px: 0,
                                 borderRadius: 1,
                                 mb: 0.5,
@@ -422,8 +422,8 @@ export default function GroupDetailsComponent(props) {
                                 }
                             }}>
                                 <ListItemAvatar>
-                                    <Avatar 
-                                        src={user.avatarUrl} 
+                                    <Avatar
+                                        src={user.avatarUrl}
                                         alt={user.name}
                                         sx={{
                                             bgcolor: isDark ? "#ff9800" : "secondary.main",
@@ -435,7 +435,7 @@ export default function GroupDetailsComponent(props) {
                                         {user.name?.charAt(0).toUpperCase()}
                                     </Avatar>
                                 </ListItemAvatar>
-                                <ListItemText 
+                                <ListItemText
                                     primary={user.userId || user.name || "Unknown User"}
                                     secondary={user.name !== user.userId ? user.name : null}
                                     sx={{
@@ -451,8 +451,8 @@ export default function GroupDetailsComponent(props) {
                             </ListItem>
                         ))}
                         {members.length === 0 && (
-                            <Typography variant="body2" sx={{ 
-                                p: 2, 
+                            <Typography variant="body2" sx={{
+                                p: 2,
                                 textAlign: 'center',
                                 color: isDark ? "rgba(255, 255, 255, 0.6)" : "text.secondary",
                                 fontStyle: 'italic'
@@ -465,8 +465,8 @@ export default function GroupDetailsComponent(props) {
             </Card>
 
             {/* Owner Configuration Dialog */}
-            <Dialog 
-                open={configDialogOpen} 
+            <Dialog
+                open={configDialogOpen}
                 onClose={() => setConfigDialogOpen(false)}
                 maxWidth="md"
                 fullWidth
@@ -480,15 +480,15 @@ export default function GroupDetailsComponent(props) {
             >
                 <DialogTitle sx={{ pb: 1 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="h6" sx={{ 
+                        <Typography variant="h6" sx={{
                             color: isDark ? "rgba(255, 255, 255, 0.9)" : "text.primary",
                             fontWeight: 600
                         }}>
                             Group Configuration
                         </Typography>
                         {!editMode ? (
-                            <IconButton 
-                                onClick={() => setEditMode(true)} 
+                            <IconButton
+                                onClick={() => setEditMode(true)}
                                 sx={{
                                     color: isDark ? "#90caf9" : "primary.main",
                                     bgcolor: isDark ? "rgba(144, 202, 249, 0.15)" : "rgba(25, 118, 210, 0.05)",
@@ -502,8 +502,8 @@ export default function GroupDetailsComponent(props) {
                             </IconButton>
                         ) : (
                             <Stack direction="row" spacing={1}>
-                                <IconButton 
-                                    onClick={handleSaveChanges} 
+                                <IconButton
+                                    onClick={handleSaveChanges}
                                     sx={{
                                         color: isDark ? "#81c784" : "success.main",
                                         bgcolor: isDark ? "rgba(129, 199, 132, 0.15)" : "rgba(76, 175, 80, 0.05)",
@@ -515,8 +515,8 @@ export default function GroupDetailsComponent(props) {
                                 >
                                     <SaveIcon />
                                 </IconButton>
-                                <IconButton 
-                                    onClick={handleCancelEdit} 
+                                <IconButton
+                                    onClick={handleCancelEdit}
                                     sx={{
                                         color: isDark ? "#f44336" : "error.main",
                                         bgcolor: isDark ? "rgba(244, 67, 54, 0.15)" : "rgba(244, 67, 54, 0.05)",
@@ -556,7 +556,7 @@ export default function GroupDetailsComponent(props) {
                         />
                         <FormControlLabel
                             control={
-                                <Switch 
+                                <Switch
                                     checked={editMode ? (editedDetails.allow_invite_by_token ?? details.allow_invite_by_token) : details.allow_invite_by_token}
                                     onChange={(e) => setEditedDetails(prev => ({ ...prev, allow_invite_by_token: e.target.checked }))}
                                     disabled={!editMode}
@@ -590,19 +590,19 @@ export default function GroupDetailsComponent(props) {
                                 }
                             }}
                         />
-                        
-                        <Divider sx={{ 
+
+                        <Divider sx={{
                             borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.12)',
                             borderWidth: '1px'
                         }} />
-                        
-                        <Typography variant="subtitle1" sx={{ 
+
+                        <Typography variant="subtitle1" sx={{
                             fontWeight: 'bold',
                             color: isDark ? "rgba(255, 255, 255, 0.9)" : "text.primary"
                         }}>
                             Additional Configuration
                         </Typography>
-                        
+
                         {/* Display config object */}
                         {Object.entries(details.config || {}).length > 0 ? (
                             <Stack spacing={2}>
@@ -620,7 +620,7 @@ export default function GroupDetailsComponent(props) {
                                 ))}
                             </Stack>
                         ) : (
-                            <Typography variant="body2" sx={{ 
+                            <Typography variant="body2" sx={{
                                 color: isDark ? "rgba(255, 255, 255, 0.6)" : "text.secondary",
                                 fontStyle: 'italic',
                                 textAlign: 'center',
@@ -632,7 +632,7 @@ export default function GroupDetailsComponent(props) {
                     </Stack>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button 
+                    <Button
                         onClick={() => setConfigDialogOpen(false)}
                         sx={{
                             color: isDark ? "rgba(255, 255, 255, 0.8)" : "text.primary",
