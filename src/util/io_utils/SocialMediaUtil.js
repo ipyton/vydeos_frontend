@@ -77,13 +77,18 @@ export default class SocialMediaUtil {
         
         if (0 === idx) {
             requestName = "get_friends";
+            return MessageUtil.getFriends()
         } else if (1 === idx) {
             requestName = "get_idols";
+            return MessageUtil.getIdols()
         } else if (2 === idx) {
             requestName = "get_followers";
+            return MessageUtil.getFollowers()
+
         } else if (3 === idx) {
             requestName = "get";
             domain = "/group_chat/";
+            return MessageUtil.getGroups()
         } else if (4 === idx) {
             requestName = "get_invitations";
         } else if (5 === idx) {
@@ -91,24 +96,6 @@ export default class SocialMediaUtil {
         }
         
         
-        return MessageUtil.getGroups().then((response) => {
-            if (!response || !response.data) {
-                console.log("Internal Error");
-                throw new Error("Internal Error");
-            }
-            
-            if (response.data && response.data.code === -1) {
-                throw new Error(response.data.message || "Error with code -1");
-            }
-            
-            try {
-                const list = JSON.parse(response.data.message);
-                console.log(list);
-                return list;
-            } catch (error) {
-                console.error("Error parsing response:", error);
-                throw error;
-            }
-        });
+    
     }
 }

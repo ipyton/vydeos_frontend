@@ -458,8 +458,27 @@ export default function Friend(props) {
   // Initial data load
   useEffect(() => {
     setIsLoading(true);
-
-    SocialMediaUtil.getRelationships(value)
+    console.log(value)
+    
+    SocialMediaUtil.getRelationships(value).then((response) => {
+            if (!response || !response.data) {
+                console.log("Internal Error");
+                throw new Error("Internal Error");
+            }
+            
+            if (response.data && response.data.code === -1) {
+                throw new Error(response.data.message || "Error with code -1");
+            }
+            
+            try {
+                const list = JSON.parse(response.data.message);
+                console.log(list);
+                return list;
+            } catch (error) {
+                console.error("Error parsing response:", error);
+                throw error;
+            }
+        })
       .then(data => {
         setList(data);
         setIsLoading(false);

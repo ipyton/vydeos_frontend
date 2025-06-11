@@ -188,4 +188,16 @@ export default class MessageUtil {
     static async getFriends() {
         return apiClient.post("/friends/get_friends")
     }
+
+    static async getFollowers() {
+        return apiClient.post("/friends/get_followers")
+    }
+
+    static async getIdols(){
+        return apiClient.post("/friends/get_idols")
+    }
+    static async getGroupDetails(groupId) {
+        return apiClient.get("/group_chat/getDetails?groupId="  + groupId)
+
+    }
 }
