@@ -23,6 +23,22 @@ export default function SideBar(props) {
   let location = useLocation();
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   
+  const onDelete = (type,userId,groupId) => {
+    const criteria = {type, groupId}
+    DatabaseManipulator.deleteRecentContact(criteria).then(()=>{
+      DatabaseManipulator.deleteMessages(criteria).then(() => {
+        DatabaseManipulator.deleteUnreadMessage(criteria).then(() =>{
+
+        })
+      })
+    }).catch(e => {
+      console.error(e)
+      showNotification("error deleting message", "error")
+
+    })
+  }
+
+
   useEffect(() => {
     if (location && location.type && location.userId) {
       setSelect(location);
@@ -250,6 +266,7 @@ export default function SideBar(props) {
                 selected={select}
                 isMobile={isMobile}
                 markAsRead={markAsRead}
+                onDelete = {onDelete}
               />
             ))}
           </List>

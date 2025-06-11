@@ -19,7 +19,7 @@ import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
 
 export default function Contact(props) {
-  const { userId, name, avatar, count, timestamp, content } = props.content;
+  const { userId, name, avatar, count, timestamp, content, groupId } = props.content;
   const { selected, onClick, isMobile, onDelete, markAsRead } = props;
   const { mode } = useThemeMode();
   
@@ -112,10 +112,10 @@ export default function Contact(props) {
     if (Math.abs(swipeOffset) > actionThreshold) {
       if (isLeftSwipe && onDelete) {
         // Left swipe - delete
-        onDelete(userId);
+        onDelete(props.content.type, userId,groupId);
       } else if (isRightSwipe && markAsRead) {
         // Right swipe - mark as read
-        markAsRead(props.content.type, userId);
+        markAsRead(props.content.type, userId,groupId);
       }
     }
     

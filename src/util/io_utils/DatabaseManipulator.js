@@ -7,7 +7,7 @@ class ChatDatabase extends Dexie {
         this.version(1).stores({
             settings: 'key, value',
             contacts: '[type+userId], [type+groupId], type, timestamp',
-            messages: '&messageId, [type+userId1+userId2+sessionMessageId], [type+groupId],[type+groupId+sessionMessageId]',
+            messages: '&messageId, [type+userId1+userId2+sessionMessageId], [type+userId1+userId2], [type+groupId],[type+groupId+sessionMessageId]',
             unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
         });
 
@@ -213,6 +213,43 @@ export default class DatabaseManipulator {
         }
     }
 
+static async deleteContactHistory(criteria) {
+    try {
+        const query = db.messages;
+        let deletedCount = 0;
+
+        if (criteria.type === 'group' && criteria.groupId) {
+            // Delete all group messages with specific groupId
+            deletedCount = await query
+                .where('[type+groupId]')
+                .equals(['group', criteria.groupId])
+                .delete();
+        } else if (
+            criteria.type === 'single' &&
+            criteria.userId1 &&
+            criteria.userId2
+        ) {
+            const result = DatabaseManipulator.compareStrings(criteria.userId1, criteria.userId2)
+            const count = await query
+                .where('[type+userId1+userId2]')
+                .equals(['single', result.smaller, result.larger])
+                .delete();
+
+            deletedCount = count;
+        } else {
+            console.error('No valid criteria provided');
+            return false;
+        }
+
+        console.log(`Successfully deleted ${deletedCount} messages`);
+        return true;
+    } catch (error) {
+        console.error('Error deleting messages by criteria:', error);
+        return false;
+    }
+}
+
+
 
 
     static async getRecentContactByTypeAndId(type, id) {
@@ -271,7 +308,7 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async    getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
+    static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
         const own = localStorage.getItem("userId")
         try {
             let messages;
