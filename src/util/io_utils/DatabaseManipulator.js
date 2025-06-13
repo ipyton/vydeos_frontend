@@ -308,39 +308,38 @@ static async deleteContactHistory(criteria) {
         }
     }
 
-    static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
-        const own = localStorage.getItem("userId")
-        try {
-            let messages;
-            const result = compareStrings(own, senderId)
-            if (type === 'group') {
-                messages = await db.messages
-                    .where('[type+groupId+sessionMessageId]')
-                    .belowOrEqual([type, senderId, beforeSessionMessageId])
-                    .reverse() // This reverses the index traversal order
-                    .limit(limit)
-                    .toArray();
-                if (messages) messages = messages.reverse()
+   static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
+    const own = localStorage.getItem("userId");
+    try {
+        let messages;
+        const result = compareStrings(own, senderId);
 
-            } else {
-                console.log([type, result.smaller, result.larger, beforeSessionMessageId])
+        if (type === 'group') {
+            messages = await db.messages
+                .where('[type+groupId]')
+                .equals([type, senderId])
+                .and(msg => msg.sessionMessageId <= beforeSessionMessageId)
+                .reverse()
+                .limit(limit)
+                .toArray();
 
-                messages = await db.messages
-                    .where('[type+userId1+userId2+sessionMessageId]')
-                    .belowOrEqual([type, result.smaller, result.larger, beforeSessionMessageId])
-                    .reverse() // This reverses the index traversal order
-                    .limit(limit)
-                    .toArray()
-                if (messages) messages = messages.reverse()
-            }
-        console.log(messages)
-
-            return messages;
-        } catch (error) {
-            console.error('Error getting contact history:', error);
-            return [];
+        } else {
+            messages = await db.messages
+                .where('[type+userId1+userId2]')
+                .equals([type, result.smaller, result.larger])
+                .and(msg => msg.sessionMessageId <= beforeSessionMessageId)
+                .reverse()
+                .limit(limit)
+                .toArray();
         }
+
+        return messages.reverse(); // 从旧到新排序
+    } catch (error) {
+        console.error('Error getting contact history:', error);
+        return [];
     }
+}
+
 
     static async getContactHistoryCount(type, receiverId) {
         try {

@@ -38,6 +38,7 @@ import { set } from "../redux/Search";
 import { useThemeMode } from '../../Themes/ThemeContext';
 import DatabaseManipulator from '../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../Providers/NotificationProvider';
+import { clearAllData } from '../../util/io_utils/StorageManager';
 // Constants
 const DRAWER_WIDTH = 240;
 
@@ -245,8 +246,7 @@ export default function Header(props) {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
-    localforage.clear();
+    clearAllData()
     setLogin(false);
     setBadgeContent?.(null);
     navigate("/login");

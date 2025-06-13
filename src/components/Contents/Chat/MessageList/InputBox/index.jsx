@@ -154,7 +154,7 @@ const textFieldStyles = {
     setIsLoading(true);
     
     try {
-      const userId = await localforage.getItem("userId");
+      const userId = localStorage.getItem("userId");
       
       if (!userId || !select) {
         console.error("Missing user ID or selected contact");

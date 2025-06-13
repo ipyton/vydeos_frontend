@@ -11,7 +11,7 @@ import { useNotification } from './Providers/NotificationProvider';
 import { ThemeContextProvider } from './Themes/ThemeContext';
 import { login, logout } from './components/redux/authSlice'; // Adjust path to your auth slice
 import AuthUtil from './util/io_utils/AuthUtil';
-
+import { clearAllData } from './util/io_utils/StorageManager';
 function checkNetworkStatus() {
   return navigator.onLine;
 }
@@ -33,26 +33,15 @@ function App() {
       const token = localStorage.getItem("token");
       const storedLoginState = localStorage.getItem('isLoggedIn');
       const userId = localStorage.getItem('userId');
-      
+
       if (token && storedLoginState === 'true' && userId) {
         // Restore login state from localStorage
         dispatch(login({
           token: token,
           user: { userId: userId }, // Add any other user data you have
         }));
-        
-        // Also set in localforage for consistency
-        await localforage.setItem("userId", userId);
-      } else {
-        // Clean up any inconsistent state
-        localStorage.removeItem("token");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("isLoggedIn");
-        await localforage.removeItem("userId");
-        dispatch(logout());
-      }
-        localforage.getItem("paths").then(res=>{
-            if (res === null) {
+        localforage.getItem("paths").then(res => {
+          if (res === null) {
             AuthUtil.getPaths().then(
               (response1) => {
                 if (response1.data.code === 0) {
@@ -60,11 +49,25 @@ function App() {
                 }
               }
             )
-            }
+          }
 
         })
 
-      
+        // Also set in localforage for consistency
+        await localforage.setItem("userId", userId);
+      } else {
+        // Clean up any inconsistent state
+        
+        clearAllData()
+
+        
+        dispatch(logout());
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 500);
+      }
+
+
       setIsInitialized(true);
     };
 
@@ -88,18 +91,15 @@ function App() {
   if (!isAuthenticated || showLoginModal) {
     return (
       <StrictMode>
-        <AccountIssue 
+        <AccountIssue
           loginState={isAuthenticated}
           setLoginState={(newState) => {
             if (newState) {
               // Don't dispatch login here - let the login success handler do it
               // This is just for UI state management
             } else {
+              clearAllData()
               dispatch(logout());
-              localStorage.removeItem("token");
-              localStorage.removeItem("userId");
-              localStorage.removeItem("isLoggedIn");
-              localforage.removeItem("userId");
             }
           }}
         />
@@ -112,12 +112,13 @@ function App() {
     return (
       <BrowserRouter>
         <ThemeContextProvider>
-          <Contents 
+          <Contents
             setLogin={async (newState) => {
               if (newState) {
                 // Login success should be handled by the login action
               } else {
                 // Logout
+                clearAllData()
                 dispatch(logout());
                 localStorage.removeItem("token");
                 localStorage.removeItem("userId");

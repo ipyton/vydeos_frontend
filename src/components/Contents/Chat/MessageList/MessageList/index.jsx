@@ -331,6 +331,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     if (select) {
       setHasMoreMessages(true);
       setPullDistance(0);
+      setChatRecords([])
       loadingTriggeredRef.current = false; // Reset loading flag
       console.log("-=-=-=-===-=-=-=-=-=-=-=-=-")
       console.log(select)
