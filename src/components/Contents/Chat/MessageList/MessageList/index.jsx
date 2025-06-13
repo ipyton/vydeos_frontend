@@ -363,8 +363,6 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId).then((res)=>{
         if (res.count === 0) return
         DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.count).then(messages=>{
-          console.log("99999999999")
-          console.log(messages)
           select.count = 0
           DatabaseManipulator.addRecentContacts([select]).then(()=>{
             setChatRecords(prevRecords => [...prevRecords, ...messages])

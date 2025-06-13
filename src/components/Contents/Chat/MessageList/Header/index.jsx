@@ -54,7 +54,7 @@ const stringAvatar = (name) => {
 };
 
 export default function Header(props) {
-  const { selected, onBack } = props;
+  const { selected, onBack,select } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -126,7 +126,7 @@ export default function Header(props) {
   };
 
   // Extract name and avatar info
-  const contactName = selected.name || (selected.type === "groupId" ? selected.groupId : "Chat");
+  const contactName = selected.name || (selected.type === "groupId" ? selected.groupId : selected.userId);
   const isOnline = selected.status === "online";
   
   return (
