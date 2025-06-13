@@ -120,8 +120,19 @@ export default function Contents(props) {
     }
 
     const groupMessageHandler = (message) => {
+        const sender = message.userId 
+        const receiver = localStorage.getItem("userEmail")
+        message.senderId = sender
+        message.receiver = receiver
+        DatabaseManipulator.addContactHistories([message]).then(() => {
+            DatabaseManipulator.insertUnreadMessages([message]).then(() => {
+                DatabaseManipulator.addRecentContacts([message]).then(() => {
+                    dispatcher(update())
+                });
 
-
+            })
+        });
+        console.log("handle group messages")
     }
 
     const handleMessage = (message) => {
@@ -171,7 +182,7 @@ export default function Contents(props) {
     }, []);
 
 
-    const markAsRead = (type, userId) => {
+    const markAsRead = (type, userId,groupId) => {
         MessageUtil.markAsRead(type, userId).then((res) => {
             if (res && res.data && res.data.code === 0) {
                 console.log("Marked as read successfully")

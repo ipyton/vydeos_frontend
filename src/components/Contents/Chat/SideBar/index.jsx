@@ -74,19 +74,25 @@ export default function SideBar(props) {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
-
-  const filteredContacts = Array.isArray(userRecords) 
-    ? userRecords.filter(record => 
-        (record.name && record.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
-        (record.userId && record.userId.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    : [];
+const filteredContacts = userRecords;
+  // const filteredContacts = Array.isArray(userRecords) 
+  //   ? userRecords.filter(record => 
+  //       (record.name && record.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+  //       (record.userId && record.userId.toLowerCase().includes(searchQuery.toLowerCase()))
+  //     )
+  //   : [];
 
   const onClick = (idx) => {
     return () => {
       let mid = filteredContacts[idx];
-      markAsRead(mid.type,mid.userId)
+      if (mid.type === "single") {
+       markAsRead(mid.type,mid.userId)
       setSelect({ "userId": mid.userId, "type": mid.type });
+      } else {
+        markAsRead(mid.type, mid.userId, mid.groupId)
+        setSelect({ "userId": mid.userId, "type": mid.type,"groupId":mid.groupId })
+      }
+
     }
   };
 
@@ -260,7 +266,7 @@ export default function SideBar(props) {
           }}>
             {filteredContacts.map((content, idx) => (
               <Contact 
-                key={content.userId || idx} 
+                key={content.type + content.userId  || idx} 
                 onClick={onClick(idx)} 
                 content={content} 
                 selected={select}

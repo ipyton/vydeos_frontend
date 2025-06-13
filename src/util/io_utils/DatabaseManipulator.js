@@ -78,32 +78,64 @@ export default class DatabaseManipulator {
         try {
             for (const message of messages) {
                 const userId = message.senderId || message.userId;
-                const type = message.type;
-                const key = [type, userId]; // 用于索引查找
+                const type = message.type;      
+                const groupId = message.groupId
+                if (type === "single") {
+                    const key = [type, userId]; // 用于索引查找
 
-                const existing = await db.contacts.get(key);
+                    const existing = await db.contacts.get(key);
 
-                if (existing) {
-                    await db.contacts.update(key, {
-                        name: message.name || existing.name,
-                        avatar: message.avatar || existing.avatar,
-                        content: message.content || existing.content,
-                        timestamp: message.sendTime || message.timestamp || existing.timestamp|| Date.now(),
-                        count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
-                        sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
-                    });
-                } else {
-                    await db.contacts.add({
-                        userId,
-                        name: message.name || "",
-                        avatar: message.avatar || "",
-                        type,
-                        timestamp: message.sendTime || message.timestamp || Date.now(),
-                        content: message.content || "",
-                        count: message.count || 1,
-                        sessionMessageId: message.sessionMessageId || -1
-                    });
+                    if (existing) {
+                        await db.contacts.update(key, {
+                            name: message.name || existing.name,
+                            avatar: message.avatar || existing.avatar,
+                            content: message.content || existing.content,
+                            timestamp: message.sendTime || message.timestamp || existing.timestamp || Date.now(),
+                            count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
+                            sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
+                        });
+                    } else {
+                        await db.contacts.add({
+                            userId,
+                            name: message.name || "",
+                            avatar: message.avatar || "",
+                            type,
+                            timestamp: message.sendTime || message.timestamp || Date.now(),
+                            content: message.content || "",
+                            count: message.count || 1,
+                            sessionMessageId: message.sessionMessageId || -1
+                        });
+                    }
+                } else if (type === "group") {
+                    const key = [type, groupId]; // 用于索引查找
+
+                    const existing = await db.contacts.get(key);
+
+                    if (existing) {
+                        await db.contacts.update(key, {
+                            userId,
+                            name: message.name || existing.name,
+                            avatar: message.avatar || existing.avatar,
+                            content: message.content || existing.content,
+                            timestamp: message.sendTime || message.timestamp || existing.timestamp || Date.now(),
+                            count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
+                            sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
+                        });
+                    } else {
+                        await db.contacts.add({
+                            groupId,
+                            userId,
+                            name: message.name || "",
+                            avatar: message.avatar || "",
+                            type,
+                            timestamp: message.sendTime || message.timestamp || Date.now(),
+                            content: message.content || "",
+                            count: message.count || 1,
+                            sessionMessageId: message.sessionMessageId || -1
+                        });
+                    }
                 }
+
             }
         } catch (error) {
             console.error('Error adding recent contacts:', error);
@@ -168,6 +200,7 @@ export default class DatabaseManipulator {
                         content: message.content ?? existing.content ?? "",
                         count: message.hasOwnProperty('count') ? message.count : (existing.count ?? 0),
                         sessionMessageId: message.sessionMessageId ?? existing.sessionMessageId ?? -1,
+                        groupId:message.groupId || 0
                     };
 
                     // Add the appropriate ID field based on type
@@ -213,41 +246,41 @@ export default class DatabaseManipulator {
         }
     }
 
-static async deleteContactHistory(criteria) {
-    try {
-        const query = db.messages;
-        let deletedCount = 0;
+    static async deleteContactHistory(criteria) {
+        try {
+            const query = db.messages;
+            let deletedCount = 0;
 
-        if (criteria.type === 'group' && criteria.groupId) {
-            // Delete all group messages with specific groupId
-            deletedCount = await query
-                .where('[type+groupId]')
-                .equals(['group', criteria.groupId])
-                .delete();
-        } else if (
-            criteria.type === 'single' &&
-            criteria.userId1 &&
-            criteria.userId2
-        ) {
-            const result = DatabaseManipulator.compareStrings(criteria.userId1, criteria.userId2)
-            const count = await query
-                .where('[type+userId1+userId2]')
-                .equals(['single', result.smaller, result.larger])
-                .delete();
+            if (criteria.type === 'group' && criteria.groupId) {
+                // Delete all group messages with specific groupId
+                deletedCount = await query
+                    .where('[type+groupId]')
+                    .equals(['group', criteria.groupId])
+                    .delete();
+            } else if (
+                criteria.type === 'single' &&
+                criteria.userId1 &&
+                criteria.userId2
+            ) {
+                const result = DatabaseManipulator.compareStrings(criteria.userId1, criteria.userId2)
+                const count = await query
+                    .where('[type+userId1+userId2]')
+                    .equals(['single', result.smaller, result.larger])
+                    .delete();
 
-            deletedCount = count;
-        } else {
-            console.error('No valid criteria provided');
+                deletedCount = count;
+            } else {
+                console.error('No valid criteria provided');
+                return false;
+            }
+
+            console.log(`Successfully deleted ${deletedCount} messages`);
+            return true;
+        } catch (error) {
+            console.error('Error deleting messages by criteria:', error);
             return false;
         }
-
-        console.log(`Successfully deleted ${deletedCount} messages`);
-        return true;
-    } catch (error) {
-        console.error('Error deleting messages by criteria:', error);
-        return false;
     }
-}
 
 
 
@@ -308,37 +341,37 @@ static async deleteContactHistory(criteria) {
         }
     }
 
-   static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
-    const own = localStorage.getItem("userId");
-    try {
-        let messages;
-        const result = compareStrings(own, senderId);
+    static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
+        const own = localStorage.getItem("userId");
+        try {
+            let messages;
+            const result = compareStrings(own, senderId);
 
-        if (type === 'group') {
-            messages = await db.messages
-                .where('[type+groupId]')
-                .equals([type, senderId])
-                .and(msg => msg.sessionMessageId <= beforeSessionMessageId)
-                .reverse()
-                .limit(limit)
-                .toArray();
+            if (type === 'group') {
+                messages = await db.messages
+                    .where('[type+groupId]')
+                    .equals([type, senderId])
+                    .and(msg => msg.sessionMessageId <= beforeSessionMessageId)
+                    .reverse()
+                    .limit(limit)
+                    .toArray();
 
-        } else {
-            messages = await db.messages
-                .where('[type+userId1+userId2]')
-                .equals([type, result.smaller, result.larger])
-                .and(msg => msg.sessionMessageId <= beforeSessionMessageId)
-                .reverse()
-                .limit(limit)
-                .toArray();
+            } else {
+                messages = await db.messages
+                    .where('[type+userId1+userId2]')
+                    .equals([type, result.smaller, result.larger])
+                    .and(msg => msg.sessionMessageId <= beforeSessionMessageId)
+                    .reverse()
+                    .limit(limit)
+                    .toArray();
+            }
+
+            return messages.reverse(); // 从旧到新排序
+        } catch (error) {
+            console.error('Error getting contact history:', error);
+            return [];
         }
-
-        return messages.reverse(); // 从旧到新排序
-    } catch (error) {
-        console.error('Error getting contact history:', error);
-        return [];
     }
-}
 
 
     static async getContactHistoryCount(type, receiverId) {
@@ -558,7 +591,7 @@ static async deleteContactHistory(criteria) {
 
             for (const message of messages) {
                 if (
-                    (message.type === 'group' && (!message.groupId || !message.userId1 || !message.userId2)) ||
+                    (message.type === 'group' && (!message.groupId || !message.userId)) ||
                     (message.type === 'single' && (!message.userId1 || !message.userId2)) ||
                     !message.type
                 ) {

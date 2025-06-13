@@ -39,13 +39,15 @@ export default function Contact(props) {
   
 
   const isSelected = React.useMemo(() => {
+    console.log("-----------------------")
+    console.log(selected)
     if (!selected) {
       return false;
     }
     if (selected.type === "userId") {
       return userId === selected.userId;
     } else if (selected.type === "groupId") {
-      return userId === selected.groupId;
+      return groupId === selected.groupId;
     }
     return userId === selected.userId;
   }, [selected, userId]);
@@ -312,7 +314,7 @@ export default function Contact(props) {
                   fontSize: isMobile ? '0.9rem' : '1rem'
                 }}
               >
-                {name || userId}
+                {name || userId || selected.groupId}
               </Typography>
               
               <Typography 
@@ -403,7 +405,7 @@ export default function Contact(props) {
         }}
       >
         <MenuItem 
-          onClick={()=>{markAsRead(props.content.type,userId)}}
+          onClick={()=>{markAsRead(props.content.type,userId,selected.groupId)}}
           disabled={!count || !markAsRead}
           sx={{
             color: mode === 'dark' ? '#ffffff' : '#000000',

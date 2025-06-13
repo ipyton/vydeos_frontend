@@ -177,8 +177,8 @@ export default class MessageUtil {
         });
     }
 
-    static markAsRead(type, userId ) {
-        return apiClient.post("/chat/markUnread", {type: type, senderId: userId})
+    static markAsRead(type, userId,groupId ) {
+        return apiClient.post("/chat/markUnread", {type: type, senderId: userId, groupId})
     }
 
     static getUnreadMessages(){
