@@ -9,7 +9,8 @@ import {
   ListItemText,
   Paper,
   Slider,
-  useTheme
+  useTheme,
+  Chip
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -18,6 +19,10 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import DeleteIcon from '@mui/icons-material/Delete';
 import UndoIcon from '@mui/icons-material/Undo';
 import CloseIcon from '@mui/icons-material/Close';
+import InfoIcon from '@mui/icons-material/Info';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningIcon from '@mui/icons-material/Warning';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const MessageBubble = ({ 
   message, 
@@ -37,56 +42,7 @@ const MessageBubble = ({
   
   senderName = senderName || 'Unknown Sender';
   
-  const formatTime = (timestamp) => {
-    const now = Date.now();
-    const diff = now - timestamp;
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const messageDate = new Date(timestamp);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (seconds < 60) {
-      return seconds < 10 ? 'Just now' : `${seconds}s ago`;
-    } else if (minutes < 60) {
-      return `${minutes}m ago`;
-    } else {
-      if (messageDate.toDateString() === today.toDateString()) {
-        return messageDate.toLocaleTimeString([], { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
-      } else if (messageDate.toDateString() === yesterday.toDateString()) {
-        return `Yesterday ${messageDate.toLocaleTimeString([], { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        })}`;
-      } else if (diff < 7 * 24 * 60 * 60 * 1000) {
-        const dayName = messageDate.toLocaleDateString([], { weekday: 'short' });
-        return `${dayName} ${messageDate.toLocaleTimeString([], { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        })}`;
-      } else if (messageDate.getFullYear() === today.getFullYear()) {
-        return messageDate.toLocaleDateString([], { 
-          month: 'short', 
-          day: 'numeric',
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
-      } else {
-        return messageDate.toLocaleDateString([], { 
-          year: 'numeric',
-          month: 'short', 
-          day: 'numeric',
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
-      }
-    }
-  };
+//message.type = "status"
 
   const formatDateAndTime = (timestamp) => {
     const messageDate = new Date(timestamp);
@@ -134,6 +90,9 @@ const MessageBubble = ({
   };
 
   const handleContextMenu = (event) => {
+    // Don't show context menu for status messages
+    if (message.type === 'status') return;
+    
     event.preventDefault();
     setContextMenu(
       contextMenu === null
@@ -146,6 +105,9 @@ const MessageBubble = ({
   };
 
   const handleTouchStart = (e) => {
+    // Don't show context menu for status messages
+    if (message.type === 'status') return;
+    
     const timer = setTimeout(() => {
       const touch = e.touches[0];
       setContextMenu({
@@ -177,6 +139,34 @@ const MessageBubble = ({
     setContextMenu(null);
   };
 
+  const getStatusIcon = (severity) => {
+    switch (severity) {
+      case 'success':
+        return <CheckCircleIcon fontSize="small" />;
+      case 'warning':
+        return <WarningIcon fontSize="small" />;
+      case 'error':
+        return <ErrorIcon fontSize="small" />;
+      case 'info':
+      default:
+        return <InfoIcon fontSize="small" />;
+    }
+  };
+
+  const getStatusColor = (severity) => {
+    switch (severity) {
+      case 'success':
+        return theme.palette.success;
+      case 'warning':
+        return theme.palette.warning;
+      case 'error':
+        return theme.palette.error;
+      case 'info':
+      default:
+        return theme.palette.info;
+    }
+  };
+
   const renderMessageContent = () => {
     if (message.withdrawn) {
       return (
@@ -188,6 +178,27 @@ const MessageBubble = ({
     }
 
     switch (message.type) {
+      case 'status':
+        const statusColor = getStatusColor(message.severity);
+        return (
+          <Chip
+            icon={getStatusIcon(message.severity)}
+            label={message.content}
+            variant="outlined"
+            size="small"
+            sx={{
+              borderColor: statusColor.main,
+              color: statusColor.main,
+              backgroundColor: darkMode 
+                ? `${statusColor.main}15` 
+                : `${statusColor.main}10`,
+              '& .MuiChip-icon': {
+                color: statusColor.main
+              }
+            }}
+          />
+        );
+
       case 'text':
       case 'single':
         return (
@@ -293,6 +304,31 @@ const MessageBubble = ({
     }
   };
 
+  // Special rendering for status messages
+  if (message.type === 'status') {
+    return (
+      <Box sx={{ mb: 2, textAlign: 'center' }}>
+        {renderMessageContent()}
+        
+        {timestamp && (
+          <Typography 
+            variant="caption" 
+            component="div"
+            title={getAbsoluteTime(timestamp)}
+            sx={{ 
+              mt: 0.5,
+              cursor: 'help',
+              color: darkMode ? theme.palette.grey[500] : theme.palette.grey[400]
+            }}
+          >
+            {formatDateAndTime(timestamp)}
+          </Typography>
+        )}
+      </Box>
+    );
+  }
+
+  // Regular message rendering
   return (
     <Box sx={{ mb: 2, textAlign: isOwn ? 'right' : 'left' }}>
       {!isOwn && senderName && !message.withdrawn && (
