@@ -385,7 +385,7 @@ export default function Login(props) {
                     label="Remember me for 30 days"
                     sx={{ mb: 2 }}
                   />
-                          <GoogleOAuthProvider clientId="你的客户端ID">
+                          <GoogleOAuthProvider clientId="282080402821-e07eo98flrekqkh8p4rja2kr5f387psi.apps.googleusercontent.com">
             <SignInButton />
           </GoogleOAuthProvider>
                   

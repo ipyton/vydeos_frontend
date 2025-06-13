@@ -201,4 +201,8 @@ export default class AccountUtil {
   static forget() {
     // Implementation needed
   }
+
+  static googleLogin(params) {
+    return apiClient.post("/account/google", params)
+  }
 }
