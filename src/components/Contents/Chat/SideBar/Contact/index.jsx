@@ -19,10 +19,11 @@ import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
 
 export default function Contact(props) {
-  const { userId, name, avatar, count, timestamp, content, groupId } = props.content;
+  const { userId, name, avatar, count, timestamp, content, groupId,type,groupName } = props.content;
   const { selected, onClick, isMobile, onDelete, markAsRead } = props;
   const { mode } = useThemeMode();
-  
+  console.log("content")
+  console.log(content)
   // Touch and swipe handling
   const [touchStart, setTouchStart] = React.useState(null);
   const [touchEnd, setTouchEnd] = React.useState(null);
@@ -39,7 +40,6 @@ export default function Contact(props) {
   
 
   const isSelected = React.useMemo(() => {
-    console.log("-----------------------")
     console.log(selected)
     if (!selected) {
       return false;
@@ -314,7 +314,7 @@ export default function Contact(props) {
                   fontSize: isMobile ? '0.9rem' : '1rem'
                 }}
               >
-                {name || userId || selected.groupId}
+                {type === "single" ? (name|| userId):( groupId|| groupName)}
               </Typography>
               
               <Typography 

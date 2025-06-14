@@ -50,8 +50,15 @@ export default function SideBar(props) {
     DatabaseManipulator.getRecentContacts()
       .then((res) => {
         console.log("Fetched contacts:", res);
-        if(select && select.userId){
+        if(select && select.userId && select.type === "single"){
           const user = res.find(item=>item.userId === select.userId)
+          if (user) {
+            user.count = 0;
+            select.count = 0
+            DatabaseManipulator.addRecentContacts([select])
+          }
+        } else if (select && select.groupId && select.type === "group") {
+          const user = res.find(item=>item.groupId === select.groupId)
           if (user) {
             user.count = 0;
             select.count = 0
@@ -265,8 +272,9 @@ const filteredContacts = userRecords;
             }
           }}>
             {filteredContacts.map((content, idx) => (
+
               <Contact 
-                key={content.type + content.userId  || idx} 
+                key={content.type + content.userId + content.groupId || idx} 
                 onClick={onClick(idx)} 
                 content={content} 
                 selected={select}
