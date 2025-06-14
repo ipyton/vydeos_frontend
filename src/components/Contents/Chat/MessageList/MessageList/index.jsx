@@ -333,9 +333,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       setPullDistance(0);
       setChatRecords([])
       loadingTriggeredRef.current = false; // Reset loading flag
-      console.log("-=-=-=-===-=-=-=-=-=-=-=-=-")
-      console.log(select)
-      DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId)
+      DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId,select.groupId)
         .then((newestSessionMessageId) => {
           console.log("newestSessionId" + newestSessionMessageId)
           setLastSessionMessageId(newestSessionMessageId);
@@ -360,7 +358,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       //   .catch(error => {
       //     console.error("Error getting newest session message ID:", error);
       //   });
-      DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId).then((res)=>{
+      DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId,select.groupId).then((res)=>{
         if (res.count === 0) return
         DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.count).then(messages=>{
           select.count = 0
@@ -381,7 +379,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
     }
 
     if (chatRecords.length === 0) {
-      MessageMiddleware.getContactHistory(select.type, select.userId, limit, lastSessionMessageId)
+      MessageMiddleware.getContactHistory(select.type, select.userId, limit, lastSessionMessageId, select.groupId)
         .then((res) => {
           if (res && res.length > 0) {
             console.log("res")

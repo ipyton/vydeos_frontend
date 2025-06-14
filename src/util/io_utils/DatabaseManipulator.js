@@ -224,11 +224,18 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async getNewestSessionMessageId(type, userId) {
+    static async getNewestSessionMessageId(type, userId,groupId) {
         try {
-            const contact = await db.contacts.get({ type, userId });
-            console.log(contact)
-            return contact ? contact.sessionMessageId || -1 : -1; // 返回 sessionMessageId 或 -1
+            if (type === "single") {
+                const contact = await db.contacts.get({ type, userId });
+                console.log(contact)
+                return contact ? contact.sessionMessageId || -1 : -1; // 返回 sessionMessageId 或 -1
+            } else if (type === "group") {
+                const contact = await db.contacts.get({ type, groupId });
+                console.log(contact)
+                return contact ? contact.sessionMessageId || -1 : -1;
+            }
+
         } catch (error) {
             console.error('Error getting newest session message ID:', error);
             return -1;
@@ -285,12 +292,21 @@ export default class DatabaseManipulator {
 
 
 
-    static async getRecentContactByTypeAndId(type, id) {
+    static async getRecentContactByTypeAndId(type, id,groupId) {
         try {
+            if (type ==="single") {
             return db.contacts
                 .where('[type+userId]')
                 .equals([type, id])
                 .first();
+            }
+            else if (type ==="group") {
+                return db.contacts
+                .where('[type+groupId]')
+                .equals([type, groupId])
+                .first();
+            }
+
         } catch (error) {
             console.error('Error getting recent contact:', error);
             return null;
@@ -341,22 +357,23 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10) {
+    static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10,groupId) {
         const own = localStorage.getItem("userId");
         try {
             let messages;
-            const result = compareStrings(own, senderId);
 
             if (type === 'group') {
                 messages = await db.messages
                     .where('[type+groupId]')
-                    .equals([type, senderId])
+                    .equals([type, groupId])
                     .and(msg => msg.sessionMessageId <= beforeSessionMessageId)
                     .reverse()
                     .limit(limit)
                     .toArray();
 
             } else {
+                const result = compareStrings(own, senderId);
+
                 messages = await db.messages
                     .where('[type+userId1+userId2]')
                     .equals([type, result.smaller, result.larger])

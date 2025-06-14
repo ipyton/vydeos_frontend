@@ -63,13 +63,15 @@ export default class MessageMiddleware {
     }
 
 
-    static async getContactHistory(type, userId, limit = 15, lastSessionMessageId) {
-        return DatabaseManipulator.getContactHistory(type, userId, lastSessionMessageId,limit).then(localRes=>{
-if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes) && localRes.length >= limit) {
+    static async getContactHistory(type, userId, limit = 15, lastSessionMessageId, groupId) {
+        return DatabaseManipulator.getContactHistory(type, userId, lastSessionMessageId,limit,groupId).then(localRes=>{
+            console.log(localRes)
+
+            if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes) && localRes.length >= limit) {
                 return localRes;
             }
             else {
-                return MessageUtil.getMessageRecords(type,userId, limit, lastSessionMessageId).then(async networkRes=> {
+                return MessageUtil.getMessageRecords(type,userId, limit, lastSessionMessageId,groupId).then(async networkRes=> {
                     const result =  MessageMiddleware.fillMissingMessages(lastSessionMessageId, limit, JSON.parse(networkRes.data.message) , localRes||[])
                     console.log(result)
                     await DatabaseManipulator.addContactHistories(result.missingFromLocal)

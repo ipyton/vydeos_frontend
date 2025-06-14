@@ -177,7 +177,7 @@ const MessageBubble = ({
       );
     }
 
-    switch (message.type) {
+    switch (message.messageType) {
       case 'status':
         const statusColor = getStatusColor(message.severity);
         return (
@@ -305,7 +305,7 @@ const MessageBubble = ({
   };
 
   // Special rendering for status messages
-  if (message.type === 'status') {
+  if (message.messageType === 'status') {
     return (
       <Box sx={{ mb: 2, textAlign: 'center' }}>
         {renderMessageContent()}
