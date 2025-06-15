@@ -78,9 +78,9 @@ static async addRecentContacts(messages) {
     console.log(messages)
     try {
         for (const message of messages) {
-            const userId = message.senderId || message.userId;
+            const userId = message.senderId || message.userId || "";
             const type = message.type;      
-            const groupId = message.groupId || null; // Handle undefined groupId
+            const groupId = message.groupId || 0; // Handle undefined groupId
             
             if (type === "single") {
                 // Create consistent key format
@@ -128,7 +128,7 @@ static async addRecentContacts(messages) {
                 }
                 
             } else if (type === "group") {
-                const key = `${type}+${groupId}+${userId}`;
+                const key = `${type}+${groupId}`;
                 
                 try {
                     const existing = await db.contacts.get(key);

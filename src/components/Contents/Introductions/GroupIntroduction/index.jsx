@@ -69,11 +69,13 @@ export default function GroupDetailsComponent(props) {
     const handleChat = () => {
         const contact = {
             type: "group",
-            userId: details.groupId,
-            name: details.groupName
+            groupId: details.groupId,
+            name: details.groupName,
+            count: 0
         };
 
-        DatabaseManipulator.addRecentContact(contact).then(() => {
+        DatabaseManipulator.addRecentContacts([contact]).then(() => {
+            console.log(contact)
             navigate("/chat", { ...contact });
             dispatch(update());
         });

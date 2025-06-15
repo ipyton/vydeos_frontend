@@ -121,21 +121,28 @@ export default class MessageUtil {
         if (sendTo.type === "single") {
             data.receiverId = sendTo.userId;
             data.type = "single";
+            console.log(data);
+            return apiClient.post("/chat/sendMessage", Qs.stringify(data), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
         }
         else if (sendTo.type === "group") {
-            data.groupId = sendTo.userId;
+            data.groupId = sendTo.groupId;
             data.type = "group";
+            return apiClient.post("/group_chat/sendMessage", Qs.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+            });
+
         }
         else {
             return;
         }
         
-        console.log(data);
-        return apiClient.post("/chat/sendMessage", Qs.stringify(data), {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
+
     }
 
     // this is used for show friend details.
