@@ -41,7 +41,7 @@ export default function ChatContainer(props) {
     }
   };
 
-  if (!select || !select.type || !select.userId) {
+  if (!select || !select.type ) {
     return (
       <Box
         sx={{

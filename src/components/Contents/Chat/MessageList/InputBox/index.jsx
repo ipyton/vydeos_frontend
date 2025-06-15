@@ -164,9 +164,34 @@ const textFieldStyles = {
       const response = await MessageUtil.sendMessage(userId, select, text, "text");
 
       if (response.data.result === true) {
-  
+        if (select.type === "single") {
         let direction = true
         const result = compareStrings(userId, select.userId)
+        if (result.larger === userId) {
+          direction = false
+        }
+          const message = {
+            userId1: result.smaller,
+            userId2: result.larger,
+            direction:direction,
+            content: text,
+            type: select.type,
+            timestamp: response.data.timestamp,
+            messageId:response.data.messageId,
+            sessionMessageId: response.data.sessionMessageId,
+            messageType:"text"
+
+          };
+          await DatabaseManipulator.addContactHistory(message);
+          const senderId = direction ? result.larger : result.smaller
+          message.senderId = senderId
+          //message.count = 0
+          await DatabaseManipulator.initRecentContacts([message])
+          setChatRecords([...chatRecords, message]); // Update chat records
+
+        } else if (select.type==="group") {
+        let direction = true
+        const result = compareStrings(userId, "")
         if (result.larger === userId) {
           direction = false
         }
@@ -174,18 +199,28 @@ const textFieldStyles = {
           userId1: result.smaller,
           userId2: result.larger,
           direction:direction,
+          groupId:select.groupId,
           content: text,
           type: select.type,
           timestamp: response.data.timestamp,
           messageId:response.data.messageId,
           sessionMessageId: response.data.sessionMessageId,
+          messageType:"text"
+          
         };
         await DatabaseManipulator.addContactHistory(message);
         const senderId = direction ? result.larger : result.smaller
-        message.senderId = senderId
+        message.userId = ""
         //message.count = 0
         await DatabaseManipulator.initRecentContacts([message])
         setChatRecords([...chatRecords, message]); // Update chat records
+
+        }
+        let direction = true
+        const result = compareStrings(userId, select.userId)
+        if (result.larger === userId) {
+          direction = false
+        }
 
         dispatcher(update())
 

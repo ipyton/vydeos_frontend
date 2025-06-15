@@ -32,7 +32,11 @@ const stringToColor = (string) => {
 };
 
 const getInitials = (name) => {
+  if ( typeof name === "number" ) {
+    return name
+  }
   if (!name) return 'U';
+  
   return name
     .split(' ')
     .map((part) => part[0])
@@ -126,7 +130,7 @@ export default function Header(props) {
   };
 
   // Extract name and avatar info
-  const contactName = selected.name || (selected.type === "groupId" ? selected.groupId : selected.userId);
+  const contactName = selected.name || (selected.type === "group" ? selected.groupId : selected.userId);
   const isOnline = selected.status === "online";
   
   return (

@@ -122,7 +122,9 @@ export default function Contents(props) {
     const groupMessageHandler = (message) => {
         const sender = message.userId 
         const receiver = localStorage.getItem("userEmail")
-        message.senderId = sender
+        // message.senderId = sender
+        console.log("group")
+        console.log(message)
         message.receiver = receiver
         message.groupId = message.groupId
         DatabaseManipulator.addContactHistories([message]).then(() => {
@@ -166,6 +168,7 @@ export default function Contents(props) {
             } else if (action === "connectionFailed") {
                 console.warn("WebSocket connection failed");
             } else if (action === "messageReceived") {
+                console.log("messageREceiveed")
                 handleMessage(JSON.parse(data));
             }
         };
@@ -189,7 +192,7 @@ export default function Contents(props) {
                 console.log("Marked as read successfully")
                 // Update the notifications state to remove the read message
                 DatabaseManipulator.changeCountOfRecentContact(type, userId,groupId, 0).then(() => {
-                    DatabaseManipulator.deleteUnreadMessage(type, userId).then(() => {
+                    DatabaseManipulator.deleteUnreadMessage(type,groupId, userId).then(() => {
                         const updatedList = notifications.filter(notification => {
                             console.log("Filtering notification:", notification, "with userId:", userId, "and type:", type);
                             return !(notification.senderId === userId && notification.type === type);

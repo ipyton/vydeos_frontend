@@ -41,8 +41,8 @@ const MessageBubble = ({
   const [longPressTimer, setLongPressTimer] = useState(null);
   
   senderName = senderName || 'Unknown Sender';
-  
-//message.type = "status"
+
+  //message.type = "status"
 
   const formatDateAndTime = (timestamp) => {
     const messageDate = new Date(timestamp);
@@ -200,7 +200,6 @@ const MessageBubble = ({
         );
 
       case 'text':
-      case 'single':
         return (
           <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
             {message.content}

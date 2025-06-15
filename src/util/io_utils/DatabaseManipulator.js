@@ -8,7 +8,7 @@ class ChatDatabase extends Dexie {
             settings: 'key, value',
             contacts: '&[type+groupId+userId], type, timestamp',
             messages: '&messageId, [type+userId1+userId2+sessionMessageId], [type+userId1+userId2], [type+groupId],[type+groupId+sessionMessageId]',
-            unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
+            unreadMessages: '&[type+groupId+senderId], userId, senderId, sessionMessageId, messageId'
         });
 
         // Add hooks for auto-updating timestamps
@@ -134,10 +134,10 @@ static async addRecentContacts(messages) {
                     const existing = await db.contacts.get(key);
                     if (existing) {
                         await db.contacts.update(key, {
-                            userId,
+                            userId:"",
                             name: message.name || existing.name,
                             avatar: message.avatar || existing.avatar,
-                            content: message.content || existing.content,
+                            content: userId+ ": " + (message.content || existing.content),
                             timestamp: message.sendTime || message.timestamp || existing.timestamp || Date.now(),
                             count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
                             sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
@@ -145,12 +145,12 @@ static async addRecentContacts(messages) {
                     } else {
                         await db.contacts.add({
                             groupId,
-                            userId,
+                            userId:"",
                             name: message.name || "",
                             avatar: message.avatar || "",
                             type,
                             timestamp: message.sendTime || message.timestamp || Date.now(),
-                            content: message.content || "",
+                            content: userId + ": " +  message.content || "",
                             count: message.count || 1,
                             sessionMessageId: message.sessionMessageId || -1
                         });
@@ -231,6 +231,7 @@ static async addRecentContacts(messages) {
                     const existing = existingContactsMap.get(key) || {};
 
                     const contact = {
+                        userId: message.userId,
                         type: type,
                         timestamp: message.sendTime ?? existing.timestamp ?? Date.now(),
                         name: message.name ?? existing.name ?? "",
@@ -241,12 +242,6 @@ static async addRecentContacts(messages) {
                         groupId:message.groupId || 0
                     };
 
-                    // Add the appropriate ID field based on type
-                    if (isGroup) {
-                        contact.groupId = id;
-                    } else {
-                        contact.userId = id;
-                    }
 
                     return contact;
                 });
@@ -362,13 +357,13 @@ static async addRecentContacts(messages) {
         try {
 
             if (
-                (message.type === 'group' && (!message.groupId || !message.userId1 || !message.userId2)) ||
+                (message.type === 'group' && (!message.groupId)) ||
                 (message.type === 'single' && (!message.userId1 || !message.userId2)) ||
                 !message.type
             ) {
                 return;
             }
-
+            
             const messageData = {
                 ...message,
                 messageId: message.id || message.messageId,
@@ -446,19 +441,19 @@ static async addRecentContacts(messages) {
     static async insertUnreadMessages(unreadMessages) {
         try {
             const dataToInsert = await Promise.all(unreadMessages.map(async (unreadMessage) => {
-                const key = `${unreadMessage.type}+${unreadMessage.senderId}`;
 
                 // 查询是否存在已读消息
                 const existing = await db.unreadMessages
-                    .where('[type+senderId]')
-                    .equals([unreadMessage.type, unreadMessage.senderId])
+                    .where('[type+groupId+senderId]')
+                    .equals([unreadMessage.type, unreadMessage.type === "group" ? unreadMessage.groupId : 0, unreadMessage.type === "group" ?"":unreadMessage.senderId])
                     .first();
 
                 const previousCount = existing?.count || 0;
 
                 return {
                     userId: unreadMessage.userId,
-                    senderId: unreadMessage.senderId,
+                    groupId: unreadMessage.groupId || 0,
+                    senderId:unreadMessage.type ==="group"? "":unreadMessage.senderId,
                     sessionMessageId: unreadMessage.sessionMessageId,
                     type: unreadMessage.type,
                     messageType: unreadMessage.messageType,
@@ -471,6 +466,7 @@ static async addRecentContacts(messages) {
                 };
             }));
 
+            console.log("puting")
             await db.unreadMessages.bulkPut(dataToInsert);
             return true;
         } catch (error) {
@@ -686,11 +682,11 @@ static async addRecentContacts(messages) {
 
     }
 
-    static async deleteUnreadMessage(type, senderId) {
+    static async deleteUnreadMessage(type, groupId, senderId) {
         try {
             const deletedCount = await db.unreadMessages
-                .where('[type+senderId]')
-                .equals([type, senderId])
+                .where('[type+groupId+senderId]')
+                .equals([type, groupId,senderId])
                 .delete();
 
             return deletedCount > 0;

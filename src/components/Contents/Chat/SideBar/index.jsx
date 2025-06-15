@@ -27,7 +27,7 @@ export default function SideBar(props) {
     const criteria = {type, groupId}
     DatabaseManipulator.deleteRecentContact(criteria).then(()=>{
       DatabaseManipulator.deleteMessages(criteria).then(() => {
-        DatabaseManipulator.deleteUnreadMessage(criteria).then(() =>{
+        DatabaseManipulator.deleteUnreadMessage(type,groupId, userId).then(() =>{
 
         })
       })
