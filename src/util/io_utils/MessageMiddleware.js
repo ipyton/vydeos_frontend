@@ -31,49 +31,40 @@ export default class MessageMiddleware {
      * }}
      */
 
-static fillMissingMessages(lastMessageSessionId, limit, from_network, from_local) {
-    if (lastMessageSessionId <= 0) {
-        return { filled: [], missingFromLocal: [] };
-    }
-    
-    // 创建 Map 时使用复合键来避免冲突
-    const localMap = new Map(from_local.map(m => [`${m.messageId}-${m.sessionMessageId}`, m]));
-    const networkMap = new Map(from_network.map(m => [`${m.messageId}-${m.sessionMessageId}`, m]));
 
-    const filled = [];
-    const missingFromLocal = [];
-    const seenMessageIds = new Set(); // 添加去重检查
+    static fillMissingMessages(lastMessageSessionId, limit, from_network, from_local) {
+        if (lastMessageSessionId <= 0) {
+            return { filled: [], missingFromLocal: [] };
+        }
+        const localMap = new Map(from_local.map(m => [m.sessionMessageId, m]));
+        const networkMap = new Map(from_network.map(m => [m.sessionMessageId, m]));
 
-    for (let i = 0; i < limit; i++) {
-        const targetId = lastMessageSessionId - i;
-        const localKey = `${targetId}-${targetId}`; // 根据实际数据结构调整
-        
-        if (localMap.has(localKey)) {
-            const message = localMap.get(localKey);
-            if (!seenMessageIds.has(message.messageId)) {
-                filled.push(message);
-                seenMessageIds.add(message.messageId);
-            }
-        } else if (networkMap.has(localKey)) {
-            const fromNet = networkMap.get(localKey);
-            if (!seenMessageIds.has(fromNet.messageId)) {
+        const filled = [];
+        const missingFromLocal = [];
+
+        for (let i = 0; i < limit; i++) {
+            const targetId = lastMessageSessionId - i;
+            if (localMap.has(targetId)) {
+                filled.push(localMap.get(targetId));
+            } else if (networkMap.has(targetId)) {
+                const fromNet = networkMap.get(targetId);
                 filled.push(fromNet);
                 missingFromLocal.push(fromNet);
-                seenMessageIds.add(fromNet.messageId);
+            } else {
+                continue;
             }
-        } else {
-            break;
         }
+
+        return {
+            filled,
+            missingFromLocal
+        };
     }
 
-    return {
-        filled,
-        missingFromLocal
-    };
-}
 
     static async getContactHistory(type, userId, limit = 15, lastSessionMessageId, groupId) {
         return DatabaseManipulator.getContactHistory(type, userId, lastSessionMessageId,limit,groupId).then(localRes=>{
+            console.log(localRes)
 
             if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes) && localRes.length >= limit) {
                 return localRes;
@@ -81,6 +72,7 @@ static fillMissingMessages(lastMessageSessionId, limit, from_network, from_local
             else {
                 return MessageUtil.getMessageRecords(type,userId, limit, lastSessionMessageId,groupId).then(async networkRes=> {
                     const result =  MessageMiddleware.fillMissingMessages(lastSessionMessageId, limit, JSON.parse(networkRes.data.message) , localRes||[])
+                    console.log(result)
                     await DatabaseManipulator.addContactHistories(result.missingFromLocal)
 
                     return result.filled.reverse()

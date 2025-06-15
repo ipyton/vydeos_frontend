@@ -183,25 +183,16 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
         return;
       }
 
-      const res = await MessageMiddleware.getContactHistory(
-        select.type,
-        select.userId,
-        limit,
-        lastSessionMessageId,
-        select.groupId
-      );
+      // const res = await MessageMiddleware.getContactHistory(
+      //   select.type,
+      //   select.userId,
+      //   limit,
+      //   newMessageId,
+      //   select.groupId
+      // );
+      setLastSessionMessageId(newMessageId);
 
-      if (res && res.length > 0) {
-        setChatRecords(prevRecords => [...res, ...prevRecords]);
-        setLastSessionMessageId(newMessageId);
 
-        if (res.length < limit) {
-          setHasMoreMessages(false);
-        }
-      } else {
-        setHasMoreMessages(false);
-        setLastSessionMessageId(-1);
-      }
     } catch (error) {
       console.error("Error loading more messages:", error);
       showNotification("Failed to load messages", "error");
@@ -336,7 +327,6 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       loadingTriggeredRef.current = false; // Reset loading flag
       DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId,select.groupId)
         .then((newestSessionMessageId) => {
-          console.log("newestSessionId" + newestSessionMessageId)
           setLastSessionMessageId(newestSessionMessageId);
         })
         .catch(error => {
@@ -347,31 +337,20 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
 
 
     useEffect(() => {
-    if (select) {
-      setPullDistance(0);
-      loadingTriggeredRef.current = false; // Reset loading flag
-      // DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId)
-      //   .then((newestSessionMessageId) => {
-      //     console.log("newestSessionId" + newestSessionMessageId)
-      //     //setLastSessionMessageId(newestSessionMessageId);
+      if (select) {
+        setPullDistance(0);
+        loadingTriggeredRef.current = false; // Reset loading flag
 
-      //   })
-      //   .catch(error => {
-      //     console.error("Error getting newest session message ID:", error);
-      //   });
-      console.log("select")
-      console.log(select)
-      DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId,select.groupId).then((res)=>{
-        console.log()
-        if (res.count === 0) return
-        DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.coun,select.groupId).then(messages=>{
-          select.count = 0
-          DatabaseManipulator.addRecentContacts([select]).then(()=>{
-            setChatRecords(prevRecords => [...prevRecords, ...messages])
+        DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId,select.groupId).then((res)=>{
+          if (res.count === 0) return
+          DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.count,select.groupId).then(messages=>{
+            select.count = 0
+            DatabaseManipulator.addRecentContacts([select]).then(()=>{
+              setChatRecords(prevRecords => [...prevRecords, ...messages])
+            })
           })
         })
-      })
-    }
+      }
   }, [refresh]);
 
   useEffect(() => {
@@ -381,28 +360,32 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       setHasMoreMessages(false);
       return;
     }
-
-    if (chatRecords.length === 0) {
+      if(lastSessionMessageId >= 0) {
+        console.log("lastSessionMessageId")
+        console.log(lastSessionMessageId)
       MessageMiddleware.getContactHistory(select.type, select.userId, limit, lastSessionMessageId, select.groupId)
         .then((res) => {
           if (res && res.length > 0) {
             console.log("res")
             console.log(res)
-            setChatRecords(res);
+            setChatRecords([...res, ...chatRecords]);
             // If initial load returns fewer than limit, no more messages
             if (res.length < limit) {
               setHasMoreMessages(false);
             }
           } else {
-            setChatRecords([]);
-            setHasMoreMessages(false);
+              //setChatRecords([]);
+              setHasMoreMessages(false);
+              setLastSessionMessageId(0);
           }
         })
         .catch(error => {
           console.error("Error loading initial messages:", error);
           setHasMoreMessages(false);
         });
-    }
+    
+      }
+
   }, [lastSessionMessageId]);
 
   const handleDelete = (message) => {

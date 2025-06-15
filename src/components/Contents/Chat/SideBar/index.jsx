@@ -40,7 +40,7 @@ export default function SideBar(props) {
 
 
   useEffect(() => {
-    if (location && location.type && location.userId) {
+    if (location && location.type && (location.userId || location.groupId)) {
       setSelect(location);
     }
   }, [location.type, location.userId, setSelect]);
