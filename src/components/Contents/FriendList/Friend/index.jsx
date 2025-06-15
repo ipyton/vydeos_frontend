@@ -547,8 +547,8 @@ export default function Friend(props) {
 
   // Calculate optimal list height for different devices
   const listHeight = isMobile ?
-    windowHeight * 0.7 : // Smaller height on mobile
-    windowHeight * 0.75;  // Larger height on desktop
+    windowHeight * 0.6 : // Smaller height on mobile
+    windowHeight * 0.65;  // Larger height on desktop
 
   // Tab configurations with icons
   const tabConfigs = [
@@ -563,7 +563,6 @@ export default function Friend(props) {
   return (
     <Paper elevation={3} sx={{
       borderRadius: 2,
-      maxHeight: '100%',
       overflow: 'hidden',
       backgroundColor: mode === 'dark' ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
       backdropFilter: 'blur(10px)',
@@ -698,6 +697,7 @@ export default function Friend(props) {
             <Box sx={{
               height: listHeight,
               overflowY: 'auto',
+              paddingBottom:"16px",
               WebkitOverflowScrolling: 'touch',
               msOverflowStyle: 'none',
               scrollbarWidth: 'thin',
@@ -760,6 +760,7 @@ export default function Friend(props) {
                   <List
                     disablePadding
                     sx={{
+                      paddingBottom:'8px',
                       '& > *:not(:last-child)': {
                         borderBottom: '1px solid',
                         borderColor: mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
@@ -777,17 +778,12 @@ export default function Friend(props) {
                   </List>
                 </Fade>
               )}
-            </Box>
-          </TabPanel>
-        ))}
-      </SwipeableViews>
-
-      {/* Count indicator */}
+                    {/* Count indicator */}
       {!isLoading && counts[value] > 0 && (
         <Box sx={{
           display: 'flex',
           justifyContent: 'center',
-          mt: 1,
+          mt: 0.5,
           mb: 0.5
         }}>
           <Chip
@@ -798,6 +794,13 @@ export default function Friend(props) {
           />
         </Box>
       )}
+            </Box>
+            
+          </TabPanel>
+        ))}
+      </SwipeableViews>
+
+
 
       {/* Create Group Dialog */}
       <CreateGroupDialog

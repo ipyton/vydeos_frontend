@@ -182,9 +182,9 @@ export default function Friends(props) {
   return (
     <Stack 
       sx={{ 
-        margin: isMobile ? '8px' : '12px',
+        marginTop:"4px",
         width: '100%',
-        height: isMobile ? "calc(100vh - 64px - 24px)" : "calc(100vh - 64px - 78px)",
+        height: isMobile ? "calc(100vh - 64px - 24px)" : "calc(100vh - 64px)",
         padding: isMobile ? '0' : '0 8px',
         backgroundColor: darkModeColors.background,
         borderRadius: '12px',
@@ -287,6 +287,7 @@ export default function Friends(props) {
                 : 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
               overflow: 'hidden',
               transition: 'all 0.3s ease-in-out',
+              height:"98%"
             }}
           >              
             {/* Friends List Header */}
