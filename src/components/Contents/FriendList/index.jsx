@@ -227,8 +227,8 @@ export default function Friends(props) {
             }}
           >
             <Typography 
-              variant="h6" 
-              sx={{ 
+              variant="h6"
+              sx={{
                 color: darkModeColors.text.primary,
                 fontWeight: 600,
                 display: 'flex',

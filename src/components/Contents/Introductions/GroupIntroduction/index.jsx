@@ -1,20 +1,14 @@
 import Stack from '@mui/material/Stack';
-import * as React from 'react';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import { useSelector, useDispatch } from "react-redux";
-import SocialMediaUtil from "../../../../util/io_utils/SocialMediaUtil";
-import localforage from "localforage";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MessageUtil from "../../../../util/io_utils/MessageUtil";
 import { useEffect } from "react";
-import axios from "axios"
-import AccountUtil from "../../../../util/io_utils/AccountUtil";
-import Qs from "qs"
+
 import {
     List,
     ListItemAvatar,
@@ -244,7 +238,7 @@ export default function GroupDetailsComponent(props) {
                         </Box>
                     }
                     action={
-                        <Stack direction="row" spacing={1}>
+                        <Stack direction={{ xs: "column", sm: "row" }}  spacing={1}>
                             <Button
                                 variant="contained"
                                 startIcon={<ChatIcon />}
@@ -341,24 +335,44 @@ export default function GroupDetailsComponent(props) {
                         Group Information
                     </Typography>
                     <Stack spacing={2}>
-                        <TextField
-                            label="Created"
-                            value={formatDate(details.createTime)}
-                            variant="outlined"
-                            size="small"
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            sx={textFieldStyles}
-                        />
-                        <TextField
-                            label="Owner ID"
-                            value={details.ownerId || "N/A"}
-                            variant="outlined"
-                            size="small"
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            sx={textFieldStyles}
-                        />
+                        <Box>
+                            <Typography variant="body2" sx={{
+                                color: isDark ? "rgba(255, 255, 255, 0.7)" : "text.secondary",
+                                fontWeight: 500,
+                                mb: 0.5
+                            }}>
+                                Created
+                            </Typography>
+                            <Typography variant="body1" sx={{
+                                color: isDark ? "rgba(255, 255, 255, 0.9)" : "text.primary",
+                                bgcolor: isDark ? "rgba(255, 255, 255, 0.02)" : "transparent",
+                                p: 1.5,
+                                borderRadius: 1,
+                                border: isDark ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(0, 0, 0, 0.12)"
+                            }}>
+                                {formatDate(details.createTime)}
+                            </Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="body2" sx={{
+                                color: isDark ? "rgba(255, 255, 255, 0.7)" : "text.secondary",
+                                fontWeight: 500,
+                                mb: 0.5
+                            }}>
+                                Owner ID
+                            </Typography>
+                            <Typography variant="body1" sx={{
+                                color: isDark ? "rgba(255, 255, 255, 0.9)" : "text.primary",
+                                bgcolor: isDark ? "rgba(255, 255, 255, 0.02)" : "transparent",
+                                p: 1.5,
+                                borderRadius: 1,
+                                border: isDark ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(0, 0, 0, 0.12)",
+                                fontFamily: 'monospace',
+                                wordBreak: 'break-all' // Helps with long IDs on narrow screens
+                            }}>
+                                {details.ownerId || "N/A"}
+                            </Typography>
+                        </Box>
                         <FormControlLabel
                             control={
                                 <Switch
