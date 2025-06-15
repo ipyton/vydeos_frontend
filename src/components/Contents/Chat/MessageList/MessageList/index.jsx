@@ -187,7 +187,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
         select.type,
         select.userId,
         limit,
-        lastSessionMessageId
+        lastSessionMessageId,
+        select.groupId
       );
 
       if (res && res.length > 0) {
@@ -358,9 +359,11 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       //   .catch(error => {
       //     console.error("Error getting newest session message ID:", error);
       //   });
+      console.log("select")
+      console.log(select)
       DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId,select.groupId).then((res)=>{
         if (res.count === 0) return
-        DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.count).then(messages=>{
+        DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.coun,select.groupId).then(messages=>{
           select.count = 0
           DatabaseManipulator.addRecentContacts([select]).then(()=>{
             setChatRecords(prevRecords => [...prevRecords, ...messages])

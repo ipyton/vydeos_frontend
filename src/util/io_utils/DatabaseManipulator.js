@@ -6,7 +6,7 @@ class ChatDatabase extends Dexie {
         super('ChatDatabase');
         this.version(1).stores({
             settings: 'key, value',
-            contacts: '[type+userId], [type+groupId], type, timestamp',
+            contacts: '&[type+groupId+userId], type, timestamp',
             messages: '&messageId, [type+userId1+userId2+sessionMessageId], [type+userId1+userId2], [type+groupId],[type+groupId+sessionMessageId]',
             unreadMessages: '[type+senderId], [type+groupId], userId, senderId, sessionMessageId, messageId'
         });
@@ -70,21 +70,24 @@ export default class DatabaseManipulator {
     }
 
 
-    static async addRecentContacts(messages) {
-        if (!messages || messages.length === 0) {
-            return [];
-        }
-
-        try {
-            for (const message of messages) {
-                const userId = message.senderId || message.userId;
-                const type = message.type;      
-                const groupId = message.groupId
-                if (type === "single") {
-                    const key = [type, userId]; // 用于索引查找
-
+static async addRecentContacts(messages) {
+    if (!messages || messages.length === 0) {
+        return [];
+    }
+    console.log("-=-=-=-=-=-==")
+    console.log(messages)
+    try {
+        for (const message of messages) {
+            const userId = message.senderId || message.userId;
+            const type = message.type;      
+            const groupId = message.groupId || null; // Handle undefined groupId
+            
+            if (type === "single") {
+                // Create consistent key format
+                const key = `${type}+${groupId}+${userId}`;
+                
+                try {
                     const existing = await db.contacts.get(key);
-
                     if (existing) {
                         await db.contacts.update(key, {
                             name: message.name || existing.name,
@@ -97,6 +100,7 @@ export default class DatabaseManipulator {
                     } else {
                         await db.contacts.add({
                             userId,
+                            groupId, // Include groupId
                             name: message.name || "",
                             avatar: message.avatar || "",
                             type,
@@ -106,11 +110,28 @@ export default class DatabaseManipulator {
                             sessionMessageId: message.sessionMessageId || -1
                         });
                     }
-                } else if (type === "group") {
-                    const key = [type, groupId]; // 用于索引查找
-
+                } catch (addError) {
+                    // Handle case where record was added between get and add
+                    if (addError.name === 'ConstraintError') {
+                        console.warn('Record already exists, updating instead:', key);
+                        await db.contacts.update(key, {
+                            name: message.name,
+                            avatar: message.avatar,
+                            content: message.content,
+                            timestamp: message.sendTime || message.timestamp || Date.now(),
+                            count: message.count || 1,
+                            sessionMessageId: message.sessionMessageId || -1
+                        });
+                    } else {
+                        throw addError;
+                    }
+                }
+                
+            } else if (type === "group") {
+                const key = `${type}+${groupId}+${userId}`;
+                
+                try {
                     const existing = await db.contacts.get(key);
-
                     if (existing) {
                         await db.contacts.update(key, {
                             userId,
@@ -134,14 +155,31 @@ export default class DatabaseManipulator {
                             sessionMessageId: message.sessionMessageId || -1
                         });
                     }
+                } catch (addError) {
+                    // Handle case where record was added between get and add
+                    if (addError.name === 'ConstraintError') {
+                        console.warn('Record already exists, updating instead:', key);
+                        await db.contacts.update(key, {
+                            groupId,
+                            userId,
+                            name: message.name,
+                            avatar: message.avatar,
+                            content: message.content,
+                            timestamp: message.sendTime || message.timestamp || Date.now(),
+                            count: message.count || 1,
+                            sessionMessageId: message.sessionMessageId || -1
+                        });
+                    } else {
+                        throw addError;
+                    }
                 }
-
             }
-        } catch (error) {
-            console.error('Error adding recent contacts:', error);
-            return null;
         }
+    } catch (error) {
+        console.error('Error adding recent contacts:', error);
+        return null;
     }
+}
 
 
     static async initRecentContacts(messages) {
@@ -227,7 +265,7 @@ export default class DatabaseManipulator {
     static async getNewestSessionMessageId(type, userId,groupId) {
         try {
             if (type === "single") {
-                const contact = await db.contacts.get({ type, userId });
+                const contact = await db.contacts.get({ type, groupId,userId });
                 console.log(contact)
                 return contact ? contact.sessionMessageId || -1 : -1; // 返回 sessionMessageId 或 -1
             } else if (type === "group") {
@@ -292,20 +330,12 @@ export default class DatabaseManipulator {
 
 
 
-    static async getRecentContactByTypeAndId(type, id,groupId) {
+    static async getRecentContactByTypeAndId(type, id, groupId) {
         try {
-            if (type ==="single") {
             return db.contacts
-                .where('[type+userId]')
-                .equals([type, id])
+                .where('[type+groupId+userId]')
+                .equals([type,groupId, id])
                 .first();
-            }
-            else if (type ==="group") {
-                return db.contacts
-                .where('[type+groupId]')
-                .equals([type, groupId])
-                .first();
-            }
 
         } catch (error) {
             console.error('Error getting recent contact:', error);
@@ -336,8 +366,6 @@ export default class DatabaseManipulator {
                 (message.type === 'single' && (!message.userId1 || !message.userId2)) ||
                 !message.type
             ) {
-                console.log("eeeeeeeee")
-                console.log(message)
                 return;
             }
 
@@ -357,7 +385,9 @@ export default class DatabaseManipulator {
         }
     }
 
-    static async getContactHistory(type, senderId, beforeSessionMessageId = Infinity, limit = 10,groupId) {
+    static async getContactHistory(type, senderId, beforeSessionMessageId = 0, limit = 15,groupId) {
+
+        console.log({type, senderId, beforeSessionMessageId, limit, groupId})
         const own = localStorage.getItem("userId");
         try {
             let messages;
@@ -637,13 +667,23 @@ export default class DatabaseManipulator {
     }
 
 
-    static changeCountOfRecentContact(type, id, count) {
+    static changeCountOfRecentContact(type, userId,groupId, count) {
+        if (type === "group") {
         return db.contacts
-            .where('[type+userId]')
-            .equals([type, id])
+            .where('[type+groupId]')
+            .equals([type,groupId])
             .modify(contact => {
                 contact.count = count;
             });
+        }else if (type === "single"){
+        return db.contacts
+            .where('[type+groupId+userId]')
+            .equals([type,groupId, userId])
+            .modify(contact => {
+                contact.count = count;
+            });
+        }
+
     }
 
     static async deleteUnreadMessage(type, senderId) {

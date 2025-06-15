@@ -124,6 +124,7 @@ export default function Contents(props) {
         const receiver = localStorage.getItem("userEmail")
         message.senderId = sender
         message.receiver = receiver
+        message.groupId = message.groupId
         DatabaseManipulator.addContactHistories([message]).then(() => {
             DatabaseManipulator.insertUnreadMessages([message]).then(() => {
                 DatabaseManipulator.addRecentContacts([message]).then(() => {
@@ -183,11 +184,11 @@ export default function Contents(props) {
 
 
     const markAsRead = (type, userId,groupId) => {
-        MessageUtil.markAsRead(type, userId).then((res) => {
+        MessageUtil.markAsRead(type, userId,groupId).then((res) => {
             if (res && res.data && res.data.code === 0) {
                 console.log("Marked as read successfully")
                 // Update the notifications state to remove the read message
-                DatabaseManipulator.changeCountOfRecentContact(type, userId, 0).then(() => {
+                DatabaseManipulator.changeCountOfRecentContact(type, userId,groupId, 0).then(() => {
                     DatabaseManipulator.deleteUnreadMessage(type, userId).then(() => {
                         const updatedList = notifications.filter(notification => {
                             console.log("Filtering notification:", notification, "with userId:", userId, "and type:", type);

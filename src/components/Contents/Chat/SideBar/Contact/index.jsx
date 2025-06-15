@@ -23,7 +23,7 @@ export default function Contact(props) {
   const { selected, onClick, isMobile, onDelete, markAsRead } = props;
   const { mode } = useThemeMode();
   console.log("content")
-  console.log(content)
+  console.log(props.content)
   // Touch and swipe handling
   const [touchStart, setTouchStart] = React.useState(null);
   const [touchEnd, setTouchEnd] = React.useState(null);
@@ -44,9 +44,9 @@ export default function Contact(props) {
     if (!selected) {
       return false;
     }
-    if (selected.type === "userId") {
+    if (selected.type === "single") {
       return userId === selected.userId;
-    } else if (selected.type === "groupId") {
+    } else if (selected.type === "group") {
       return groupId === selected.groupId;
     }
     return userId === selected.userId;
@@ -286,7 +286,7 @@ export default function Contact(props) {
                     backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                   }}
                 >
-                  {props.content.type === "groupId" ? 
+                  {props.content.type === "group" ? 
                     <GroupIcon sx={{ color: mode === 'dark' ? '#ffffff' : 'inherit' }} /> : 
                     <PersonIcon sx={{ color: mode === 'dark' ? '#ffffff' : 'inherit' }} />
                   }
@@ -314,7 +314,7 @@ export default function Contact(props) {
                   fontSize: isMobile ? '0.9rem' : '1rem'
                 }}
               >
-                {type === "single" ? (name|| userId):( groupId|| groupName)}
+                {type === "single" ? (name || userId):( groupId|| groupName)}
               </Typography>
               
               <Typography 

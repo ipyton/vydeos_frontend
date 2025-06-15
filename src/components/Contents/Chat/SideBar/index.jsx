@@ -51,20 +51,22 @@ export default function SideBar(props) {
       .then((res) => {
         console.log("Fetched contacts:", res);
         if(select && select.userId && select.type === "single"){
-          const user = res.find(item=>item.userId === select.userId)
+          const user = res.find(item=>item.userId === select.userId && item.type === select.type)
           if (user) {
             user.count = 0;
             select.count = 0
             DatabaseManipulator.addRecentContacts([select])
           }
         } else if (select && select.groupId && select.type === "group") {
-          const user = res.find(item=>item.groupId === select.groupId)
+          const user = res.find(item=>item.groupId === select.groupId && item.type === select.type)
           if (user) {
             user.count = 0;
             select.count = 0
             DatabaseManipulator.addRecentContacts([select])
           }
         }
+        console.log("userRecords")
+        console.log(res)
         setUserRecords(res || []); // Ensure this is always an array
 
         setLoading(false);
@@ -93,7 +95,7 @@ const filteredContacts = userRecords;
     return () => {
       let mid = filteredContacts[idx];
       if (mid.type === "single") {
-       markAsRead(mid.type,mid.userId)
+       markAsRead(mid.type,mid.userId,mid.groupId)
       setSelect({ "userId": mid.userId, "type": mid.type });
       } else {
         markAsRead(mid.type, mid.userId, mid.groupId)

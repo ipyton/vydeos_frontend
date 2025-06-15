@@ -118,22 +118,6 @@ export default function Header() {
       avatar: 'https://via.placeholder.com/60/4CAF50/white?text=RD',
       memberCount: 1247,
       isPublic: true
-    },
-    'XYZ789': {
-      type: 'user',
-      name: 'John Smith',
-      introduction: 'Full-stack developer passionate about modern web technologies. Always happy to help and learn from others!',
-      avatar: 'https://via.placeholder.com/60/2196F3/white?text=JS',
-      status: 'online',
-      mutualFriends: 5
-    },
-    'DEF456': {
-      type: 'group',
-      name: 'Design Systems',
-      introduction: 'Everything about creating and maintaining design systems. Share resources, discuss tools, and showcase your work.',
-      avatar: 'https://via.placeholder.com/60/FF9800/white?text=DS',
-      memberCount: 892,
-      isPublic: false
     }
   };
 

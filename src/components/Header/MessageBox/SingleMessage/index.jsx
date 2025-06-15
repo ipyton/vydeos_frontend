@@ -24,7 +24,7 @@ export function SingleMessage(props) {
 
     const handleDelete = (event) => {
         event.stopPropagation(); // Prevent the menu item click
-        markAsRead(notification.type, notification.senderId)
+        markAsRead(notification.type, notification.senderId, notification.groupId)
     }
 
     const { mode } = useThemeMode();
