@@ -233,6 +233,7 @@ export default function Friends(props) {
                 fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
+                borderRadius: 3,
                 gap: 1,
               }}
             >
@@ -277,7 +278,7 @@ export default function Friends(props) {
           <Paper
             elevation={mode === 'dark' ? 0 : 2}
             sx={{
-              width: isMobile ? 'calc(100% - 8px)' : '42%',
+              width: isMobile ? 'calc(100vw - 64px)' : '42%',
               marginRight: isMobile ? 1 : 2,
               backgroundColor: darkModeColors.paper,
               borderRadius: '16px',

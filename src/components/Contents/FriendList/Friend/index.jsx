@@ -720,7 +720,7 @@ export default function Friend(props) {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  height: '100%',
+                  height: '100vh',
                   flexDirection: 'column',
                   gap: 2
                 }}>
@@ -734,7 +734,7 @@ export default function Friend(props) {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  height: '100%',
+                  height: '100vh',
                   flexDirection: 'column',
                   gap: 2,
                   opacity: 0.7
