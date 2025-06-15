@@ -115,7 +115,6 @@ export default function MovieDetails(props) {
       setVideoIdentifier(props.content);
     }
   }, [props.content, location.state]);
-  console.log(details);
 
   // Handle star/favorite action
   const handleStar = () => {

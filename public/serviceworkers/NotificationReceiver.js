@@ -74,7 +74,6 @@ self.addEventListener('message', (event) => {
 self.addEventListener('push', (event) => {
     console.log('收到推送消息:', event.data.text());
     const message = JSON.parse(event.data.text())
-    console.log(message)
     event.waitUntil(
         self.registration.showNotification(data.title, {
             body: data.message,

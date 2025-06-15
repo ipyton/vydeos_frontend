@@ -19,7 +19,6 @@ export default function Comments(props) {
     return (<div>
         {props.comments && props.comments.map(element => {
           
-          console.log(element)
             return <Comment avatar={element.avatar} name={element.userId} content={element.content} likes={element.likes} subComments={element.subComments}></Comment>
         })}
 

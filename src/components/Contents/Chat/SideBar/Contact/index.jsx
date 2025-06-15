@@ -22,8 +22,7 @@ export default function Contact(props) {
   const { userId, name, avatar, count, timestamp, content, groupId,type,groupName } = props.content;
   const { selected, onClick, isMobile, onDelete, markAsRead } = props;
   const { mode } = useThemeMode();
-  console.log("content")
-  console.log(props.content)
+
   // Touch and swipe handling
   const [touchStart, setTouchStart] = React.useState(null);
   const [touchEnd, setTouchEnd] = React.useState(null);
@@ -40,7 +39,6 @@ export default function Contact(props) {
   
 
   const isSelected = React.useMemo(() => {
-    console.log(selected)
     if (!selected) {
       return false;
     }

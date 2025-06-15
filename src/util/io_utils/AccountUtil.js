@@ -23,7 +23,6 @@ export default class AccountUtil {
         return
       }
       let content = response.data
-      console.log(content)
       setLanguages(content)
     })
   }
@@ -134,16 +133,7 @@ export default class AccountUtil {
 
   static updateUserInfo(introduction, nickName, location, pictures, birthdate, gender, language, country) {
     if (!pictures) pictures = []
-    console.log({
-      introduction: introduction,
-      userName: nickName,
-      location: location,
-      pictures: pictures,
-      dateOfBirth: birthdate,
-      gender: gender,
-      language: language,
-      country: country
-    })
+
     
     return localforage.getItem("userId").then(res => {
       return apiClient({

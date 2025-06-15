@@ -458,7 +458,6 @@ export default function Friend(props) {
   // Initial data load
   useEffect(() => {
     setIsLoading(true);
-    console.log(value)
     
     SocialMediaUtil.getRelationships(value).then((response) => {
             if (!response || !response.data) {
@@ -472,7 +471,6 @@ export default function Friend(props) {
             
             try {
                 const list = JSON.parse(response.data.message);
-                console.log(list);
                 return list;
             } catch (error) {
                 console.error("Error parsing response:", error);

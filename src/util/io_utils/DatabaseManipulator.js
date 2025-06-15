@@ -74,7 +74,6 @@ static async addRecentContacts(messages) {
     if (!messages || messages.length === 0) {
         return [];
     }
-    console.log(messages)
     try {
         for (const message of messages) {
             const userId = message.senderId || message.userId || "";
@@ -112,11 +111,9 @@ const keyArray = [type, groupId, userId];
                 
             } else if (type === "group") {
 const keyArray = [type, groupId, ""];
-                console.log(keyArray)
                 
                     const existing = await db.contacts.get(keyArray);
-                    console.log("existing")
-                    console.log(existing)
+
                     if (existing) {
                         await db.contacts.update(keyArray, {
                             userId:"",
@@ -229,11 +226,9 @@ const keyArray = [type, groupId, ""];
         try {
             if (type === "single") {
                 const contact = await db.contacts.get({ type, groupId,userId });
-                console.log(contact)
                 return contact ? contact.sessionMessageId || -1 : -1; // 返回 sessionMessageId 或 -1
             } else if (type === "group") {
                 const contact = await db.contacts.get({ type, groupId });
-                console.log(contact)
                 return contact ? contact.sessionMessageId || -1 : -1;
             }
 
@@ -434,7 +429,6 @@ const keyArray = [type, groupId, ""];
                 };
             }));
 
-            console.log("puting")
             await db.unreadMessages.bulkPut(dataToInsert);
             return true;
         } catch (error) {

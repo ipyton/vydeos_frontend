@@ -206,9 +206,7 @@ export default function Login(props) {
     setIsLoading(true);
     
     const data = new FormData(event.currentTarget);
-    console.log(selected)
     data.append("remember", selected);
-    console.log(data.get("remember"))
 
     try {
       const response = await AccountUtil.login(data);

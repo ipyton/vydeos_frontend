@@ -57,9 +57,7 @@ export default function SearchResults(props) {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     React.useEffect(() => {
-        console.log("SearchResults: searchType changed to", searchType);
-        console.log("list", list)
-        console.log(list)
+
         states[value] = list;
         setState(states);
     }, [list]);

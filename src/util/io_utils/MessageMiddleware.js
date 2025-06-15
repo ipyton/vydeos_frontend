@@ -74,7 +74,6 @@ static fillMissingMessages(lastMessageSessionId, limit, from_network, from_local
 
     static async getContactHistory(type, userId, limit = 15, lastSessionMessageId, groupId) {
         return DatabaseManipulator.getContactHistory(type, userId, lastSessionMessageId,limit,groupId).then(localRes=>{
-            console.log(localRes)
 
             if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes) && localRes.length >= limit) {
                 return localRes;
@@ -82,7 +81,6 @@ static fillMissingMessages(lastMessageSessionId, limit, from_network, from_local
             else {
                 return MessageUtil.getMessageRecords(type,userId, limit, lastSessionMessageId,groupId).then(async networkRes=> {
                     const result =  MessageMiddleware.fillMissingMessages(lastSessionMessageId, limit, JSON.parse(networkRes.data.message) , localRes||[])
-                    console.log(result)
                     await DatabaseManipulator.addContactHistories(result.missingFromLocal)
 
                     return result.filled.reverse()

@@ -9,7 +9,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 export default function Introductions(props) {
     const { selector, position, isMobile, onBack } = props;
     
-    console.log(onBack);
     
     // If no selector is provided, show a message
     if (!selector || !selector.type) {

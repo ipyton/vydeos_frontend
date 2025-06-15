@@ -14,19 +14,7 @@ export const userDetails = createSlice({
         update: (state, information) => {
 
             state.value = information
-            // state.intro = information["introduction"]
-            // state.name = information["name"]
-            // state.avatar = information["avatar"]
-            // state.gender = information["gender"]
-            // state.birthdate = information["dateOfBirth"]
-            // state.location = information["location"]
-            // state.nickname = information["nickname"]
-            // state.imageData = null
-            // state.relationship = information["relationship"]
-            // state.userId = information["userId"]
 
-            // console.log(state.intro)
-            // console.log(information)
         },
         clear: (state) => {
         }

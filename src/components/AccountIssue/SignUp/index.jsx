@@ -179,7 +179,6 @@ export default function SignUp(props) {
       }).then(
         (response) => {
           if ((response != null && response !== undefined) && response.data != null && response.data !== undefined && response.data.code === 0) {
-            console.log(emailValue)
             AccountUtil.sendVerificationCode(emailValue).catch((err) => {
               console.log(err)
               return

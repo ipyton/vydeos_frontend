@@ -48,7 +48,6 @@ function register(serviceWorkerRegistration) {
     };
     serviceWorkerRegistration.pushManager.subscribe(options).then(
         (pushSubscription) => {
-            console.log(JSON.stringify(pushSubscription))
             var endpoint = pushSubscription.endpoint;
             var key = pushSubscription.getKey('p256dh');
             var auth = pushSubscription.getKey('auth');

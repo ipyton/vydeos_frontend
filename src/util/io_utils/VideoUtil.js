@@ -81,7 +81,6 @@ export default class VideoUtil {
     static async uploadVideos(resourceId,type, value, setUploadState, resourceName,setIndicator,seasonId, episode) {
         let sliceLength = 1024 * 1024 * 32
         let length = value.size
-        console.log("value:" + value)
         async function computexxHash(file) {
             const xxhashInstance = await xxhash();
             const hasher = xxhashInstance.create64("990816");
@@ -296,7 +295,6 @@ export default class VideoUtil {
                 return
             }
             let data = response.data
-            console.log(data)
             let actresses = []
             data["type"] = movieIdentifier.type
             data["actressList"].forEach(element => {
@@ -547,7 +545,6 @@ export default class VideoUtil {
 
         return downloadClient.get("/play_videos/longvideos/" + encodeURIComponent(location.type + "_" + location.resource_id + "_" + seasonId + "_" + episode + "/") + encodeURIComponent("index.m3u8"))
             .then(response => {                
-                console.log("getting contents from" + m3u8Url)
                 const content = response.data;
                 const lines = content.split("\n");
                 const processedLines = lines.map(line => {

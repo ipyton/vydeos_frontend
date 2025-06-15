@@ -44,11 +44,9 @@ export default function UploadMovie() {
             return false
         }
         let fileName = event.target.files[0].name
-        //console.log(fileName.name)
         let nameSlices = fileName.split(".")
 
         let extensionName = nameSlices[nameSlices.length - 1]
-        console.log(extensionName)
         let supportExtensionNames = ["avi", "mp4", "flv"]
         if (String.prototype.toLowerCase(extensionName) in supportExtensionNames) {
             VideoUtil.uploadVideos(title, introduction, event.target.files[0], setState)
@@ -59,7 +57,6 @@ export default function UploadMovie() {
     }
 
     let changeState = (changeState) => {
-        //console.log(changeState)
         return (event) => {
             changeState(event.target.value)
         }

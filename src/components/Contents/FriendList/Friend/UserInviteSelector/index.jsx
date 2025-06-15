@@ -47,13 +47,11 @@ export default function UserInviteSelector({ selectedUsers = [], onSelectionChan
     MessageUtil.getFriends().then((res)=> {
         if (res && res.data.code === 0) {
             const friends = JSON.parse(res.data.message)
-            console.log(friends)
             setUsers(friends)
         }
         else {
             showNotification("error fetch users","error")
         }
-        console.log(res)
     })
   },[])
   
@@ -217,10 +215,8 @@ export default function UserInviteSelector({ selectedUsers = [], onSelectionChan
             </ListItem>
           ) : (
             filteredUsers.map((user, index) => {
-                console.log(selectedUsers)
-                console.log(user)
+
               const isSelected = selectedUsers.some(selected => selected.friendId === user.friendId);
-              console.log(isSelected)
               return (
                 <React.Fragment key={user.id}>
                   <ListItemButton

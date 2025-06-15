@@ -47,7 +47,6 @@ const MessageBubble = ({
   
   senderName = senderName || 'Unknown Sender';
 
-  console.log(message)
 
   const formatDateAndTime = (timestamp) => {
     const messageDate = new Date(timestamp);

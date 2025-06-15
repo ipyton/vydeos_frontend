@@ -49,7 +49,6 @@ export default function SideBar(props) {
     setLoading(true);
     DatabaseManipulator.getRecentContacts()
       .then((res) => {
-        console.log("Fetched contacts:", res);
         if(select && select.userId && select.type === "single"){
           const user = res.find(item=>item.userId === select.userId && item.type === select.type)
           if (user) {

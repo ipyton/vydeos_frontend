@@ -143,7 +143,6 @@ export default function FriendItem(props) {
 
         return renderListItem(content.friendId, content.friendId || "User");
     } else if (idx ===2) {
-        console.log(content)
             return renderListItem(content.userId, content.userId || "User");
     }else if (idx === 3) {
         return renderListItem(content.groupName, content.groupName || "Group");

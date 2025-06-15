@@ -22,8 +22,6 @@ const CommentSendComponent = ({ movieIdentifier,comments, setComments}) => {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userAvatar, setUserAvatar] = useState('https://example.com/user-avatar.png'); // Replace with actual user avatar URL
-  console.log("identifier")
-console.log(movieIdentifier)
   const handleCommentChange = (e) => {
     setContent(e.target.value);
   };

@@ -101,7 +101,6 @@ export default function FunctionDrawer(props) {
     setOpen(!open);
   };
   const paths = localforage.getItem("paths")
-  console.log(paths)
 
   // Default navigation map with icon names as strings
   const defaultNavigationMap = [
@@ -146,7 +145,6 @@ export default function FunctionDrawer(props) {
           return;
         }
         response.forEach(element => {
-          console.log(element.route == "/**")
           if (element.route === "/**") {
             setNavigationItems(defaultNavigationMap);
             return;

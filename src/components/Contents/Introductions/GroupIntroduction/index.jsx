@@ -75,7 +75,6 @@ export default function GroupDetailsComponent(props) {
         };
 
         DatabaseManipulator.addRecentContacts([contact]).then(() => {
-            console.log(contact)
             navigate("/chat", { ...contact });
             dispatch(update());
         });
@@ -110,7 +109,6 @@ export default function GroupDetailsComponent(props) {
                 console.log("login error");
                 return;
             }
-            console.log(response.data.message)
             const details = JSON.parse(response.data.message)
             setDetails(details);
             setEditedDetails(details);

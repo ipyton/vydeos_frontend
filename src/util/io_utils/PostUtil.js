@@ -13,7 +13,6 @@ export default class PostUtil {
         }).then(response => {
             if (response) {
                 setPicurl([...picurl, response.data]);
-                console.log(picurl);
             }
         });
     }
@@ -31,7 +30,6 @@ export default class PostUtil {
             comments: [] 
         };
         
-        console.log(data);
         apiClient.post("/post/upload", data, {
             headers: {
                 'Content-Type': 'application/json'

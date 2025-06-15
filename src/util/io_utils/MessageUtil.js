@@ -11,7 +11,6 @@ export default class MessageUtil {
     }
 
     static setUserIntro(information, dispatch) {
-        console.log(information);
         dispatch(update(information));
     }
 

@@ -388,7 +388,6 @@ const handleOpenDetails = (row) => {
         if (res.data.code === 0) {
           let requests = JSON.parse(res.data.message);
           requests = requests.map((item) => {
-            console.log(item)
             return { ...item, resource_id: item.resourceId };
           })
           setRequests(requests);
