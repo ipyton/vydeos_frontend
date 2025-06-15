@@ -10,7 +10,8 @@ import {
   Paper,
   Slider,
   useTheme,
-  Chip
+  Chip,
+  Avatar
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -23,13 +24,17 @@ import InfoIcon from '@mui/icons-material/Info';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
+import PersonIcon from '@mui/icons-material/Person';
 
 const MessageBubble = ({ 
   message, 
   isOwn = false, 
   timestamp, 
   senderName,
+  senderAvatar, // New prop for avatar URL
   darkMode = false,
+  showAvatar = true, // New prop to control avatar visibility
+  avatarSize = 32, // New prop for avatar size
   onDelete,
   onWithdraw
 }) => {
@@ -42,7 +47,7 @@ const MessageBubble = ({
   
   senderName = senderName || 'Unknown Sender';
 
-  //message.type = "status"
+  console.log(message)
 
   const formatDateAndTime = (timestamp) => {
     const messageDate = new Date(timestamp);
@@ -91,7 +96,7 @@ const MessageBubble = ({
 
   const handleContextMenu = (event) => {
     // Don't show context menu for status messages
-    if (message.type === 'status') return;
+    if (message.messageType === 'status') return;
     
     event.preventDefault();
     setContextMenu(
@@ -106,7 +111,7 @@ const MessageBubble = ({
 
   const handleTouchStart = (e) => {
     // Don't show context menu for status messages
-    if (message.type === 'status') return;
+    if (message.messageType === 'status') return;
     
     const timer = setTimeout(() => {
       const touch = e.touches[0];
@@ -165,6 +170,75 @@ const MessageBubble = ({
       default:
         return theme.palette.info;
     }
+  };
+
+  // Generate initials from sender name for fallback avatar
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Generate a consistent color based on sender name
+  const getAvatarColor = (name) => {
+    if (!name) return theme.palette.grey[500];
+    
+    const colors = [
+      theme.palette.primary.main,
+      theme.palette.secondary.main,
+      '#f44336', // red
+      '#e91e63', // pink
+      '#9c27b0', // purple
+      '#673ab7', // deep purple
+      '#3f51b5', // indigo
+      '#2196f3', // blue
+      '#03a9f4', // light blue
+      '#00bcd4', // cyan
+      '#009688', // teal
+      '#4caf50', // green
+      '#8bc34a', // light green
+      '#cddc39', // lime
+      '#ffeb3b', // yellow
+      '#ffc107', // amber
+      '#ff9800', // orange
+      '#ff5722', // deep orange
+    ];
+    
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    hash = Math.abs(hash);
+    
+    return colors[hash % colors.length];
+  };
+
+  const renderAvatar = () => {
+    if (!showAvatar || isOwn) return null;
+
+    return (
+      <Avatar
+        src={senderAvatar}
+        sx={{
+          width: avatarSize,
+          height: avatarSize,
+          bgcolor: senderAvatar ? 'transparent' : getAvatarColor(senderName),
+          color: 'white',
+          fontSize: avatarSize * 0.4,
+          fontWeight: 'bold',
+          mr: 1.5,
+          flexShrink: 0
+        }}
+      >
+        {!senderAvatar && (
+          senderName ? getInitials(senderName) : <PersonIcon fontSize="small" />
+        )}
+      </Avatar>
+    );
   };
 
   const renderMessageContent = () => {
@@ -327,76 +401,95 @@ const MessageBubble = ({
     );
   }
 
-  // Regular message rendering
+  // Regular message rendering with avatar support
   return (
-    <Box sx={{ mb: 2, textAlign: isOwn ? 'right' : 'left' }}>
-      {!isOwn && senderName && !message.withdrawn && (
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            display: 'block',
-            px: 1,
-            mb: 0.5,
-            color: darkMode ? theme.palette.grey[400] : theme.palette.grey[600]
-          }}
-        >
-          {senderName}
-        </Typography>
-      )}
-      
-      <Paper
-        elevation={1}
-        onContextMenu={handleContextMenu}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchMove={handleTouchMove}
-        sx={{
-          display: 'inline-block',
-          maxWidth: { xs: '85%', sm: '70%', md: '60%' },
-          borderRadius: 3,
-          px: 2,
-          py: 1.5,
-          cursor: 'context-menu',
-          userSelect: 'none',
-          transition: 'box-shadow 0.2s',
-          '&:hover': {
-            boxShadow: theme.shadows[2]
-          },
-          ...(isOwn ? {
-            bgcolor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            ml: 'auto'
-          } : {
-            bgcolor: darkMode ? theme.palette.grey[700] : theme.palette.background.paper,
-            color: darkMode ? theme.palette.common.white : theme.palette.text.primary,
-            border: `1px solid ${theme.palette.divider}`,
-            mr: 'auto'
-          })
-        }}
-      >
-        {renderMessageContent()}
-      </Paper>
-      
+    <Box sx={{ mb: 2 }}>
       <Box sx={{ 
-        mt: 0.5,
-        px: 1,
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: isOwn ? 'flex-end' : 'flex-start',
-        gap: 0.25
+        flexDirection: isOwn ? 'row-reverse' : 'row',
+        alignItems: 'flex-start',
+        gap: 0
       }}>
-        <Typography 
-          variant="caption" 
-          component="div"
-          title={getAbsoluteTime(timestamp)}
-          sx={{ 
-            cursor: 'help',
-            color: darkMode ? theme.palette.grey[500] : theme.palette.grey[400]
-          }}
-        >
-          {formatDateAndTime(timestamp)}
-        </Typography>
-
+        {/* Avatar */}
+        {renderAvatar()}
+        
+        {/* Message content */}
+        <Box sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: isOwn ? 'flex-end' : 'flex-start',
+          flex: 1,
+          minWidth: 0 // Prevent flex item from overflowing
+        }}>
+          {/* Sender name */}
+          {!isOwn && senderName && !message.withdrawn && showAvatar && (
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                display: 'block',
+                px: 1,
+                mb: 0.5,
+                color: darkMode ? theme.palette.grey[400] : theme.palette.grey[600]
+              }}
+            >
+              {senderName}
+            </Typography>
+          )}
+          
+          {/* Message bubble */}
+          <Paper
+            elevation={1}
+            onContextMenu={handleContextMenu}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchMove={handleTouchMove}
+            sx={{
+              display: 'inline-block',
+              maxWidth: { xs: '85%', sm: '70%', md: '60%' },
+              borderRadius: isOwn ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+              px: 2,
+              py: 1.5,
+              cursor: 'context-menu',
+              userSelect: 'none',
+              transition: 'box-shadow 0.2s',
+              '&:hover': {
+                boxShadow: theme.shadows[2]
+              },
+              ...(isOwn ? {
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+              } : {
+                bgcolor: darkMode ? theme.palette.grey[700] : theme.palette.background.paper,
+                color: darkMode ? theme.palette.common.white : theme.palette.text.primary,
+                border: `1px solid ${theme.palette.divider}`,
+              })
+            }}
+          >
+            {renderMessageContent()}
+          </Paper>
+          
+          {/* Timestamp */}
+          <Box sx={{ 
+            mt: 0.5,
+            px: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: isOwn ? 'flex-end' : 'flex-start',
+            gap: 0.25
+          }}>
+            <Typography 
+              variant="caption" 
+              component="div"
+              title={getAbsoluteTime(timestamp)}
+              sx={{ 
+                cursor: 'help',
+                color: darkMode ? theme.palette.grey[500] : theme.palette.grey[400]
+              }}
+            >
+              {formatDateAndTime(timestamp)}
+            </Typography>
+          </Box>
+        </Box>
       </Box>
 
       {/* Context Menu */}

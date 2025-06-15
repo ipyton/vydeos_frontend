@@ -362,6 +362,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       console.log("select")
       console.log(select)
       DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId,select.groupId).then((res)=>{
+        console.log()
         if (res.count === 0) return
         DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.coun,select.groupId).then(messages=>{
           select.count = 0
@@ -519,10 +520,11 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
             key={`${message.messageId}`}
             message={message}
             timestamp={message.timestamp}
-            isOwn={(message.direction ? message.userId1 : message.userId2) !== select.userId}
+            isOwn={message.type==="group"? (message.userId === localStorage.getItem("userId")) : (message.direction ? message.userId1 : message.userId2) !== select.userId}
+            //isOwn={(message.direction ? message.userId1 : message.userId2) !== select.userId}
             onDelete={handleDelete}
             onWithdraw={handleWithdraw}
-            senderName={(message.direction ? message.userId1 : message.userId2)}
+            senderName={message.type==="group"? (message.userId):(message.direction ? message.userId1 : message.userId2)}
             darkMode={mode === 'dark'}
           />
         ))}

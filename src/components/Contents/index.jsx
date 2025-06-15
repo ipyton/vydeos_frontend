@@ -127,6 +127,7 @@ export default function Contents(props) {
         console.log(message)
         message.receiver = receiver
         message.groupId = message.groupId
+        
         DatabaseManipulator.addContactHistories([message]).then(() => {
             DatabaseManipulator.insertUnreadMessages([message]).then(() => {
                 DatabaseManipulator.addRecentContacts([message]).then(() => {

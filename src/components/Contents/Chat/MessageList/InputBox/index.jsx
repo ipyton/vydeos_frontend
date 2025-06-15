@@ -196,6 +196,7 @@ const textFieldStyles = {
           direction = false
         }
         const message = {
+          userId,
           userId1: result.smaller,
           userId2: result.larger,
           direction:direction,
@@ -210,7 +211,7 @@ const textFieldStyles = {
         };
         await DatabaseManipulator.addContactHistory(message);
         const senderId = direction ? result.larger : result.smaller
-        message.userId = ""
+        // message.userId = ""
         //message.count = 0
         await DatabaseManipulator.initRecentContacts([message])
         setChatRecords([...chatRecords, message]); // Update chat records

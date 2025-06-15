@@ -74,7 +74,6 @@ static async addRecentContacts(messages) {
     if (!messages || messages.length === 0) {
         return [];
     }
-    console.log("-=-=-=-=-=-==")
     console.log(messages)
     try {
         for (const message of messages) {
@@ -84,12 +83,11 @@ static async addRecentContacts(messages) {
             
             if (type === "single") {
                 // Create consistent key format
-                const key = `${type}+${groupId}+${userId}`;
+const keyArray = [type, groupId, userId];
                 
-                try {
-                    const existing = await db.contacts.get(key);
+                    const existing = await db.contacts.get(keyArray);
                     if (existing) {
-                        await db.contacts.update(key, {
+                        await db.contacts.update(keyArray, {
                             name: message.name || existing.name,
                             avatar: message.avatar || existing.avatar,
                             content: message.content || existing.content,
@@ -110,30 +108,17 @@ static async addRecentContacts(messages) {
                             sessionMessageId: message.sessionMessageId || -1
                         });
                     }
-                } catch (addError) {
-                    // Handle case where record was added between get and add
-                    if (addError.name === 'ConstraintError') {
-                        console.warn('Record already exists, updating instead:', key);
-                        await db.contacts.update(key, {
-                            name: message.name,
-                            avatar: message.avatar,
-                            content: message.content,
-                            timestamp: message.sendTime || message.timestamp || Date.now(),
-                            count: message.count || 1,
-                            sessionMessageId: message.sessionMessageId || -1
-                        });
-                    } else {
-                        throw addError;
-                    }
-                }
+
                 
             } else if (type === "group") {
-                const key = `${type}+${groupId}`;
+const keyArray = [type, groupId, ""];
+                console.log(keyArray)
                 
-                try {
-                    const existing = await db.contacts.get(key);
+                    const existing = await db.contacts.get(keyArray);
+                    console.log("existing")
+                    console.log(existing)
                     if (existing) {
-                        await db.contacts.update(key, {
+                        await db.contacts.update(keyArray, {
                             userId:"",
                             name: message.name || existing.name,
                             avatar: message.avatar || existing.avatar,
@@ -155,24 +140,7 @@ static async addRecentContacts(messages) {
                             sessionMessageId: message.sessionMessageId || -1
                         });
                     }
-                } catch (addError) {
-                    // Handle case where record was added between get and add
-                    if (addError.name === 'ConstraintError') {
-                        console.warn('Record already exists, updating instead:', key);
-                        await db.contacts.update(key, {
-                            groupId,
-                            userId,
-                            name: message.name,
-                            avatar: message.avatar,
-                            content: message.content,
-                            timestamp: message.sendTime || message.timestamp || Date.now(),
-                            count: message.count || 1,
-                            sessionMessageId: message.sessionMessageId || -1
-                        });
-                    } else {
-                        throw addError;
-                    }
-                }
+                
             }
         }
     } catch (error) {
@@ -231,7 +199,7 @@ static async addRecentContacts(messages) {
                     const existing = existingContactsMap.get(key) || {};
 
                     const contact = {
-                        userId: message.userId,
+                        userId: isGroup? "":message.userId,
                         type: type,
                         timestamp: message.sendTime ?? existing.timestamp ?? Date.now(),
                         name: message.name ?? existing.name ?? "",
@@ -479,7 +447,6 @@ static async addRecentContacts(messages) {
     static async initUnreadMessages(unreadMessages) {
         try {
             const dataToInsert = await Promise.all(unreadMessages.map(async (unreadMessage) => {
-                const key = `${unreadMessage.type}+${unreadMessage.senderId}`;
                 return {
                     userId: unreadMessage.userId,
                     senderId: unreadMessage.senderId,
@@ -491,7 +458,8 @@ static async addRecentContacts(messages) {
                     count: unreadMessage.count, // 累加
                     sendTime: unreadMessage.sendTime
                         ? new Date(unreadMessage.sendTime).getTime()
-                        : Date.now()
+                        : Date.now(),
+                        groupId: unreadMessage.type ==="group" ?  unreadMessage.groupId: 0
                 };
             }));
 
