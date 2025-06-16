@@ -21,7 +21,7 @@ export default function SideBar(props) {
   const { mode } = useThemeMode();
 
   let location = useLocation();
-  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
+  const refresh = useSelector((state) => state.refreshSideBar.value.refresh);
   
   const onDelete = (type,userId,groupId) => {
     const criteria = {type, groupId}
@@ -84,19 +84,25 @@ export default function SideBar(props) {
   };
 const filteredContacts = userRecords;
 
-  const onClick = (idx) => {
-    return () => {
-      let mid = userRecords[idx];
-      if (mid.type === "single") {
-       markAsRead(mid.type,mid.userId,mid.groupId)
-      setSelect({ "userId": mid.userId, "type": mid.type });
-      } else {
-        markAsRead(mid.type, mid.userId, mid.groupId)
-        setSelect({ "userId": mid.userId, "type": mid.type,"groupId":mid.groupId })
-      }
-
+const onClick = (idx) => {
+  return () => {
+    const mid = userRecords[idx];
+    
+    // 构建新的选择对象
+    const newSelect = mid.type === "single" 
+      ? { "userId": mid.userId, "type": mid.type }
+      : { "userId": mid.userId, "type": mid.type, "groupId": mid.groupId };
+    
+    // 深度比较当前选中状态
+    const isEqual = JSON.stringify(select) === JSON.stringify(newSelect);
+    
+    if (!isEqual) {
+      setSelect(newSelect);
     }
+    markAsRead(mid.type, mid.userId, mid.groupId);
+
   };
+};
 
   return (
     <Paper

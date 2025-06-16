@@ -7,12 +7,11 @@ import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import MessageUtil from '../../../../../util/io_utils/MessageUtil';
-import localforage from 'localforage';
 import DatabaseManipulator from '../../../../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
 import { useSelector, useDispatch } from 'react-redux';
-import {update} from "../../../../redux/refreshMessages"
+import {update} from "../../../../redux/refreshSideBar"
 
 
 function compareStrings(str1, str2) {

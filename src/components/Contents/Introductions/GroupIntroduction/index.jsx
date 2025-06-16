@@ -37,7 +37,7 @@ import {
     Cancel as CancelIcon
 } from '@mui/icons-material';
 import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
-import { update } from '../../../redux/refresh';
+// import { update } from '../../../redux/refresh';
 import { useNotification } from '../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
 
@@ -76,7 +76,7 @@ export default function GroupDetailsComponent(props) {
 
         DatabaseManipulator.addRecentContacts([contact]).then(() => {
             navigate("/chat", { ...contact });
-            dispatch(update());
+            // dispatch(update());
         });
     };
 

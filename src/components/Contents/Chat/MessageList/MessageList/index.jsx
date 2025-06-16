@@ -322,6 +322,8 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       setHasMoreMessages(true);
       setPullDistance(0);
       setChatRecords([])
+      console.log(select)
+      console.log("--=-=-=-=-=-")
       loadingTriggeredRef.current = false; // Reset loading flag
       DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId,select.groupId)
         .then((newestSessionMessageId) => {
@@ -334,22 +336,29 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   }, [select]);
 
 
-    useEffect(() => {
-      if (select) {
-        setPullDistance(0);
-        loadingTriggeredRef.current = false; // Reset loading flag
+const isFirstRender = useRef(true);
 
-        DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId,select.groupId).then((res)=>{
-          if (res.count === 0) return
-          DatabaseManipulator.getContactHistory(select.type,select.userId, res.sessionMessageId,res.count,select.groupId).then(messages=>{
-            select.count = 0
-            DatabaseManipulator.addRecentContacts([select]).then(()=>{
-              setChatRecords(prevRecords => [...prevRecords, ...messages])
-            })
-          })
-        })
-      }
-  }, [refresh]);
+useEffect(() => {
+  if (isFirstRender.current) {
+    isFirstRender.current = false;
+    return; // 第一次执行时直接返回，不执行后续代码
+  }
+  
+  if (select) {
+    setPullDistance(0);
+    loadingTriggeredRef.current = false;
+    
+    DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId, select.groupId).then((res) => {
+      if (res.count === 0) return;
+      DatabaseManipulator.getContactHistory(select.type, select.userId, res.sessionMessageId, res.count, select.groupId).then(messages => {
+        select.count = 0;
+        DatabaseManipulator.addRecentContacts([select]).then(() => {
+          setChatRecords(prevRecords => [...prevRecords, ...messages]);
+        });
+      });
+    });
+  }
+}, [refresh]);
 
   useEffect(() => {
     if (lastSessionMessageId === 0) return;

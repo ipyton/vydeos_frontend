@@ -9,17 +9,9 @@ import { useThemeMode } from '../../../Themes/ThemeContext';
 import MenuItem from '@mui/material/MenuItem';
 export default function MessageBox(props) {
   let {refresh, notificationsAnchorEl, menuId, notificationsOpen, setNotificationsAnchorEl,notifications,setNotifications, markAsRead} = props
-  let [message, setMessage] = useState([])
   const { mode } = useThemeMode();
   const handleNotificationClose = () => {
     setNotificationsAnchorEl(null)
-  }
-
-  console.log(notifications)
-
-
-  let onclick = (idx) => {
-    localforage.setItem(message[idx].userId + "_lastRead")
   }
 
     return (     

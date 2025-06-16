@@ -38,7 +38,7 @@ import SocialMediaUtil from '../../../../util/io_utils/SocialMediaUtil';
 import MessageUtil from '../../../../util/io_utils/MessageUtil';
 import AccountUtil from '../../../../util/io_utils/AccountUtil';
 import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
-import { update } from '../../../redux/refresh';
+//import { update } from '../../../redux/refreshSiderBar';
 import { useNotification } from '../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
 
@@ -86,7 +86,6 @@ export default function UserInformation(props) {
 
     const relationship = details.relationship;
     
-    // Reset states
     setFollowButtonText('');
     setContactButtonText('');
     setExtraInformation('');
@@ -165,7 +164,7 @@ export default function UserInformation(props) {
 
       await DatabaseManipulator.initRecentContacts([contact]);
       navigate('/chat', { ...contact });
-      dispatch(update());
+     //dispatch(update());
       showNotification(`Started conversation with ${details.userName}`, 'success');
       
     } catch (error) {

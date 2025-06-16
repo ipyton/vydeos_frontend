@@ -17,11 +17,11 @@ export default function ChatContainer(props) {
   const { select, setSelect, isMobile } = props;
   const [chatRecords, setChatRecords] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [messageListLoading,setMessageListLoading] = useState(false)
   const location = useLocation();
   const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   const { mode, toggleMode } = useThemeMode();
   const { showNotification } = useNotification();
-  const cursor = useSelector(state => state.scrollCursor.cursors[select.type + "_" + select.userId]);
 
   const handleBackClick = () => {
     setSelect(null);
@@ -112,6 +112,8 @@ export default function ChatContainer(props) {
             onDeleteError={(error) => {
               showNotification("Failed to delete message: " + error.message, "error");
             }}
+            setLoading={setMessageListLoading}
+            isLoading={messageListLoading}
           />
         </Box>
       )}

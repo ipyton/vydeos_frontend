@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-export const refresh = createSlice({
-    name: 'refresh',
+export const refreshMailBox = createSlice({
+    name: 'refreshMailBox',
     initialState: {
         value: { refresh: false }
     },
@@ -16,6 +16,6 @@ export const refresh = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { update, clear } = refresh.actions
+export const { update, clear } = refreshMailBox.actions
 
-export default refresh.reducer
+export default refreshMailBox.reducer

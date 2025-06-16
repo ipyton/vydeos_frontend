@@ -21,10 +21,12 @@ import Header from "../Header"
 import { useEffect, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { update } from "../redux/refreshMessages"
+import { update as updateSideBar } from "../redux/refreshSideBar"
+import { update as updateMailBox } from "../redux/refreshMailBox"
+import { update as updateMessages } from "../redux/refreshMessages"
+
 import Box from '@mui/material/Box';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import UserInitializer from "../../util/io_utils/UserInitializer"
 import LongVideoIntroduction from "./Introductions/LongVideoIntroduction"
 import { useSelector } from 'react-redux';
 
@@ -41,7 +43,6 @@ import UpdateLog from "./UpdateLog"
 import MessageUtil from "../../util/io_utils/MessageUtil"
 import { useNotification } from '../../Providers/NotificationProvider';
 import DatabaseManipulator from "../../util/io_utils/DatabaseManipulator"
-// import {update} from "../redux/refresh"
 
 
 const defaultTheme = createTheme();
@@ -112,7 +113,9 @@ export default function Contents(props) {
         DatabaseManipulator.addContactHistories([message]).then(() => {
             DatabaseManipulator.insertUnreadMessages([message]).then(() => {
                 DatabaseManipulator.addRecentContacts([message]).then(() => {
-                    dispatcher(update())
+                    dispatcher(updateMailBox())
+                    dispatcher(updateMessages())
+                    dispatcher(updateSideBar())
                 });
 
             })
@@ -131,7 +134,9 @@ export default function Contents(props) {
         DatabaseManipulator.addContactHistories([message]).then(() => {
             DatabaseManipulator.insertUnreadMessages([message]).then(() => {
                 DatabaseManipulator.addRecentContacts([message]).then(() => {
-                    dispatcher(update())
+                                        dispatcher(updateMailBox())
+                    dispatcher(updateMessages())
+                    dispatcher(updateSideBar())
                 });
 
             })
@@ -200,8 +205,8 @@ export default function Contents(props) {
                         });
                         console.log("Updated notifications list:", updatedList);
                         setNotifications(updatedList);
-                        dispatcher(update())
-
+                    dispatcher(updateMailBox())
+                    dispatcher(updateSideBar())
 
                     })
                 })
@@ -222,7 +227,7 @@ export default function Contents(props) {
                     DatabaseManipulator.initUnreadMessages(messages).then(() => {
                         DatabaseManipulator.initRecentContacts(messages).then(() => {
                             setNotifications(messages)
-                            dispatcher(update())
+                            //dispatcher(update())
                         })
                     })
                 })

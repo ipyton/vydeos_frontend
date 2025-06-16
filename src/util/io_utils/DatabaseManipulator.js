@@ -110,16 +110,18 @@ const keyArray = [type, groupId, userId];
 
                 
             } else if (type === "group") {
-const keyArray = [type, groupId, ""];
+                    const keyArray = [type, groupId, ""];
                 
                     const existing = await db.contacts.get(keyArray);
 
                     if (existing) {
+                        console.log(message)
+                        console.log(existing)
                         await db.contacts.update(keyArray, {
                             userId:"",
                             name: message.name || existing.name,
                             avatar: message.avatar || existing.avatar,
-                            content: userId+ ": " + (message.content || existing.content),
+                            content: (message.userId+ ": " + message.content) || existing.content,
                             timestamp: message.sendTime || message.timestamp || existing.timestamp || Date.now(),
                             count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
                             sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
