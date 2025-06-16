@@ -256,6 +256,8 @@ export default function Login(props) {
                           user: content.userId,
                           token: responseData.message
                         }));
+                            return <Navigate to="/" replace />;
+
                         
                       }, 500);
                     }
