@@ -13,7 +13,7 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
   const messagesStartRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const animationFrameRef = useRef(null);
-  const { mode, toggleMode } = useThemeMode();
+  const { mode } = useThemeMode();
   //const refresh = useSelector((state) => state.refreshMessages.value.refresh);
   const loadingTriggeredRef = useRef(false);
 
