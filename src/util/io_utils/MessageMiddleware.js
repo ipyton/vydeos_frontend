@@ -67,9 +67,12 @@ export default class MessageMiddleware {
             console.log(localRes)
 
             if (MessageMiddleware.isSessionMessageIdContinuous(lastSessionMessageId, localRes) && localRes.length >= limit) {
+                console.log("Local Only")
+                console.log(lastSessionMessageId)
                 return localRes;
             }
             else {
+                console.log("use Internet confs")
                 return MessageUtil.getMessageRecords(type,userId, limit, lastSessionMessageId,groupId).then(async networkRes=> {
                     const result =  MessageMiddleware.fillMissingMessages(lastSessionMessageId, limit, JSON.parse(networkRes.data.message) , localRes||[])
                     console.log(result)

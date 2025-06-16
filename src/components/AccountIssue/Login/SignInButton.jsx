@@ -52,7 +52,7 @@ const SignInButton = () => {
       mb: 2 
     }}>
       {/* 方案1: 使用GoogleLogin组件并添加容器样式 */}
-      <Box sx={{
+      {/* <Box sx={{
         width: '100%',
         '& > div': {
           width: '100% !important',
@@ -74,10 +74,10 @@ const SignInButton = () => {
           shape="rectangular"
           width="100%"
         />
-      </Box>
+      </Box> */}
 
       {/* 方案2: 如果上面不行，可以使用自定义按钮 */}
-      {/* 
+      
       <GoogleLogin
         onSuccess={handleGoogleSuccess}
         onError={handleGoogleError}
@@ -102,7 +102,7 @@ const SignInButton = () => {
           </Button>
         )}
       />
-      */}
+     
     </Box>
   );
 };
