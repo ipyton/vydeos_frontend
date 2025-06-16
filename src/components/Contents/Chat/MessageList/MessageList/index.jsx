@@ -322,8 +322,6 @@ export default function MessageList({ chatRecords, setChatRecords, select }) {
       setHasMoreMessages(true);
       setPullDistance(0);
       setChatRecords([])
-      console.log(select)
-      console.log("--=-=-=-=-=-")
       loadingTriggeredRef.current = false; // Reset loading flag
       DatabaseManipulator.getNewestSessionMessageId(select.type, select.userId,select.groupId)
         .then((newestSessionMessageId) => {
@@ -349,7 +347,7 @@ useEffect(() => {
     loadingTriggeredRef.current = false;
     DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId, select.groupId).then((res) => {
       if (res.count === 0) return;
-      DatabaseManipulator.getContactHistory(select.type, select.userId, res.sessionMessageId, res.count, select.groupId).then(messages => {
+      MessageMiddleware.getContactHistory(select.type, select.userId, res.count, res.sessionMessageId, select.groupId).then(messages => {
         setChatRecords(prevRecords => [...prevRecords, ...messages]);
         DatabaseManipulator.changeCountOfRecentContact(select.type, select.userId,select.groupId, 0)
       });

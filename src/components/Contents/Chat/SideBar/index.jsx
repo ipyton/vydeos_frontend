@@ -54,13 +54,11 @@ export default function SideBar(props) {
           const user = res.find(item=>item.userId === select.userId && item.type === select.type)
           if (user) {
             user.count = 0;
-            //DatabaseManipulator.addRecentContacts([select])
           }
         } else if (select && select.groupId && select.type === "group") {
           const user = res.find(item=>item.groupId === select.groupId && item.type === select.type)
           if (user) {
             user.count = 0;
-            //DatabaseManipulator.addRecentContacts([select])
           }
         }
         setUserRecords(res || []); // Ensure this is always an array
