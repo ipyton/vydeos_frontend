@@ -26,6 +26,7 @@ import { login } from "../../redux/authSlice"; // Adjust path to your auth actio
 import store from "../../redux/store"; // Adjust path to your Redux store
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 // Custom theme with a more modern palette - matching the signup theme
 const theme = createTheme({
   palette: {
@@ -130,6 +131,7 @@ export default function Login(props) {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const { showNotification } = useNotification();
+const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
   const navigate = useNavigate();
 
@@ -149,13 +151,12 @@ export default function Login(props) {
     }
     setBarState({...barState, open: false});
   };
+  if (isAuthenticated) {
+  return <Navigate to="/" replace />;
+}
 
   if (true === networkErr) {
     return <NetworkError />;
-  }
-
-  if (true === login) {
-    return <Navigate to="/" replace />;
   }
 
   const validate = () => {

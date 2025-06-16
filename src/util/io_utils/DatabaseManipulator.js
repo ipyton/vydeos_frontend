@@ -580,22 +580,6 @@ static async addRecentContacts(messages) {
         }
     }
 
-    static async getMessagesByDateRange(startDate, endDate, limit = 50, offset = 0) {
-        try {
-            const startTimestamp = new Date(startDate).getTime();
-            const endTimestamp = new Date(endDate).getTime();
-
-            return db.messages
-                .where('timestamp')
-                .between(startTimestamp, endTimestamp)
-                .offset(offset)
-                .limit(limit)
-                .toArray();
-        } catch (error) {
-            console.error('Error getting messages by date range:', error);
-            return [];
-        }
-    }
 
     static async addContactHistories(messages) {
         try {
