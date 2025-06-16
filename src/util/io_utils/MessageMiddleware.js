@@ -7,7 +7,7 @@ export default class MessageMiddleware {
 
     static async isSessionMessageIdContinuous(startId, messages) {
         if (!Array.isArray(messages) || messages.length === 0) return true;
-
+        
         for (let i = 0; i < messages.length; i++) {
             const expectedId = startId - i;
             if (messages[i].sessionMessageId !== expectedId) {

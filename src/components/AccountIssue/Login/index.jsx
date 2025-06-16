@@ -25,7 +25,7 @@ import SignInButton from './SignInButton';
 import { login } from "../../redux/authSlice"; // Adjust path to your auth actions
 import store from "../../redux/store"; // Adjust path to your Redux store
 import { useNavigate } from 'react-router-dom';
-
+import { Navigate } from 'react-router-dom';
 // Custom theme with a more modern palette - matching the signup theme
 const theme = createTheme({
   palette: {
