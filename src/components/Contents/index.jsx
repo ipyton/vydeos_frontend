@@ -134,7 +134,7 @@ export default function Contents(props) {
         DatabaseManipulator.addContactHistories([message]).then(() => {
             DatabaseManipulator.insertUnreadMessages([message]).then(() => {
                 DatabaseManipulator.addRecentContacts([message]).then(() => {
-                                        dispatcher(updateMailBox())
+                    dispatcher(updateMailBox())
                     dispatcher(updateMessages())
                     dispatcher(updateSideBar())
                 });
@@ -205,8 +205,8 @@ export default function Contents(props) {
                         });
                         console.log("Updated notifications list:", updatedList);
                         setNotifications(updatedList);
-                    dispatcher(updateMailBox())
-                    dispatcher(updateSideBar())
+                        dispatcher(updateMailBox())
+                        dispatcher(updateSideBar())
 
                     })
                 })

@@ -115,7 +115,7 @@ export default function Contact(props) {
         onDelete(props.content.type, userId,groupId);
       } else if (isRightSwipe && markAsRead) {
         // Right swipe - mark as read
-        markAsRead(props.content.type, userId,groupId);
+        markAsRead(props.content.type, userId, groupId);
       }
     }
     

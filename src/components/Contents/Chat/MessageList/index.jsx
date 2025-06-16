@@ -27,9 +27,9 @@ export default function ChatContainer(props) {
     setSelect(null);
   };
 
-  useEffect( () => {
-    MessageUtil.markAsRead(select.type, select.userId);
-  }, [select, refresh, showNotification]);
+  // useEffect( () => {
+  //   MessageUtil.markAsRead(select.type, select.userId,select.groupId);
+  // }, [select, refresh, showNotification]);
 
 
   const handleDeleteMessage = async (messageId) => {

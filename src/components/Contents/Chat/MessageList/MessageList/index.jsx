@@ -347,14 +347,11 @@ useEffect(() => {
   if (select) {
     setPullDistance(0);
     loadingTriggeredRef.current = false;
-    
     DatabaseManipulator.getRecentContactByTypeAndId(select.type, select.userId, select.groupId).then((res) => {
       if (res.count === 0) return;
       DatabaseManipulator.getContactHistory(select.type, select.userId, res.sessionMessageId, res.count, select.groupId).then(messages => {
-        select.count = 0;
-        DatabaseManipulator.addRecentContacts([select]).then(() => {
-          setChatRecords(prevRecords => [...prevRecords, ...messages]);
-        });
+        setChatRecords(prevRecords => [...prevRecords, ...messages]);
+        DatabaseManipulator.changeCountOfRecentContact(select.type, select.userId,select.groupId, 0)
       });
     });
   }

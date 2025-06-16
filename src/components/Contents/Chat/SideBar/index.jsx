@@ -49,23 +49,20 @@ export default function SideBar(props) {
     setLoading(true);
     DatabaseManipulator.getRecentContacts()
       .then((res) => {
+        //do not let the current contact has the unread count
         if(select && select.userId && select.type === "single"){
           const user = res.find(item=>item.userId === select.userId && item.type === select.type)
           if (user) {
             user.count = 0;
-            select.count = 0
-            DatabaseManipulator.addRecentContacts([select])
+            //DatabaseManipulator.addRecentContacts([select])
           }
         } else if (select && select.groupId && select.type === "group") {
           const user = res.find(item=>item.groupId === select.groupId && item.type === select.type)
           if (user) {
             user.count = 0;
-            select.count = 0
-            DatabaseManipulator.addRecentContacts([select])
+            //DatabaseManipulator.addRecentContacts([select])
           }
         }
-        console.log("userRecords")
-        console.log(res)
         setUserRecords(res || []); // Ensure this is always an array
 
         setLoading(false);
@@ -87,20 +84,23 @@ const filteredContacts = userRecords;
 const onClick = (idx) => {
   return () => {
     const mid = userRecords[idx];
-    
+
     // 构建新的选择对象
-    const newSelect = mid.type === "single" 
-      ? { "userId": mid.userId, "type": mid.type }
-      : { "userId": mid.userId, "type": mid.type, "groupId": mid.groupId };
-    
-    // 深度比较当前选中状态
-    const isEqual = JSON.stringify(select) === JSON.stringify(newSelect);
-    
+    const newSelect = mid.type === "single"
+      ? { userId: mid.userId, type: mid.type }
+      : { userId: mid.userId, type: mid.type, groupId: mid.groupId };
+
+    // 仅比较指定字段，而非整个对象
+    const isEqual = 
+      select?.userId === newSelect.userId &&
+      select?.type === newSelect.type &&
+      (newSelect.type === "group" ? select?.groupId === newSelect.groupId : true);
+
     if (!isEqual) {
       setSelect(newSelect);
     }
-    markAsRead(mid.type, mid.userId, mid.groupId);
 
+    markAsRead(mid.type, mid.userId, mid.groupId);
   };
 };
 

@@ -74,6 +74,8 @@ static async addRecentContacts(messages) {
     if (!messages || messages.length === 0) {
         return [];
     }
+    console.log("addRecentContacts")
+    console.log(messages)
     try {
         for (const message of messages) {
             const userId = message.senderId || message.userId || "";
@@ -82,7 +84,7 @@ static async addRecentContacts(messages) {
             
             if (type === "single") {
                 // Create consistent key format
-const keyArray = [type, groupId, userId];
+                    const keyArray = [type, groupId, userId];
                 
                     const existing = await db.contacts.get(keyArray);
                     if (existing) {
@@ -150,6 +152,8 @@ const keyArray = [type, groupId, userId];
 
 
     static async initRecentContacts(messages) {
+        console.log("initRecentContacts")
+        console.log(messages)
         if (!messages || messages.length === 0) {
             return [];
         }
@@ -633,22 +637,23 @@ const keyArray = [type, groupId, userId];
 
 
     static changeCountOfRecentContact(type, userId,groupId, count) {
+        console.log([type,userId,groupId,count])
         if (type === "group") {
         return db.contacts
-            .where('[type+groupId]')
-            .equals([type,groupId])
+            .where('[type+groupId+userId]')
+            .equals([type,groupId,userId])
             .modify(contact => {
+                console.log(contact)
                 contact.count = count;
             });
         }else if (type === "single"){
         return db.contacts
             .where('[type+groupId+userId]')
-            .equals([type,groupId, userId])
+            .equals([type,0, userId])
             .modify(contact => {
                 contact.count = count;
             });
         }
-
     }
 
     static async deleteUnreadMessage(type, groupId, senderId) {
@@ -665,25 +670,5 @@ const keyArray = [type, groupId, userId];
         }
     }
 
-    static async addCountToRecentContact(type, id, timestamp) {
-        try {
-            const contact = await db.contacts.get({ type, userId: id });
 
-            if (contact) {
-                const newCount = (contact.count === 0 || contact.count == null)
-                    ? 1
-                    : contact.count + 1;
-
-                await db.contacts.update([type, id], {
-                    count: newCount,
-                    timestamp: timestamp || Date.now(), // 可选更新时间
-                });
-            } else {
-                // 如果找不到，是否新建？视业务逻辑而定，这里暂不处理
-                console.warn('Contact not found:', type, id);
-            }
-        } catch (error) {
-            console.error('Failed to update count:', error);
-        }
-    }
 }
