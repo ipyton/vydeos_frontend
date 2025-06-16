@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Box, Fab, CircularProgress, Typography } from "@mui/material";
 import { KeyboardArrowUp, KeyboardArrowDown, Refresh } from "@mui/icons-material";
-import { MessageBox } from "react-chat-elements";
 import { useThemeMode } from "../../../../../Themes/ThemeContext";
 import MessageBubble from "./ImprovedMessage";
 import DatabaseManipulator from "../../../../../util/io_utils/DatabaseManipulator";
 import { useSelector } from "react-redux";
-import { Database } from "lucide-react";
 import { useNotification } from "../../../../../Providers/NotificationProvider";
 import MessageMiddleware from "../../../../../util/io_utils/MessageMiddleware";
 

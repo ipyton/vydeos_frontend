@@ -223,7 +223,10 @@ const keyArray = [type, groupId, ""];
     }
 
     static async getNewestSessionMessageId(type, userId,groupId) {
+        if (!userId) userId =""
+        if (!groupId) groupId = 0
         try {
+            
             if (type === "single") {
                 const contact = await db.contacts.get({ type, groupId,userId });
                 return contact ? contact.sessionMessageId || -1 : -1; // 返回 sessionMessageId 或 -1
@@ -290,6 +293,8 @@ const keyArray = [type, groupId, ""];
 
     static async getRecentContactByTypeAndId(type, id, groupId) {
         try {
+            if (!groupId) groupId = 0
+            if (!id) id = ""
             return db.contacts
                 .where('[type+groupId+userId]')
                 .equals([type,groupId, id])

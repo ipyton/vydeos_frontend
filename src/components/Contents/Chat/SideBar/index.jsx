@@ -83,16 +83,10 @@ export default function SideBar(props) {
     setSearchQuery(event.target.value);
   };
 const filteredContacts = userRecords;
-  // const filteredContacts = Array.isArray(userRecords) 
-  //   ? userRecords.filter(record => 
-  //       (record.name && record.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
-  //       (record.userId && record.userId.toLowerCase().includes(searchQuery.toLowerCase()))
-  //     )
-  //   : [];
 
   const onClick = (idx) => {
     return () => {
-      let mid = filteredContacts[idx];
+      let mid = userRecords[idx];
       if (mid.type === "single") {
        markAsRead(mid.type,mid.userId,mid.groupId)
       setSelect({ "userId": mid.userId, "type": mid.type });
