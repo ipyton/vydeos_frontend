@@ -44,7 +44,8 @@ import {
   Security as SecurityIcon,
   ArrowBack as ArrowBackIcon,
   DeleteSweep as ClearDataIcon,
-  CloudDownload as ImportIcon
+  CloudDownload as ImportIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { useThemeMode } from '../../../Themes/ThemeContext';
 
@@ -54,6 +55,8 @@ export default function SettingsPage() {
   const [autoLanguage, setAutoLanguage] = useState(false);
   const [enhancedSecurity, setEnhancedSecurity] = useState(true);
   const [clearDataDialogOpen, setClearDataDialogOpen] = useState(false);
+  const [refreshCacheDialogOpen, setRefreshCacheDialogOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Data import dialog states
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -85,6 +88,43 @@ export default function SettingsPage() {
       }),
     },
   });
+
+  // Function to force refresh cache and reload
+  const forceRefreshCache = async () => {
+    setIsRefreshing(true);
+    
+    try {
+      // Clear Service Worker cache
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+        console.log('Service worker caches cleared');
+      }
+      
+      // Unregister all service workers
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(
+          registrations.map(registration => registration.unregister())
+        );
+        console.log('Service workers unregistered');
+      }
+      
+      // Clear browser cache by adding timestamp to URL
+      const url = new URL(window.location.href);
+      url.searchParams.set('_t', Date.now().toString());
+      
+      // Force reload with cache bypass
+      window.location.replace(url.href);
+      
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      // Fallback: hard reload
+      window.location.reload(true);
+    }
+  };
 
   // Function to clear all browser data
   const clearAllData = () => {
@@ -141,6 +181,20 @@ export default function SettingsPage() {
 
   const handleCancelClearData = () => {
     setClearDataDialogOpen(false);
+  };
+
+  // Cache refresh handlers
+  const handleRefreshCacheClick = () => {
+    setRefreshCacheDialogOpen(true);
+  };
+
+  const handleConfirmRefreshCache = () => {
+    setRefreshCacheDialogOpen(false);
+    forceRefreshCache();
+  };
+
+  const handleCancelRefreshCache = () => {
+    setRefreshCacheDialogOpen(false);
   };
 
   // Data import functions
@@ -372,7 +426,7 @@ export default function SettingsPage() {
 
             <Divider sx={{ my: 3 }} />
 
-            {/* Clear All Data Section */}
+            {/* Data Management Section */}
             <Box sx={{ px: 2, pb: 2 }}>
               <Typography variant="h6" sx={{ mb: 2, color: 'text.secondary' }}>
                 Data Management
@@ -407,6 +461,45 @@ export default function SettingsPage() {
                       }}
                     >
                       Import
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+
+              {/* Force Refresh Cache Button */}
+              <Card sx={{ mb: 2, backgroundColor: 'warning.main', color: 'warning.contrastText' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <RefreshIcon sx={{ mr: 2 }} />
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          Force Refresh Cache
+                        </Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                          Clear all cached data and reload to get latest version
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      color="inherit"
+                      onClick={handleRefreshCacheClick}
+                      disabled={isRefreshing}
+                      sx={{ 
+                        borderColor: 'warning.contrastText',
+                        color: 'warning.contrastText',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          borderColor: 'warning.contrastText',
+                        },
+                        '&:disabled': {
+                          borderColor: 'rgba(255, 255, 255, 0.3)',
+                          color: 'rgba(255, 255, 255, 0.3)',
+                        }
+                      }}
+                    >
+                      {isRefreshing ? 'Refreshing...' : 'Refresh'}
                     </Button>
                   </Box>
                 </CardContent>
@@ -511,7 +604,37 @@ export default function SettingsPage() {
           </DialogActions>
         </Dialog>
 
-        {/* Confirmation Dialog */}
+        {/* Force Refresh Cache Confirmation Dialog */}
+        <Dialog
+          open={refreshCacheDialogOpen}
+          onClose={handleCancelRefreshCache}
+          aria-labelledby="refresh-cache-dialog-title"
+          aria-describedby="refresh-cache-dialog-description"
+        >
+          <DialogTitle id="refresh-cache-dialog-title">
+            Force Refresh Cache?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="refresh-cache-dialog-description">
+              This will clear all cached data and force reload the page to get the latest version:
+              <br />• Service Worker cache
+              <br />• Browser cache
+              <br />• Unregister Service Workers
+              <br /><br />
+              The page will automatically reload after clearing the cache. This is useful when you need to ensure you're viewing the most up-to-date version of the application.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancelRefreshCache} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmRefreshCache} color="warning" variant="contained" autoFocus>
+              Refresh Cache
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Clear All Data Confirmation Dialog */}
         <Dialog
           open={clearDataDialogOpen}
           onClose={handleCancelClearData}
