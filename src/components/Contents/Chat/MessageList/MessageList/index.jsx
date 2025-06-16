@@ -44,6 +44,144 @@ export default function MessageList({ chatRecords, setChatRecords, select,markAs
   const DAMPING_FACTOR = 0.3; // 阻尼系数 (0-1, 越小阻尼越大)
   const RELEASE_THRESHOLD = 80; // 释放触发加载的阈值
   const MOUSE_WHEEL_DAMPING = 0.5; // 鼠标滚轮阻尼系数
+// 添加触摸事件处理器
+const [lastTouchY, setLastTouchY] = useState(0);
+const [startTouchY, setStartTouchY] = useState(0);
+const [isTouching, setIsTouching] = useState(false);
+  const handleWheel = useCallback((e) => {
+    if (isLoading || loadingTriggeredRef.current) {
+      e.preventDefault();
+      return;
+    }
+
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const atTop = scrollTop <= 0;
+
+    // At top scrolling up with more messages
+    if (atTop && e.deltaY < 0 && hasMoreMessages) {
+      e.preventDefault();
+      const dampedDelta = e.deltaY * MOUSE_WHEEL_DAMPING;
+      const newPullDistance = Math.min(
+        pullDistance + Math.abs(dampedDelta) * 0.5,
+        MAX_PULL_DISTANCE
+      );
+      setPullDistance(newPullDistance);
+
+      // Debounce the loading trigger
+      if (newPullDistance >= RELEASE_THRESHOLD && !isLoading && !loadingTriggeredRef.current) {
+        if (wheelTimeoutRef.current) {
+          clearTimeout(wheelTimeoutRef.current);
+        }
+
+        wheelTimeoutRef.current = setTimeout(() => {
+          if (!isLoading && !loadingTriggeredRef.current) {
+            handleLoadMoreMessages();
+          }
+        }, 50); // 50ms debounce
+      }
+      return;
+    }
+
+    // ... rest of wheel handling code remains the same
+  }, [pullDistance, isLoading, hasMoreMessages]);
+// 处理触摸开始事件
+const handleTouchStart = useCallback((e) => {
+  if (isLoading) return;
+
+  const container = scrollContainerRef.current;
+  if (!container) return;
+
+  const { scrollTop } = container;
+  const atTop = scrollTop <= 0;
+
+  // Only prevent touch start if at top and no more messages
+  if (atTop && !hasMoreMessages) return;
+
+  const touch = e.touches[0];
+  setIsTouching(true);
+  setStartTouchY(touch.clientY);
+  setLastTouchY(touch.clientY);
+  setVelocity(0);
+}, [isLoading, hasMoreMessages]);
+
+// 处理触摸移动事件
+const handleTouchMove = useCallback((e) => {
+  if (!isTouching || isLoading) return;
+
+  const container = scrollContainerRef.current;
+  if (!container) return;
+
+  const touch = e.touches[0];
+  const deltaY = touch.clientY - lastTouchY;
+  const totalDelta = touch.clientY - startTouchY;
+  const { scrollTop } = container;
+
+  // 只在顶部且向下拖拽时应用阻尼 (only if has more messages)
+  if (scrollTop <= 0 && totalDelta > 0 && hasMoreMessages) {
+    e.preventDefault();
+    setIsDragging(true);
+
+    // 应用阻尼效果
+    const dampedDistance = totalDelta * DAMPING_FACTOR;
+    const newPullDistance = Math.min(dampedDistance, MAX_PULL_DISTANCE);
+    setPullDistance(newPullDistance);
+
+    // 计算速度（用于后续的惯性滚动）
+    setVelocity(deltaY);
+  }
+
+  setLastTouchY(touch.clientY);
+}, [isTouching, lastTouchY, startTouchY, isLoading, hasMoreMessages]);
+
+// 处理触摸结束事件
+const handleTouchEnd = useCallback(() => {
+  if (!isTouching) return;
+
+  setIsTouching(false);
+  setIsDragging(false);
+
+  // Only trigger if not already loading and not already triggered
+  if (pullDistance >= RELEASE_THRESHOLD && !isLoading && !loadingTriggeredRef.current && hasMoreMessages) {
+    handleLoadMoreMessages();
+  } else {
+    // Bounce back animation
+    const bounceBack = () => {
+      setPullDistance(prev => {
+        const newDistance = prev * 0.9;
+        if (newDistance > 1) {
+          requestAnimationFrame(bounceBack);
+          return newDistance;
+        }
+        return 0;
+      });
+    };
+    bounceBack();
+  }
+}, [pullDistance, isLoading, hasMoreMessages]);
+
+
+// 同时更新 handleMouseDown 条件判断，添加触摸状态
+const handleMouseDown = useCallback((e) => {
+  if (isLoading || isTouching) return; // 防止鼠标和触摸事件冲突
+
+  const container = scrollContainerRef.current;
+  if (!container) return;
+
+  const { scrollTop } = container;
+  const atTop = scrollTop <= 0;
+
+  if (atTop && !hasMoreMessages) return;
+
+  setIsMousePressed(true);
+  setStartMouseY(e.clientY);
+  setLastMouseY(e.clientY);
+  setVelocity(0);
+}, [isLoading, hasMoreMessages, isTouching]);
+
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -82,24 +220,7 @@ export default function MessageList({ chatRecords, setChatRecords, select,markAs
     animationFrameRef.current = requestAnimationFrame(animateScroll);
   };
 
-  // 处理鼠标按下事件
-  const handleMouseDown = useCallback((e) => {
-    if (isLoading) return;
 
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const { scrollTop } = container;
-    const atTop = scrollTop <= 0;
-
-    // Only prevent mouse down if at top and no more messages
-    if (atTop && !hasMoreMessages) return;
-
-    setIsMousePressed(true);
-    setStartMouseY(e.clientY);
-    setLastMouseY(e.clientY);
-    setVelocity(0);
-  }, [isLoading, hasMoreMessages]);
 
   // 处理鼠标移动事件
   const handleMouseMove = useCallback((e) => {
@@ -204,45 +325,46 @@ export default function MessageList({ chatRecords, setChatRecords, select,markAs
     }
   };
   const wheelTimeoutRef = useRef(null);
-  const handleWheel = useCallback((e) => {
-    if (isLoading || loadingTriggeredRef.current) {
-      e.preventDefault();
-      return;
+// 在 useEffect 中添加触摸事件监听器
+useEffect(() => {
+  const container = scrollContainerRef.current;
+  if (!container) return;
+
+  // 鼠标事件（桌面端）
+  container.addEventListener('wheel', handleWheel, { passive: false });
+  container.addEventListener('mousedown', handleMouseDown);
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+
+  // 触摸事件（移动端）
+  container.addEventListener('touchstart', handleTouchStart, { passive: false });
+  container.addEventListener('touchmove', handleTouchMove, { passive: false });
+  container.addEventListener('touchend', handleTouchEnd);
+
+  return () => {
+    // 清理鼠标事件
+    container.removeEventListener('wheel', handleWheel);
+    container.removeEventListener('mousedown', handleMouseDown);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+
+    // 清理触摸事件
+    container.removeEventListener('touchstart', handleTouchStart);
+    container.removeEventListener('touchmove', handleTouchMove);
+    container.removeEventListener('touchend', handleTouchEnd);
+
+    // Clean up timeouts
+    if (wheelTimeoutRef.current) {
+      clearTimeout(wheelTimeoutRef.current);
     }
 
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const atTop = scrollTop <= 0;
-
-    // At top scrolling up with more messages
-    if (atTop && e.deltaY < 0 && hasMoreMessages) {
-      e.preventDefault();
-      const dampedDelta = e.deltaY * MOUSE_WHEEL_DAMPING;
-      const newPullDistance = Math.min(
-        pullDistance + Math.abs(dampedDelta) * 0.5,
-        MAX_PULL_DISTANCE
-      );
-      setPullDistance(newPullDistance);
-
-      // Debounce the loading trigger
-      if (newPullDistance >= RELEASE_THRESHOLD && !isLoading && !loadingTriggeredRef.current) {
-        if (wheelTimeoutRef.current) {
-          clearTimeout(wheelTimeoutRef.current);
-        }
-
-        wheelTimeoutRef.current = setTimeout(() => {
-          if (!isLoading && !loadingTriggeredRef.current) {
-            handleLoadMoreMessages();
-          }
-        }, 50); // 50ms debounce
-      }
-      return;
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
     }
+  };
+}, [handleWheel, handleMouseDown, handleMouseMove, handleMouseUp, 
+    handleTouchStart, handleTouchMove, handleTouchEnd]);
 
-    // ... rest of wheel handling code remains the same
-  }, [pullDistance, isLoading, hasMoreMessages]);
 
   // 处理滚动事件
   const handleScroll = useCallback(() => {
