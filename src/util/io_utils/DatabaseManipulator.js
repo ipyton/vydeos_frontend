@@ -12,11 +12,11 @@ class ChatDatabase extends Dexie {
         });
 
         // Add hooks for auto-updating timestamps
-        this.messages.hook('creating', (primKey, obj, trans) => {
-            if (obj.time) {
-                obj.timestamp = new Date(obj.time).getTime();
-            }
-        });
+        // this.messages.hook('creating', (primKey, obj, trans) => {
+        //     if (obj.time) {
+        //         obj.timestamp = new Date(obj.time).getTime();
+        //     }
+        // });
 
         // this.mailbox.hook('creating', (primKey, obj, trans) => {
         //     if (obj.time) {
@@ -24,11 +24,11 @@ class ChatDatabase extends Dexie {
         //     }
         // });
 
-        this.unreadMessages.hook('creating', (primKey, obj, trans) => {
-            if (obj.sendTime) {
-                obj.timestamp = new Date(obj.sendTime).getTime();
-            }
-        });
+        // this.unreadMessages.hook('creating', (primKey, obj, trans) => {
+        //     if (obj.timestamp) {
+        //         obj.timestamp = new Date(obj.timestamp).getTime();
+        //     }
+        // });
     }
 }
 
@@ -92,7 +92,7 @@ static async addRecentContacts(messages) {
                             name: message.name || existing.name,
                             avatar: message.avatar || existing.avatar,
                             content: message.content || existing.content,
-                            timestamp: message.sendTime || message.timestamp || existing.timestamp || Date.now(),
+                            timestamp: message.timestamp || existing.timestamp ,
                             count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
                             sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
                         });
@@ -103,7 +103,7 @@ static async addRecentContacts(messages) {
                             name: message.name || "",
                             avatar: message.avatar || "",
                             type,
-                            timestamp: message.sendTime || message.timestamp || Date.now(),
+                            timestamp:  message.timestamp ,
                             content: message.content || "",
                             count: message.count || 1,
                             sessionMessageId: message.sessionMessageId || -1
@@ -124,7 +124,7 @@ static async addRecentContacts(messages) {
                             name: message.name || existing.name,
                             avatar: message.avatar || existing.avatar,
                             content: (message.userId+ ": " + message.content) || existing.content,
-                            timestamp: message.sendTime || message.timestamp || existing.timestamp || Date.now(),
+                            timestamp: message.timestamp || existing.timestamp ,
                             count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
                             sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
                         });
@@ -135,7 +135,7 @@ static async addRecentContacts(messages) {
                             name: message.name || "",
                             avatar: message.avatar || "",
                             type,
-                            timestamp: message.sendTime || message.timestamp || Date.now(),
+                            timestamp: message.timestamp ,
                             content: userId + ": " +  message.content || "",
                             count: message.count || 1,
                             sessionMessageId: message.sessionMessageId || -1
@@ -204,7 +204,7 @@ static async addRecentContacts(messages) {
                     const contact = {
                         userId: isGroup? "":message.userId || message.senderId,
                         type: type,
-                        timestamp: message.sendTime ?? existing.timestamp ?? Date.now(),
+                        timestamp: existing.timestamp ,
                         name: message.name ?? existing.name ?? "",
                         avatar: message.avatar ?? existing.avatar ?? "",
                         content: message.content ?? existing.content ?? "",
@@ -434,9 +434,7 @@ static async addRecentContacts(messages) {
                     content: unreadMessage.content,
                     messageId: unreadMessage.messageId,
                     count: previousCount + 1, // 累加
-                    sendTime: unreadMessage.sendTime
-                        ? new Date(unreadMessage.sendTime).getTime()
-                        : Date.now()
+                    timestamp: unreadMessage.timestamp 
                 };
             }));
 
@@ -461,9 +459,7 @@ static async addRecentContacts(messages) {
                     content: unreadMessage.content,
                     messageId: unreadMessage.messageId,
                     count: unreadMessage.count, // 累加
-                    sendTime: unreadMessage.sendTime
-                        ? new Date(unreadMessage.sendTime).getTime()
-                        : Date.now(),
+                    timestamp: unreadMessage.timestamp,
                         groupId: unreadMessage.type ==="group" ?  unreadMessage.groupId: 0
                 };
             }));

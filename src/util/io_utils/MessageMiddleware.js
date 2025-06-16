@@ -5,13 +5,15 @@ import DatabaseManipulator from './DatabaseManipulator';
 
 export default class MessageMiddleware {
 
-    static async isSessionMessageIdContinuous(startId, messages) {
+    static isSessionMessageIdContinuous(startId, messages) {
         if (!Array.isArray(messages) || messages.length === 0) return true;
-        
-        for (let i = 0; i < messages.length; i++) {
+        console.log("startId")
+        console.log(startId)
+        console.log(messages)
+        for (let i = messages.length - 1; i >= 0 ; i --) {
             const expectedId = startId - i;
-            if (messages[i].sessionMessageId !== expectedId) {
-                console.log(`Not continuous at index ${i}: expected ${expectedId}, got ${messages[i].sessionMessageId}`);
+            if (messages[messages.length - i - 1].sessionMessageId !== expectedId) {
+                console.log(`Not continuous at index ${messages.length - i - 1}: expected ${expectedId}, got ${messages[messages.length - i - 1].sessionMessageId}`);
                 return false;
             }
         }
@@ -38,7 +40,9 @@ export default class MessageMiddleware {
         }
         const localMap = new Map(from_local.map(m => [m.sessionMessageId, m]));
         const networkMap = new Map(from_network.map(m => [m.sessionMessageId, m]));
-
+        console.log("from local")
+        console.log(localMap)
+        console.log(networkMap)
         const filled = [];
         const missingFromLocal = [];
 
