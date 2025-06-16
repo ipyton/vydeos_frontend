@@ -14,7 +14,7 @@ import { useNotification } from "../../../../Providers/NotificationProvider";
 
 
 export default function ChatContainer(props) {
-  const { select, setSelect, isMobile } = props;
+  const { select, setSelect, isMobile, markAsRead } = props;
   const [chatRecords, setChatRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [messageListLoading,setMessageListLoading] = useState(false)
@@ -26,10 +26,6 @@ export default function ChatContainer(props) {
   const handleBackClick = () => {
     setSelect(null);
   };
-
-  // useEffect( () => {
-  //   MessageUtil.markAsRead(select.type, select.userId,select.groupId);
-  // }, [select, refresh, showNotification]);
 
 
   const handleDeleteMessage = async (messageId) => {
@@ -114,6 +110,7 @@ export default function ChatContainer(props) {
             }}
             setLoading={setMessageListLoading}
             isLoading={messageListLoading}
+            markAsRead ={markAsRead}
           />
         </Box>
       )}

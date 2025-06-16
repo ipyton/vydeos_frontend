@@ -55,7 +55,7 @@ export default function Chat(props) {
               isMobile={isMobile}
               setNotifications={setNotifications}
               notifications={notifications}
-
+              markAsRead = {markAsRead}
             />
           </div>
         </Slide>

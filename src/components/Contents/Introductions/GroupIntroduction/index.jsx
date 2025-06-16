@@ -71,7 +71,7 @@ export default function GroupDetailsComponent(props) {
             type: "group",
             groupId: details.groupId,
             name: details.groupName,
-            count: 0
+            count:0
         };
 
         DatabaseManipulator.addRecentContacts([contact]).then(() => {

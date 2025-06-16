@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { useNotification } from "../../../../../Providers/NotificationProvider";
 import MessageMiddleware from "../../../../../util/io_utils/MessageMiddleware";
 
-export default function MessageList({ chatRecords, setChatRecords, select }) {
+export default function MessageList({ chatRecords, setChatRecords, select,markAsRead }) {
   const messagesEndRef = useRef(null);
   const messagesStartRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -349,7 +349,8 @@ useEffect(() => {
       if (res.count === 0) return;
       MessageMiddleware.getContactHistory(select.type, select.userId, res.count, res.sessionMessageId, select.groupId).then(messages => {
         setChatRecords(prevRecords => [...prevRecords, ...messages]);
-        DatabaseManipulator.changeCountOfRecentContact(select.type, select.userId,select.groupId, 0)
+        markAsRead(select.type, select.userId, select.groupId)
+        // DatabaseManipulator.changeCountOfRecentContact(select.type, select.userId,select.groupId, 0)
       });
     });
   }

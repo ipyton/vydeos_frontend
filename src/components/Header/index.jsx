@@ -168,15 +168,15 @@ export default function Header(props) {
   const searchSuggestionOpen = !Boolean(suggestionAnchorEl);
   const languageMenuOpen = Boolean(languageAnchorEl);
   const notificationsOpen = Boolean(notificationsAnchorEl);
-  const refresh = useSelector((state) => state.refreshMessages.value.refresh);
+  const refresh = useSelector((state) => state.refreshMailBox.value.refresh);
 
   const { showNotification } = useNotification();
   
   // Hooks
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { notifications, setNotifications, setLogin, avatar, setBadgeContent, markAsRead } = props;
-
+  const {  setLogin, avatar, setBadgeContent, markAsRead } = props;
+  const [notifications,setNotifications] = useState([])
   // Event handlers
   function handleDocumentClick(event) {
     if (event.target.id !== "category" && event.target.id !== "searchInput") {
@@ -204,6 +204,9 @@ export default function Header(props) {
         console.error("Error fetching unread message count:", error);
         setMessageCount(0); // Fallback to 0 on error
         showNotification("Failed to fetch unread message count", "error");
+      })
+      DatabaseManipulator.getUnreadMessages().then(res=>{
+        setNotifications(res)
       })
 
   },[refresh])

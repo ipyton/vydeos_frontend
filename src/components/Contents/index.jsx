@@ -43,6 +43,7 @@ import UpdateLog from "./UpdateLog"
 import MessageUtil from "../../util/io_utils/MessageUtil"
 import { useNotification } from '../../Providers/NotificationProvider';
 import DatabaseManipulator from "../../util/io_utils/DatabaseManipulator"
+import { GroupOutlined } from "@mui/icons-material"
 
 
 const defaultTheme = createTheme();
@@ -193,18 +194,19 @@ export default function Contents(props) {
 
 
     const markAsRead = (type, userId,groupId) => {
+        console.log([type,userId,groupId])
         MessageUtil.markAsRead(type, userId,groupId).then((res) => {
             if (res && res.data && res.data.code === 0) {
                 console.log("Marked as read successfully")
                 // Update the notifications state to remove the read message
                 DatabaseManipulator.changeCountOfRecentContact(type, userId,groupId, 0).then(() => {
                     DatabaseManipulator.deleteUnreadMessage(type,groupId, userId).then(() => {
-                        const updatedList = notifications.filter(notification => {
-                            console.log("Filtering notification:", notification, "with userId:", userId, "and type:", type);
-                            return !(notification.senderId === userId && notification.type === type);
-                        });
-                        console.log("Updated notifications list:", updatedList);
-                        setNotifications(updatedList);
+                        // const updatedList = notifications.filter(notification => {
+                        //     console.log("Filtering notification:", notification, "with userId:", userId, "and type:", type);
+                        //     return !(notification.senderId === userId && notification.type === type);
+                        // });
+                        // console.log("Updated notifications list:", updatedList);
+                        //setNotifications(updatedList);
                         dispatcher(updateMailBox())
                         dispatcher(updateSideBar())
 
@@ -252,7 +254,7 @@ export default function Contents(props) {
     return (
         < ThemeProvider theme={defaultTheme} >
             <Box sx={{ display: 'flex' }}>
-                <Header avatar={avatar} setAvatar={setAvatar} setLogin={setLogin} notifications={notifications} setNotifications={setNotifications} markAsRead={markAsRead}></Header>
+                <Header avatar={avatar} setAvatar={setAvatar} setLogin={setLogin}  markAsRead={markAsRead}></Header>
                 <Box width="calc(100% - 64px)" justifyContent="center" alignItems="center" marginTop="64px">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <div>
@@ -264,8 +266,7 @@ export default function Contents(props) {
                                     <Route path="/editor" element={<TextEditor barState={state} setBarState={setState} status={props}></TextEditor>}></Route>
                                     <Route path="/videos" element={<Videos barState={state} setBarState={setState} status={props}></Videos>}></Route>
                                     <Route path="/chat" element={<Chat barState={state} setBarState={setState} status={props}
-                                        sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector} notifications={notifications}
-                                        setNotifications={setNotifications} markAsRead={markAsRead}></Chat>}></Route>
+                                        sideBarSelector={sideBarSelector} setSideBarSelector={setSideBarSelector}  markAsRead={markAsRead}></Chat>}></Route>
                                     <Route path="/settings" element={<Settings barState={state} setBarState={setState} status={props}></Settings>}></Route>
                                     <Route path="/notfound" element={<NetworkError barState={state} setBarState={setState} status={props} ></NetworkError>}></Route>
                                     <Route path="/friends" element={<Friends barState={state} setBarState={setState} status={props}></Friends>}></Route>

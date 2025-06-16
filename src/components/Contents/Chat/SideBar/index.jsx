@@ -43,12 +43,13 @@ export default function SideBar(props) {
     if (location && location.type && (location.userId || location.groupId)) {
       setSelect(location);
     }
-  }, [location.type, location.userId, setSelect]);
+  }, [location]);
 
   useEffect(() => {
     setLoading(true);
     DatabaseManipulator.getRecentContacts()
       .then((res) => {
+        console.log(res)
         //do not let the current contact has the unread count
         if(select && select.userId && select.type === "single"){
           const user = res.find(item=>item.userId === select.userId && item.type === select.type)

@@ -93,7 +93,7 @@ static async addRecentContacts(messages) {
                             avatar: message.avatar || existing.avatar,
                             content: message.content || existing.content,
                             timestamp: message.timestamp || existing.timestamp ,
-                            count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
+                            count: message.count != null ? message.count : ((existing.count || 0) + 1),
                             sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
                         });
                     } else {
@@ -103,9 +103,9 @@ static async addRecentContacts(messages) {
                             name: message.name || "",
                             avatar: message.avatar || "",
                             type,
-                            timestamp:  message.timestamp ,
+                            timestamp:  message.timestamp || Date.now(),
                             content: message.content || "",
-                            count: message.count || 1,
+                            count: message.count != null ? message.count : 1,
                             sessionMessageId: message.sessionMessageId || -1
                         });
                     }
@@ -125,7 +125,7 @@ static async addRecentContacts(messages) {
                             avatar: message.avatar || existing.avatar,
                             content: (message.userId+ ": " + message.content) || existing.content,
                             timestamp: message.timestamp || existing.timestamp ,
-                            count: message.count !== undefined ? message.count : ((existing.count || 0) + 1),
+                            count: message.count != null ? message.count : ((existing.count || 0) + 1),
                             sessionMessageId: message.sessionMessageId || existing.sessionMessageId || -1
                         });
                     } else {
@@ -135,9 +135,9 @@ static async addRecentContacts(messages) {
                             name: message.name || "",
                             avatar: message.avatar || "",
                             type,
-                            timestamp: message.timestamp ,
+                            timestamp: message.timestamp || Date.now(),
                             content: userId + ": " +  message.content || "",
-                            count: message.count || 1,
+                            count: message.count != null ? message.count : 1,
                             sessionMessageId: message.sessionMessageId || -1
                         });
                     }
@@ -167,7 +167,7 @@ static async addRecentContacts(messages) {
                         return [msg.type, msg.groupId];
                     } else {
                         // Single/direct contact
-                        return [msg.type, 0,msg.senderId || msg.userId];
+                        return [msg.type, 0, msg.senderId || msg.userId];
                     }
                 })
                 .filter(key => key[1]); // Remove entries where second part is undefined
@@ -204,7 +204,7 @@ static async addRecentContacts(messages) {
                     const contact = {
                         userId: isGroup? "":message.userId || message.senderId,
                         type: type,
-                        timestamp: existing.timestamp ,
+                        timestamp: message.timestamp||existing.timestamp ,
                         name: message.name ?? existing.name ?? "",
                         avatar: message.avatar ?? existing.avatar ?? "",
                         content: message.content ?? existing.content ?? "",
@@ -618,6 +618,7 @@ static async addRecentContacts(messages) {
 
     static changeCountOfRecentContact(type, userId,groupId, count) {
         console.log([type,userId,groupId,count])
+        groupId = groupId != null?groupId:0
         if (type === "group") {
         return db.contacts
             .where('[type+groupId+userId]')
@@ -637,7 +638,10 @@ static async addRecentContacts(messages) {
     }
 
     static async deleteUnreadMessage(type, groupId, senderId) {
+                groupId = groupId != null?groupId:0
+
         try {
+            
             const deletedCount = await db.unreadMessages
                 .where('[type+groupId+senderId]')
                 .equals([type, groupId,senderId])
