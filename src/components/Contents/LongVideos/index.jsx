@@ -10,9 +10,10 @@ import VideoUtil from "../../../util/io_utils/VideoUtil";
 import CommentSendComponent from "../Util/CommentSendingComponent";
 import EpisodeSelector from "./EpisodeSelector";
 
-
+import { useThemeMode } from "../../../Themes/ThemeContext";
 
 const VideoPage = () => {
+  const { mode } = useThemeMode();
   const theme = useTheme();
   const location = useLocation();
 
@@ -26,15 +27,56 @@ const VideoPage = () => {
   const [playableEpisodes, setPlayableEpisodes] = useState([]);
   const { showNotification } = useNotification();
 
+  // 根据主题模式定义样式
+  const getThemeStyles = () => {
+    const isDark = mode === 'dark';
+    return {
+      mainContainer: {
+        backgroundColor: isDark ? '#121212' : '#ffffff',
+        color: isDark ? '#ffffff' : '#000000',
+        minHeight: '100vh'
+      },
+      paper: {
+        backgroundColor: isDark ? '#1e1e1e' : theme.palette.background.paper,
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+        border: isDark ? '1px solid #333' : 'none'
+      },
+      playlistSection: {
+        backgroundColor: isDark ? '#2d2d2d' : theme.palette.background.paper,
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+        border: isDark ? '1px solid #404040' : 'none'
+      },
+      playlistItem: {
+        backgroundColor: isDark ? '#3d3d3d' : theme.palette.background.default,
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+        border: isDark ? '1px solid #505050' : '1px solid #e0e0e0',
+        '&:hover': {
+          backgroundColor: isDark ? '#4d4d4d' : '#f5f5f5'
+        }
+      },
+      title: {
+        color: isDark ? '#ffffff' : theme.palette.text.primary
+      },
+      subtitle: {
+        color: isDark ? '#b0b0b0' : theme.palette.text.secondary
+      },
+      loadingContainer: {
+        backgroundColor: isDark ? '#121212' : '#ffffff',
+        color: isDark ? '#ffffff' : '#000000'
+      }
+    };
+  };
+
+  const themeStyles = getThemeStyles();
 
   useEffect(() => {
     if (location.state?.resource_id && location.state?.type) {
       setIsLoading(true);
 
       Promise.all([
-        VideoUtil.getVideoInformation(location.state,setVideoMeta),
+        VideoUtil.getVideoInformation(location.state, setVideoMeta),
         VideoUtil.get_comments(location.state, setComments).then(response => {
-          if (response && response.data &&response.data.code === 0) {
+          if (response && response.data && response.data.code === 0) {
             setComments(JSON.parse(response.data.message));
           }
         }),
@@ -43,25 +85,24 @@ const VideoPage = () => {
           setCurrentSeason(1);
           setCurrentEpisode(0);
         }
-        setIsLoading(false)
+        setIsLoading(false);
       });
     }
   }, [location.state]);
 
-  useEffect(()=> {
+  useEffect(() => {
     if (videoMeta && videoMeta.type === "tv") {
-      if (currentSeason && currentEpisode){
+      if (currentSeason && currentEpisode) {
         VideoUtil.get_and_processM3u8(location.state, setVideoOption, currentSeason, currentEpisode).then((res) => {
           console.log("Video Option: ", videoOption);
-        })
-        
+        });
       }
-  }
-}, [location.state, currentEpisode, currentSeason])
+    }
+  }, [location.state, currentEpisode, currentSeason]);
 
   useEffect(() => {
     if (location.state.type !== "movie") {
-      if (currentSeason && currentSeason !== 0 ) {
+      if (currentSeason && currentSeason !== 0) {
         VideoUtil.get_season_meta(videoMeta.resource_id, videoMeta.type, currentSeason).then((res) => {
           if (res.data.code === 0 && res.data.message !== "null") {
             let result = JSON.parse(res.data.message);
@@ -69,16 +110,14 @@ const VideoPage = () => {
             setTotalEpisodes(result.totalEpisode);
           }
         })
-  
         .catch((error) => {
           console.error('Error fetching season metadata:', error);
         });
       }
     }
-  }, [currentSeason])
+  }, [currentSeason]);
 
   const handlePlayerReady = (player) => {
-    // playerRef.current = player;
     player.on('waiting', () => {
       console.log('Player is waiting');
     });
@@ -95,14 +134,18 @@ const VideoPage = () => {
         justifyContent="center"
         alignItems="center"
         height="100vh"
+        sx={themeStyles.loadingContainer}
       >
-        <Typography variant="h6">Loading...</Typography>
+        <Typography variant="h6" sx={themeStyles.title}>
+          Loading...
+        </Typography>
       </Box>
     );
   }
 
   return (
     <Box sx={{
+      ...themeStyles.mainContainer,
       maxWidth: "1200px",
       margin: "0 auto",
       padding: theme.spacing(2)
@@ -110,13 +153,13 @@ const VideoPage = () => {
       <Stack spacing={3}>
         {/* Video Section */}
         <Paper
-          elevation={0}
+          elevation={mode === 'dark' ? 3 : 0}
           sx={{
+            ...themeStyles.paper,
             display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' }, // Responsive layout
+            flexDirection: { xs: 'column', md: 'row' },
             gap: theme.spacing(2),
-            padding: theme.spacing(2),
-            backgroundColor: theme.palette.background.default
+            padding: theme.spacing(2)
           }}
         >
           {/* Main Video Content */}
@@ -128,9 +171,9 @@ const VideoPage = () => {
               variant="h4"
               gutterBottom
               sx={{ 
-                fontWeight: 600, 
-                color: theme.palette.text.primary,
-                mb: 2 // Add some margin bottom
+                ...themeStyles.title,
+                fontWeight: 600,
+                mb: 2
               }}
             >
               {videoMeta?.movie_name + videoMeta.release_year || "Untitled Video"}
@@ -139,13 +182,16 @@ const VideoPage = () => {
             {/* Video Container with Responsive 16:9 Aspect Ratio */}
             <Box sx={{
               position: 'relative',
-              paddingTop: '56.25%', // 16:9 Aspect Ratio
+              paddingTop: '56.25%',
               width: '100%',
               height: 0,
-              overflow: 'hidden'
+              overflow: 'hidden',
+              backgroundColor: mode === 'dark' ? '#000000' : '#f0f0f0',
+              borderRadius: theme.shape.borderRadius
             }}>
               {
-                videoOption && videoMeta ? <Box sx={{
+                videoOption && videoMeta ? 
+                <Box sx={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
@@ -153,11 +199,18 @@ const VideoPage = () => {
                   height: '100%'
                 }}>
                   <LongVideo
-                    //key={`video-${currentSeason}-${currentEpisode}`} // Add this key prop
                     options={videoOption}
                     onReady={handlePlayerReady}
                   />
-                </Box>: (<Typography>Loading</Typography>)
+                </Box> : 
+                <Box sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }}>
+                  <Typography sx={themeStyles.title}>Loading</Typography>
+                </Box>
               }
             </Box>
           </Box>
@@ -165,50 +218,91 @@ const VideoPage = () => {
           {/* Playlist Section */}
           <Box
             sx={{
+              ...themeStyles.playlistSection,
               flex: { md: 1 },
               width: { xs: '100%', md: 'auto' },
-              backgroundColor: theme.palette.background.paper,
               borderRadius: theme.shape.borderRadius,
               padding: theme.spacing(2),
-              mt: { xs: 2, md: 0 } // Add top margin on mobile
+              mt: { xs: 2, md: 0 }
             }}
           >
             <Typography
               variant="h6"
               gutterBottom
-              sx={{ color: theme.palette.text.secondary }}
+              sx={themeStyles.subtitle}
             >
               Playlist
             </Typography>
             <Stack spacing={1}>
-              <Paper variant="outlined" sx={{ padding: theme.spacing(1) }}>
-                <Typography>Video 1</Typography>
+              <Paper 
+                variant="outlined" 
+                sx={{ 
+                  ...themeStyles.playlistItem,
+                  padding: theme.spacing(1),
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease'
+                }}
+              >
+                <Typography sx={themeStyles.title}>Video 1</Typography>
               </Paper>
-              <Paper variant="outlined" sx={{ padding: theme.spacing(1) }}>
-                <Typography>Video 2</Typography>
+              <Paper 
+                variant="outlined" 
+                sx={{ 
+                  ...themeStyles.playlistItem,
+                  padding: theme.spacing(1),
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease'
+                }}
+              >
+                <Typography sx={themeStyles.title}>Video 2</Typography>
               </Paper>
             </Stack>
           </Box>
         </Paper>
-        {/* seasonId, setSeasonId, episode, setEpisode, details, totalSeason, setTotalSeason */}
-        {videoMeta.type === "movie" ? <div></div> : <EpisodeSelector seasonId={currentSeason} playableEpisodes={playableEpisodes} setSeasonId={setCurrentSeason} episode={currentEpisode} setEpisode={setCurrentEpisode} totalEpisodes={totalEpisodes} details={videoMeta}></EpisodeSelector>}
 
+        {/* Episode Selector */}
+        {videoMeta.type === "movie" ? 
+          <div></div> : 
+          <Box sx={themeStyles.paper}>
+            <EpisodeSelector 
+              seasonId={currentSeason} 
+              playableEpisodes={playableEpisodes} 
+              setSeasonId={setCurrentSeason} 
+              episode={currentEpisode} 
+              setEpisode={setCurrentEpisode} 
+              totalEpisodes={totalEpisodes} 
+              details={videoMeta}
+            />
+          </Box>
+        }
+
+        {/* Comments Section */}
         <Paper
-          elevation={0}
+          elevation={mode === 'dark' ? 3 : 0}
           sx={{
-            padding: theme.spacing(2),
-            backgroundColor: theme.palette.background.default
+            ...themeStyles.paper,
+            padding: theme.spacing(2)
           }}
         >
           <Typography
             variant="h5"
             gutterBottom
-            sx={{ fontWeight: 500, color: theme.palette.text.primary }}
+            sx={{ 
+              ...themeStyles.title,
+              fontWeight: 500 
+            }}
           >
             Comments
           </Typography>
-          <CommentSendComponent movieIdentifier = {location.state} comments = {comments} setComments={setComments}></CommentSendComponent>
-          <Comments comments={comments} movieIdentifier = {location.state}/>
+          <CommentSendComponent 
+            movieIdentifier={location.state} 
+            comments={comments} 
+            setComments={setComments}
+          />
+          <Comments 
+            comments={comments} 
+            movieIdentifier={location.state}
+          />
         </Paper>
       </Stack>
     </Box>
