@@ -184,7 +184,7 @@ const textFieldStyles = {
           };
           await DatabaseManipulator.addContactHistory(message);
           const senderId = direction ? result.larger : result.smaller
-          message.senderId = senderId
+          message.userId = senderId
           //message.count = 0
           await DatabaseManipulator.initRecentContacts([message])
           setChatRecords([...chatRecords, message]); // Update chat records

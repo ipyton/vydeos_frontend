@@ -161,7 +161,7 @@ const keyArray = [type, groupId, ""];
                         return [msg.type, msg.groupId];
                     } else {
                         // Single/direct contact
-                        return [msg.type, msg.senderId || msg.userId];
+                        return [msg.type, 0,msg.senderId || msg.userId];
                     }
                 })
                 .filter(key => key[1]); // Remove entries where second part is undefined
@@ -196,7 +196,7 @@ const keyArray = [type, groupId, ""];
                     const existing = existingContactsMap.get(key) || {};
 
                     const contact = {
-                        userId: isGroup? "":message.userId,
+                        userId: isGroup? "":message.userId || message.senderId,
                         type: type,
                         timestamp: message.sendTime ?? existing.timestamp ?? Date.now(),
                         name: message.name ?? existing.name ?? "",
@@ -210,7 +210,7 @@ const keyArray = [type, groupId, ""];
 
                     return contact;
                 });
-
+                console.log(contactList)
             if (contactList.length > 0) {
                 await db.contacts.bulkPut(contactList);
             }
