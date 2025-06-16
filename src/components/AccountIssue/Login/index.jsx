@@ -14,7 +14,6 @@ import LoginIcon from '@mui/icons-material/Login';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Navigate } from "react-router-dom";
 import NetworkError from '../../Errors/NetworkError';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
 import { useNotification } from '../../../Providers/NotificationProvider';
@@ -25,6 +24,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import SignInButton from './SignInButton';
 import { login } from "../../redux/authSlice"; // Adjust path to your auth actions
 import store from "../../redux/store"; // Adjust path to your Redux store
+import { useNavigate } from 'react-router-dom';
 
 // Custom theme with a more modern palette - matching the signup theme
 const theme = createTheme({
@@ -131,6 +131,7 @@ export default function Login(props) {
   const [passwordError, setPasswordError] = useState("");
   const { showNotification } = useNotification();
 
+  const navigate = useNavigate();
 
   // Snackbar state
   const [barState, setBarState] = useState({
@@ -256,7 +257,7 @@ export default function Login(props) {
                           user: content.userId,
                           token: responseData.message
                         }));
-                            return <Navigate to="/" replace />;
+                      navigate('/', { replace: true });
 
                         
                       }, 500);
