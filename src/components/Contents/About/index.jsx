@@ -32,11 +32,11 @@ const AboutPage = () => {
     const { mode } = useThemeMode();
   
   const personalInfo = {
-    name: "Your Name",
-    title: "Frontend Developer",
-    avatarUrl: "https://via.placeholder.com/150", // Replace with your image
-    location: "City, Country",
-    bio: "Frontend developer passionate about building intuitive user interfaces and accessible web applications. I enjoy working with modern JavaScript frameworks and learning new technologies.",
+    name: "Noah Chen",
+    title: "Developer",
+    avatarUrl: "https://pub-54727f9e6f694597be444e52fa082e3a.r2.dev/21750044243_.pic.jpg", // Replace with your image
+    location: "Melbourne, Australia",
+    bio: "Noah Chen is a Melbourne-based full-stack developer with a strong foundation in backend engineering, cloud infrastructure, and data systems. With hands-on experience in building scalable platforms using technologies like Spring Boot, Flask, React, Kafka, Redis, ScyllaDB, and MinIO, he excels at delivering reliable and high-performance applications. He has contributed to projects ranging from community video-sharing platforms to enterprise-grade network tools, demonstrating both versatility and technical depth. Zhiheng combines his academic background in computer science with practical problem-solving skills to build systems that are efficient, maintainable, and user-focused. He is currently seeking opportunities in backend development, full stack engineering, or data engineering.",
     skills: ["React", "JavaScript", "Material UI", "HTML/CSS", "Redux"],
     social: {
       linkedin: "https://linkedin.com/in/yourprofile",
