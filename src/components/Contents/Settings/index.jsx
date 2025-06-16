@@ -661,7 +661,7 @@ export default function SettingsPage() {
               Cancel
             </Button>
             <Button onClick={handleConfirmClearData} color="error" variant="contained" autoFocus>
-              Clear All Data
+              Clear All User Data
             </Button>
           </DialogActions>
         </Dialog>
