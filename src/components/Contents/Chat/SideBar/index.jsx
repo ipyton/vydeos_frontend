@@ -62,6 +62,8 @@ export default function SideBar(props) {
             user.count = 0;
           }
         }
+        console.log("-00-0-0-0-0-0-0-0-0-0")
+        console.log(res)
         setUserRecords(res || []); // Ensure this is always an array
 
         setLoading(false);
@@ -78,7 +80,6 @@ export default function SideBar(props) {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
-const filteredContacts = userRecords;
 
 const onClick = (idx) => {
   return () => {
@@ -238,7 +239,7 @@ const onClick = (idx) => {
               Start making some friends first
             </Typography>
           </Box>
-        ) : filteredContacts.length === 0 ? (
+        ) : userRecords.length === 0 ? (
           <Box sx={{ 
             p: isMobile ? 4 : 4, 
             textAlign: 'center',
@@ -271,7 +272,7 @@ const onClick = (idx) => {
               }
             }
           }}>
-            {filteredContacts.map((content, idx) => (
+            {userRecords.map((content, idx) => (
 
               <Contact 
                 key={content.type + content.userId + content.groupId || idx} 

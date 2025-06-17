@@ -328,7 +328,7 @@ console.log(API_BASE_URL + "/account/getAvatar/" + "single_"+localStorage.getIte
               </Typography>
               
               <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 2 }}>
-                Customize your personal information
+                Customize your personal information, Your ID:{localStorage.getItem("userId")}
               </Typography>
             </Box>
 

@@ -277,7 +277,7 @@ export default function Contact(props) {
                 }}
               >
                 <Avatar 
-                  src={API_BASE_URL + "/account/getAvatar" + type + "_" + (type ==="single" ? userId: groupId )}
+                  src={API_BASE_URL + "/account/getAvatar/" + type + "_" + (type ==="single" ? userId: groupId )}
                   sx={{ 
                     width: isMobile ? 40 : 48, 
                     height: isMobile ? 40 : 48,

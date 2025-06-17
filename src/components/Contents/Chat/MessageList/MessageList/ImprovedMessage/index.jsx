@@ -182,51 +182,20 @@ const MessageBubble = ({
       .slice(0, 2);
   };
 
-  // Generate a consistent color based on sender name
-  const getAvatarColor = (name) => {
-    if (!name) return theme.palette.grey[500];
-    
-    const colors = [
-      theme.palette.primary.main,
-      theme.palette.secondary.main,
-      '#f44336', // red
-      '#e91e63', // pink
-      '#9c27b0', // purple
-      '#673ab7', // deep purple
-      '#3f51b5', // indigo
-      '#2196f3', // blue
-      '#03a9f4', // light blue
-      '#00bcd4', // cyan
-      '#009688', // teal
-      '#4caf50', // green
-      '#8bc34a', // light green
-      '#cddc39', // lime
-      '#ffeb3b', // yellow
-      '#ffc107', // amber
-      '#ff9800', // orange
-      '#ff5722', // deep orange
-    ];
-    
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    hash = Math.abs(hash);
-    
-    return colors[hash % colors.length];
-  };
 
   const renderAvatar = () => {
     if (!showAvatar || isOwn) return null;
-
+    console.log("32234234234324")
+    console.log(message)
+    console.log( API_BASE_URL + "/account/getAvatar/" + message.type + "_" + (message.type === "group" ? message.groupId: message.userId))
     return (
       <Avatar
-        src={API_BASE_URL + "/account/getAvatar/" + message.type + "_" + (message.type === "group" ? message.groupId: message.userId)}
+        src={API_BASE_URL + "/account/getAvatar/" + "single_" +  message.userId}
         sx={{
-          width: avatarSize,
-          height: avatarSize,
-          bgcolor: senderAvatar ? 'transparent' : getAvatarColor(senderName),
-          color: 'white',
+          // width: avatarSize,
+          // height: avatarSize,
+         // bgcolor: senderAvatar ? 'transparent' : getAvatarColor(senderName),
+          //color: 'white',
           fontSize: avatarSize * 0.4,
           fontWeight: 'bold',
           mr: 1.5,

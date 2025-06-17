@@ -202,9 +202,9 @@ static async addRecentContacts(messages) {
                     const existing = existingContactsMap.get(key) || {};
 
                     const contact = {
-                        userId: isGroup? "":message.userId || message.senderId,
+                        userId: isGroup? "":message.senderId||message.userId,
                         type: type,
-                        timestamp: message.timestamp||existing.timestamp ,
+                        timestamp: message.timestamp|| existing.timestamp ,
                         name: message.name ?? existing.name ?? "",
                         avatar: message.avatar ?? existing.avatar ?? "",
                         content: message.content ?? existing.content ?? "",
