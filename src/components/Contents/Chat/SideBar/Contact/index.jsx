@@ -17,6 +17,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
+import { API_BASE_URL } from '../../../../../util/io_utils/URL';
 
 export default function Contact(props) {
   const { userId, name, avatar, count, timestamp, content, groupId,type,groupName } = props.content;
@@ -276,7 +277,7 @@ export default function Contact(props) {
                 }}
               >
                 <Avatar 
-                  src={avatar}
+                  src={API_BASE_URL + "/account/getAvatar" + type + "_" + (type ==="single" ? userId: groupId )}
                   sx={{ 
                     width: isMobile ? 40 : 48, 
                     height: isMobile ? 40 : 48,

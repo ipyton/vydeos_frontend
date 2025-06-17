@@ -25,7 +25,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
 import PersonIcon from '@mui/icons-material/Person';
-
+import { API_BASE_URL } from '../../../../../../util/io_utils/URL';
 const MessageBubble = ({ 
   message, 
   isOwn = false, 
@@ -221,7 +221,7 @@ const MessageBubble = ({
 
     return (
       <Avatar
-        src={senderAvatar}
+        src={API_BASE_URL + "/account/getAvatar/" + message.type + "_" + (message.type === "group" ? message.groupId: message.userId)}
         sx={{
           width: avatarSize,
           height: avatarSize,
@@ -410,7 +410,7 @@ const MessageBubble = ({
         gap: 0
       }}>
         {/* Avatar */}
-        {renderAvatar()}
+        {renderAvatar(senderName)}
         
         {/* Message content */}
         <Box sx={{ 

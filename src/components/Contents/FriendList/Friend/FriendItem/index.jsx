@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
-
+import { API_BASE_URL } from '../../../../../util/io_utils/URL';
 export default function FriendItem(props) {
     const { content, idx, setSelector } = props;
     const theme = useTheme();
@@ -96,7 +96,7 @@ export default function FriendItem(props) {
     };
 
     // Common render function to reduce code duplication
-    const renderListItem = (displayName, altText = "User") => (
+    const renderListItem = (displayName, id ) => (
         <React.Fragment>
             <ListItemButton 
                 onClick={handleClick(idx)} 
@@ -109,8 +109,8 @@ export default function FriendItem(props) {
                 <ListItem alignItems="flex-start" sx={touchFriendlyStyles}>
                     <ListItemAvatar>
                         <Avatar 
-                            alt={altText} 
-                            src="/static/images/avatar/1.jpg"
+                            alt={displayName} 
+                            src={API_BASE_URL + "/account/getAvatar/" +(idx===3?"group_":"single_") +id }
                             sx={avatarStyles}
                         >
                             {/* Fallback to first letter if image fails */}

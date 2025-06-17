@@ -41,7 +41,7 @@ import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
 //import { update } from '../../../redux/refreshSiderBar';
 import { useNotification } from '../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
-
+import { API_BASE_URL } from '../../../../util/io_utils/URL';
 export default function UserInformation(props) {
   const theme = useTheme();
   const { mode } = useThemeMode();
@@ -57,7 +57,7 @@ export default function UserInformation(props) {
   const [extraInformation, setExtraInformation] = useState('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-
+  console.log(details)
   const { userId, isMobile, position = 'center' } = props;
 
   // Enhanced dark mode color system
@@ -267,7 +267,7 @@ export default function UserInformation(props) {
                   <Box sx={{ position: 'relative' }}>
                     <Avatar
                       alt={details.userName}
-                      src={details.avatar}
+                      src={API_BASE_URL + "/account/getAvatar/" + "single_"+ details.userId}
                       sx={{
                         width: 80,
                         height: 80,

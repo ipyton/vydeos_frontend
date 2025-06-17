@@ -11,6 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useThemeMode } from '../../../../../Themes/ThemeContext';
+import { API_BASE_URL } from '../../../../../util/io_utils/URL';
 
 // Create a simple avatar utility function here instead of importing
 const stringToColor = (string) => {
@@ -155,7 +156,7 @@ export default function Header(props) {
           <Box sx={{ position: 'relative', mr: 2 }}>
             <Avatar 
               {...stringAvatar(contactName)}
-              src={selected.avatar}
+              src={API_BASE_URL + "/account/getAvatar/" + selected.type + "_" + (selected.type==="group" ? selected.groupId:selected.userId)}
               sx={avatarStyles}
             />
             <Box sx={onlineIndicatorStyles} />

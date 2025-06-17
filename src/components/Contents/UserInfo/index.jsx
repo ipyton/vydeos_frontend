@@ -39,7 +39,7 @@ import { useNotification } from '../../../Providers/NotificationProvider';
 import PictureUtil from '../../../util/io_utils/FileUtil';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
 import { useThemeMode } from '../../../Themes/ThemeContext';
-
+import {API_BASE_URL} from "../../../util/io_utils/URL"
 // Country list moved inline for simplicity
 const countries = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua & Deps", "Argentina", "Armenia", "Australia", 
@@ -190,7 +190,7 @@ export default function UserInfo(props) {
         }
 
         // Fetch avatar
-        await AccountUtil.getAvatar(avatar, setAvatar);
+        // await AccountUtil.getAvatar(avatar, setAvatar);
 
         // Fetch languages
         await AccountUtil.getLanguages(setLanguages);
@@ -216,7 +216,7 @@ export default function UserInfo(props) {
       dateOfBirth: newDate ? newDate.format('YYYY-MM-DD') : prevState.dateOfBirth
     }));
   };
-
+console.log(API_BASE_URL + "/account/getAvatar/" + "single_"+localStorage.getItem("userId"))
   const handleAvatarUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -280,7 +280,7 @@ export default function UserInfo(props) {
             >
               <Box sx={{ position: 'relative' }}>
                 <Avatar 
-                  src={avatar} 
+                  src={API_BASE_URL + "/account/getAvatar/" + "single_"+localStorage.getItem("userId")} 
                   sx={{ 
                     width: 140, 
                     height: 140, 
