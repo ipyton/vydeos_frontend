@@ -216,7 +216,6 @@ export default function UserInfo(props) {
       dateOfBirth: newDate ? newDate.format('YYYY-MM-DD') : prevState.dateOfBirth
     }));
   };
-console.log(API_BASE_URL + "/account/getAvatar/" + "single_"+localStorage.getItem("userId"))
   const handleAvatarUpload = (event) => {
     const file = event.target.files[0];
     if (file) {

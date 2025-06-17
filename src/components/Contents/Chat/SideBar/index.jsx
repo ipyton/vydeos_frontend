@@ -49,7 +49,6 @@ export default function SideBar(props) {
     setLoading(true);
     DatabaseManipulator.getRecentContacts()
       .then((res) => {
-        console.log(res)
         //do not let the current contact has the unread count
         if(select && select.userId && select.type === "single"){
           const user = res.find(item=>item.userId === select.userId && item.type === select.type)
@@ -62,8 +61,7 @@ export default function SideBar(props) {
             user.count = 0;
           }
         }
-        console.log("-00-0-0-0-0-0-0-0-0-0")
-        console.log(res)
+
         setUserRecords(res || []); // Ensure this is always an array
 
         setLoading(false);

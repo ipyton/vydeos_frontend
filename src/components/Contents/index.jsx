@@ -229,6 +229,8 @@ export default function Contents(props) {
                     DatabaseManipulator.initUnreadMessages(messages).then(() => {
                         DatabaseManipulator.initRecentContacts(messages).then(() => {
                             setNotifications(messages)
+                            dispatcher(updateMailBox())
+                            dispatcher(updateSideBar())
                             //dispatcher(update())
                         })
                     })
@@ -240,13 +242,7 @@ export default function Contents(props) {
         })
     }, [])
 
-    useEffect(() => {
-        DatabaseManipulator.getUnreadMessages().then((res) => {
-            console.log("Fetched unread messages:", res);
-            setNotifications(res || []); // Ensure this is always an array
-        })
 
-    }, [refresh])
 
 
     console.log(sideBarSelector)

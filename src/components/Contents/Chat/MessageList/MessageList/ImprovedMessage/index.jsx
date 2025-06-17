@@ -185,10 +185,7 @@ const MessageBubble = ({
 
   const renderAvatar = () => {
     if (!showAvatar || isOwn) return null;
-    console.log("32234234234324")
-    console.log(message)
-    console.log( API_BASE_URL + "/account/getAvatar/" + message.type + "_" + (message.type === "group" ? message.groupId: message.userId))
-    return (
+      return (
       <Avatar
         src={API_BASE_URL + "/account/getAvatar/" + "single_" +  message.userId}
         sx={{

@@ -8,7 +8,7 @@ class ChatDatabase extends Dexie {
             settings: 'key, value',
             contacts: '&[type+groupId+userId], type, timestamp',
             messages: '&messageId, [type+userId1+userId2+sessionMessageId], [type+userId1+userId2], [type+groupId],[type+groupId+sessionMessageId]',
-            unreadMessages: '&[type+groupId+senderId], userId, senderId, sessionMessageId, messageId'
+            unreadMessages: '&[type+groupId+senderId],[type+groupId], userId, senderId, sessionMessageId, messageId'
         });
 
         // Add hooks for auto-updating timestamps
@@ -638,16 +638,25 @@ static async addRecentContacts(messages) {
     }
 
     static async deleteUnreadMessage(type, groupId, senderId) {
-                groupId = groupId != null?groupId:0
 
         try {
-            
-            const deletedCount = await db.unreadMessages
-                .where('[type+groupId+senderId]')
-                .equals([type, groupId,senderId])
-                .delete();
+        if (type==="group") {
+                const deletedCount = await db.unreadMessages
+                                .where('[type+groupId]')
+                                .equals([type, groupId])
+                                .delete();
 
-            return deletedCount > 0;
+                            return deletedCount > 0;
+
+        }else if (type ==="single"){
+                const deletedCount = await db.unreadMessages
+                                .where('[type+groupId+senderId]')
+                                .equals([type, 0,senderId])
+                                .delete();
+
+                            return deletedCount > 0;
+                        }
+
         } catch (error) {
             console.error('Error deleting unread message:', error);
             return false;
