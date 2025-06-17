@@ -44,6 +44,7 @@ import MessageUtil from "../../util/io_utils/MessageUtil"
 import { useNotification } from '../../Providers/NotificationProvider';
 import DatabaseManipulator from "../../util/io_utils/DatabaseManipulator"
 import { GroupOutlined } from "@mui/icons-material"
+import QRScanner from "./QRScanner"
 
 
 const defaultTheme = createTheme();
@@ -285,6 +286,7 @@ export default function Contents(props) {
                                     <Route path="/role" element={<RolePermissionPage></RolePermissionPage>}></Route>
                                     <Route path="/downloadRequestsManager" element={<DownloadRequestManager></DownloadRequestManager>} ></Route>
                                     <Route path="/logs" element={<UpdateLog></UpdateLog>} ></Route>
+                                    <Route path="/scanner" element={<QRScanner></QRScanner>} ></Route>
                                     <Route path="*" element={<NotFound barState={state} setBarState={setState} status={props} />} ></Route>
 
                                 </Routes>
