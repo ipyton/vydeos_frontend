@@ -202,22 +202,7 @@ const onClick = (idx) => {
           background: mode === 'dark' ? '#666666' : '#a8a8a8',
         },
       }}>
-        {loading ? (
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            minHeight: isMobile ? 'calc(100vh - 64px - 66px - 70px)' : 'auto',
-            width: '100%'
-          }}>
-            <CircularProgress 
-              size={isMobile ? 30 : 40} 
-              sx={{
-                color: mode === 'dark' ? '#ffffff' : '#1976d2'
-              }}
-            />
-          </Box>
-        ) : !Array.isArray(userRecords) || userRecords.length === 0 ? (
+        { !Array.isArray(userRecords) || userRecords.length === 0 ? (
           <Box sx={{ 
             p: isMobile ? 2 : 4, 
             textAlign: 'center',

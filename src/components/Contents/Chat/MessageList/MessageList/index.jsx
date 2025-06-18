@@ -512,7 +512,6 @@ useEffect(() => {
       }
 
   }, [lastSessionMessageId]);
-  console.log("------------------lastSessionMessageId--------------")
   console.log(lastSessionMessageId)
 
   const handleDelete = (message) => {
