@@ -104,7 +104,7 @@ export default function UserInformation(props) {
         setExtraInformation('Following you');
         break;
       case 10: // You follow them
-        setContactButtonText('Contact');
+        setContactButtonText('');
         setFollowButtonText('Unfollow');
         break;
       case 11: // Mutual following

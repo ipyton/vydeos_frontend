@@ -468,69 +468,146 @@ const RolePermissionPage = () => {
               />
               
               {/* Path List */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ mb: 1, display: 'flex', alignItems: 'center', color: mode === 'dark' ? '#fff' : 'black' }}>
-                  <PathIcon sx={{ mr: 1, fontSize: '1.2rem', color: mode === 'dark' ? '#fff' : 'black' }} />
-                  Allowed Paths
-                </Typography>
-                
-                <Paper 
-                  variant="outlined" 
-                  sx={{ 
-                    p: 2, 
-                    minHeight: '100px',
-                    maxHeight: '250px',
-                    overflow: 'auto',
-                    borderRadius: 1,
-                    bgcolor: mode === 'dark' ? '#1e1e1e' : alpha('#f5f5f5', 0.6)
+<Box sx={{ mb: 3 }}>
+  <Typography 
+    variant="subtitle1" 
+    sx={{ 
+      mb: 1, 
+      display: 'flex', 
+      alignItems: 'center', 
+      color: mode === 'dark' ? '#fff' : '#000' 
+    }}
+  >
+    <PathIcon sx={{ 
+      mr: 1, 
+      fontSize: '1.2rem', 
+      color: mode === 'dark' ? '#fff' : '#000' 
+    }} />
+    Allowed Paths
+  </Typography>
+                                
+  <Paper
+    variant="outlined"
+    sx={{
+      p: 2,
+      minHeight: '100px',
+      maxHeight: '250px',
+      overflow: 'auto',
+      borderRadius: 1,
+      bgcolor: mode === 'dark' ? '#1e1e1e' : alpha('#f5f5f5', 0.6),
+      borderColor: mode === 'dark' ? '#333' : undefined,
+      // Force all text colors within this Paper
+      '& *': {
+        color: mode === 'dark' ? '#fff !important' : undefined
+      },
+      // Override specific MUI components that might have their own colors
+      '& .MuiTypography-root': {
+        color: mode === 'dark' ? '#fff !important' : undefined
+      },
+      '& .MuiListItemText-secondary': {
+        color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7) !important' : undefined
+      }
+    }}
+  >
+    {paths.length > 0 ? (
+      <List dense>
+        {paths.map((path, index) => (
+          <ListItem
+            key={index}
+            secondaryAction={
+              <Box>
+                <IconButton 
+                  edge="end" 
+                  aria-label="edit" 
+                  onClick={() => openEditPathDialog(index)}
+                  sx={{
+                    '&:hover': {
+                      bgcolor: mode === 'dark' ? 'rgba(63, 81, 181, 0.1)' : 'rgba(63, 81, 181, 0.04)'
+                    }
                   }}
                 >
-                  {paths.length > 0 ? (
-                    <List dense>
-                      {paths.map((path, index) => (
-                        <ListItem
-                          key={index}
-                          secondaryAction={
-                            <Box>
-                              <IconButton edge="end" aria-label="edit" onClick={() => openEditPathDialog(index)}>
-                                <EditIcon sx={{ fontSize: '1.2rem', color: '#3f51b5' }} />
-                              </IconButton>
-                              <IconButton edge="end" aria-label="delete" onClick={() => handleDeletePath(index)}>
-                                <DeleteIcon sx={{ fontSize: '1.2rem', color: 'error.main' }} />
-                              </IconButton>
-                            </Box>
-                          }
-                        >
-                          <ListItemText
-                            primary={
-                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Typography variant="body2" fontWeight="medium">
-                                  {path.name}
-                                </Typography>
-                                <Chip 
-                                  label={path.type} 
-                                  size="small" 
-                                  color={path.type === 'admin' ? 'error' : path.type === 'api' ? 'info' : 'default'}
-                                  sx={{ ml: 1, height: '20px' }}
-                                />
-                              </Box>
-                            }
-                            secondary={
-                              <Typography variant="caption" color="text.secondary">
-                                {path.route}
-                              </Typography>
-                            }
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary" sx={{ width: '100%', textAlign: 'center', p: 2, color: mode === 'dark' ? '#fff' : 'black' }}>
-                      No paths assigned. Add paths below.
-                    </Typography>
-                  )}
-                </Paper>
+                  <EditIcon sx={{ 
+                    fontSize: '1.2rem', 
+                    color: mode === 'dark' ? '#5c6bc0' : '#3f51b5' 
+                  }} />
+                </IconButton>
+                <IconButton 
+                  edge="end" 
+                  aria-label="delete" 
+                  onClick={() => handleDeletePath(index)}
+                  sx={{
+                    '&:hover': {
+                      bgcolor: mode === 'dark' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(244, 67, 54, 0.04)'
+                    }
+                  }}
+                >
+                  <DeleteIcon sx={{ 
+                    fontSize: '1.2rem', 
+                    color: mode === 'dark' ? '#ef5350' : '#f44336' 
+                  }} />
+                </IconButton>
               </Box>
+            }
+          >
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography 
+                    variant="body2" 
+                    fontWeight="medium"
+                    sx={{ color: mode === 'dark' ? '#fff' : '#000' }}
+                  >
+                    {path.name}
+                  </Typography>
+                  <Chip
+                    label={path.type}
+                    size="small"
+                    color={path.type === 'admin' ? 'error' : path.type === 'api' ? 'info' : 'default'}
+                    sx={{ 
+                      ml: 1, 
+                      height: '20px',
+                      // Force chip colors for dark mode
+                      ...(mode === 'dark' && {
+                        bgcolor: path.type === 'admin' ? '#d32f2f' : 
+                                path.type === 'api' ? '#1976d2' : '#424242',
+                        color: '#fff !important',
+                        '& .MuiChip-label': {
+                          color: '#fff !important'
+                        }
+                      })
+                    }}
+                  />
+                </Box>
+              }
+              secondary={
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)' 
+                  }}
+                >
+                  {path.route}
+                </Typography>
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
+    ) : (
+      <Typography 
+        variant="body2" 
+        sx={{ 
+          width: '100%', 
+          textAlign: 'center', 
+          p: 2, 
+          color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)' 
+        }}
+      >
+        No paths assigned. Add paths below.
+      </Typography>
+    )}
+  </Paper>
+</Box>
               
               {/* Add New Path */}
               <Box sx={{ mb: 3, p: 2, border: '1px dashed', borderColor: alpha('#3f51b5', 0.3), borderRadius: 1 }}>

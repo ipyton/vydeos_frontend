@@ -39,6 +39,7 @@ import { useThemeMode } from '../../Themes/ThemeContext';
 import DatabaseManipulator from '../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../Providers/NotificationProvider';
 import { clearAllData } from '../../util/io_utils/StorageManager';
+import { API_BASE_URL } from '../../util/io_utils/URL';
 // Constants
 const DRAWER_WIDTH = 240;
 
@@ -579,7 +580,7 @@ export default function Header(props) {
             ml: 1 
           }}
         >
-          <StyledAvatar alt="User Avatar" src={avatar} />
+          <StyledAvatar alt="User Avatar" src={API_BASE_URL + "/account/getAvatar/single" + "_"+localStorage.getItem("userId") } />
         </IconButton>
       </Box>
 
