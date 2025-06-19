@@ -9,15 +9,14 @@ import { useNavigate } from "react-router-dom";
 import MessageUtil from "../../../../util/io_utils/MessageUtil";
 import { useEffect } from "react";
 import Members from './Members';
+
+import { QRCodeCanvas } from 'qrcode.react';
+
 import {
-    List,
-    ListItemAvatar,
     Avatar,
-    ListItemText,
     Card,
     CardContent,
     CardHeader,
-    Divider,
     Switch,
     FormControlLabel,
     Box,
@@ -33,6 +32,7 @@ import {
     InputAdornment,
     Collapse
 } from '@mui/material';
+
 import {
     ExitToApp as ExitIcon,
     Chat as ChatIcon,
@@ -43,6 +43,7 @@ import {
     ContentCopy as CopyIcon,
     Refresh as RefreshIcon
 } from '@mui/icons-material';
+
 import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
 // import { update } from '../../../redux/refresh';
 import { useNotification } from '../../../../Providers/NotificationProvider';
@@ -69,7 +70,7 @@ export default function GroupDetailsComponent(props) {
 
     const [members, setMembers] = useState([]);
     const [isOwner, setIsOwner] = useState(false);
-    
+
     // Editing states
     const [editingField, setEditingField] = useState(null); // 'name', 'description', or null
     const [editedValues, setEditedValues] = useState({
@@ -133,7 +134,7 @@ export default function GroupDetailsComponent(props) {
                 groupDescription: editedValues.groupDescription,
                 allow_invite_by_token: editedValues.allow_invite_by_token
             }));
-            
+
             setEditingField(null);
             showNotification("Group details updated successfully", "success");
         } catch (error) {
@@ -165,7 +166,7 @@ export default function GroupDetailsComponent(props) {
                 showNotification("Avatar file size must be less than 5MB", "error");
                 return;
             }
-            
+
             if (!file.type.startsWith('image/')) {
                 showNotification("Please select a valid image file", "error");
                 return;
@@ -185,7 +186,7 @@ export default function GroupDetailsComponent(props) {
             if (selectedAvatar) {
                 // Add your avatar upload logic here
                 // const uploadResponse = await MessageUtil.uploadGroupAvatar(details.groupId, selectedAvatar);
-                
+
                 // For now, just use the preview URL
                 setDetails(prev => ({ ...prev, avatar: avatarPreview }));
                 showNotification("Avatar updated successfully", "success");
@@ -204,12 +205,11 @@ export default function GroupDetailsComponent(props) {
         setAvatarPreview("");
     };
 
-    // Invitation code functions
     const generateInvitationCode = async () => {
         try {
             // Add your invitation code generation logic here
             // const response = await MessageUtil.generateInvitationCode(details.groupId);
-            
+
             // For demo purposes, generate a random code
             const code = Math.random().toString(36).substring(2, 10).toUpperCase();
             setInvitationCode(code);
@@ -442,13 +442,13 @@ export default function GroupDetailsComponent(props) {
                                         </Typography>
                                         {isOwner && (
                                             <Fade in={true}>
-                                                <EditIcon 
-                                                    sx={{ 
+                                                <EditIcon
+                                                    sx={{
                                                         color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
                                                         fontSize: '1.2rem',
                                                         opacity: 0.7,
                                                         '&:hover': { opacity: 1 }
-                                                    }} 
+                                                    }}
                                                 />
                                             </Fade>
                                         )}
@@ -540,7 +540,7 @@ export default function GroupDetailsComponent(props) {
                     }}>
                         Description
                     </Typography>
-                    
+
                     {editingField === 'description' ? (
                         <ClickAwayListener onClickAway={cancelEditing}>
                             <Box>
@@ -604,14 +604,14 @@ export default function GroupDetailsComponent(props) {
                                 </Typography>
                                 {isOwner && (
                                     <Fade in={true}>
-                                        <EditIcon 
-                                            sx={{ 
+                                        <EditIcon
+                                            sx={{
                                                 color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
                                                 fontSize: '1rem',
                                                 opacity: 0.7,
                                                 mt: 0.2,
                                                 '&:hover': { opacity: 1 }
-                                            }} 
+                                            }}
                                         />
                                     </Fade>
                                 )}
@@ -672,7 +672,7 @@ export default function GroupDetailsComponent(props) {
                                 {details.ownerId || "N/A"}
                             </Typography>
                         </Box>
-                        
+
                         {/* Editable Allow Invite by Token */}
                         <Box sx={{
                             ...editableTextStyles,
@@ -694,7 +694,7 @@ export default function GroupDetailsComponent(props) {
                                                 // Auto-save for switch
                                                 setDetails(prev => ({ ...prev, allow_invite_by_token: newValue }));
                                                 showNotification("Invite setting updated", "success");
-                                                
+
                                                 // Generate invitation code if enabled
                                                 if (newValue) {
                                                     await generateInvitationCode();
@@ -784,8 +784,9 @@ export default function GroupDetailsComponent(props) {
                                             </IconButton>
                                         </Tooltip>
                                     )}
+
                                 </Typography>
-                                
+
                                 {invitationCode ? (
                                     <TextField
                                         value={invitationCode}
@@ -860,7 +861,7 @@ export default function GroupDetailsComponent(props) {
                                         )}
                                     </Box>
                                 )}
-                                
+
                                 <Typography variant="caption" sx={{
                                     color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
                                     mt: 1,
@@ -868,6 +869,29 @@ export default function GroupDetailsComponent(props) {
                                     fontStyle: 'italic'
                                 }}>
                                     Share this code with others to let them join the group
+                                </Typography>
+
+                            </Box>
+
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                mt: 2,
+                                gap: 1
+                            }}>
+                                <QRCodeCanvas
+                                    value={`group.${invitationCode}`}
+                                    size={128}
+                                    level="M"
+                                    bgColor={isDark ? "#1a1a1a" : "#ffffff"}
+                                    fgColor={isDark ? "#ffffff" : "#000000"}
+                                />
+                                <Typography variant="caption" sx={{
+                                    color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+                                    textAlign: 'center'
+                                }}>
+                                    Scan to join group
                                 </Typography>
                             </Box>
                         </Collapse>
@@ -957,8 +981,8 @@ export default function GroupDetailsComponent(props) {
                             textAlign: 'center',
                             lineHeight: 1.4
                         }}>
-                            Supported formats: JPG, PNG, GIF<br/>
-                            Maximum file size: 5MB<br/>
+                            Supported formats: JPG, PNG, GIF<br />
+                            Maximum file size: 5MB<br />
                             Recommended size: 400x400 pixels
                         </Typography>
                     </Box>

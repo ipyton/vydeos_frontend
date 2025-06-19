@@ -4,9 +4,6 @@ import {
   ImageListItem,
   Avatar,
   Stack,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
   Typography,
   TextField,
   Button,
@@ -21,7 +18,16 @@ import {
   useTheme,
   Fade,
   Zoom,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
+
+import {
+    Chat as ChatIcon,
+    ContentCopy as CopyIcon,
+    Refresh as RefreshIcon
+} from '@mui/icons-material';
+
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import localforage from 'localforage';
@@ -29,7 +35,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CakeIcon from '@mui/icons-material/Cake';
 import WcIcon from '@mui/icons-material/Wc';
-import ChatIcon from '@mui/icons-material/Chat';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import VerifiedIcon from '@mui/icons-material/Verified';
@@ -42,6 +47,9 @@ import DatabaseManipulator from '../../../../util/io_utils/DatabaseManipulator';
 import { useNotification } from '../../../../Providers/NotificationProvider';
 import { useThemeMode } from '../../../../Themes/ThemeContext';
 import { API_BASE_URL } from '../../../../util/io_utils/URL';
+
+import { QRCodeCanvas } from 'qrcode.react';
+
 export default function UserInformation(props) {
   const theme = useTheme();
   const { mode } = useThemeMode();
@@ -49,6 +57,7 @@ export default function UserInformation(props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const [invitationCode, setInvitationCode] = useState()
   // State management
   const [details, setDetails] = useState({});
   const [userID, setUserID] = useState(0);
@@ -59,6 +68,7 @@ export default function UserInformation(props) {
   const [actionLoading, setActionLoading] = useState(false);
   console.log(details)
   const { userId, isMobile, position = 'center' } = props;
+  const [isOwner, setIsOwner] = useState(false);
 
   // Enhanced dark mode color system
   const colors = {
@@ -85,7 +95,7 @@ export default function UserInformation(props) {
     }
 
     const relationship = details.relationship;
-    
+
     setFollowButtonText('');
     setContactButtonText('');
     setExtraInformation('');
@@ -123,14 +133,14 @@ export default function UserInformation(props) {
       try {
         setLoading(true);
         console.log('Fetching user data for:', userId);
-        
+
         // Get current user ID
         const currentUserId = await localforage.getItem('userId');
         setUserID(currentUserId);
-        
+
         // Request user info
         await MessageUtil.requestUserInfo(userId, setDetails);
-        
+
       } catch (error) {
         console.error('Error fetching user data:', error);
         showNotification('Failed to load user information', 'error');
@@ -148,32 +158,56 @@ export default function UserInformation(props) {
   const handleContact = async () => {
     try {
       const currentUserId = await localforage.getItem('userId');
-      
+
       if (details.userId === currentUserId) {
         showNotification('Cannot contact yourself', 'warning');
         return;
       }
 
       setActionLoading(true);
-      const contact = { 
-        type: 'single', 
-        userId: userId, 
-        name: details.userName ,
-        count:0
+      const contact = {
+        type: 'single',
+        userId: userId,
+        name: details.userName,
+        count: 0
       };
 
       DatabaseManipulator.addRecentContacts([contact]).then(() => {
-          navigate("/chat", { ...contact });
-          // dispatch(update());
+        navigate("/chat", { ...contact });
+        // dispatch(update());
       });
-     //dispatch(update());
+      //dispatch(update());
       showNotification(`Started conversation with ${details.userName}`, 'success');
-      
+
     } catch (error) {
       console.error('Error starting conversation:', error);
       showNotification('Failed to start conversation', 'error');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const generateInvitationCode = async () => {
+      try {
+          // Add your invitation code generation logic here
+          // const response = await MessageUtil.generateInvitationCode(details.groupId);
+
+          // For demo purposes, generate a random code
+          const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+          setInvitationCode(code);
+          showNotification("Invitation code generated", "success");
+      } catch (error) {
+          showNotification("Failed to generate invitation code", "error");
+      }
+  };
+  
+  const copyInvitationCode = () => {
+    if (invitationCode) {
+      navigator.clipboard.writeText(invitationCode).then(() => {
+        showNotification("Invitation code copied to clipboard", "success");
+      }).catch(() => {
+        showNotification("Failed to copy invitation code", "error");
+      });
     }
   };
 
@@ -191,7 +225,7 @@ export default function UserInformation(props) {
         await SocialMediaUtil.follow(currentUserId, details.userId, details, setDetails);
         showNotification(`Now following ${details.userName}`, 'success');
       }
-      
+
     } catch (error) {
       console.error('Error updating follow status:', error);
       showNotification('Failed to update follow status', 'error');
@@ -226,7 +260,7 @@ export default function UserInformation(props) {
           height: '100%',
           overflow: 'auto',
           backgroundColor: colors.background,
-          backgroundImage: mode === 'dark' 
+          backgroundImage: mode === 'dark'
             ? 'radial-gradient(circle at 20% 80%, #2d2d2d 0%, transparent 50%), radial-gradient(circle at 80% 20%, #1a1a1a 0%, transparent 50%)'
             : 'radial-gradient(circle at 20% 80%, #f8f9fa 0%, transparent 50%), radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 50%)',
         }}
@@ -235,8 +269,8 @@ export default function UserInformation(props) {
           direction="column"
           alignItems="center"
           spacing={3}
-          sx={{ 
-            width: '100%', 
+          sx={{
+            width: '100%',
             p: isMobile ? 2 : 3,
             maxWidth: 600,
             margin: '0 auto',
@@ -267,7 +301,7 @@ export default function UserInformation(props) {
                   <Box sx={{ position: 'relative' }}>
                     <Avatar
                       alt={details.userName}
-                      src={API_BASE_URL + "/account/getAvatar/" + "single_"+ details.userId}
+                      src={API_BASE_URL + "/account/getAvatar/" + "single_" + details.userId}
                       sx={{
                         width: 80,
                         height: 80,
@@ -336,11 +370,11 @@ export default function UserInformation(props) {
                         color={extraInformation.includes('yourself') ? 'primary' : 'default'}
                         size="small"
                         sx={{
-                          backgroundColor: extraInformation.includes('yourself') 
-                            ? colors.accent 
+                          backgroundColor: extraInformation.includes('yourself')
+                            ? colors.accent
                             : colors.surface,
-                          color: extraInformation.includes('yourself') 
-                            ? '#ffffff' 
+                          color: extraInformation.includes('yourself')
+                            ? '#ffffff'
                             : colors.text.secondary,
                         }}
                       />
@@ -361,16 +395,16 @@ export default function UserInformation(props) {
                           sx={{
                             minWidth: 120,
                             borderRadius: '25px',
-                            backgroundColor: followButtonText === 'Follow' 
-                              ? colors.accent 
+                            backgroundColor: followButtonText === 'Follow'
+                              ? colors.accent
                               : 'transparent',
                             borderColor: colors.accent,
-                            color: followButtonText === 'Follow' 
-                              ? '#ffffff' 
+                            color: followButtonText === 'Follow'
+                              ? '#ffffff'
                               : colors.accent,
                             '&:hover': {
-                              backgroundColor: followButtonText === 'Follow' 
-                                ? colors.accent + 'dd' 
+                              backgroundColor: followButtonText === 'Follow'
+                                ? colors.accent + 'dd'
                                 : colors.accent + '20',
                               transform: 'translateY(-2px)',
                               boxShadow: `0 4px 12px ${colors.accent}40`,
@@ -488,6 +522,103 @@ export default function UserInformation(props) {
                       </Box>
                     </Box>
                   )}
+
+                  {invitationCode ? (
+                    <TextField
+                      value={invitationCode}
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      InputProps={{
+                        readOnly: true,
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={copyInvitationCode}
+                              edge="end"
+                              sx={{
+                                color: mode === "dark" ? '#90caf9' : 'primary.main'
+                              }}
+                            >
+                              <CopyIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                        sx: {
+                          fontFamily: 'monospace',
+                          fontSize: '1.1rem',
+                          fontWeight: 'bold',
+                          bgcolor: mode == "dark" ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
+                          '& fieldset': {
+                            borderColor: mode === "dark" ? 'rgba(144, 202, 249, 0.5)' : 'rgba(25, 118, 210, 0.5)',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: mode === "dark" ? 'rgba(144, 202, 249, 0.7)' : 'rgba(25, 118, 210, 0.7)',
+                          },
+                        }
+                      }}
+                      sx={{
+                        '& .MuiInputBase-input': {
+                          color: mode === "dark" ? 'rgba(255, 255, 255, 0.95)' : 'text.primary',
+                          textAlign: 'center',
+                          letterSpacing: '0.1em'
+                        }
+                      }}
+                    />
+                  ) : (
+                    <Box sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      p: 2,
+                      bgcolor: mode === "dark" ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.02)',
+                      borderRadius: 1,
+                      border: mode === "dark" ? '1px dashed rgba(255, 255, 255, 0.3)' : '1px dashed rgba(0, 0, 0, 0.3)'
+                    }}>
+                      {isOwner ? (
+                        <Button
+                          variant="outlined"
+                          startIcon={<RefreshIcon />}
+                          onClick={generateInvitationCode}
+                          sx={{
+                            color: mode === "dark" ? '#90caf9' : 'primary.main',
+                            borderColor: mode === "dark" ? '#90caf9' : 'primary.main'
+                          }}
+                        >
+                          Generate Code
+                        </Button>
+                      ) : (
+                        <Typography sx={{
+                          color: mode === "dark" ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary',
+                          fontStyle: 'italic'
+                        }}>
+                          No invitation code available
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+
+                  <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    mt: 2,
+                    gap: 1
+                  }}>
+                    <QRCodeCanvas
+                      value={`single.${invitationCode}`}
+                      size={128}
+                      level="M"
+                      bgColor={mode === "dark" ? "#1a1a1a" : "#ffffff"}
+                      fgColor={mode === "dark" ? "#ffffff" : "#000000"}
+                    />
+                    <Typography variant="caption" sx={{
+                      color: mode === "dark" ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+                      textAlign: 'center'
+                    }}>
+                      Scan to share yourself.
+                    </Typography>
+                  </Box>
                 </Stack>
               </CardContent>
             </Card>
