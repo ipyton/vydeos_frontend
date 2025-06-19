@@ -1,20 +1,19 @@
 import Qs from 'qs'
 import { apiClient } from "./ApiClient";
+import ImageCompressor from './ImageCompressor';
 
 export default class PostUtil {
 
-    static uploadPicture(pic, picurl, setPicurl) {
-        apiClient.post("/file/uploadPostPic", { file: pic }, {
+    static uploadPicture(pic, picurl) {
+        return ImageCompressor.compressImage(pic, 1024).then(res => {
+        return apiClient.post("/file/uploadPostPic", { file: res }, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
-        }).catch(exception => {
-            console.error('Upload picture error:', exception);
-        }).then(response => {
-            if (response) {
-                setPicurl([...picurl, response.data]);
-            }
-        });
+        })
+        })
+
+
     }
 
     static sendPost(content, pics, notice, who_can_see, location, list, setList) {
