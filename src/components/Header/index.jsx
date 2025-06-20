@@ -53,6 +53,7 @@ const Search = styled('div')(({ theme }) => ({
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
+  marginRight: 0,
   width: '100%',
   [theme.breakpoints.up('sm')]: {
     marginLeft: theme.spacing(3),
@@ -67,7 +68,7 @@ const Search = styled('div')(({ theme }) => ({
 const SearchInput = styled(InputBase)(({ theme }) => ({
   flex: 1,
   padding: theme.spacing(1, 1, 1, 0),
-  paddingLeft: theme.spacing(2),
+  paddingLeft: theme.spacing(1),
   transition: theme.transitions.create('width'),
   width: '100%',
   [theme.breakpoints.up('md')]: {
@@ -109,6 +110,8 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
       position: 'absolute',
       top: 0,
       left: 0,
+      right: 0,
+      bottom: 0,
       width: '100%',
       height: '100%',
       borderRadius: '50%',
@@ -154,14 +157,14 @@ export default function Header(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [suggestionAnchorEl, setSuggestionAnchorEl] = useState(null);
-  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);  
+  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
   const [search, setSearch] = useState('');
   const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState(false);
   const [categorySelected, setCategorySelected] = useState([false, false, false, false, false]);
   const [changed, setChanged] = useState(false);
-  const [messageCount, setMessageCount] = useState(0); 
+  const [messageCount, setMessageCount] = useState(0);
   const { mode } = useThemeMode();
   // UI state booleans
   const isMenuOpen = Boolean(anchorEl);
@@ -172,12 +175,12 @@ export default function Header(props) {
   const refresh = useSelector((state) => state.refreshMailBox.value.refresh);
 
   const { showNotification } = useNotification();
-  
+
   // Hooks
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {  setLogin, avatar, setBadgeContent, markAsRead } = props;
-  const [notifications,setNotifications] = useState([])
+  const { setLogin, avatar, setBadgeContent, markAsRead } = props;
+  const [notifications, setNotifications] = useState([])
   // Event handlers
   function handleDocumentClick(event) {
     if (event.target.id !== "category" && event.target.id !== "searchInput") {
@@ -192,7 +195,7 @@ export default function Header(props) {
       window.removeEventListener("click", handleDocumentClick);
     };
   }, [categorySelected]);
-  
+
 
   useEffect(() => {
     console.log("refreshing unread message count");
@@ -206,14 +209,14 @@ export default function Header(props) {
         setMessageCount(0); // Fallback to 0 on error
         showNotification("Failed to fetch unread message count", "error");
       })
-      DatabaseManipulator.getUnreadMessages().then(res=>{
-        setNotifications(res)
-      })
+    DatabaseManipulator.getUnreadMessages().then(res => {
+      setNotifications(res)
+    })
 
-  },[refresh])
+  }, [refresh])
 
 
-  
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -288,7 +291,7 @@ export default function Header(props) {
 
   // Mock data for suggestions
   const mockData = [
-    { title: "Helloworld", introduction: "introduction", pic: "", type: "contact" }, 
+    { title: "Helloworld", introduction: "introduction", pic: "", type: "contact" },
     { title: "Helloworld", introduction: "introduction", pic: "", type: "movie" }
   ];
 
@@ -298,51 +301,51 @@ export default function Header(props) {
   const textColor = mode === 'dark' ? '#fff' : '#000';
   const renderMenu = (
 
-<Menu
-  anchorEl={anchorEl}
-  anchorOrigin={{
-    vertical: 'top',
-    horizontal: 'right',
-  }}
-  id={menuId}
-  keepMounted
-  transformOrigin={{
-    vertical: 'top',
-    horizontal: 'right',
-  }}
-  open={isMenuOpen}
-  onClose={handleMenuClose}
-  PaperProps={{
-    elevation: 3,
-    sx: {
-      bgcolor: bgColor,
-      color: textColor,
-      overflow: 'visible',
-      filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.2))',
-      mt: 1.5,
-      '&:before': {
-        content: '""',
-        display: 'block',
-        position: 'absolute',
-        top: 0,
-        right: 14,
-        width: 10,
-        height: 10,
-        bgcolor: bgColor,
-        transform: 'translateY(-50%) rotate(45deg)',
-        zIndex: 0,
-      },
-    },
-  }}
->
-  <MenuItem sx={{ color: textColor }} onClick={handleInfomation}>Account Information</MenuItem>
-  <MenuItem sx={{ color: textColor }} onClick={handleSettings}>Settings</MenuItem>
-  <MenuItem sx={{ color: textColor }} onClick={handleLogout}>Log Out</MenuItem>
-</Menu>
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+      PaperProps={{
+        elevation: 3,
+        sx: {
+          bgcolor: bgColor,
+          color: textColor,
+          overflow: 'visible',
+          filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.2))',
+          mt: 1.5,
+          '&:before': {
+            content: '""',
+            display: 'block',
+            position: 'absolute',
+            top: 0,
+            right: 10,
+            width: 10,
+            height: 10,
+            bgcolor: bgColor,
+            transform: 'translateY(-50%) rotate(45deg)',
+            zIndex: 0,
+          },
+        },
+      }}
+    >
+      <MenuItem sx={{ color: textColor }} onClick={handleInfomation}>Account Information</MenuItem>
+      <MenuItem sx={{ color: textColor }} onClick={handleSettings}>Settings</MenuItem>
+      <MenuItem sx={{ color: textColor }} onClick={handleLogout}>Log Out</MenuItem>
+    </Menu>
   );
 
   const renderLanguageMenu = (
-    <Menu 
+    <Menu
       anchorEl={languageAnchorEl}
       anchorOrigin={{
         vertical: 'top',
@@ -358,7 +361,7 @@ export default function Header(props) {
       onClose={() => setLanguageAnchorEl(null)}
       PaperProps={{
         elevation: 3,
-        sx: { 
+        sx: {
           minWidth: 120,
           mt: 1.5,
         },
@@ -371,250 +374,253 @@ export default function Header(props) {
   );
 
   const renderMessageMenu = (
-    <MessageBox 
-      notificationsAnchorEl={notificationsAnchorEl} 
-      setNotificationsAnchorEl={setNotificationsAnchorEl} 
+    <MessageBox
+      notificationsAnchorEl={notificationsAnchorEl}
+      setNotificationsAnchorEl={setNotificationsAnchorEl}
       notificationsOpen={notificationsOpen}
       notifications={notifications}
       setNotifications={setNotifications}
       markAsRead={markAsRead}
     />
   );
-  
+
   const suggestionBar = (
-    <SearchAndSuggestion 
-      categorySelected={categorySelected} 
-      setCategorySelected={setCategorySelected} 
-      searchResult={mockData} 
-      searchSuggestionOpen={searchSuggestionOpen} 
-      setSuggestionOpen={setSuggestionAnchorEl} 
-      left={open} 
+    <SearchAndSuggestion
+      categorySelected={categorySelected}
+      setCategorySelected={setCategorySelected}
+      searchResult={mockData}
+      searchSuggestionOpen={searchSuggestionOpen}
+      setSuggestionOpen={setSuggestionAnchorEl}
+      left={open}
       setCategory={setCategory}
     />
   );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
-<Menu
-  anchorEl={mobileMoreAnchorEl}
-  anchorOrigin={{
-    vertical: 'top',
-    horizontal: 'right',
-  }}
-  id={mobileMenuId}
-  keepMounted
-  transformOrigin={{
-    vertical: 'top',
-    horizontal: 'right',
-  }}
-  open={isMobileMenuOpen}
-  onClose={handleMobileMenuClose}
-  PaperProps={{
-    sx: {
-      backgroundColor: mode === 'dark' ? '#2c2c2c' : '#ffffff',
-      color: mode === 'dark' ? '#ffffff' : '#000000',
-      boxShadow: mode === 'dark'
-        ? '0px 4px 12px rgba(0, 0, 0, 0.7)'
-        : '0px 4px 12px rgba(0, 0, 0, 0.1)',
-    },
-  }}
->
-  <MenuItem
-    onClick={handleNotificationOpen}
-    sx={{
-      '&:hover': {
-        backgroundColor: mode === 'dark' ? '#3a3a3a' : '#f5f5f5',
-      },
-    }}
-  >
-    <IconButton
-      size="large"
-      aria-label="show new notifications"
-      sx={{ color: mode === 'dark' ? '#ffffff' : '#000000' }}
+    <Menu
+      anchorEl={mobileMoreAnchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={mobileMenuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMobileMenuOpen}
+      onClose={handleMobileMenuClose}
+      PaperProps={{
+        sx: {
+          backgroundColor: mode === 'dark' ? '#2c2c2c' : '#ffffff',
+          color: mode === 'dark' ? '#ffffff' : '#000000',
+          boxShadow: mode === 'dark'
+            ? '0px 4px 12px rgba(0, 0, 0, 0.7)'
+            : '0px 4px 12px rgba(0, 0, 0, 0.1)',
+        },
+      }}
     >
-      <StyledBadge badgeContent={messageCount} color="error">
-        <NotificationsIcon />
-      </StyledBadge>
-    </IconButton>
-    <p style={{ marginLeft: 8 }}>Notifications</p>
-  </MenuItem>
-
-  <MenuItem
-    onClick={handleProfileMenuOpen}
-    sx={{
-      '&:hover': {
-        backgroundColor: mode === 'dark' ? '#3a3a3a' : '#f5f5f5',
-      },
-    }}
-  >
-    <IconButton
-      size="large"
-      aria-label="account"
-      aria-controls="primary-search-account-menu"
-      aria-haspopup="true"
-      sx={{ color: mode === 'dark' ? '#ffffff' : '#000000' }}
-    >
-      <StyledAvatar alt="User Avatar" src={avatar} />
-    </IconButton>
-    <p style={{ marginLeft: 8 }}>Account</p>
-  </MenuItem>
-</Menu>
-
-  );
-
-  return (
-<div>
-  <AppBar
-    position="fixed"
-    open={open}
-    sx={{
-      //backgroundColor: mode === 'dark' ? '#121212' : 'rgba(56, 56, 160, 0.6)',
-      color: mode === 'dark' ? '#ffffff' : 'rgba(0,0,0,0.6)',
-      boxShadow: mode === 'dark'
-        ? '0px 2px 4px rgba(0,0,0,0.6)'
-        : '0px 2px 4px rgba(0,0,0,0.1)',
-        height: '64px',
-    }}
-  >
-    <Toolbar>
-      <IconButton
-        edge="start"
-        aria-label="open drawer"
-        onClick={toggleDrawer}
+      <MenuItem
+        onClick={handleNotificationOpen}
         sx={{
-          color: mode === 'dark' ? '#ffffff' : '#000000',
-          marginRight: '0px',
-          ...(open && { display: 'none' }),
           '&:hover': {
-            backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-          }
+            backgroundColor: mode === 'dark' ? '#3a3a3a' : '#f5f5f5',
+          },
         }}
       >
-        <MenuIcon />
-      </IconButton>
-
-      <AppTitle
-        variant="h6"
-        noWrap
-        component="div"
-        sx={{ 
-          display: { xs: 'none', sm: 'block' }, 
-          marginLeft: "2.5%",
-          fontSize: '1.5rem',
-          color: mode === 'dark' ? '#ffffff' : '#000000',
-        }}
-      >
-        Vydeos  
-      </AppTitle>
-
-      <Box sx={{ flexGrow: 1 }} />
-
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <Search sx={{
-          backgroundColor: mode === 'dark' ? '#1e1e1e' : '#f1f1f1',
-          borderRadius: 1,
-          display: 'flex',
-          alignItems: 'center',
-        }}>
-          <SearchInput
-            id="searchInput"
-            placeholder="Search Everything"
-            inputProps={{ 'aria-label': 'search' }}
-            onChange={handleSearchChange}
-            onBlur={handleTextBlur}
-            onFocus={handleFocus}
-            onKeyPress={handleKeyPress}
-            sx={{
-              color: mode === 'dark' ? '#ffffff' : '#000000',
-              '&::placeholder': {
-                color: mode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
-              },
-            }}
-          />
-          <IconButton 
-            type="button" 
-            sx={{ 
-              p: '10px',
-              color: mode === 'dark' ? '#ffffff' : '#000000',
-              '&:hover': {
-                backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-              }
-            }} 
-            aria-label="search" 
-            onClick={handleSearch}
-          >
-            <SearchIcon />
-          </IconButton>
-        </Search>
-      </Box>
-
-      <Box sx={{ flexGrow: 1 }} />
-
-      <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
         <IconButton
           size="large"
-          aria-label="show notifications"
-          onClick={handleNotificationOpen}
-          sx={{ 
-            color: mode === 'dark' ? '#ffffff' : '#000000',
-            mx: 1,
-            '&:hover': {
-              backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-            }
-          }}
+          aria-label="show new notifications"
+          sx={{ color: mode === 'dark' ? '#ffffff' : '#000000' }}
         >
           <StyledBadge badgeContent={messageCount} color="error">
             <NotificationsIcon />
           </StyledBadge>
         </IconButton>
+        <p style={{ marginLeft: 8 }}>Notifications</p>
+      </MenuItem>
 
+      <MenuItem
+        onClick={handleProfileMenuOpen}
+        sx={{
+          '&:hover': {
+            backgroundColor: mode === 'dark' ? '#3a3a3a' : '#f5f5f5',
+          },
+        }}
+      >
         <IconButton
           size="large"
-          edge="end"
           aria-label="account"
-          aria-controls={menuId}
+          aria-controls="primary-search-account-menu"
           aria-haspopup="true"
-          onClick={handleProfileMenuOpen}
-          sx={{ 
-            color: mode === 'dark' ? '#ffffff' : '#000000',
-            ml: 1 
-          }}
+          sx={{ color: mode === 'dark' ? '#ffffff' : '#000000' }}
         >
-          <StyledAvatar alt="User Avatar" src={API_BASE_URL + "/account/getAvatar/single" + "_"+localStorage.getItem("userId") } />
+          <StyledAvatar alt="User Avatar" src={avatar} />
         </IconButton>
-      </Box>
+        <p style={{ marginLeft: 8 }}>Account</p>
+      </MenuItem>
+    </Menu>
 
-      <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-        <IconButton
-          size="large"
-          aria-label="show more"
-          aria-controls={mobileMenuId}
-          aria-haspopup="true"
-          onClick={handleMobileMenuOpen}
-          sx={{
-            color: mode === 'dark' ? '#ffffff' : '#000000',
-            '&:hover': {
-              backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-            }
-          }}
-        >
-          <MoreIcon />
-        </IconButton>
-      </Box>
-    </Toolbar>
-  </AppBar>
+  );
 
-  {renderMobileMenu}
-  {renderMenu}
+  return (
+    <div>
+      <AppBar
+        position="fixed"
+        open={open}
+        sx={{
+          //backgroundColor: mode === 'dark' ? '#121212' : 'rgba(56, 56, 160, 0.6)',
+          color: mode === 'dark' ? '#ffffff' : 'rgba(0,0,0,0.6)',
+          boxShadow: mode === 'dark'
+            ? '0px 2px 4px rgba(0,0,0,0.6)'
+            : '0px 2px 4px rgba(0,0,0,0.1)',
+          height: '64px',
+        }}
+      >
+        <Toolbar >
+          <IconButton
+            edge="start"
+            aria-label="open drawer"
+            onClick={toggleDrawer}
+            sx={{
+              color: mode === 'dark' ? '#ffffff' : '#000000',
+              marginRight: '0px',
+              ...(open && { display: 'none' }),
+              '&:hover': {
+                backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+              }
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
 
-  <div onMouseDown={(e) => e.preventDefault()}>
-    {suggestionBar}
-  </div>
+          <AppTitle
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{
+              display: { xs: 'none', sm: 'block' },
+              marginLeft: "2.5%",
+              fontSize: '1.5rem',
+              color: mode === 'dark' ? '#ffffff' : '#000000',
+            }}
+          >
+            Vydeos
+          </AppTitle>
 
-  {renderLanguageMenu}
-  {renderMessageMenu}
-  <FunctionDrawer setOpen={setOpen} open={open} />
-</div>
+          {/* <Box sx={{ flexGrow: 1 }} /> */}
+
+          <Box sx={{
+            flexGrow: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>            
+          <Search sx={{
+            backgroundColor: mode === 'dark' ? '#1e1e1e' : '#f1f1f1',
+            borderRadius: 1,
+            display: 'flex',
+            alignItems: 'center',
+          }}>
+              <SearchInput
+                id="searchInput"
+                placeholder="Search Everything"
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={handleSearchChange}
+                onBlur={handleTextBlur}
+                onFocus={handleFocus}
+                onKeyPress={handleKeyPress}
+                sx={{
+                  color: mode === 'dark' ? '#ffffff' : '#000000',
+                  '&::placeholder': {
+                    color: mode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+                  },
+                }}
+              />
+              <IconButton
+                type="button"
+                sx={{
+                  color: mode === 'dark' ? '#ffffff' : '#000000',
+                  '&:hover': {
+                    backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                  }
+                }}
+                aria-label="search"
+                onClick={handleSearch}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Search>
+          </Box>
+
+
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
+            <IconButton
+              size="large"
+              aria-label="show notifications"
+              onClick={handleNotificationOpen}
+              sx={{
+                color: mode === 'dark' ? '#ffffff' : '#000000',
+                mx: 1,
+                '&:hover': {
+                  backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                }
+              }}
+            >
+              <StyledBadge badgeContent={messageCount} color="error">
+                <NotificationsIcon />
+              </StyledBadge>
+            </IconButton>
+
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              sx={{
+                color: mode === 'dark' ? '#ffffff' : '#000000',
+                ml: 1
+              }}
+            >
+              <StyledAvatar alt="User Avatar" src={API_BASE_URL + "/account/getAvatar/single" + "_" + localStorage.getItem("userId")} />
+            </IconButton>
+          </Box>
+
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-controls={mobileMenuId}
+              aria-haspopup="true"
+              onClick={handleMobileMenuOpen}
+              sx={{
+                color: mode === 'dark' ? '#ffffff' : '#000000',
+                '&:hover': {
+                  backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                }
+              }}
+            >
+              <MoreIcon />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {renderMobileMenu}
+      {renderMenu}
+
+      <div onMouseDown={(e) => e.preventDefault()}>
+        {suggestionBar}
+      </div>
+
+      {renderLanguageMenu}
+      {renderMessageMenu}
+      <FunctionDrawer setOpen={setOpen} open={open} />
+    </div>
 
   );
 }

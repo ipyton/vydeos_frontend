@@ -393,7 +393,7 @@ export default function Article(props) {
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="h6" sx={{ 
-                fontWeight: 600,
+                fontWeight: 500,
                 color: mode === 'dark' ? 'white' : 'inherit'
               }}>
                 {postOwner}
@@ -422,19 +422,7 @@ export default function Article(props) {
             />
           }
         />
-        
-        <CardContent sx={{ pb: 1 }}>
-          <Typography 
-            variant="body1" 
-            color={mode === 'dark' ? 'white' : 'text.primary'}
-            sx={{ 
-              lineHeight: 1.6,
-              fontSize: '1rem'
-            }}
-          >
-            {props?.content?.content || `This is a sample article with images that can be fetched with authentication headers.`}
-          </Typography>
-        </CardContent>
+
 
         {images.length > 0 && renderImages()}
 

@@ -5,7 +5,7 @@ import { useNotification } from '../../../Providers/NotificationProvider';
 
 // Material UI imports
 import {
-  Box, List, ListItem,Fab,Stack
+  Box, List, ListItem, Stack, ButtonBase, Typography, Backdrop
 } from "@mui/material";
 
 // Material UI icons
@@ -22,21 +22,22 @@ import {
 import { useThemeMode } from '../../../Themes/ThemeContext';
 import AddPostDialog from "./AddPostDialog";
 
+import { useTheme, useMediaQuery, Fade, Slide } from '@mui/material';
 
 function Item(props) {
   const { login, setLogin, barState, setBarState } = props;
+  const theme = useTheme();
+  
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // State variables
   const [articles, setArticles] = useState([]);
-
-
-
   const [page, setPage] = useState("friend");
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotification();
   const { mode } = useThemeMode();
-  // Handler functions
 
+  // Handler functions
   const handleClickOpen = () => setOpen(true);
 
   const handleFriends = () => {
@@ -84,21 +85,75 @@ function Item(props) {
     // Implement pagination logic here
   };
 
-
   // Load initial data if needed
   if (articles.length === 0) {
     loadMoreData();
   }
 
-  const fabStyle = {
-    margin: 1,
+  // iOS-style button group styles
+  const buttonGroupStyle = {
     position: 'fixed',
-    bottom: 40,
-    right: 40,
+    bottom: isMobile ? 20 : 30,
+    right: isMobile ? 20 : 30,
+    display: 'flex',
+    flexDirection: isMobile ? 'column' : 'row',
+    gap: 1,
+    padding: '8px',
+    borderRadius: '20px',
+    backgroundColor: mode === 'dark' 
+      ? 'rgba(44, 44, 46, 0.8)' 
+      : 'rgba(255, 255, 255, 0.8)',
+    backdropFilter: 'blur(20px)',
+    border: mode === 'dark' 
+      ? '1px solid rgba(255, 255, 255, 0.1)' 
+      : '1px solid rgba(0, 0, 0, 0.1)',
+    boxShadow: mode === 'dark'
+      ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+      : '0 8px 32px rgba(0, 0, 0, 0.15)',
+    zIndex: 1000,
+  };
+
+  const buttonStyle = (isActive = false, isAddButton = false) => ({
+    minWidth: isAddButton ? (isMobile ? '44px' : '56px') : (isMobile ? '80px' : '100px'),
+    height: isMobile ? '40px' : '48px',
+    borderRadius: isMobile ? '12px' : '16px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: isMobile ? 0.5 : 1,
+    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+    backgroundColor: isActive 
+      ? (mode === 'dark' ? 'rgba(10, 132, 255, 0.9)' : 'rgba(0, 122, 255, 0.9)')
+      : (mode === 'dark' ? 'rgba(58, 58, 60, 0.6)' : 'rgba(242, 242, 247, 0.8)'),
+    color: isActive 
+      ? '#ffffff' 
+      : (mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.8)'),
+    border: isActive 
+      ? 'none' 
+      : (mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)'),
+    fontWeight: 600,
+    fontSize: isMobile ? '12px' : '14px',
+    textTransform: 'none',
+    '&:hover': {
+      transform: 'scale(1.05)',
+      backgroundColor: isActive 
+        ? (mode === 'dark' ? 'rgba(10, 132, 255, 1)' : 'rgba(0, 122, 255, 1)')
+        : (mode === 'dark' ? 'rgba(72, 72, 74, 0.8)' : 'rgba(229, 229, 234, 0.9)'),
+      boxShadow: mode === 'dark'
+        ? '0 4px 16px rgba(0, 0, 0, 0.3)'
+        : '0 4px 16px rgba(0, 0, 0, 0.1)',
+    },
+    '&:active': {
+      transform: 'scale(0.95)',
+    },
+  });
+
+  const iconStyle = {
+    fontSize: isMobile ? '16px' : '20px',
   };
 
   return (
-    <Box sx={{ width: "80%", margin: "0 auto" }}>
+    <Box sx={{ width: isMobile ? "100%" : "80%", margin: "0 auto" }}>
       {/* Posts list */}
       <List>
         {articles && articles.map((article, idx) => (
@@ -107,55 +162,48 @@ function Item(props) {
           </ListItem>
         ))}
       </List>
-      <AddPostDialog open={open} setOpen={setOpen} articles={articles} setArticles={setArticles} ></AddPostDialog>
+      
+      <AddPostDialog 
+        open={open} 
+        setOpen={setOpen} 
+        articles={articles} 
+        setArticles={setArticles} 
+      />
 
-      {/* Floating action buttons */}
-      <Box sx={fabStyle}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-          <Fab 
-            color="primary" 
-            onClick={handleClickOpen} 
-            aria-label="create post"
-          >
-            <AddIcon />
-          </Fab>
-          
-          <Fab 
-            variant="extended" 
-            onClick={handleFriends} 
-            color={page === "friend" ? "secondary" : "default"}
-            aria-label="friends posts"
-            sx={{
-              bgcolor: page === "friend" 
-                ? 'secondary.main' 
-                : mode === 'dark' ? 'background.paper' : undefined,
-              color: page === "friend" 
-                ? 'secondary.contrastText' 
-                : mode === 'dark' ? 'text.primary' : undefined,
-            }}
-          >
-            <EditIcon sx={{ mr: 1 }} />
+      {/* iOS-style floating button group */}
+      <Box sx={buttonGroupStyle}>
+        {/* Add Post Button */}
+        <ButtonBase
+          onClick={handleClickOpen}
+          sx={buttonStyle(false, true)}
+          aria-label="create post"
+        >
+          <AddIcon sx={iconStyle} />
+        </ButtonBase>
+        
+        {/* Friends Button */}
+        <ButtonBase
+          onClick={handleFriends}
+          sx={buttonStyle(page === "friend")}
+          aria-label="friends posts"
+        >
+          <EditIcon sx={iconStyle} />
+          <Typography variant="body2" sx={{ fontSize: isMobile ? '11px' : '14px', fontWeight: 600 }}>
             Friends
-          </Fab>
-          
-          <Fab 
-            variant="extended" 
-            onClick={handleMy} 
-            color={page === "my" ? "secondary" : "default"}
-            aria-label="my posts"
-            sx={{
-              bgcolor: page === "friend" 
-                ? 'secondary.main' 
-                : mode === 'dark' ? 'background.paper' : undefined,
-              color: page === "friend" 
-                ? 'secondary.contrastText' 
-                : mode === 'dark' ? 'text.primary' : undefined,
-            }}
-          >
-            <NavigationIcon sx={{ mr: 1 }} />
+          </Typography>
+        </ButtonBase>
+        
+        {/* My Posts Button */}
+        <ButtonBase
+          onClick={handleMy}
+          sx={buttonStyle(page === "my")}
+          aria-label="my posts"
+        >
+          <NavigationIcon sx={iconStyle} />
+          <Typography variant="body2" sx={{ fontSize: isMobile ? '11px' : '14px', fontWeight: 600 }}>
             My Posts
-          </Fab>
-        </Stack>
+          </Typography>
+        </ButtonBase>
       </Box>
     </Box>
   );
