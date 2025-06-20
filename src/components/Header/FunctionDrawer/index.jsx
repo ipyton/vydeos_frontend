@@ -10,17 +10,32 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import Tooltip from '@mui/material/Tooltip'; // 添加Tooltip导入
+import Tooltip from '@mui/material/Tooltip';
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import AuthUtil from '../../../util/io_utils/AuthUtil';
 import localforage from 'localforage';
-// Import all Material UI icons dynamically
-import * as MuiIcons from '@mui/icons-material';
-import { useThemeMode } from '../../../Themes/ThemeContext'; 
+// 按需导入图标，而不是导入整个图标库
+import MessageIcon from '@mui/icons-material/Message';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import HomeIcon from '@mui/icons-material/Home';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import EditIcon from '@mui/icons-material/Edit';
+import PeopleIcon from '@mui/icons-material/People';
+import TuneIcon from '@mui/icons-material/Tune';
+import DownloadIcon from '@mui/icons-material/Download';
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import HistoryIcon from '@mui/icons-material/History';
+import InfoIcon from '@mui/icons-material/Info';
+import InboxIcon from '@mui/icons-material/Inbox';
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 const drawerWidth = 240;
 
+// 缓存样式混合器
 const openedMixin = (theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create('width', {
@@ -53,7 +68,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 1),
   backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.9)' : theme.palette.background.default,
   color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -78,180 +92,241 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// Helper function to get Material UI icon component by name
-const DynamicIcon = ({ iconName }) => {
-  const { mode } = useThemeMode(); // Access theme mode
-  // Material UI exports icons without the "Icon" suffix
-  // Convert "MessageIcon" to "Message" for proper lookup
-  const iconNameWithoutSuffix = iconName.replace(/Icon$/, '');
-  
-  // Default to Inbox if the requested icon doesn't exist
-  const IconComponent = MuiIcons[iconNameWithoutSuffix] || MuiIcons['Inbox'];
-  return <IconComponent sx={{ color: mode === 'dark' ? '#ffffff' : 'inherit' }} />;
+// 创建图标映射表，避免动态导入
+const ICON_MAP = {
+  Message: MessageIcon,
+  Whatshot: WhatshotIcon,
+  Home: HomeIcon,
+  VideoLibrary: VideoLibraryIcon,
+  Edit: EditIcon,
+  People: PeopleIcon,
+  Tune: TuneIcon,
+  Download: DownloadIcon,
+  QuestionAnswer: QuestionAnswerIcon,
+  DownloadForOffline: DownloadForOfflineIcon,
+  ManageAccounts: ManageAccountsIcon,
+  AdminPanelSettings: AdminPanelSettingsIcon,
+  History: HistoryIcon,
+  Info: InfoIcon,
+  Inbox: InboxIcon,
 };
+
+// 优化后的图标组件，使用 React.memo
+const DynamicIcon = React.memo(({ iconName, isDark }) => {
+  const IconComponent = ICON_MAP[iconName] || InboxIcon;
+  return <IconComponent sx={{ color: isDark ? '#ffffff' : 'inherit' }} />;
+});
+
+DynamicIcon.displayName = 'DynamicIcon';
+
+// 缓存默认导航映射
+const DEFAULT_NAVIGATION_MAP = [
+  { name: 'Chat', route: '/chat', iconName: 'Message' },
+  { name: 'Trending', route: '/trending', iconName: 'Whatshot' },
+  { name: 'Posts', route: '/', iconName: 'Home' },
+  { name: 'Videos', route: '/videolist', iconName: 'VideoLibrary' },
+  { name: 'Edit', route: '/editor', iconName: 'Edit' },
+  { name: 'Friend', route: '/friends', iconName: 'People' },
+  { name: 'Settings', route: '/settings', iconName: 'Tune' },
+  { name: 'Download', route: '/download', iconName: 'Download' },
+  { name: 'Ask', route: '/qa', iconName: 'QuestionAnswer' },
+  { name: 'Handle Download Request', route: '/downloadRequestsManager', iconName: 'DownloadForOffline' },
+  { name: 'User Management', route: '/userManage', iconName: 'ManageAccounts' },
+  { name: 'Role Management', route: '/role', iconName: 'AdminPanelSettings' },
+  { name: 'Version Log', route: '/logs', iconName: 'History' },
+  { name: 'About', route: '/about', iconName: 'Info' }
+];
+
+const ICON_ROUTE_MAP = {
+  '/chat': 'Message',
+  '/trending': 'Whatshot',
+  '/': 'Home',
+  '/videolist': 'VideoLibrary',
+  '/editor': 'Edit',
+  '/friends': 'People',
+  '/settings': 'Tune',
+  '/download': 'Download',
+  '/qa': 'QuestionAnswer',
+  '/downloadRequestsManager': 'DownloadForOffline',
+  '/userManage': 'ManageAccounts',
+  '/role': 'AdminPanelSettings',
+  '/logs': 'History',
+  '/about': 'Info'
+};
+
+// 使用 React.memo 优化 NavigationItem 组件
+const NavigationItem = React.memo(({ item, open, isDark, onNavigation }) => {
+  const handleClick = useCallback(() => {
+    onNavigation(item.route);
+  }, [item.route, onNavigation]);
+
+  return (
+    <Tooltip 
+      title={item.name} 
+      placement="right" 
+      arrow
+      disableHoverListener={open}
+      enterDelay={100}
+      leaveDelay={0}
+      enterNextDelay={50}
+      disableInteractive={false}
+      followCursor={false}
+    >
+      <ListItem 
+        onClick={handleClick} 
+        disablePadding 
+        sx={{ display: 'block' }}
+      >
+        <ListItemButton
+          sx={{
+            minHeight: 48,
+            justifyContent: open ? 'initial' : 'center',
+            px: 2.5,
+            '&:hover': {
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+            },
+          }}
+        >
+          <ListItemIcon
+            sx={{
+              minWidth: 0,
+              mr: open ? 3 : 'auto',
+              justifyContent: 'center',
+              color: isDark ? '#ffffff' : 'inherit',
+            }}
+          >
+            <DynamicIcon iconName={item.iconName} isDark={isDark} />
+          </ListItemIcon>
+          <ListItemText 
+            primary={item.name} 
+            sx={{ 
+              opacity: open ? 1 : 0,
+              '& .MuiTypography-root': {
+                color: isDark ? '#ffffff' : 'inherit',
+              }
+            }} 
+          />
+        </ListItemButton>
+      </ListItem>
+    </Tooltip>
+  );
+});
+
+NavigationItem.displayName = 'NavigationItem';
 
 export default function FunctionDrawer(props) {
   const theme = useTheme();
   const navigate = useNavigate();
   const { open, setOpen } = props;
   const [navigationItems, setNavigationItems] = useState([]);
-  const { mode } = useThemeMode(); // Access theme mode
+  const { mode } = useThemeMode();
   
-  const toggleDrawer = () => {
+  const isDark = mode === 'dark';
+  
+  // 使用 useCallback 优化事件处理函数
+  const toggleDrawer = useCallback(() => {
     setOpen(!open);
-  };
-  const paths = localforage.getItem("paths")
+  }, [open, setOpen]);
 
-  // Default navigation map with icon names as strings
-  const defaultNavigationMap = [
-    { name: 'Chat', route: '/chat', iconName: 'Message' },
-    { name: 'Trending', route: '/trending', iconName: 'Whatshot' },
-    { name: 'Posts', route: '/', iconName: 'Home' },
-    { name: 'Videos', route: '/videolist', iconName: 'VideoLibrary' },
-    { name: 'Edit', route: '/editor', iconName: 'Edit' },
-    { name: 'Friend', route: '/friends', iconName: 'People' },
-    { name: 'Settings', route: '/settings', iconName: 'Tune' },
-    { name: 'Download', route: '/download', iconName: 'Download' },
-    { name: 'Ask', route: '/qa', iconName: 'QuestionAnswer' },
-    { name: 'Handle Download Request', route: '/downloadRequestsManager', iconName: 'DownloadForOffline' },
-    { name: 'User Management', route: '/userManage', iconName: 'ManageAccounts' },
-    { name: 'Role Management', route: '/role', iconName: 'AdminPanelSettings' },
-    { name: 'Version Log', route: '/logs', iconName: 'History' },
-    { name: 'About', route: '/about', iconName: 'Info' }
-  ];
-  const iconMap = {
-    '/chat': 'Message',
-    '/trending': 'Whatshot',
-    '/': 'Home',
-    '/videolist': 'VideoLibrary',
-    '/editor': 'Edit',
-    '/friends': 'People',
-    '/settings': 'Tune',
-    '/download': 'Download',
-    '/qa': 'QuestionAnswer',
-    '/downloadRequestsManager': 'DownloadForOffline',
-    '/userManage': 'ManageAccounts',
-    '/role': 'AdminPanelSettings',
-    '/logs': 'History',
-    '/about': 'Info'
-  };
+  const handleNavigation = useCallback((route) => {
+    navigate(route);
+  }, [navigate]);
+
+  // 使用 useMemo 优化样式计算
+  const drawerStyles = useMemo(() => ({
+    backgroundColor: isDark ? '#121212' : '#fff',
+    color: isDark ? '#fff' : '#000',
+    '& .MuiDrawer-paper': {
+      backgroundColor: isDark ? '#121212' : '#fff',
+      color: isDark ? '#fff' : '#000',
+    },
+  }), [isDark]);
+
+  const headerStyles = useMemo(() => ({
+    backgroundColor: isDark ? '#121212' : '#fff',
+    color: isDark ? '#fff' : '#000',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    px: 2,
+  }), [isDark]);
+
+  const dividerStyles = useMemo(() => ({
+    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+  }), [isDark]);
+
+  const listStyles = useMemo(() => ({
+    backgroundColor: isDark ? 'rgba(0, 0, 0, 0.8)' : theme.palette.background.default,
+    color: isDark ? '#ffffff' : theme.palette.text.primary,
+    '& .MuiListItemIcon-root': {
+      color: isDark ? '#ffffff' : 'inherit',
+    },
+  }), [isDark, theme.palette.background.default, theme.palette.text.primary]);
+
+  const iconButtonStyles = useMemo(() => ({
+    color: isDark ? '#ffffff' : '#000000',
+  }), [isDark]);
+
   useEffect(() => {
-    // Initialize with default navigation
-    localforage.getItem("paths").then(
-      (response) => {
-        let tmp = []
+    let isMounted = true;
+    
+    const loadNavigationItems = async () => {
+      try {
+        const response = await localforage.getItem("paths");
+        
+        if (!isMounted) return;
+        
         if (!response || response.length === 0) {
           setNavigationItems([]);
           return;
         }
-        response.forEach(element => {
+
+        const tmp = [];
+        for (const element of response) {
           if (element.route === "/**") {
-            setNavigationItems(defaultNavigationMap);
+            setNavigationItems(DEFAULT_NAVIGATION_MAP);
             return;
+          } else {
+            tmp.push({ 
+              name: element.name, 
+              route: element.route, 
+              iconName: ICON_ROUTE_MAP[element.route] || 'Inbox'
+            });
           }
-          else {
-            tmp.push({ name: element.name, route: element.route, iconName: iconMap[element.route] })
-            setNavigationItems(tmp)
-         }
-        });
+        }
+        setNavigationItems(tmp);
+      } catch (error) {
+        console.error('Failed to load navigation items:', error);
+        if (isMounted) {
+          setNavigationItems([]);
+        }
       }
-    ) 
+    };
 
-
+    loadNavigationItems();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const handleNavigation = (route) => {
-    navigate(route);
-  };
-
   return (
-    <Drawer variant="permanent" open={open}   sx={{
-      backgroundColor: mode === 'dark' ? '#121212' : '#fff', // or match with MUI theme.paper
-      color: mode === 'dark' ? '#fff' : '#000',
-      '& .MuiDrawer-paper': {
-        backgroundColor: mode === 'dark' ? '#121212' : '#fff',
-        color: mode === 'dark' ? '#fff' : '#000',
-      },
-    }}>
-      <DrawerHeader  sx={{
-      backgroundColor: mode === 'dark' ? '#121212' : '#fff', // Set header background color
-      color: mode === 'dark' ? '#fff' : '#000',              // Set text/icon color in header
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      px: 2, // Optional padding
-    }}>
-        <IconButton 
-          onClick={toggleDrawer}
-          sx={{
-            color: mode === 'dark' ? '#ffffff' : '#000000',
-          }}
-        >
+    <Drawer variant="permanent" open={open} sx={drawerStyles}>
+      <DrawerHeader sx={headerStyles}>
+        <IconButton onClick={toggleDrawer} sx={iconButtonStyles}>
           {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>
       </DrawerHeader>
-      <Divider sx={{
-        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
-      }} />
-      <List sx={{
-        backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.8)' : theme.palette.background.default,
-        color: mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
-        '& .MuiListItemIcon-root': {
-          color: mode === 'dark' ? '#ffffff' : 'inherit',
-        },
-      }}>
+      <Divider sx={dividerStyles} />
+      <List sx={listStyles}>
         {navigationItems.map((item) => (
-          <Tooltip 
-            title={item.iconName} 
-            placement="right" 
-            arrow
-            // 只在drawer关闭时显示tooltip，避免与文字重叠
-            disableHoverListener={open}
-            // 修复快速移动时不显示的问题
-            enterDelay={100}
-            leaveDelay={0}
-            enterNextDelay={50}
-            disableInteractive={false}
-            followCursor={false}
-            key={item.name}
-          >
-            <ListItem 
-              onClick={() => handleNavigation(item.route)} 
-              disablePadding 
-              sx={{ display: 'block' }}
-            >
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                  '&:hover': {
-                    backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                    color: mode === 'dark' ? '#ffffff' : 'inherit',
-                  }}
-                >
-                  <DynamicIcon iconName={item.iconName} />
-                </ListItemIcon>
-                <ListItemText 
-                  primary={item.name} 
-                  sx={{ 
-                    opacity: open ? 1 : 0,
-                    '& .MuiTypography-root': {
-                      color: mode === 'dark' ? '#ffffff' : 'inherit',
-                    }
-                  }} 
-                />
-              </ListItemButton>
-            </ListItem>
-          </Tooltip>
+          <NavigationItem
+            key={item.route} // 使用 route 作为 key，因为它更稳定
+            item={item}
+            open={open}
+            isDark={isDark}
+            onNavigation={handleNavigation}
+          />
         ))}
       </List>
     </Drawer>

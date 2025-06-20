@@ -66,7 +66,6 @@ export default function UserInformation(props) {
   const [extraInformation, setExtraInformation] = useState('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  console.log(details)
   const { userId, isMobile, position = 'center' } = props;
   const [isOwner, setIsOwner] = useState(false);
 
@@ -200,7 +199,7 @@ export default function UserInformation(props) {
           showNotification("Failed to generate invitation code", "error");
       }
   };
-  
+
   const copyInvitationCode = () => {
     if (invitationCode) {
       navigator.clipboard.writeText(invitationCode).then(() => {
@@ -598,27 +597,7 @@ export default function UserInformation(props) {
                     </Box>
                   )}
 
-                  <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    mt: 2,
-                    gap: 1
-                  }}>
-                    <QRCodeCanvas
-                      value={`single.${invitationCode}`}
-                      size={128}
-                      level="M"
-                      bgColor={mode === "dark" ? "#1a1a1a" : "#ffffff"}
-                      fgColor={mode === "dark" ? "#ffffff" : "#000000"}
-                    />
-                    <Typography variant="caption" sx={{
-                      color: mode === "dark" ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
-                      textAlign: 'center'
-                    }}>
-                      Scan to share yourself.
-                    </Typography>
-                  </Box>
+
                 </Stack>
               </CardContent>
             </Card>

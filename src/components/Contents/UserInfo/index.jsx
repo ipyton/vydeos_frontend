@@ -20,6 +20,9 @@ import {
   Stack,
   Tooltip
 } from '@mui/material';
+
+import { QRCodeCanvas } from 'qrcode.react';
+
 import { createTheme, ThemeProvider, alpha } from '@mui/material/styles';
 import { deepPurple, purple, grey } from '@mui/material/colors';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -69,7 +72,7 @@ const countries = [
 export default function UserInfo(props) {
   const { login, setLogin } = props.status || {};
   const { showNotification } = useNotification();
-
+  const [invitationCode, setInvitationCode] = useState()
   const [userInfo, setUserInfo] = useState({
     avatar: "",
     gender: null, // null represents "prefer not to say"
@@ -330,7 +333,27 @@ export default function UserInfo(props) {
                 Customize your personal information, Your ID:{localStorage.getItem("userId")}
               </Typography>
             </Box>
-
+                  <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    mt: 2,
+                    gap: 1
+                  }}>
+                    <QRCodeCanvas
+                      value={`single.${invitationCode}`}
+                      size={128}
+                      level="M"
+                      bgColor={mode === "dark" ? "#1a1a1a" : "#ffffff"}
+                      fgColor={mode === "dark" ? "#ffffff" : "#000000"}
+                    />
+                    <Typography variant="caption" sx={{
+                      color: mode === "dark" ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+                      textAlign: 'center'
+                    }}>
+                      Scan to make friends
+                    </Typography>
+                  </Box>
             <Divider variant="middle" sx={{ mb: 4 }} />
 
             {/* Main form */}
