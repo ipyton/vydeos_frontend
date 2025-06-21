@@ -114,7 +114,7 @@ export default function SearchResults() {
   const [value, setValue] = useState(0);
   const [list, setList] = useState([]);
   const [selector, setSelector] = useState({ type: null, objectId: null });
-  const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.8);
+  const [viewHeight, setViewHeight] = useState(window.innerHeight - 84);
   const [isLoading, setIsLoading] = useState(false);
   const [counts, setCounts] = useState([0, 0, 0, 0, 0]); // Counts for each tab
   const [showMobileDetail, setShowMobileDetail] = useState(false);
@@ -247,10 +247,11 @@ export default function SearchResults() {
   return (
     <Stack 
       sx={{ 
-        width: isMobile ? '100%' : '90%',
+        width: isMobile ? '100%' : '100%',
         height: viewHeight,
         gap: 2,
-        p: isMobile ? 1 : 0
+        p: isMobile ? 1 : 2,
+
       }} 
       direction={isMobile ? 'column' : 'row'} 
       spacing={0}
