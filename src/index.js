@@ -9,12 +9,15 @@ import { Provider } from 'react-redux'
 import axios from 'axios';
 import MessageUtil from './util/io_utils/MessageUtil';
 import { NotificationProvider } from './Providers/NotificationProvider';
+import { SearchProvider } from './Providers/SearchProvider';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <Provider store={store}>
-        <NotificationProvider>
-        <App />
-        </NotificationProvider>
+        <SearchProvider>
+            <NotificationProvider>
+                <App />
+            </NotificationProvider>
+        </SearchProvider>
     </Provider>
 
 );
@@ -51,7 +54,7 @@ function register(serviceWorkerRegistration) {
             var endpoint = pushSubscription.endpoint;
             var key = pushSubscription.getKey('p256dh');
             var auth = pushSubscription.getKey('auth');
-        
+
             MessageUtil.registerEndPoint(endpoint, key, auth)
             // The push subscription details needed by the application
             // server are now available, and can be sent to it using,

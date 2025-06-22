@@ -165,6 +165,11 @@ export default function SearchResults() {
   }, [value]);
 
   const performSearch = (tabIndex, searchQuery) => {
+    if (searchQuery.length === 0 || searchQuery === "") {
+      
+      return
+    }
+
     if (tabIndex === 0) {
       console.log("Searching contacts by ID:", searchQuery);
       SearchUtil.searchChatContactById(searchQuery, handleSearchResults).then(() => {
