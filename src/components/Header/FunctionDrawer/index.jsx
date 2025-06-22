@@ -32,6 +32,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import InfoIcon from '@mui/icons-material/Info';
 import InboxIcon from '@mui/icons-material/Inbox';
 import { useThemeMode } from '../../../Themes/ThemeContext';
+import { CameraIcon } from 'lucide-react';
 
 const drawerWidth = 240;
 
@@ -109,6 +110,7 @@ const ICON_MAP = {
   History: HistoryIcon,
   Info: InfoIcon,
   Inbox: InboxIcon,
+  Scanner:CameraIcon,
 };
 
 // 优化后的图标组件，使用 React.memo
@@ -134,7 +136,8 @@ const DEFAULT_NAVIGATION_MAP = [
   { name: 'User Management', route: '/userManage', iconName: 'ManageAccounts' },
   { name: 'Role Management', route: '/role', iconName: 'AdminPanelSettings' },
   { name: 'Version Log', route: '/logs', iconName: 'History' },
-  { name: 'About', route: '/about', iconName: 'Info' }
+  { name: 'About', route: '/about', iconName: 'Info' },
+  { name: 'Scanner', route: '/scanner', iconName: 'Scanner' }
 ];
 
 const ICON_ROUTE_MAP = {
@@ -151,7 +154,8 @@ const ICON_ROUTE_MAP = {
   '/userManage': 'ManageAccounts',
   '/role': 'AdminPanelSettings',
   '/logs': 'History',
-  '/about': 'Info'
+  '/about': 'Info',
+  '/scanner' : "Scanner"
 };
 
 // 使用 React.memo 优化 NavigationItem 组件
