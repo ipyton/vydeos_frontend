@@ -229,12 +229,8 @@ const handleAvatarUpload = async (event) => {
       // Upload avatar and wait for completion
       await AccountUtil.uploadAvatar(file);
       
-      showNotification("Avatar uploaded successfully!", "success");
+      showNotification("Avatar uploaded successfully! You need at most 1 min to make effect!", "success");
       
-      // Refresh the page after successful upload
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500); // Small delay to show the success message
       
     } catch (error) {
       console.error("Error uploading avatar:", error);
