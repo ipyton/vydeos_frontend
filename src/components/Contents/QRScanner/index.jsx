@@ -86,8 +86,7 @@ const theme = createTheme({
 });
 
 const QRScanner = ({ 
-  scannerSize = 280,
-  compact = false 
+  scannerSize = 400,
 }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState('');
@@ -198,7 +197,7 @@ const QRScanner = ({
       const config = {
         fps: 5,
         qrbox: { 
-          width: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize, 
+          width: isMobile ? Math.min(250, window.innerWidth-80) : scannerSize, 
           height: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize
         },
         aspectRatio: 1.0,
@@ -448,64 +447,12 @@ const QRScanner = ({
                         Ready to scan
                       </Typography>
                       <Typography color="rgba(255,255,255,0.7)" variant="body2">
-                        Camera starting...
+                        Camera waiting...
                       </Typography>
                     </Stack>
                   </Box>
                 )}
 
-                {/* Scanning Overlay */}
-                {isScanning && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      inset: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize,
-                        height: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize,
-                        position: 'relative',
-                        border: '2px solid rgba(255,255,255,0.5)',
-                        borderRadius: 2,
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          height: 2,
-                          background: 'linear-gradient(90deg, transparent, #2196f3, transparent)',
-                          animation: 'scan 2s infinite'
-                        }
-                      }}
-                    >
-                      {/* Corner indicators */}
-                      {[
-                        { top: -8, left: -8, borderTop: '4px solid #2196f3', borderLeft: '4px solid #2196f3' },
-                        { top: -8, right: -8, borderTop: '4px solid #2196f3', borderRight: '4px solid #2196f3' },
-                        { bottom: -8, left: -8, borderBottom: '4px solid #2196f3', borderLeft: '4px solid #2196f3' },
-                        { bottom: -8, right: -8, borderBottom: '4px solid #2196f3', borderRight: '4px solid #2196f3' }
-                      ].map((style, index) => (
-                        <Box
-                          key={index}
-                          sx={{
-                            position: 'absolute',
-                            width: 24,
-                            height: 24,
-                            ...style,
-                            animation: 'pulse 1.5s infinite'
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                )}
               </Paper>
 
               {/* Status */}
