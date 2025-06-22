@@ -1,7 +1,94 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, Square, AlertCircle, CheckCircle, RefreshCw, ExternalLink, Zap } from 'lucide-react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert,
+  AlertTitle,
+  CircularProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Chip,
+  IconButton,
+  Paper,
+  Container,
+  Stack,
+  Fade,
+  Slide,
+  Badge
+} from '@mui/material';
+import {
+  Camera,
+  Stop,
+  Refresh,
+  Link,
+  CheckCircle,
+  Error,
+  Wifi,
+  Email,
+  Phone,
+  TextFields,
+  ContactPage,
+  Close
+} from '@mui/icons-material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-const QRScanner = () => {
+// Create custom theme
+const theme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#2196f3',
+      dark: '#1976d2',
+    },
+    secondary: {
+      main: '#9c27b0',
+    },
+    success: {
+      main: '#4caf50',
+    },
+    error: {
+      main: '#f44336',
+    },
+    background: {
+      default: '#0a0a0a',
+      paper: 'rgba(255, 255, 255, 0.05)',
+    },
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backdropFilter: 'blur(20px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          textTransform: 'none',
+          fontWeight: 600,
+        },
+      },
+    },
+  },
+});
+
+const QRScanner = ({ 
+  scannerSize = 280,
+  compact = false 
+}) => {
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
@@ -10,13 +97,24 @@ const QRScanner = () => {
   const [selectedCamera, setSelectedCamera] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [scanCount, setScanCount] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   
   const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
 
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Initialize html5-qrcode scanner
   useEffect(() => {
-    // Load html5-qrcode library
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js';
     script.async = true;
@@ -29,10 +127,31 @@ const QRScanner = () => {
     };
     document.head.appendChild(script);
 
+    // Add CSS for proper mobile viewport
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes scan {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(calc(100% - 4px)); }
+      }
+      @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+    `;
+    document.head.appendChild(style);
+
     return () => {
       stopScanning();
       if (document.head.contains(script)) {
         document.head.removeChild(script);
+      }
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
       }
     };
   }, []);
@@ -40,18 +159,15 @@ const QRScanner = () => {
   const initializeScanner = async () => {
     try {
       if (window.Html5Qrcode) {
-        // Get available cameras
         const devices = await window.Html5Qrcode.getCameras();
         if (devices && devices.length > 0) {
           setCameras(devices);
-          // Prefer back camera (environment facing)
           const backCamera = devices.find(device => 
             device.label.toLowerCase().includes('back') || 
             device.label.toLowerCase().includes('environment')
           ) || devices[0];
           setSelectedCamera(backCamera.id);
           
-          // Auto-start scanning
           setTimeout(() => {
             startScanning(backCamera.id);
           }, 800);
@@ -80,8 +196,11 @@ const QRScanner = () => {
       html5QrCodeRef.current = new window.Html5Qrcode("qr-reader");
       
       const config = {
-        fps: 10,
-        qrbox: { width: 280, height: 280 },
+        fps: 5,
+        qrbox: { 
+          width: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize, 
+          height: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize
+        },
         aspectRatio: 1.0,
         disableFlip: false
       };
@@ -90,15 +209,13 @@ const QRScanner = () => {
         cameraId,
         config,
         (decodedText, decodedResult) => {
-          // Success callback
           setResult(decodedText);
           setShowResult(true);
           setScanCount(prev => prev + 1);
           stopScanning();
         },
         (errorMessage) => {
-          // Error callback (usually just "No QR code found")
-          // We don't show these as they're normal during scanning
+          // Normal scanning errors - don't show
         }
       );
       
@@ -161,282 +278,405 @@ const QRScanner = () => {
 
   const getResultColor = (type) => {
     const colors = {
-      'URL': 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white',
-      'Contact': 'bg-gradient-to-r from-green-500 to-emerald-500 text-white',
-      'WiFi': 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
-      'Email': 'bg-gradient-to-r from-orange-500 to-red-500 text-white',
-      'Phone': 'bg-gradient-to-r from-pink-500 to-rose-500 text-white',
-      'Text': 'bg-gradient-to-r from-gray-500 to-slate-500 text-white'
+      'URL': 'primary',
+      'Contact': 'success',
+      'WiFi': 'secondary',
+      'Email': 'warning',
+      'Phone': 'info',
+      'Text': 'default'
     };
-    return colors[type] || colors['Text'];
+    return colors[type] || 'default';
   };
 
   const getTypeIcon = (type) => {
     const icons = {
-      'URL': ExternalLink,
-      'Contact': Camera,
-      'WiFi': Zap,
-      'Email': Camera,
-      'Phone': Camera,
-      'Text': Camera
+      'URL': Link,
+      'Contact': ContactPage,
+      'WiFi': Wifi,
+      'Email': Email,
+      'Phone': Phone,
+      'Text': TextFields
     };
-    return icons[type] || Camera;
+    return icons[type] || TextFields;
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 p-8">
-            <div className="text-center">
-              <div className="relative mb-6">
-                <div className="w-16 h-16 mx-auto">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-                  <div className="absolute inset-2 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full animate-ping"></div>
-                  <div className="absolute inset-4 bg-white rounded-full flex items-center justify-center">
-                    <Camera className="w-6 h-6 text-purple-600" />
-                  </div>
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-3">Initializing Scanner</h2>
-              <p className="text-purple-200">Setting up camera access...</p>
-              <div className="mt-6 flex justify-center">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ThemeProvider theme={theme}>
+        <Box
+          sx={{
+            width: '100%',
+            height: '100vh',
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #2d1b69 50%, #1a1a1a 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: isMobile ? 1 : 2
+          }}
+        >
+          <Card sx={{ maxWidth: 300, width: '90%' }}>
+            <CardContent>
+              <Stack spacing={3} alignItems="center">
+                <Box position="relative">
+                  <CircularProgress size={60} thickness={4} />
+                  <Box
+                    position="absolute"
+                    top="50%"
+                    left="50%"
+                    sx={{ transform: 'translate(-50%, -50%)' }}
+                  >
+                    <Camera sx={{ fontSize: 24, color: 'primary.main' }} />
+                  </Box>
+                </Box>
+                <Box textAlign="center">
+                  <Typography variant="h6" gutterBottom>
+                    Initializing Scanner
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Setting up camera access...
+                  </Typography>
+                </Box>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Box>
+      </ThemeProvider>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
-      <div className="max-w-md mx-auto">
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
-          {/* Header */}
-          <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/80 via-purple-600/80 to-pink-600/80"></div>
-            <div className="relative">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                      <Camera className="w-7 h-7 text-white" />
-                    </div>
-                    {scanCount > 0 && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-bold text-white">{scanCount}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <h1 className="text-xl font-bold text-white">QR Scanner Pro</h1>
-                    <p className="text-white/80 text-sm">Advanced QR detection</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-white/80 text-xs">Live</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Error Display */}
-          {error && (
-            <div className="m-4 p-4 bg-red-500/20 backdrop-blur-sm border border-red-500/30 rounded-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 text-red-400" />
-                </div>
-                <div>
-                  <p className="text-red-300 font-medium">Scanner Error</p>
-                  <p className="text-red-200 text-sm">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Scanner Area */}
-          <div className="p-4">
-            <div className="relative bg-black rounded-2xl overflow-hidden shadow-inner" style={{ aspectRatio: '1' }}>
-              <div id="qr-reader" className="w-full h-full"></div>
-              
-              {!isScanning && !error && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-sm">
-                  <div className="text-center text-white">
-                    <div className="relative mb-6">
-                      <div className="w-20 h-20 mx-auto bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                        <Camera className="w-10 h-10 text-white/70" />
-                      </div>
-                      <div className="absolute inset-0 border-2 border-white/30 rounded-2xl animate-pulse"></div>
-                    </div>
-                    <p className="text-white/80 font-medium">Ready to scan</p>
-                    <p className="text-white/60 text-sm mt-1">Camera starting...</p>
-                  </div>
-                </div>
+    <ThemeProvider theme={theme}>
+      <Box
+        sx={{
+          width: '100%',
+          height:"calc(100vh - 64px)",
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #2d1b69 50%, #1a1a1a 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          p: isMobile ? 1 : 2
+        }}
+      >
+        <Container
+          maxWidth={false}
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            maxWidth: isMobile ? '100%' : '600px',
+            mx: 'auto',
+            p: isMobile ? '8px !important' : undefined
+          }}
+        >
+          <Card 
+            sx={{ 
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: isMobile ? 1 : 2,
+              height: isMobile ? 'calc(100vh - 64px)' : 'calc(100vh)'
+            }}
+          >
+            <CardContent 
+              sx={{ 
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                p: isMobile ? 1.5 : 3,
+                '&:last-child': { pb: isMobile ? 1.5 : 3 }
+              }}
+            >
+              {/* Error Display */}
+              {error && (
+                <Alert severity="error" sx={{ mb: 2, flexShrink: 0 }} icon={<Error />}>
+                  <AlertTitle>Scanner Error</AlertTitle>
+                  {error}
+                </Alert>
               )}
 
-              {/* Enhanced Scanning Overlay */}
+              {/* Scanner Area */}
+              <Paper
+                sx={{
+                  position: 'relative',
+                  flex: 1,
+                  minHeight: isMobile ? '50vh' : '400px',
+                  backgroundColor: '#000',
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  mb: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Box 
+                  id="qr-reader" 
+                  sx={{ 
+                    width: '100%', 
+                    height: '100%',
+                    '& video': {
+                      width: '100% !important',
+                      height: '100% !important',
+                      objectFit: 'cover'
+                    }
+                  }} 
+                />
+                
+                {!isScanning && !error && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'rgba(0,0,0,0.8)',
+                      backdropFilter: 'blur(4px)'
+                    }}
+                  >
+                    <Stack alignItems="center" spacing={2}>
+                      <Paper
+                        sx={{
+                          p: 2,
+                          backgroundColor: 'rgba(255,255,255,0.1)',
+                          animation: 'pulse 2s infinite'
+                        }}
+                      >
+                        <Camera sx={{ fontSize: 40, color: 'white' }} />
+                      </Paper>
+                      <Typography color="white" variant={isMobile ? "body1" : "h6"}>
+                        Ready to scan
+                      </Typography>
+                      <Typography color="rgba(255,255,255,0.7)" variant="body2">
+                        Camera starting...
+                      </Typography>
+                    </Stack>
+                  </Box>
+                )}
+
+                {/* Scanning Overlay */}
+                {isScanning && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize,
+                        height: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize,
+                        position: 'relative',
+                        border: '2px solid rgba(255,255,255,0.5)',
+                        borderRadius: 2,
+                        '&::before': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: 2,
+                          background: 'linear-gradient(90deg, transparent, #2196f3, transparent)',
+                          animation: 'scan 2s infinite'
+                        }
+                      }}
+                    >
+                      {/* Corner indicators */}
+                      {[
+                        { top: -8, left: -8, borderTop: '4px solid #2196f3', borderLeft: '4px solid #2196f3' },
+                        { top: -8, right: -8, borderTop: '4px solid #2196f3', borderRight: '4px solid #2196f3' },
+                        { bottom: -8, left: -8, borderBottom: '4px solid #2196f3', borderLeft: '4px solid #2196f3' },
+                        { bottom: -8, right: -8, borderBottom: '4px solid #2196f3', borderRight: '4px solid #2196f3' }
+                      ].map((style, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            position: 'absolute',
+                            width: 24,
+                            height: 24,
+                            ...style,
+                            animation: 'pulse 1.5s infinite'
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+              </Paper>
+
+              {/* Status */}
               {isScanning && (
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <div className="relative w-56 h-56">
-                      {/* Main scanning frame */}
-                      <div className="absolute inset-0 border-2 border-white/50 rounded-2xl"></div>
-                      
-                      {/* Animated corners */}
-                      <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-400 rounded-tl-2xl animate-pulse"></div>
-                      <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-400 rounded-tr-2xl animate-pulse"></div>
-                      <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-400 rounded-bl-2xl animate-pulse"></div>
-                      <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-400 rounded-br-2xl animate-pulse"></div>
-                      
-                      {/* Scanning line */}
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-pulse"></div>
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-bounce" style={{animationDelay: '0.5s'}}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Status */}
-            {isScanning && (
-              <div className="flex items-center justify-center gap-3 mt-4 p-4 bg-blue-500/20 backdrop-blur-sm rounded-xl border border-blue-500/30">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                </div>
-                <span className="text-blue-200 font-medium">Scanning for QR codes...</span>
-              </div>
-            )}
-
-            {/* Controls */}
-            <div className="mt-4 space-y-3">
-              {!isScanning && !error && (
-                <button
-                  onClick={() => startScanning()}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-3"
+                <Alert
+                  severity="info"
+                  sx={{ mb: 2, flexShrink: 0 }}
+                  icon={
+                    <Stack direction="row" spacing={0.5}>
+                      {[0, 1, 2].map((i) => (
+                        <Box
+                          key={i}
+                          sx={{
+                            width: 6,
+                            height: 6,
+                            backgroundColor: 'info.main',
+                            borderRadius: '50%',
+                            animation: 'bounce 1.4s infinite',
+                            animationDelay: `${i * 0.16}s`
+                          }}
+                        />
+                      ))}
+                    </Stack>
+                  }
                 >
-                  <Camera className="w-6 h-6" />
-                  Start Scanning
-                </button>
+                  Scanning for QR codes...
+                </Alert>
               )}
 
-              {isScanning && (
-                <button
-                  onClick={stopScanning}
-                  className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-3"
-                >
-                  <Square className="w-6 h-6" />
-                  Stop Scanning
-                </button>
-              )}
+              {/* Controls */}
+              <Stack spacing={2} sx={{ flexShrink: 0 }}>
+                {!isScanning && !error && (
+                  <Button
+                    variant="contained"
+                    size="large"
+                    startIcon={<Camera />}
+                    onClick={() => startScanning()}
+                    sx={{
+                      background: 'linear-gradient(45deg, #2196f3 30%, #9c27b0 90%)',
+                      py: isMobile ? 1.5 : 1.5
+                    }}
+                  >
+                    Start Scanning
+                  </Button>
+                )}
 
-              {/* Camera Selector */}
-              {cameras.length > 1 && (
-                <div className="space-y-3">
-                  <label className="block text-white/80 font-medium">Switch Camera:</label>
-                  <div className="relative">
-                    <select
+                {isScanning && (
+                  <Button
+                    variant="contained"
+                    size="large"
+                    color="error"
+                    startIcon={<Stop />}
+                    onClick={stopScanning}
+                    sx={{ py: isMobile ? 1.5 : 1.5 }}
+                  >
+                    Stop Scanning
+                  </Button>
+                )}
+
+                {/* Camera Selector */}
+                {cameras.length > 1 && (
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Camera</InputLabel>
+                    <Select
                       value={selectedCamera}
+                      label="Camera"
                       onChange={(e) => switchCamera(e.target.value)}
-                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white appearance-none cursor-pointer hover:bg-white/20 transition-colors"
+                      startAdornment={<Refresh sx={{ mr: 1 }} />}
                     >
                       {cameras.map((camera, index) => (
-                        <option key={camera.id} value={camera.id} className="bg-gray-800 text-white">
+                        <MenuItem key={camera.id} value={camera.id}>
                           {camera.label || `Camera ${index + 1}`}
-                        </option>
+                        </MenuItem>
                       ))}
-                    </select>
-                    <RefreshCw className="absolute right-3 top-3 w-5 h-5 text-white/60 pointer-events-none" />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+                    </Select>
+                  </FormControl>
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
+        </Container>
 
-      {/* Enhanced Result Modal */}
-      {showResult && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 max-w-sm w-full max-h-96 overflow-hidden animate-scale-in">
-            <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Success!</h3>
-                  <p className="text-green-100 text-sm">QR Code detected</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-4 space-y-4">
-              <div className="flex items-center gap-2">
-                <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold ${getResultColor(getResultType(result))}`}>
-                  {React.createElement(getTypeIcon(getResultType(result)), { className: "w-4 h-4" })}
-                  {getResultType(result)}
-                </div>
-              </div>
+        {/* Result Dialog */}
+        <Dialog
+          open={showResult}
+          onClose={handleResultClose}
+          maxWidth="sm"
+          fullWidth
+          fullScreen={isMobile}
+          TransitionComponent={Slide}
+          TransitionProps={{ direction: 'up' }}
+        >
+          <DialogTitle sx={{ bgcolor: 'success.main', color: 'white' }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <CheckCircle />
+              <Box>
+                <Typography variant="h6">Success!</Typography>
+                <Typography variant="body2">QR Code detected</Typography>
+              </Box>
+              <Box sx={{ flexGrow: 1 }} />
+              <IconButton onClick={handleResultClose} sx={{ color: 'white' }}>
+                <Close />
+              </IconButton>
+            </Stack>
+          </DialogTitle>
+          
+          <DialogContent sx={{ p: 3 }}>
+            <Stack spacing={3}>
+              <Chip
+                icon={React.createElement(getTypeIcon(getResultType(result)), { fontSize: 'small' })}
+                label={getResultType(result)}
+                color={getResultColor(getResultType(result))}
+                variant="filled"
+                sx={{ alignSelf: 'flex-start' }}
+              />
               
-              <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
-                <p className="text-white text-sm break-all leading-relaxed">{result}</p>
-              </div>
+              <Paper
+                sx={{
+                  p: 2,
+                  backgroundColor: 'background.paper',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{
+                    wordBreak: 'break-all',
+                    fontFamily: 'monospace',
+                    lineHeight: 1.6,
+                    fontSize: isMobile ? '0.875rem' : '1rem'
+                  }}
+                >
+                  {result}
+                </Typography>
+              </Paper>
 
               {isURL(result) && (
-                <button
+                <Button
+                  variant="contained"
+                  startIcon={<Link />}
                   onClick={() => window.open(result, '_blank')}
-                  className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+                  sx={{
+                    background: 'linear-gradient(45deg, #2196f3 30%, #00bcd4 90%)'
+                  }}
                 >
-                  <ExternalLink className="w-4 h-4" />
                   Open Link
-                </button>
+                </Button>
               )}
+            </Stack>
+          </DialogContent>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={handleRescan}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
-                >
-                  Scan Again
-                </button>
-                <button
-                  onClick={handleResultClose}
-                  className="flex-1 bg-gradient-to-r from-gray-600 to-slate-600 hover:from-gray-700 hover:to-slate-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        .animate-scale-in {
-          animation: scale-in 0.2s ease-out;
-        }
-      `}</style>
-    </div>
+          <DialogActions sx={{ p: 2, gap: 1 }}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleRescan}
+              sx={{ flex: 1 }}
+            >
+              Scan Again
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleResultClose}
+              sx={{ flex: 1 }}
+            >
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </ThemeProvider>
   );
 };
 
