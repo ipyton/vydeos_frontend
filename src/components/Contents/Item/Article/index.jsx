@@ -132,14 +132,21 @@ const CommentItem = styled(ListItem)(({ theme, mode }) => ({
 
 const ImageContainer = styled(Box)(({ theme, mode }) => ({
   position: 'relative',
+  width: '100%',
+  height: 0,
+  paddingBottom: '100%', // Creates 1:1 aspect ratio (Safari-compatible)
   overflow: 'hidden',
   borderRadius: theme.spacing(1),
-  aspectRatio: '1/1',
   backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: '150px',
+  '& > *': {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+  }
 }));
 
 // Avatar color generator
@@ -209,7 +216,7 @@ const useAuthImage = (url, headers = {}) => {
   return { imageData, loading, error };
 };
 
-// Auth Image Component
+
 const AuthImage = ({ src, alt, authHeaders, mode, sx, ...props }) => {
   const { imageData, loading, error } = useAuthImage(src, authHeaders);
 
@@ -236,19 +243,34 @@ const AuthImage = ({ src, alt, authHeaders, mode, sx, ...props }) => {
   }
 
   return (
-    <StyledCardMedia
-      component="img"
-      image={imageData}
-      alt={alt}
-      mode={mode}
+    <Box
       sx={{
         width: '100%',
-        height: '100%',
-        objectFit: 'cover',
+        height: 0,
+        paddingBottom: '100%', // Creates 1:1 aspect ratio
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: 1,
         ...sx,
       }}
-      {...props}
-    />
+    >
+      <StyledCardMedia
+        component="img"
+        image={imageData}
+        alt={alt}
+        mode={mode}
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center',
+        }}
+        {...props}
+      />
+    </Box>
   );
 };
 

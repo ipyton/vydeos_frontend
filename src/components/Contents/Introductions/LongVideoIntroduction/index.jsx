@@ -266,7 +266,7 @@ export default function MovieDetails(props) {
             spacing={4} 
             sx={{ width: "100%" }}
           >
-            {isMobile && props.onBack && (
+            {/* {isMobile && props.onBack && (
               <IconButton
                 onClick={() => props.onBack()}
                 sx={{
@@ -278,7 +278,7 @@ export default function MovieDetails(props) {
               >
                 <ArrowBackIcon />
               </IconButton>
-            )}
+            )} */}
 
             {/* Movie Poster */}
             <Box sx={{ width: { xs: "100%", sm: "30%" }, mb: { xs: 2, sm: 0 } }}>
