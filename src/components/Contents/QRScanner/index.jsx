@@ -21,10 +21,9 @@ import {
   Paper,
   Container,
   Stack,
-  Fade,
   Slide,
-  Badge
 } from '@mui/material';
+
 import {
   Camera,
   Stop,
@@ -85,7 +84,7 @@ const theme = createTheme({
   },
 });
 
-const QRScanner = ({ 
+const QRScanner = ({
   scannerSize = 400,
 }) => {
   const [isScanning, setIsScanning] = useState(false);
@@ -97,7 +96,7 @@ const QRScanner = ({
   const [isLoading, setIsLoading] = useState(true);
   const [scanCount, setScanCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  
+
   const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
 
@@ -106,7 +105,7 @@ const QRScanner = ({
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -161,12 +160,12 @@ const QRScanner = ({
         const devices = await window.Html5Qrcode.getCameras();
         if (devices && devices.length > 0) {
           setCameras(devices);
-          const backCamera = devices.find(device => 
-            device.label.toLowerCase().includes('back') || 
+          const backCamera = devices.find(device =>
+            device.label.toLowerCase().includes('back') ||
             device.label.toLowerCase().includes('environment')
           ) || devices[0];
           setSelectedCamera(backCamera.id);
-          
+
           setTimeout(() => {
             startScanning(backCamera.id);
           }, 800);
@@ -187,17 +186,17 @@ const QRScanner = ({
     try {
       setError('');
       setIsScanning(true);
-      
+
       if (!window.Html5Qrcode) {
         throw new Error('QR scanner library not loaded');
       }
 
       html5QrCodeRef.current = new window.Html5Qrcode("qr-reader");
-      
+
       const config = {
         fps: 5,
-        qrbox: { 
-          width: isMobile ? Math.min(250, window.innerWidth-80) : scannerSize, 
+        qrbox: {
+          width: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize,
           height: isMobile ? Math.min(250, window.innerWidth - 80) : scannerSize
         },
         aspectRatio: 1.0,
@@ -217,7 +216,7 @@ const QRScanner = ({
           // Normal scanning errors - don't show
         }
       );
-      
+
     } catch (err) {
       setError('Failed to start scanning: ' + err.message);
       setIsScanning(false);
@@ -348,7 +347,7 @@ const QRScanner = ({
       <Box
         sx={{
           width: '100%',
-          height:"calc(100vh - 64px)",
+          height: "calc(100vh - 64px)",
           background: 'linear-gradient(135deg, #1a1a1a 0%, #2d1b69 50%, #1a1a1a 100%)',
           display: 'flex',
           flexDirection: 'column',
@@ -367,8 +366,8 @@ const QRScanner = ({
             p: isMobile ? '8px !important' : undefined
           }}
         >
-          <Card 
-            sx={{ 
+          <Card
+            sx={{
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
@@ -376,8 +375,8 @@ const QRScanner = ({
               height: isMobile ? 'calc(100vh - 64px)' : 'calc(100vh)'
             }}
           >
-            <CardContent 
-              sx={{ 
+            <CardContent
+              sx={{
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
@@ -408,19 +407,19 @@ const QRScanner = ({
                   justifyContent: 'center'
                 }}
               >
-                <Box 
-                  id="qr-reader" 
-                  sx={{ 
-                    width: '100%', 
+                <Box
+                  id="qr-reader"
+                  sx={{
+                    width: '100%',
                     height: '100%',
                     '& video': {
                       width: '100% !important',
                       height: '100% !important',
                       objectFit: 'cover'
                     }
-                  }} 
+                  }}
                 />
-                
+
                 {!isScanning && !error && (
                   <Box
                     sx={{
@@ -536,331 +535,331 @@ const QRScanner = ({
         </Container>
 
         {/* Result Dialog */}
-<Dialog
-  open={showResult}
-  onClose={handleResultClose}
-  maxWidth="sm"
-  fullWidth
-  fullScreen={isMobile}
-  TransitionComponent={Slide}
-  TransitionProps={{ direction: 'up' }}
-  PaperProps={{
-    sx: {
-      borderRadius: isMobile ? 0 : 4,
-      backdropFilter: 'blur(20px)',
-      backgroundColor: 'rgba(255, 255, 255, 0.85)',
-      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      overflow: 'hidden',
-      ...(theme.palette.mode === 'dark' && {
-        backgroundColor: 'rgba(18, 18, 18, 0.85)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-      })
-    }
-  }}
-  BackdropProps={{
-    sx: {
-      backdropFilter: 'blur(8px)',
-      backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    }
-  }}
->
-  <DialogTitle 
-    sx={{ 
-      background: 'linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%)',
-      color: 'white',
-      position: 'relative',
-      overflow: 'hidden',
-      p: 3,
-      minHeight: 100,
-      display: 'flex',
-      alignItems: 'center',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%)',
-        backdropFilter: 'blur(20px)',
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: -50,
-        right: -50,
-        width: 150,
-        height: 150,
-        background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
-        borderRadius: '50%',
-      }
-    }}
-  >
-    <Stack 
-      direction="row" 
-      spacing={3} 
-      alignItems="center"
-      sx={{ 
-        position: 'relative', 
-        zIndex: 2,
-        width: '100%'
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 56,
-          height: 56,
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)',
-          backdropFilter: 'blur(20px)',
-          border: '2px solid rgba(255, 255, 255, 0.25)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-          position: 'relative',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 2,
-            left: 2,
-            right: 2,
-            bottom: 2,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.08) 100%)',
-            opacity: 0.5,
-          }
-        }}
-      >
-        <CheckCircle sx={{ 
-          fontSize: 32, 
-          position: 'relative', 
-          zIndex: 1,
-          filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
-          color: '#22c55e'
-        }} />
-      </Box>
-      <Box sx={{ flex: 1 }}>
-        <Typography 
-          variant="h5" 
-          sx={{ 
-            fontWeight: 700,
-            textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-            letterSpacing: '-0.02em',
-            background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.9) 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            mb: 0.5
+        <Dialog
+          open={showResult}
+          onClose={handleResultClose}
+          maxWidth="sm"
+          fullWidth
+          fullScreen={isMobile}
+          TransitionComponent={Slide}
+          TransitionProps={{ direction: 'up' }}
+          PaperProps={{
+            sx: {
+              borderRadius: isMobile ? 0 : 4,
+              backdropFilter: 'blur(20px)',
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              overflow: 'hidden',
+              ...(theme.palette.mode === 'dark' && {
+                backgroundColor: 'rgba(18, 18, 18, 0.85)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              })
+            }
+          }}
+          BackdropProps={{
+            sx: {
+              backdropFilter: 'blur(8px)',
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            }
           }}
         >
-          Success!
-        </Typography>
-        <Typography 
-          variant="body1" 
-          sx={{ 
-            opacity: 0.9,
-            textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
-            fontWeight: 500,
-            letterSpacing: '0.01em'
-          }}
-        >
-          QR Code detected successfully
-        </Typography>
-      </Box>
-      <IconButton 
-        onClick={handleResultClose} 
-        sx={{ 
-          color: 'white',
-          width: 44,
-          height: 44,
-          backgroundColor: 'rgba(255, 255, 255, 0.12)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
-          '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            transform: 'scale(1.05) translateY(-1px)',
-            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
-          },
-          '&:active': {
-            transform: 'scale(0.98)',
-          },
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        }}
-      >
-        <Close sx={{ fontSize: 20 }} />
-      </IconButton>
-    </Stack>
-  </DialogTitle>
-
-  <DialogContent sx={{ p: 3, position: 'relative' }}>
-    <Stack spacing={3}>
-      <Chip
-        icon={React.createElement(getTypeIcon(getResultType(result)), { fontSize: 'small' })}
-        label={getResultType(result)}
-        color={getResultColor(getResultType(result))}
-        variant="filled"
-        sx={{ 
-          alignSelf: 'flex-start',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          '& .MuiChip-label': {
-            fontWeight: 500,
-          }
-        }}
-      />
-
-      <Paper
-        sx={{
-          p: 3,
-          backgroundColor: 'rgba(255, 255, 255, 0.7)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          borderRadius: 3,
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          position: 'relative',
-          overflow: 'hidden',
-          ...(theme.palette.mode === 'dark' && {
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          }),
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '1px',
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)',
-          }
-        }}
-      >
-        <Typography
-          variant="body1"
-          sx={{
-            wordBreak: 'break-all',
-            fontFamily: 'SF Mono, Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace',
-            lineHeight: 1.6,
-            fontSize: isMobile ? '0.875rem' : '1rem',
-            fontWeight: 400,
-            position: 'relative',
-            zIndex: 1,
-          }}
-        >
-          {result}
-        </Typography>
-      </Paper>
-
-      {isURL(result) && (
-        <Button
-          variant="contained"
-          startIcon={<Link />}
-          onClick={() => window.open(result, '_blank')}
-          sx={{
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: 3,
-            py: 1.5,
-            px: 3,
-            fontWeight: 600,
-            textTransform: 'none',
-            fontSize: '1rem',
-            boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            position: 'relative',
-            overflow: 'hidden',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
-              opacity: 0,
-              transition: 'opacity 0.3s ease',
-            },
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: '0 12px 35px rgba(59, 130, 246, 0.5)',
+          <DialogTitle
+            sx={{
+              background: 'linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%)',
+              color: 'white',
+              position: 'relative',
+              overflow: 'hidden',
+              p: 3,
+              minHeight: 100,
+              display: 'flex',
+              alignItems: 'center',
               '&::before': {
-                opacity: 1,
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%)',
+                backdropFilter: 'blur(20px)',
+              },
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: -50,
+                right: -50,
+                width: 150,
+                height: 150,
+                background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
+                borderRadius: '50%',
               }
-            },
-            '&:active': {
-              transform: 'translateY(0px)',
-            },
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-        >
-          Open Link
-        </Button>
-      )}
-    </Stack>
-  </DialogContent>
+            }}
+          >
+            <Stack
+              direction="row"
+              spacing={3}
+              alignItems="center"
+              sx={{
+                position: 'relative',
+                zIndex: 2,
+                width: '100%'
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  border: '2px solid rgba(255, 255, 255, 0.25)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                  position: 'relative',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 2,
+                    left: 2,
+                    right: 2,
+                    bottom: 2,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.08) 100%)',
+                    opacity: 0.5,
+                  }
+                }}
+              >
+                <CheckCircle sx={{
+                  fontSize: 32,
+                  position: 'relative',
+                  zIndex: 1,
+                  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+                  color: '#22c55e'
+                }} />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 700,
+                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                    letterSpacing: '-0.02em',
+                    background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.9) 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    mb: 0.5
+                  }}
+                >
+                  Success!
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    opacity: 0.9,
+                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
+                    fontWeight: 500,
+                    letterSpacing: '0.01em'
+                  }}
+                >
+                  QR Code detected successfully
+                </Typography>
+              </Box>
+              <IconButton
+                onClick={handleResultClose}
+                sx={{
+                  color: 'white',
+                  width: 44,
+                  height: 44,
+                  backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    transform: 'scale(1.05) translateY(-1px)',
+                    boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
+                  },
+                  '&:active': {
+                    transform: 'scale(0.98)',
+                  },
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              >
+                <Close sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Stack>
+          </DialogTitle>
 
-  <DialogActions 
-    sx={{ 
-      p: 3, 
-      gap: 2,
-      background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-      backdropFilter: 'blur(20px)',
-      borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-    }}
-  >
-    <Button
-      variant="contained"
-      color="success"
-      onClick={handleRescan}
-      sx={{ 
-        flex: 1,
-        borderRadius: 3,
-        py: 1.5,
-        fontWeight: 600,
-        textTransform: 'none',
-        fontSize: '1rem',
-        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 6px 20px rgba(34, 197, 94, 0.3)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        '&:hover': {
-          transform: 'translateY(-1px)',
-          boxShadow: '0 8px 25px rgba(34, 197, 94, 0.4)',
-        },
-        transition: 'all 0.2s ease-in-out',
-      }}
-    >
-      Scan Again
-    </Button>
-    <Button
-      variant="outlined"
-      onClick={handleResultClose}
-      sx={{ 
-        flex: 1,
-        borderRadius: 3,
-        py: 1.5,
-        fontWeight: 600,
-        textTransform: 'none',
-        fontSize: '1rem',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.3)',
-        color: theme.palette.mode === 'dark' ? 'white' : 'inherit',
-        '&:hover': {
-          backgroundColor: 'rgba(255, 255, 255, 0.2)',
-          transform: 'translateY(-1px)',
-          borderColor: 'rgba(255, 255, 255, 0.4)',
-        },
-        transition: 'all 0.2s ease-in-out',
-      }}
-    >
-      Close
-    </Button>
-  </DialogActions>
-</Dialog>
+          <DialogContent sx={{ p: 3, position: 'relative' }}>
+            <Stack spacing={3}>
+              <Chip
+                icon={React.createElement(getTypeIcon(getResultType(result)), { fontSize: 'small' })}
+                label={getResultType(result)}
+                color={getResultColor(getResultType(result))}
+                variant="filled"
+                sx={{
+                  alignSelf: 'flex-start',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  '& .MuiChip-label': {
+                    fontWeight: 500,
+                  }
+                }}
+              />
+
+              <Paper
+                sx={{
+                  p: 3,
+                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: 3,
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  ...(theme.palette.mode === 'dark' && {
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                  }),
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)',
+                  }
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{
+                    wordBreak: 'break-all',
+                    fontFamily: 'SF Mono, Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace',
+                    lineHeight: 1.6,
+                    fontSize: isMobile ? '0.875rem' : '1rem',
+                    fontWeight: 400,
+                    position: 'relative',
+                    zIndex: 1,
+                  }}
+                >
+                  {result}
+                </Typography>
+              </Paper>
+
+              {isURL(result) && (
+                <Button
+                  variant="contained"
+                  startIcon={<Link />}
+                  onClick={() => window.open(result, '_blank')}
+                  sx={{
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: 3,
+                    py: 1.5,
+                    px: 3,
+                    fontWeight: 600,
+                    textTransform: 'none',
+                    fontSize: '1rem',
+                    boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
+                      opacity: 0,
+                      transition: 'opacity 0.3s ease',
+                    },
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 12px 35px rgba(59, 130, 246, 0.5)',
+                      '&::before': {
+                        opacity: 1,
+                      }
+                    },
+                    '&:active': {
+                      transform: 'translateY(0px)',
+                    },
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}
+                >
+                  Open Link
+                </Button>
+              )}
+            </Stack>
+          </DialogContent>
+
+          <DialogActions
+            sx={{
+              p: 3,
+              gap: 2,
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+              backdropFilter: 'blur(20px)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleRescan}
+              sx={{
+                flex: 1,
+                borderRadius: 3,
+                py: 1.5,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '1rem',
+                background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 6px 20px rgba(34, 197, 94, 0.3)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                '&:hover': {
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 8px 25px rgba(34, 197, 94, 0.4)',
+                },
+                transition: 'all 0.2s ease-in-out',
+              }}
+            >
+              Scan Again
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleResultClose}
+              sx={{
+                flex: 1,
+                borderRadius: 3,
+                py: 1.5,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '1rem',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                color: theme.palette.mode === 'dark' ? 'white' : 'inherit',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  transform: 'translateY(-1px)',
+                  borderColor: 'rgba(255, 255, 255, 0.4)',
+                },
+                transition: 'all 0.2s ease-in-out',
+              }}
+            >
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </ThemeProvider>
   );

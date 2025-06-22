@@ -219,15 +219,29 @@ export default function UserInfo(props) {
       dateOfBirth: newDate ? newDate.format('YYYY-MM-DD') : prevState.dateOfBirth
     }));
   };
-  const handleAvatarUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
+const handleAvatarUpload = async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    try {
       const avatarUrl = URL.createObjectURL(file);
       setAvatar(avatarUrl);
-      AccountUtil.uploadAvatar(file);
+      
+      // Upload avatar and wait for completion
+      await AccountUtil.uploadAvatar(file);
+      
       showNotification("Avatar uploaded successfully!", "success");
+      
+      // Refresh the page after successful upload
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500); // Small delay to show the success message
+      
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      showNotification("Failed to upload avatar", "error");
     }
-  };
+  }
+};
 
   const handleSubmit = (event) => {
     event.preventDefault();
