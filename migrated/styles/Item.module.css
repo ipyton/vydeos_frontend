@@ -1,0 +1,36 @@
+.container {
+  padding: 16px;
+  min-height: calc(100vh - 64px);
+  width: 100%;
+}
+
+.articleList {
+  padding: 0;
+  margin: 0;
+}
+
+.articleItem {
+  padding: 16px 0;
+  width: 100%;
+}
+
+.buttonGroup {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.actionButton {
+  transition: transform 0.2s ease;
+}
+
+.actionButton:hover {
+  transform: scale(1.05);
+}
+
+.actionButton:active {
+  transform: scale(0.95);
+}
+
+.activeButton {
+  font-weight: bold;
+} 

@@ -1,0 +1,65 @@
+.articleCard {
+  width: 100%;
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.articleCard:hover {
+  transform: translateY(-4px);
+}
+
+.authorName {
+  font-weight: 600;
+}
+
+.titleContent {
+  padding-top: 0;
+}
+
+.mediaContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.media {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.media:hover {
+  transform: scale(1.02);
+}
+
+.content {
+  white-space: pre-line;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+}
+
+.expand {
+  transform: rotate(0deg);
+  margin-left: auto;
+  transition: transform 0.3s;
+}
+
+.expandOpen {
+  transform: rotate(180deg);
+  margin-left: auto;
+}
+
+.comment {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.comment:last-child {
+  border-bottom: none;
+} 

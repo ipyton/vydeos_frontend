@@ -1,0 +1,134 @@
+.container {
+  padding: 16px;
+  min-height: calc(100vh - 64px);
+}
+
+.profilePaper {
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.profilePaper:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.banner {
+  position: relative;
+  overflow: hidden;
+}
+
+.banner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 107%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 55%, rgba(255, 255, 255, 0) 70%);
+}
+
+.avatarSection {
+  position: relative;
+  z-index: 2;
+}
+
+.avatar {
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.uploadButton {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.uploadButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+  font-weight: 700;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.subtitle {
+  text-align: center;
+  opacity: 0.8;
+  margin-bottom: 16px;
+}
+
+.qrSection {
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 16px;
+  border-radius: 8px;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.qrCaption {
+  margin-top: 8px;
+}
+
+.form {
+  padding: 16px;
+}
+
+.card {
+  margin-bottom: 24px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.textField {
+  margin-bottom: 8px;
+}
+
+.formControl {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.submitContainer {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.submitButton {
+  padding: 10px 32px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(103, 58, 183, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .container {
+    padding: 8px;
+  }
+  
+  .form {
+    padding: 8px;
+  }
+} 

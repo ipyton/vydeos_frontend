@@ -1,0 +1,65 @@
+.dialog {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dialogTitle {
+  padding-bottom: 8px;
+}
+
+.titleInput {
+  margin-bottom: 16px;
+}
+
+.contentInput {
+  margin-bottom: 16px;
+}
+
+.previewContainer {
+  position: relative;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mediaPreview {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.removePreview {
+  position: absolute !important;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  color: white !important;
+}
+
+.removePreview:hover {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 24px 16px 24px;
+}
+
+.mediaButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.mediaButton {
+  border-radius: 50%;
+}
+
+.submitButton {
+  border-radius: 20px;
+  padding: 6px 16px;
+  text-transform: none;
+  font-weight: 600;
+} 

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="10%" stop-color="#FE6B8B" />
+      <stop offset="90%" stop-color="#FF8E53" />
+    </linearGradient>
+  </defs>
+  <style>
+    .text { 
+      font-size: 140px; 
+      font-weight: bold; 
+      font-family: sans-serif; 
+      fill: url(#gradient); 
+      text-anchor: middle;
+    }
+    .subtext { 
+      font-size: 48px; 
+      font-family: sans-serif; 
+      fill: #666; 
+      text-anchor: middle;
+    }
+    .icon { 
+      fill: url(#gradient);  
+    }
+    .circlebg {
+      fill: rgba(255,255,255,0.1);
+      stroke: rgba(255,255,255,0.3);
+      stroke-width: 2;
+    }
+  </style>
+  
+  <circle cx="256" cy="256" r="200" class="circlebg" />
+  
+  <text x="256" y="230" class="text">404</text>
+  <text x="256" y="290" class="subtext">Page Not Found</text>
+  
+  <g transform="translate(186, 320)">
+    <path class="icon" d="M140,20c0-11-9-20-20-20H20C9,0,0,9,0,20v100c0,11,9,20,20,20h100c11,0,20-9,20-20V20z M70,120H20V70h20v20h30V120z M70,60H40V20h30V60z M120,120H90V90h30V120z M120,60H90V20h30V60z" />
+  </g>
+</svg>

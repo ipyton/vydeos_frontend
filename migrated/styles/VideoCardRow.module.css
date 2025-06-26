@@ -1,0 +1,23 @@
+.rowContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+/* Responsive styles */
+@media (max-width: 960px) {
+  .rowContainer {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .rowContainer {
+    gap: 8px;
+    justify-content: center;
+  }
+} 

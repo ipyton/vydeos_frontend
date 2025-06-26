@@ -1,0 +1,94 @@
+.container {
+  padding: 32px 16px;
+  min-height: calc(100vh - 64px);
+}
+
+.paper {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.paper:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.avatar {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.name {
+  font-weight: 700;
+}
+
+.title {
+  font-weight: 500;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+}
+
+.sectionTitle {
+  font-weight: 600;
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.sectionTitle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #6200EE, #BB86FC);
+  border-radius: 3px;
+}
+
+.bio {
+  line-height: 1.7;
+}
+
+.skillChip {
+  margin: 4px;
+  transition: transform 0.2s ease;
+}
+
+.skillChip:hover {
+  transform: scale(1.05);
+}
+
+.thankCard {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  height: 100%;
+}
+
+.thankCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thankTitle {
+  font-weight: 600;
+}
+
+.thankText {
+  opacity: 0.9;
+}
+
+.quote {
+  font-style: italic;
+  opacity: 0.8;
+  max-width: 80%;
+  margin: 0 auto;
+  padding-top: 16px;
+} 
