@@ -205,7 +205,7 @@ export default function SignUp(props) {
   };
 
   const previousStep = () => {
-    setActiveStep(activeStep - 1);
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
   const isStepSkipped = (step) => {
@@ -213,280 +213,227 @@ export default function SignUp(props) {
   };
 
   const jumpToLoginPage = () => {
-    navigate("/account/login");
+    navigate('/login');
   };
 
   const steps = [
-    'Email Address',
-    'Verification',
-    'Set Password',
-    'Complete',
+    'Verify Email',
+    'Confirm Code',
+    'Create Password',
+    'Complete'
   ];
 
-  // Step Content Components
   const StepContent = () => {
     switch (activeStep) {
       case 0:
         return (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
+          <Box component="form" onSubmit={step1} sx={{ mt: 3 }}>
+            <TextField
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isLoading}
             >
-              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-                <EmailIcon fontSize="large" />
-              </Avatar>
-              <Typography component="h1" variant="h4" gutterBottom>
-                Create Account
-              </Typography>
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-                Enter your email to get started with your new account
-              </Typography>
-              
-              <Box component="form" noValidate onSubmit={step1} sx={{ width: '100%' }}>
-                <TextField
-                  required
+              {isLoading ? "Sending..." : "Send Verification Code"}
+            </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link href="/login" variant="body2">
+                  Already have an account? Sign in
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+        );
+      case 1:
+        return (
+          <Box component="form" onSubmit={step2} sx={{ mt: 3 }}>
+            <TextField
+              required
+              fullWidth
+              name="digits"
+              label="6-Digit Code"
+              id="digits"
+              autoComplete="one-time-code"
+              autoFocus
+              inputProps={{ maxLength: 6 }}
+            />
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={7}>
+                <CountDownButton
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  // onChange={(event) => setEmail(event.target.value)}
-                  // value={email}
-                  sx={{ mb: 2 }}
                   variant="outlined"
+                  onClick={() => {
+                    AccountUtil.sendVerificationCode(email).then(
+                      (response) => {
+                        if (response && response.data && response.data.code === 0) {
+                          showNotification("Verification code resent", "success");
+                        } else {
+                          showNotification("Failed to resend verification code", "error");
+                        }
+                      }
+                    );
+                  }}
                 />
+              </Grid>
+              <Grid item xs={12} sm={5}>
                 <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   disabled={isLoading}
-                  sx={{ py: 1.5 }}
                 >
-                  {isLoading ? "Sending Verification..." : "Continue"}
+                  {isLoading ? "Verifying..." : "Verify Code"}
                 </Button>
-                <Grid container justifyContent="center" sx={{ mt: 3 }}>
-                  <Grid item>
-                    <Link href="/account/login" variant="body2" color="primary.main">
-                      Already have an account? Sign in
-                    </Link>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Box>
-        );
-      case 1:
-        return (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
+              </Grid>
+            </Grid>
+            <Button
+              fullWidth
+              variant="text"
+              onClick={previousStep}
+              sx={{ mt: 2 }}
             >
-              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-                <LockOutlinedIcon fontSize="large" />
-              </Avatar>
-              <Typography component="h1" variant="h4" gutterBottom>
-                Verify Email
-              </Typography>
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 1 }}>
-                We've sent a verification code to
-              </Typography>
-              <Typography variant="body1" fontWeight="bold" sx={{ mb: 3 }}>
-                {email}
-              </Typography>
-              
-              <Box component="form" noValidate onSubmit={step2} sx={{ width: '100%' }}>
-                <TextField
-                  required
-                  fullWidth
-                  id="digits"
-                  label="6-Digit Code"
-                  name="digits"
-                  placeholder="000000"
-                  inputProps={{ maxLength: 6 }}
-                  sx={{ mb: 2 }}
-                />
-                
-                <Stack direction="row" spacing={2}>
-                  <Button
-                    onClick={previousStep}
-                    variant="outlined"
-                    sx={{ py: 1.5, flex: 1 }}
-                    disabled={isLoading}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{ py: 1.5, flex: 2 }}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Verifying..." : "Verify Code"}
-                  </Button>
-                </Stack>
-                <CountDownButton email={email} activeStep={activeStep} />
-              </Box>
-            </Box>
+              Back
+            </Button>
+          </Box>
         );
-        
       case 2:
         return (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
+          <Box component="form" onSubmit={step3} sx={{ mt: 3 }}>
+            <TextField
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="new-password"
+              autoFocus
+              error={!!passwordError}
+              helperText={passwordError || "Password must include uppercase, lowercase, number, and special character"}
+            />
+            <TextField
+              required
+              fullWidth
+              name="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              id="confirmPassword"
+              autoComplete="new-password"
+              sx={{ mt: 2 }}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isLoading}
             >
-              <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-                <PersonAddIcon fontSize="large" />
-              </Avatar>
-              <Typography component="h1" variant="h4" gutterBottom>
-                Set Password
-              </Typography>
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-                Create a secure password for your new account
-              </Typography>
-              
-              <Box component="form" noValidate onSubmit={step3} sx={{ width: '100%' }}>
-                <TextField
-                  required
-                  fullWidth
-                  id="password"
-                  label="Password"
-                  name="password"
-                  type="password"
-                  error={!!passwordError}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  required
-                  fullWidth
-                  id="confirmPassword"
-                  label="Confirm Password"
-                  type="password"
-                  error={!!passwordError}
-                  helperText={passwordError}
-                  sx={{ mb: 2 }}
-                />
-                
-                <Stack direction="row" spacing={2}>
-                  <Button
-                    onClick={previousStep}
-                    variant="outlined"
-                    sx={{ py: 1.5, flex: 1 }}
-                    disabled={isLoading}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{ py: 1.5, flex: 2 }}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating Account..." : "Complete Registration"}
-                  </Button>
-                </Stack>
-              </Box>
-            </Box>
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
+            <Button
+              fullWidth
+              variant="text"
+              onClick={previousStep}
+            >
+              Back
+            </Button>
+          </Box>
         );
-        
       case 3:
         return (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-              }}
+          <Box sx={{ mt: 3, textAlign: 'center' }}>
+            <Avatar sx={{ m: '0 auto', bgcolor: 'success.main', width: 60, height: 60 }}>
+              <CheckCircleIcon fontSize="large" />
+            </Avatar>
+            <Typography variant="h5" sx={{ mt: 2 }}>
+              Registration Complete!
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+              Your account has been created successfully.
+            </Typography>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={jumpToLoginPage}
+              sx={{ mt: 3 }}
             >
-              <Avatar sx={{ m: 2, bgcolor: 'success.main', width: 64, height: 64 }}>
-                <CheckCircleIcon fontSize="large" />
-              </Avatar>
-              <Typography component="h1" variant="h4" gutterBottom>
-                Registration Complete!
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 400 }}>
-                Your account has been successfully created. You can now sign in to access your account.
-              </Typography>
-              
-              <Button
-                onClick={jumpToLoginPage}
-                fullWidth
-                variant="contained"
-                sx={{ py: 1.5 }}
-              >
-                Sign In
-              </Button>
-            </Box>
+              Sign In
+            </Button>
+          </Box>
         );
-        
       default:
-        return <Typography>Something went wrong!</Typography>;
+        return <div>Unknown step</div>;
     }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container component="main" maxWidth="sm"  sx={{
-            backdropFilter: 'blur(30px)',
-            WebkitBackdropFilter: 'blur(30px)', // For Safari compatibility
-            backgroundColor: 'rgba(255, 255, 255, 0.1)', // Optional: semi-transparent background
-            borderRadius: '16px', // Optional: rounded corners
-            padding: '20px', // Optional: internal padding
-          }}>
+      <Container component="main" maxWidth="sm">
+        <CssBaseline />
+        <Paper
+          elevation={6}
+          sx={{
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mt: 8,
+            mb: 4,
+            width: '100%',
+            maxWidth: '550px',
+            mx: 'auto'
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+            <PersonAddIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
+          
+          <Stepper activeStep={activeStep} sx={{ width: '100%', mt: 3 }}>
+            {steps.map((label, index) => {
+              const stepProps = {};
+              const labelProps = {};
+              if (isStepSkipped(index)) {
+                stepProps.completed = false;
+              }
+              return (
+                <Step key={label} {...stepProps}>
+                  <StepLabel {...labelProps} StepIconComponent={() => StepIcons[index]}>
+                    {label}
+                  </StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
+          
+          <Box sx={{ width: '100%', mt: 2 }}>
+            <StepContent />
+          </Box>
+        </Paper>
+        <Copyright sx={{ mt: 5 }} />
         <Snackbar
           anchorOrigin={{ vertical, horizontal }}
           open={open}
+          autoHideDuration={6000}
           onClose={handleClose}
-          autoHideDuration={5000}
-          sx={{ mt: 6 }}
         >
           <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
             {message}
           </Alert>
         </Snackbar>
-        
-
-          <Box sx={{ pt: 2, pb: 4 }}>
-            <Stepper activeStep={activeStep} alternativeLabel>
-              {steps.map((label, index) => {
-                const stepProps = {};
-                const labelProps = {};
-                
-                if (isStepSkipped(index)) {
-                  stepProps.completed = false;
-                }
-                
-                return (
-                  <Step key={label} {...stepProps}>
-                    <StepLabel 
-                      {...labelProps}
-                      StepIconProps={{
-                        icon: StepIcons[index]
-                      }}
-                    >
-                      {label}
-                    </StepLabel>
-                  </Step>
-                );
-              })}
-            </Stepper>
-          </Box>
-          
-          <Divider sx={{ mb: 4 }} />
-          
-          <StepContent />
-        
-        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );

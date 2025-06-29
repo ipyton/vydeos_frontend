@@ -219,7 +219,7 @@ export default function Login(props) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="sm">
         <CssBaseline />
         <Paper
           elevation={6}
@@ -230,6 +230,9 @@ export default function Login(props) {
             alignItems: 'center',
             mt: 8,
             mb: 4,
+            width: '100%',
+            maxWidth: '550px',
+            mx: 'auto'
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
