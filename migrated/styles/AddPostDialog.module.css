@@ -62,4 +62,197 @@
   padding: 6px 16px;
   text-transform: none;
   font-weight: 600;
+}
+
+.dialogContent {
+  padding: 16px;
+}
+
+.dialogContentDark {
+  background-color: #121212;
+  color: #fff;
+}
+
+.dialogContentLight {
+  background-color: white;
+  color: inherit;
+}
+
+.textField {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.textFieldDark {
+  background-color: #121212;
+}
+
+.textFieldDark .input {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+.textFieldDark .label {
+  color: #aaa;
+}
+
+.textFieldLight .input {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: inherit;
+}
+
+.textFieldLight .label {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.imageList {
+  width: 100%;
+}
+
+.imageListItem {
+  overflow: visible;
+  padding: 0;
+  position: relative;
+}
+
+.imagePreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  width: 24px;
+  height: 24px;
+  z-index: 1;
+}
+
+.deleteButton:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.accordion {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.accordionDark {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+.accordionLight {
+  background-color: #f5f5f5;
+}
+
+.accordionSummary {
+  min-height: 48px;
+}
+
+.accordionSummaryDark {
+  background-color: #2d2d2d;
+}
+
+.accordionSummaryLight {
+  background-color: #e0e0e0;
+}
+
+.accordionDetails {
+  padding: 16px;
+}
+
+.accordionDetailsDark {
+  background-color: #1e1e1e;
+}
+
+.accordionDetailsLight {
+  background-color: #f5f5f5;
+}
+
+.uploadButton {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.uploadButtonDark {
+  background-color: #1976d2;
+  color: white;
+}
+
+.uploadButtonLight {
+  background-color: #2196f3;
+  color: white;
+}
+
+.uploadButtonDark:hover {
+  background-color: #1565c0;
+}
+
+.uploadButtonLight:hover {
+  background-color: #1976d2;
+}
+
+.sendButton {
+  margin-left: 8px;
+}
+
+.sendButtonDark {
+  background-color: #2e7d32;
+  color: white;
+}
+
+.sendButtonLight {
+  background-color: #4caf50;
+  color: white;
+}
+
+.sendButtonDark:hover {
+  background-color: #1b5e20;
+}
+
+.sendButtonLight:hover {
+  background-color: #388e3c;
+}
+
+.cancelButton {
+  color: #f44336;
+}
+
+.switchContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.switchLabel {
+  margin-right: 8px;
+}
+
+.switchDark {
+  color: #90caf9;
+}
+
+.switchLight {
+  color: #1976d2;
+}
+
+.chip {
+  margin: 4px;
+}
+
+.chipDark {
+  background-color: #424242;
+  color: #fff;
+}
+
+.chipLight {
+  background-color: #e0e0e0;
+  color: rgba(0, 0, 0, 0.87);
 } 

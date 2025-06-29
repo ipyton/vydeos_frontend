@@ -1,192 +1,251 @@
-import apiClient from './ApiClient';
+import Qs from 'qs';
+import { apiClient } from './ApiClient';
+import { API_URL } from './URL';
 
-class PostUtil {
+class PostUtilClass {
+  /**
+   * Upload a post picture
+   * @param {File} pic - The picture file to upload
+   * @returns {Promise} - Promise object with upload result
+   */
+  async uploadPicture(pic) {
+    // Skip on server-side
+    if (typeof window === 'undefined') {
+      return Promise.resolve({ data: { message: '' } });
+    }
+
+    try {
+      // Dynamically import the ImageCompressor to avoid SSR issues
+      const ImageCompressor = (await import('./ImageCompressor')).default;
+      const compressedImage = await ImageCompressor.compressImage(pic, 1024);
+      
+      return apiClient.post(`${API_URL}/file/uploadPostPic`, { file: compressedImage }, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).catch(error => {
+        console.error('Error uploading post picture:', error);
+        return { data: { message: '' } };
+      });
+    } catch (error) {
+      console.error('Error loading ImageCompressor or compressing image:', error);
+      return Promise.resolve({ data: { message: '' } });
+    }
+  }
+
+  /**
+   * Send a new post
+   * @param {string} content - Post content text
+   * @param {Array} pics - Array of picture URLs
+   * @param {Array} notice - Users to notify
+   * @param {Array} whoCanSee - Users who can see the post
+   * @param {string} location - Post location
+   * @param {Array} list - Current posts list
+   * @param {Function} setList - Function to update posts list
+   * @returns {Promise} - Promise object representing the result
+   */
+  sendPost(content, pics, notice, whoCanSee, location, list, setList) {
+    // Skip on server-side
+    if (typeof window === 'undefined') {
+      return Promise.resolve();
+    }
+
+    const data = { 
+      images: pics, 
+      content: content, 
+      authorName: "author", 
+      notice: notice || [], 
+      users: whoCanSee || [], 
+      location: location || "", 
+      voices: [], 
+      videos: [], 
+      comments: [] 
+    };
+    
+    return apiClient.post(`${API_URL}/post/upload`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      if (response && setList) {
+        setList([data, ...list]);
+      }
+      return response;
+    }).catch(error => {
+      console.error('Error sending post:', error);
+      return null;
+    });
+  }
+
   /**
    * Get posts by user ID
-   * @param {string} userId - The user ID
-   * @param {Array} existingPosts - Existing posts array
-   * @param {Function} setArticles - Function to set articles state
+   * @param {string} id - User ID
+   * @param {Array} list - Current posts list
+   * @param {Function} setList - Function to update posts list
+   * @returns {Promise} - Promise object representing the result
    */
-  static async getPostsById(userId, existingPosts = [], setArticles = null) {
-    try {
-      if (!userId) {
-        console.error('getUserPosts: No user ID provided');
+  getPostsById(id, list = [], setList) {
+    // Skip on server-side
+    if (typeof window === 'undefined' || !localStorage) {
+      return Promise.resolve([]);
+    }
+
+    const requestData = Qs.stringify({
+      userID: localStorage.getItem("userId") || id
+    });
+
+    return apiClient.post(`${API_URL}/post/get_by_user_id`, requestData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }).then(response => {
+      if (!response || !response.data || !response.data.posts) {
+        console.log("Connection error or no posts");
         return [];
       }
       
-      const response = await apiClient({
-        url: `/posts/user/${userId}`,
-        method: 'get',
-      });
-      
-      if (response.data && response.data.code === 0) {
-        const posts = JSON.parse(response.data.message);
-        if (setArticles) {
-          setArticles([...existingPosts, ...posts]);
-        }
-        return posts;
-      } else {
-        console.error('Failed to fetch user posts:', response.data);
-        return [];
+      if (setList) {
+        setList([...list, ...response.data.posts]);
       }
-    } catch (error) {
-      console.error('Error fetching user posts:', error);
+      
+      return response.data.posts;
+    }).catch(error => {
+      console.error('Error getting posts by ID:', error);
       return [];
-    }
-  }
-  
-  /**
-   * Get posts from friends
-   * @param {Array} existingPosts - Existing posts array
-   * @param {Function} setArticles - Function to set articles state
-   */
-  static async getFriendPosts(existingPosts = [], setArticles = null) {
-    try {
-      const response = await apiClient({
-        url: '/posts/friends',
-        method: 'get',
-      });
-      
-      if (response.data && response.data.code === 0) {
-        const posts = JSON.parse(response.data.message);
-        if (setArticles) {
-          setArticles([...existingPosts, ...posts]);
-        }
-        return posts;
-      } else {
-        console.error('Failed to fetch friend posts:', response.data);
-        return [];
-      }
-    } catch (error) {
-      console.error('Error fetching friend posts:', error);
-      return [];
-    }
-  }
-  
-  /**
-   * Create a new post
-   * @param {FormData} formData - Form data containing post details and media
-   * @returns {Promise} - API response
-   */
-  static async createPost(formData) {
-    try {
-      const response = await apiClient({
-        url: '/posts',
-        method: 'post',
-        data: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      
-      return response;
-    } catch (error) {
-      console.error('Error creating post:', error);
-      throw error;
-    }
-  }
-  
-  /**
-   * Like a post
-   * @param {string} postId - The post ID
-   * @returns {Promise} - API response
-   */
-  static async likePost(postId) {
-    try {
-      if (!postId) {
-        console.error('likePost: No post ID provided');
-        return null;
-      }
-      
-      const response = await apiClient({
-        url: `/posts/${postId}/like`,
-        method: 'post',
-      });
-      
-      return response;
-    } catch (error) {
-      console.error(`Error liking post ${postId}:`, error);
-      throw error;
-    }
-  }
-  
-  /**
-   * Comment on a post
-   * @param {string} postId - The post ID
-   * @param {string} content - Comment content
-   * @returns {Promise} - API response
-   */
-  static async commentPost(postId, content) {
-    try {
-      if (!postId || !content) {
-        console.error('commentPost: Missing required parameters');
-        return null;
-      }
-      
-      const response = await apiClient({
-        url: `/posts/${postId}/comment`,
-        method: 'post',
-        data: { content },
-      });
-      
-      return response;
-    } catch (error) {
-      console.error(`Error commenting on post ${postId}:`, error);
-      throw error;
-    }
-  }
-  
-  /**
-   * Get a post by ID
-   * @param {string} postId - The post ID
-   * @returns {Promise} - API response
-   */
-  static async getPostById(postId) {
-    try {
-      if (!postId) {
-        console.error('getPostById: No post ID provided');
-        return null;
-      }
-      
-      const response = await apiClient({
-        url: `/posts/${postId}`,
-        method: 'get',
-      });
-      
-      if (response.data && response.data.code === 0) {
-        return JSON.parse(response.data.message);
-      } else {
-        console.error('Failed to fetch post:', response.data);
-        return null;
-      }
-    } catch (error) {
-      console.error(`Error fetching post ${postId}:`, error);
-      return null;
-    }
+    });
   }
 
   /**
-   * Mock method to generate dummy posts for testing
-   * @param {number} count - Number of posts to generate
-   * @returns {Array} - Array of dummy posts
+   * Get friend posts
+   * @param {Array} list - Current posts list
+   * @param {Function} setList - Function to update posts list
+   * @returns {Promise} - Promise object representing the result
    */
-  static getMockPosts(count = 5) {
-    const mockPosts = [];
-    for (let i = 0; i < count; i++) {
-      mockPosts.push({
-        id: `mock-${Date.now()}-${i}`,
-        title: `Sample Post ${i + 1}`,
-        content: `This is a sample post content for post number ${i + 1}. It contains some text to demonstrate how posts would appear in the UI.`,
-        authorName: 'Demo User',
-        authorAvatar: 'https://i.pravatar.cc/150?img=' + (i + 1),
-        publishDate: new Date(Date.now() - i * 86400000).toISOString(),
-        likeCount: Math.floor(Math.random() * 100),
-        commentCount: Math.floor(Math.random() * 20),
-        imageUrl: i % 2 === 0 ? `https://picsum.photos/800/400?random=${i}` : null,
-      });
+  getFriendPosts(list = [], setList) {
+    // Skip on server-side
+    if (typeof window === 'undefined') {
+      return Promise.resolve([]);
     }
-    return mockPosts;
+
+    const requestData = Qs.stringify({});
+
+    return apiClient.post(`${API_URL}/post/get_friends_posts`, requestData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }).then(response => {
+      if (!response || !response.data || !response.data.posts) {
+        console.log("Connection error or no friend posts");
+        return [];
+      }
+      
+      if (setList) {
+        setList([...list, ...response.data.posts]);
+      }
+      
+      return response.data.posts;
+    }).catch(error => {
+      console.error('Error getting friend posts:', error);
+      return [];
+    });
+  }
+
+  /**
+   * Get recommended posts
+   * @param {number} limit - Number of posts to return
+   * @returns {Promise} - Promise object with recommended posts
+   */
+  getRecommendPosts(limit = 10) {
+    // Skip on server-side
+    if (typeof window === 'undefined') {
+      return Promise.resolve([]);
+    }
+    
+    return apiClient.get(`${API_URL}/post/get_recommended`, {
+      params: { limit }
+    }).then(response => {
+      if (!response || !response.data || !response.data.posts) {
+        return [];
+      }
+      return response.data.posts;
+    }).catch(error => {
+      console.error('Error getting recommended posts:', error);
+      return [];
+    });
+  }
+
+  /**
+   * Like a post
+   * @param {string} postId - Post ID
+   * @returns {Promise} - Promise object representing the result
+   */
+  likePost(postId) {
+    // Skip on server-side
+    if (typeof window === 'undefined') {
+      return Promise.resolve({ success: false });
+    }
+    
+    return apiClient.post(`${API_URL}/post/like`, { postId }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      return { success: true, data: response.data };
+    }).catch(error => {
+      console.error('Error liking post:', error);
+      return { success: false, error };
+    });
+  }
+
+  /**
+   * Comment on a post
+   * @param {string} postId - Post ID
+   * @param {string} comment - Comment text
+   * @returns {Promise} - Promise object representing the result
+   */
+  commentPost(postId, comment) {
+    // Skip on server-side
+    if (typeof window === 'undefined') {
+      return Promise.resolve({ success: false });
+    }
+    
+    return apiClient.post(`${API_URL}/post/comment`, { postId, comment }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      return { success: true, data: response.data };
+    }).catch(error => {
+      console.error('Error commenting on post:', error);
+      return { success: false, error };
+    });
+  }
+
+  /**
+   * Delete a post
+   * @param {string} postId - Post ID
+   * @returns {Promise} - Promise object representing the result
+   */
+  deletePost(postId) {
+    // Skip on server-side
+    if (typeof window === 'undefined') {
+      return Promise.resolve({ success: false });
+    }
+    
+    return apiClient.post(`${API_URL}/post/delete`, { postId }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      return { success: true, data: response.data };
+    }).catch(error => {
+      console.error('Error deleting post:', error);
+      return { success: false, error };
+    });
   }
 }
+
+// Create singleton instance
+const PostUtil = new PostUtilClass();
 
 export default PostUtil;

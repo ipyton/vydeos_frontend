@@ -1,15 +1,15 @@
 import React from 'react';
-import NotFoundError from '../components/Errors/NotFoundError';
 import Head from 'next/head';
+import NotFound from '../components/Contents/NotFound';
 
 export default function Custom404() {
   return (
     <>
       <Head>
         <title>404 - Page Not Found</title>
-        <meta name="description" content="The page you're looking for doesn't exist or has been moved." />
+        <meta name="description" content="The page you are looking for does not exist." />
       </Head>
-      <NotFoundError />
+      <NotFound />
     </>
   );
 } 

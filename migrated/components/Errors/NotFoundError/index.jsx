@@ -1,85 +1,155 @@
 import React from 'react';
-import { Box, Typography, Button, Container, Grid, Paper } from '@mui/material';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { Box, Typography, Button, Container, Paper, Grid } from '@mui/material';
+import { Search as SearchIcon, ArrowBack as ArrowBackIcon, Home as HomeIcon } from '@mui/icons-material';
 import { useThemeMode } from '../../../contexts/ThemeContext';
-import Image from 'next/image';
-
-// Import styles
 import styles from '../../../styles/NotFoundError.module.css';
 
-const NotFoundError = () => {
+export default function NotFoundError({ resourceType = 'resource', resourceId = '', customMessage = '' }) {
   const router = useRouter();
   const { mode } = useThemeMode();
-
+  
+  const handleGoBack = () => {
+    router.back();
+  };
+  
+  const handleGoHome = () => {
+    router.push('/');
+  };
+  
+  const handleSearch = () => {
+    router.push('/search');
+  };
+  
+  // Generate appropriate message based on resource type
+  const getMessage = () => {
+    if (customMessage) return customMessage;
+    
+    if (resourceId) {
+      return `The ${resourceType} with ID "${resourceId}" could not be found. It may have been deleted or never existed.`;
+    }
+    
+    return `The requested ${resourceType} could not be found. It may have been deleted or never existed.`;
+  };
+  
   return (
     <Container maxWidth="md" className={styles.container}>
       <Paper 
         elevation={3} 
-        className={styles.paper}
-        sx={{ 
-          backgroundColor: mode === 'dark' ? 'rgba(30,30,30,0.8)' : 'rgba(255,255,255,0.8)',
-          backdropFilter: 'blur(10px)'
-        }}
+        className={`${styles.paper} ${mode === 'dark' ? styles.paperDark : styles.paperLight}`}
       >
-        <Grid container spacing={3} alignItems="center" justifyContent="center">
-          <Grid item xs={12} md={6} className={styles.imageContainer}>
-            <div className={styles.imageWrapper}>
-              <Image
-                src="/images/404.svg"
-                alt="404 Not Found"
-                width={300}
-                height={300}
-                priority
-                onError={(e) => {
-                  // Fallback if image fails to load
-                  e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 24 24'%3E%3Cpath fill='%23ccc' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E";
-                }}
-              />
-            </div>
+        <Grid container spacing={4} alignItems="center">
+          <Grid item xs={12} md={5} className={styles.iconContainer}>
+            <Box className={styles.errorCode}>404</Box>
           </Grid>
           
-          <Grid item xs={12} md={6}>
-            <Box textAlign="center" className={styles.content}>
-              <Typography variant="h2" component="h1" className={styles.errorCode}>
-                404
-              </Typography>
+          <Grid item xs={12} md={7}>
+            <Typography variant="h4" component="h1" className={styles.title}>
+              {resourceType.charAt(0).toUpperCase() + resourceType.slice(1)} Not Found
+            </Typography>
+            
+            <Typography variant="body1" className={styles.message}>
+              {getMessage()}
+            </Typography>
+            
+            <Box className={styles.actions}>
+              <Button
+                variant="contained"
+                startIcon={<HomeIcon />}
+                onClick={handleGoHome}
+                className={`${styles.button} ${styles.homeButton} ${mode === 'dark' ? styles.homeButtonDark : styles.homeButtonLight}`}
+              >
+                Go Home
+              </Button>
               
-              <Typography variant="h4" component="h2" className={styles.title}>
-                Page Not Found
-              </Typography>
+              <Button
+                variant="outlined"
+                startIcon={<ArrowBackIcon />}
+                onClick={handleGoBack}
+                className={`${styles.button} ${styles.backButton} ${mode === 'dark' ? styles.backButtonDark : styles.backButtonLight}`}
+              >
+                Go Back
+              </Button>
               
-              <Typography variant="body1" className={styles.message}>
-                The page you're looking for doesn't exist or has been moved.
-              </Typography>
-              
-              <Box mt={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  onClick={() => router.push('/')}
-                  className={styles.homeButton}
-                >
-                  Go Home
-                </Button>
-                
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  size="large"
-                  onClick={() => router.back()}
-                  className={styles.backButton}
-                  sx={{ ml: 2 }}
-                >
-                  Go Back
-                </Button>
-              </Box>
+              <Button
+                variant="outlined"
+                startIcon={<SearchIcon />}
+                onClick={handleSearch}
+                className={`${styles.button} ${styles.searchButton} ${mode === 'dark' ? styles.searchButtonDark : styles.searchButtonLight}`}
+              >
+                Search
+              </Button>
             </Box>
           </Grid>
         </Grid>
       </Paper>
+      
+      <Box className={styles.suggestions}>
+        <Typography variant="subtitle2" className={styles.suggestionsTitle}>
+          You might want to check out:
+        </Typography>
+        
+        <Grid container spacing={2}>
+          {resourceType === 'post' && (
+            <>
+              <Grid item xs={6} sm={4}>
+                <Link href="/posts" passHref>
+                  <Typography component="a" className={`${styles.link} ${mode === 'dark' ? styles.linkDark : styles.linkLight}`}>
+                    All Posts
+                  </Typography>
+                </Link>
+              </Grid>
+              
+              <Grid item xs={6} sm={4}>
+                <Link href="/videos" passHref>
+                  <Typography component="a" className={`${styles.link} ${mode === 'dark' ? styles.linkDark : styles.linkLight}`}>
+                    Videos
+                  </Typography>
+                </Link>
+              </Grid>
+            </>
+          )}
+          
+          {resourceType === 'video' && (
+            <>
+              <Grid item xs={6} sm={4}>
+                <Link href="/videos" passHref>
+                  <Typography component="a" className={`${styles.link} ${mode === 'dark' ? styles.linkDark : styles.linkLight}`}>
+                    All Videos
+                  </Typography>
+                </Link>
+              </Grid>
+              
+              <Grid item xs={6} sm={4}>
+                <Link href="/posts" passHref>
+                  <Typography component="a" className={`${styles.link} ${mode === 'dark' ? styles.linkDark : styles.linkLight}`}>
+                    Blog Posts
+                  </Typography>
+                </Link>
+              </Grid>
+            </>
+          )}
+          
+          {resourceType === 'user' && (
+            <Grid item xs={6} sm={4}>
+              <Link href="/chat" passHref>
+                <Typography component="a" className={`${styles.link} ${mode === 'dark' ? styles.linkDark : styles.linkLight}`}>
+                  Chat
+                </Typography>
+              </Link>
+            </Grid>
+          )}
+          
+          <Grid item xs={6} sm={4}>
+            <Link href="/" passHref>
+              <Typography component="a" className={`${styles.link} ${mode === 'dark' ? styles.linkDark : styles.linkLight}`}>
+                Home Page
+              </Typography>
+            </Link>
+          </Grid>
+        </Grid>
+      </Box>
     </Container>
   );
-};
-
-export default NotFoundError; 
+} 

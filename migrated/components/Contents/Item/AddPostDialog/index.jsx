@@ -1,255 +1,383 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField,
-  IconButton,
-  Box,
-  InputAdornment
-} from '@mui/material';
+  Box, List, ListItem, TextField, Typography, Chip, Avatar,
+  Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
+  ImageList, ImageListItem, Accordion, AccordionSummary, AccordionDetails,
+  ListItemText, ListItemAvatar, ListItemButton, ListItemIcon,
+  Fab, Button, Checkbox, FormGroup, FormControlLabel, Stack, Switch,
+  IconButton, Divider
+} from "@mui/material";
+import { useThemeMode } from "../../../../contexts/ThemeContext";
 import {
+  Comment as CommentIcon,
+  ExpandMore as ExpandMoreIcon,
   Close as CloseIcon,
+  Add as AddIcon,
   Image as ImageIcon,
-  Videocam as VideocamIcon,
-  AttachFile as AttachFileIcon,
-  Send as SendIcon
-} from '@mui/icons-material';
-import { useNotification } from '../../../../contexts/NotificationProvider';
-import { useThemeMode } from '../../../../contexts/ThemeContext';
-
-// CSS Modules
+  Send as SendIcon,
+  LocationOn as LocationIcon,
+  People as PeopleIcon,
+  Notifications as NotificationsIcon
+} from "@mui/icons-material";
+import { createSvgIcon } from '@mui/material/utils';
+import { styled } from '@mui/material/styles';
 import styles from '../../../../styles/AddPostDialog.module.css';
 
-const AddPostDialog = ({ open, setOpen, articles, setArticles }) => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [media, setMedia] = useState(null);
-  const [preview, setPreview] = useState('');
-  const { showNotification } = useNotification();
+// Dynamically import PostUtil to avoid SSR issues
+const PostUtil = dynamic(() => import('../../../../utils/PostUtil'), { ssr: false });
+
+// Create custom Plus icon
+const PlusIcon = createSvgIcon(
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+  </svg>,
+  'Plus',
+);
+
+// Styled components
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+});
+
+const AntSwitch = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(12px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.mode === 'dark' ? '#177ddc' : '#1890ff',
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));
+
+export default function AddPostDialog({ open, setOpen, articles, setArticles }) {
   const { mode } = useThemeMode();
+  const [content, setContent] = useState("");
+  const [notice, setNotice] = useState([]);
+  const [whoCanSee, setWhoCanSee] = useState([]);
+  const [picsUrl, setPicsUrl] = useState([]);
+  const [postPics, setPostPics] = useState([]);
+  const [location, setLocation] = useState("");
+  const [expanded, setExpanded] = useState(false);
+  const [checked, setChecked] = useState([0]);
+  const [isClient, setIsClient] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Set isClient to true after component mounts
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleChange = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false);
+  };
+
+  const handleToggle = (value) => () => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+  };
+
+  const handleDelete = (chipToDelete) => {
+    // Logic to delete chips
+    if (chipToDelete.type === 'notice') {
+      setNotice(notice.filter(item => item !== chipToDelete.value));
+    } else if (chipToDelete.type === 'whoCanSee') {
+      setWhoCanSee(whoCanSee.filter(item => item !== chipToDelete.value));
+    }
+  };
 
   const handleClose = () => {
+    setPostPics([]);
+    setPicsUrl([]);
+    setContent("");
+    setLocation("");
+    setNotice([]);
+    setWhoCanSee([]);
+    setExpanded(false);
+    
     setOpen(false);
-    // Reset the form
-    setTitle('');
-    setContent('');
-    setMedia(null);
-    setPreview('');
+  }; 
+
+  // Delete photo handler
+  const handleDeletePhoto = (indexToDelete) => {
+    // Remove the photo at the specified index
+    const newPostPics = postPics.filter((_, index) => index !== indexToDelete);
+    const newPicsUrl = picsUrl.filter((_, index) => index !== indexToDelete);
+    
+    setPostPics(newPostPics);
+    setPicsUrl(newPicsUrl);
   };
 
-  const handleSubmit = async () => {
-    if (!content.trim()) {
-      showNotification('Please enter content for your post', 'warning');
-      return;
-    }
+  const handlePicUpload = async (event) => {
+    if (!isClient) return;
+    
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
 
     try {
-      // Only import on client-side
-      if (typeof window !== 'undefined') {
-        const { default: PostUtil } = await import('../../../../utils/PostUtil');
-        
-        // Create form data for media upload
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('content', content);
-        if (media) {
-          formData.append('media', media);
-        }
-        
-        const response = await PostUtil.createPost(formData);
-        
-        if (response && response.data && response.data.code === 0) {
-          // Add new post to the list
-          const newPost = {
-            id: response.data.postId || Date.now().toString(),
-            title,
-            content,
-            authorName: localStorage.getItem('userName') || 'You',
-            authorAvatar: localStorage.getItem('userAvatar') || '',
-            publishDate: new Date().toISOString(),
-            likeCount: 0,
-            commentCount: 0,
-            imageUrl: preview || null
-          };
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = async () => {
+          setPostPics([
+            ...postPics,
+            {
+              pic: URL.createObjectURL(file),
+              width: img.width,
+              height: img.height
+            }
+          ]);
           
-          setArticles([newPost, ...articles]);
-          showNotification('Post created successfully', 'success');
-          handleClose();
-        } else {
-          showNotification('Failed to create post', 'error');
-        }
-      }
+          try {
+            const response = await PostUtil.uploadPicture(file);
+            if (response && response.data) {
+              setPicsUrl([...picsUrl, response.data.message]);
+            }
+          } catch (error) {
+            console.error("Error uploading picture:", error);
+          } finally {
+            setIsUploading(false);
+          }
+        };
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
-      console.error('Error creating post:', error);
-      showNotification('Error creating post', 'error');
+      console.error("Error processing image:", error);
+      setIsUploading(false);
     }
   };
 
-  const handleMediaChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleSend = () => {
+    if (!isClient || !content.trim()) return;
     
-    setMedia(file);
-    
-    // Create preview URL
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    PostUtil.sendPost(content, picsUrl, notice, whoCanSee, location, articles, setArticles);
+    handleClose();
   };
 
+  // Don't render anything during server-side rendering
+  if (!isClient) {
+    return null;
+  }
+
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      fullWidth 
-      maxWidth="sm"
-      className={styles.dialog}
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="md"
       PaperProps={{
-        style: {
-          borderRadius: '16px',
-          backgroundColor: mode === 'dark' ? '#1e1e1e' : '#ffffff',
-          padding: '8px'
+        sx: {
+          borderRadius: '12px',
+          overflow: 'hidden'
         }
       }}
     >
-      <DialogTitle className={styles.dialogTitle}>
-        Create Post
-        <IconButton
-          aria-label="close"
-          onClick={handleClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
+      <DialogTitle sx={{ 
+        borderBottom: '1px solid',
+        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <Typography variant="h6">Share Your Thoughts</Typography>
+        <IconButton onClick={handleClose} size="small">
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      
-      <DialogContent>
+
+      <DialogContent className={`${styles.dialogContent} ${mode === 'dark' ? styles.dialogContentDark : styles.dialogContentLight}`}>
         <TextField
-          autoFocus
-          margin="dense"
-          id="title"
-          label="Title (Optional)"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className={styles.titleInput}
-        />
-        
-        <TextField
-          margin="dense"
-          id="content"
-          label="What's on your mind?"
+          id="post-content"
+          label="Say Something"
           multiline
           rows={4}
-          fullWidth
-          variant="outlined"
           value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className={styles.contentInput}
+          onChange={(event) => setContent(event.target.value)}
+          variant="filled"
+          className={`${styles.textField} ${mode === 'dark' ? styles.textFieldDark : styles.textFieldLight}`}
+          InputProps={{
+            className: mode === 'dark' ? styles.input : '',
+          }}
+          InputLabelProps={{
+            className: mode === 'dark' ? styles.label : '',
+          }}
         />
-        
-        {preview && (
-          <Box className={styles.previewContainer}>
-            <img 
-              src={preview} 
-              alt="Preview" 
-              className={styles.mediaPreview} 
-            />
-            <IconButton 
-              className={styles.removePreview}
-              onClick={() => {
-                setPreview('');
-                setMedia(null);
+
+        <ImageList className={styles.imageList} cols={3} rowHeight={164}>
+          {postPics.map((item, idx) => (
+            <ImageListItem key={idx} className={styles.imageListItem}>
+              <Box
+                component="img"
+                className={styles.imagePreview}
+                src={item.pic}
+                alt={`Upload ${idx + 1}`}
+              />
+              <IconButton
+                size="small"
+                onClick={() => handleDeletePhoto(idx)}
+                className={styles.deleteButton}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </ImageListItem>
+          ))}
+        </ImageList>
+
+        <Accordion 
+          expanded={expanded === 'panel1'} 
+          onChange={handleChange('panel1')}
+          className={`${styles.accordion} ${mode === 'dark' ? styles.accordionDark : styles.accordionLight}`}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1bh-content"
+            id="panel1bh-header"
+            className={`${styles.accordionSummary} ${mode === 'dark' ? styles.accordionSummaryDark : styles.accordionSummaryLight}`}
+          >
+            <Typography>Advanced Options</Typography>
+          </AccordionSummary>
+          <AccordionDetails className={`${styles.accordionDetails} ${mode === 'dark' ? styles.accordionDetailsDark : styles.accordionDetailsLight}`}>
+            <TextField
+              fullWidth
+              label="Location"
+              variant="outlined"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              margin="normal"
+              InputProps={{
+                startAdornment: <LocationIcon sx={{ mr: 1, color: mode === 'dark' ? '#90caf9' : '#1976d2' }} />,
               }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        )}
+            />
+            
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                <PeopleIcon sx={{ mr: 1, verticalAlign: 'middle', color: mode === 'dark' ? '#90caf9' : '#1976d2' }} />
+                Who can see this post
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {whoCanSee.map((person, index) => (
+                  <Chip
+                    key={index}
+                    label={person}
+                    onDelete={() => handleDelete({ type: 'whoCanSee', value: person })}
+                    className={`${styles.chip} ${mode === 'dark' ? styles.chipDark : styles.chipLight}`}
+                  />
+                ))}
+              </Box>
+            </Box>
+            
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                <NotificationsIcon sx={{ mr: 1, verticalAlign: 'middle', color: mode === 'dark' ? '#90caf9' : '#1976d2' }} />
+                Notify these people
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {notice.map((person, index) => (
+                  <Chip
+                    key={index}
+                    label={person}
+                    onDelete={() => handleDelete({ type: 'notice', value: person })}
+                    className={`${styles.chip} ${mode === 'dark' ? styles.chipDark : styles.chipLight}`}
+                  />
+                ))}
+              </Box>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
       </DialogContent>
-      
-      <DialogActions className={styles.dialogActions}>
-        <Box className={styles.mediaButtons}>
-          <input
-            accept="image/*"
-            className={styles.input}
-            id="icon-button-image"
-            type="file"
-            onChange={handleMediaChange}
-            hidden
-          />
-          <label htmlFor="icon-button-image">
-            <IconButton 
-              color="primary" 
-              component="span" 
-              className={styles.mediaButton}
-            >
-              <ImageIcon />
-            </IconButton>
-          </label>
-          
-          <input
-            accept="video/*"
-            className={styles.input}
-            id="icon-button-video"
-            type="file"
-            onChange={handleMediaChange}
-            hidden
-          />
-          <label htmlFor="icon-button-video">
-            <IconButton 
-              color="primary" 
-              component="span"
-              className={styles.mediaButton}
-            >
-              <VideocamIcon />
-            </IconButton>
-          </label>
-          
-          <input
-            accept="*/*"
-            className={styles.input}
-            id="icon-button-file"
-            type="file"
-            onChange={handleMediaChange}
-            hidden
-          />
-          <label htmlFor="icon-button-file">
-            <IconButton 
-              color="primary" 
-              component="span"
-              className={styles.mediaButton}
-            >
-              <AttachFileIcon />
-            </IconButton>
-          </label>
-        </Box>
+
+      <DialogActions sx={{ 
+        padding: '16px 24px', 
+        borderTop: '1px solid',
+        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      }}>
+        <Button 
+          component="label" 
+          variant="contained" 
+          startIcon={<ImageIcon />}
+          disabled={isUploading}
+          className={`${styles.uploadButton} ${mode === 'dark' ? styles.uploadButtonDark : styles.uploadButtonLight}`}
+        >
+          {isUploading ? 'Uploading...' : 'Add Photo'}
+          <VisuallyHiddenInput type="file" accept="image/*" onChange={handlePicUpload} />
+        </Button>
+        
+        <Box sx={{ flexGrow: 1 }} />
         
         <Button 
-          onClick={handleSubmit} 
+          onClick={handleClose}
+          className={styles.cancelButton}
+        >
+          Cancel
+        </Button>
+        
+        <Button 
+          onClick={handleSend} 
           variant="contained" 
-          color="primary"
           endIcon={<SendIcon />}
-          className={styles.submitButton}
+          disabled={!content.trim() || isUploading}
+          className={`${styles.sendButton} ${mode === 'dark' ? styles.sendButtonDark : styles.sendButtonLight}`}
         >
           Post
         </Button>
       </DialogActions>
     </Dialog>
   );
-};
-
-export default AddPostDialog; 
+} 

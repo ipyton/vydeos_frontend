@@ -1,0 +1,198 @@
+.container {
+  padding: 48px 24px;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.paper {
+  padding: 32px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.paperDark {
+  background: linear-gradient(145deg, #1e1e1e, #2d2d2d);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.paperLight {
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.iconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  font-size: 10rem !important;
+  opacity: 0.9;
+}
+
+.iconDark {
+  color: #ff9800;
+}
+
+.iconLight {
+  color: #e65100;
+}
+
+.title {
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.message {
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.details {
+  margin-bottom: 24px;
+}
+
+.detailsText {
+  margin-bottom: 8px;
+}
+
+.list {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.list li {
+  margin-bottom: 4px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.button {
+  font-weight: 600 !important;
+  text-transform: none !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+}
+
+.loginButton {
+  min-width: 120px;
+}
+
+.loginButtonDark {
+  background-color: #ff9800;
+  color: white;
+}
+
+.loginButtonLight {
+  background-color: #e65100;
+  color: white;
+}
+
+.loginButtonDark:hover {
+  background-color: #f57c00;
+}
+
+.loginButtonLight:hover {
+  background-color: #d84315;
+}
+
+.homeButton, .backButton {
+  min-width: 120px;
+}
+
+.homeButtonDark, .backButtonDark {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.homeButtonLight, .backButtonLight {
+  border-color: rgba(0, 0, 0, 0.23);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.homeButtonDark:hover, .backButtonDark:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.homeButtonLight:hover, .backButtonLight:hover {
+  border-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.help {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.helpTitle {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.helpText {
+  opacity: 0.8;
+}
+
+.link {
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.linkDark {
+  color: #ff9800;
+}
+
+.linkLight {
+  color: #e65100;
+}
+
+.linkDark:hover, .linkLight:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 960px) {
+  .container {
+    padding: 32px 16px;
+  }
+  
+  .icon {
+    font-size: 8rem !important;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .message {
+    font-size: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .icon {
+    font-size: 6rem !important;
+  }
+  
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .button {
+    width: 100%;
+  }
+} 

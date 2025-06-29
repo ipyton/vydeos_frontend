@@ -1,0 +1,70 @@
+.headerContainer {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+}
+
+.avatar {
+  transition: transform 0.2s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  margin-right: 1rem;
+}
+
+.mobileMenu {
+  display: flex;
+  flex-direction: column;
+}
+
+.searchInput {
+  transition: width 0.3s;
+}
+
+.searchInput:focus {
+  width: 300px;
+}
+
+.appBarBlur {
+  backdrop-filter: blur(8px);
+}
+
+.desktopSection {
+  display: flex;
+  align-items: center;
+}
+
+.mobileSection {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .desktopSection {
+    display: none;
+  }
+}
+
+@media (min-width: 601px) {
+  .mobileSection {
+    display: none;
+  }
+}
+
+.gradientText {
+  background: linear-gradient(45deg, #FFF 30%, #E0E0E0 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+} 

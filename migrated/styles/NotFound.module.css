@@ -1,63 +1,116 @@
 .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-  padding: 2rem 1rem;
-}
-
-.content {
+  padding: 48px 24px;
+  min-height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 500px;
+  justify-content: center;
 }
 
-.imageContainer {
-  width: 100%;
-  max-width: 300px;
-  margin-bottom: 2rem;
-}
-
-.image {
-  width: 100%;
-  height: auto;
-  animation: float 3s ease-in-out infinite;
+.textContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
 }
 
 .title {
-  margin-bottom: 1rem;
-  font-weight: 700;
-  background: linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%);
-  background-clip: text;
+  font-size: 5rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.highlight {
+  background: linear-gradient(90deg, #2196f3, #f50057);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
+  display: inline-block;
 }
 
-.message {
-  margin-bottom: 2rem;
+.subtitle {
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.description {
+  font-size: 1.2rem;
+  margin-bottom: 32px;
   opacity: 0.8;
-  line-height: 1.6;
+  max-width: 500px;
 }
 
-.actions {
+.buttonContainer {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .button {
-  padding: 0.75rem 1.5rem;
-  border-radius: 50px;
-  font-weight: 600;
-  text-transform: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
 }
 
-.button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+.homeButton {
+  min-width: 120px;
+}
+
+.homeButtonDark {
+  background-color: #2196f3;
+  color: white;
+}
+
+.homeButtonLight {
+  background-color: #1976d2;
+  color: white;
+}
+
+.homeButtonDark:hover {
+  background-color: #1e88e5;
+}
+
+.homeButtonLight:hover {
+  background-color: #1565c0;
+}
+
+.backButton, .searchButton {
+  min-width: 120px;
+}
+
+.backButtonDark, .searchButtonDark {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.backButtonLight, .searchButtonLight {
+  border-color: rgba(0, 0, 0, 0.23);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.backButtonDark:hover, .searchButtonDark:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.backButtonLight:hover, .searchButtonLight:hover {
+  border-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.imageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.image {
+  max-width: 100%;
+  height: auto;
+  animation: float 6s ease-in-out infinite;
 }
 
 @keyframes float {
@@ -65,27 +118,96 @@
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-20px);
   }
   100% {
     transform: translateY(0px);
   }
 }
 
-@media (max-width: 600px) {
+.suggestions {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.suggestionsTitle {
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.link {
+  display: inline-block;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.linkDark {
+  color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.linkLight {
+  color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.linkDark:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.linkLight:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: black;
+}
+
+@media (max-width: 960px) {
   .container {
-    min-height: 70vh;
-  }
-  
-  .imageContainer {
-    max-width: 200px;
+    padding: 32px 16px;
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 4rem;
   }
   
-  .actions {
+  .subtitle {
+    font-size: 1.5rem;
+  }
+  
+  .description {
+    font-size: 1rem;
+  }
+  
+  .imageContainer {
+    margin-top: 32px;
+    margin-bottom: 32px;
+  }
+  
+  .suggestions {
+    margin-top: 48px;
+  }
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 3rem;
+  }
+  
+  .buttonContainer {
     flex-direction: column;
+    width: 100%;
+  }
+  
+  .button {
+    width: 100%;
+  }
+  
+  .link {
+    width: 100%;
+    text-align: center;
   }
 } 

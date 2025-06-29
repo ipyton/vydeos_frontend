@@ -1,0 +1,454 @@
+.container {
+  text-align: center;
+  padding-top: 32px;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.userInfoContainer {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.userInfoContainerDark {
+  background-image: radial-gradient(circle at 20% 80%, #2d2d2d 0%, transparent 50%), radial-gradient(circle at 80% 20%, #1a1a1a 0%, transparent 50%);
+}
+
+.userInfoContainerLight {
+  background-image: radial-gradient(circle at 20% 80%, #f8f9fa 0%, transparent 50%), radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 50%);
+}
+
+.userInfoStack {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.userInfoStackMobile {
+  padding: 16px;
+}
+
+.userInfoStackDesktop {
+  padding: 24px;
+}
+
+.profileCard {
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.profileCardDark {
+  background-image: linear-gradient(145deg, #1e1e1e 0%, #2d2d2d 100%);
+  border: 1px solid #404040;
+}
+
+.profileCardLight {
+  background-image: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.profileCardContent {
+  padding: 24px;
+}
+
+.avatarContainer {
+  position: relative;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+}
+
+.avatarDark {
+  border: 3px solid #bb86fc;
+  box-shadow: 0 4px 20px rgba(187, 134, 252, 0.25);
+}
+
+.avatarLight {
+  border: 3px solid #1976d2;
+  box-shadow: 0 4px 20px rgba(25, 118, 210, 0.25);
+}
+
+.verifiedIcon {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+.verifiedIconDark {
+  color: #bb86fc;
+  background-color: #1e1e1e;
+}
+
+.verifiedIconLight {
+  color: #1976d2;
+  background-color: #ffffff;
+}
+
+.userInfoSection {
+  flex: 1;
+}
+
+.userInfoSectionMobile {
+  text-align: center;
+}
+
+.userInfoSectionDesktop {
+  text-align: left;
+}
+
+.userName {
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.userNameMobile {
+  justify-content: center;
+}
+
+.userNameDesktop {
+  justify-content: flex-start;
+}
+
+.nicknameChip {
+  font-style: italic;
+}
+
+.nicknameChipDark {
+  background-color: #2d2d2d;
+  color: #b3b3b3;
+}
+
+.nicknameChipLight {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+.userIntroduction {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.userIntroductionDark {
+  color: #b3b3b3;
+}
+
+.userIntroductionLight {
+  color: #666666;
+}
+
+.statusChip {
+  background-color: #2d2d2d;
+}
+
+.statusChipPrimary {
+  color: #ffffff;
+}
+
+.statusChipDark {
+  background-color: #2d2d2d;
+  color: #b3b3b3;
+}
+
+.statusChipLight {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+.actionButtons {
+  display: flex;
+}
+
+.actionButtonsMobile {
+  flex-direction: row;
+}
+
+.actionButtonsDesktop {
+  flex-direction: column;
+}
+
+.followButton {
+  min-width: 120px;
+  border-radius: 25px;
+  transition: all 0.3s ease-in-out;
+}
+
+.followButtonContained {
+  color: #ffffff;
+}
+
+.followButtonContainedDark {
+  background-color: #bb86fc;
+}
+
+.followButtonContainedLight {
+  background-color: #1976d2;
+}
+
+.followButtonOutlined {
+  background-color: transparent;
+}
+
+.followButtonOutlinedDark {
+  border-color: #bb86fc;
+  color: #bb86fc;
+}
+
+.followButtonOutlinedLight {
+  border-color: #1976d2;
+  color: #1976d2;
+}
+
+.followButtonHover {
+  transform: translateY(-2px);
+}
+
+.followButtonHoverContainedDark {
+  background-color: rgba(187, 134, 252, 0.85);
+  box-shadow: 0 4px 12px rgba(187, 134, 252, 0.25);
+}
+
+.followButtonHoverContainedLight {
+  background-color: rgba(25, 118, 210, 0.85);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);
+}
+
+.followButtonHoverOutlinedDark {
+  background-color: rgba(187, 134, 252, 0.125);
+  box-shadow: 0 4px 12px rgba(187, 134, 252, 0.25);
+}
+
+.followButtonHoverOutlinedLight {
+  background-color: rgba(25, 118, 210, 0.125);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);
+}
+
+.contactButton {
+  min-width: 120px;
+  border-radius: 25px;
+  transition: all 0.3s ease-in-out;
+}
+
+.contactButtonDark {
+  background-color: #4caf50;
+}
+
+.contactButtonLight {
+  background-color: #2e7d32;
+}
+
+.contactButtonHover {
+  transform: translateY(-2px);
+}
+
+.contactButtonHoverDark {
+  background-color: rgba(76, 175, 80, 0.85);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);
+}
+
+.contactButtonHoverLight {
+  background-color: rgba(46, 125, 50, 0.85);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+}
+
+.detailsCard {
+  width: 100%;
+  border-radius: 16px;
+}
+
+.detailsCardDark {
+  background-image: linear-gradient(145deg, #1e1e1e 0%, #2d2d2d 100%);
+  border: 1px solid #404040;
+}
+
+.detailsCardLight {
+  background-image: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.detailsCardContent {
+  padding: 24px;
+}
+
+.detailsTitle {
+  font-weight: 600;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detailsTitleDark {
+  color: #ffffff;
+}
+
+.detailsTitleLight {
+  color: #000000;
+}
+
+.detailsTitleIcon {
+  color: #bb86fc;
+}
+
+.detailsTitleIconDark {
+  color: #bb86fc;
+}
+
+.detailsTitleIconLight {
+  color: #1976d2;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.detailItemIcon {
+  color: #b3b3b3;
+}
+
+.detailItemIconDark {
+  color: #b3b3b3;
+}
+
+.detailItemIconLight {
+  color: #666666;
+}
+
+.detailItemContent {
+  flex: 1;
+}
+
+.detailItemLabel {
+  margin-bottom: 4px;
+}
+
+.detailItemLabelDark {
+  color: #808080;
+}
+
+.detailItemLabelLight {
+  color: #999999;
+}
+
+.detailItemValue {
+  font-weight: 500;
+}
+
+.detailItemValueDark {
+  color: #ffffff;
+}
+
+.detailItemValueLight {
+  color: #000000;
+}
+
+.divider {
+  border-color: #404040;
+}
+
+.dividerDark {
+  border-color: #404040;
+}
+
+.dividerLight {
+  border-color: #e0e0e0;
+}
+
+.invitationField {
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.invitationFieldDark {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.invitationFieldLight {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.invitationFieldBorderDark {
+  border-color: rgba(144, 202, 249, 0.5);
+}
+
+.invitationFieldBorderLight {
+  border-color: rgba(25, 118, 210, 0.5);
+}
+
+.invitationFieldHoverBorderDark {
+  border-color: rgba(144, 202, 249, 0.7);
+}
+
+.invitationFieldHoverBorderLight {
+  border-color: rgba(25, 118, 210, 0.7);
+}
+
+.copyButton {
+  color: #90caf9;
+}
+
+.copyButtonDark {
+  color: #90caf9;
+}
+
+.copyButtonLight {
+  color: #1976d2;
+}
+
+.noInvitationContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+.noInvitationContainerDark {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.noInvitationContainerLight {
+  background-color: rgba(0, 0, 0, 0.02);
+  border: 1px dashed rgba(0, 0, 0, 0.3);
+}
+
+.generateButton {
+  color: #90caf9;
+  border-color: #90caf9;
+}
+
+.generateButtonDark {
+  color: #90caf9;
+  border-color: #90caf9;
+}
+
+.generateButtonLight {
+  color: #1976d2;
+  border-color: #1976d2;
+}
+
+.noInvitationText {
+  font-style: italic;
+}
+
+.noInvitationTextDark {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.noInvitationTextLight {
+  color: #666666;
+} 

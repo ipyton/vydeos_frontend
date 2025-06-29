@@ -57,14 +57,14 @@ function App() {
         await localforage.setItem("userId", userId);
       } else {
         // Clean up any inconsistent state
-        
+
         clearAllData()
 
-        
+
         dispatch(logout());
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 500);
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 500);
       }
 
 
@@ -91,18 +91,21 @@ function App() {
   if (!isAuthenticated || showLoginModal) {
     return (
       <StrictMode>
-        <AccountIssue
-          loginState={isAuthenticated}
-          setLoginState={(newState) => {
-            if (newState) {
-              // Don't dispatch login here - let the login success handler do it
-              // This is just for UI state management
-            } else {
-              clearAllData()
-              dispatch(logout());
-            }
-          }}
-        />
+        <ThemeContextProvider>
+          <AccountIssue
+            loginState={isAuthenticated}
+            setLoginState={(newState) => {
+              if (newState) {
+                // Don't dispatch login here - let the login success handler do it
+                // This is just for UI state management
+              } else {
+                clearAllData()
+                dispatch(logout());
+              }
+            }}
+          />
+          </ThemeContextProvider>
+
       </StrictMode>
     );
   }

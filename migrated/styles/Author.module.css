@@ -1,0 +1,171 @@
+.card {
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.cardDark {
+  background: linear-gradient(145deg, #1e1e1e, #2d2d2d);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.cardLight {
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.cardDark:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+}
+
+.cardLight:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
+.avatar {
+  width: 100px !important;
+  height: 100px !important;
+  border: 4px solid;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.authorName {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.authorBio {
+  opacity: 0.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.infoIcon {
+  margin-right: 6px;
+  opacity: 0.7;
+}
+
+.infoText {
+  opacity: 0.8;
+}
+
+.statsBox {
+  text-align: center;
+}
+
+.statsNumber {
+  font-weight: 700;
+}
+
+.statsLabel {
+  opacity: 0.7;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-transform: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.followButtonDark {
+  background-color: #2196f3;
+  color: white;
+}
+
+.followButtonLight {
+  background-color: #1976d2;
+  color: white;
+}
+
+.followButtonDark:hover {
+  background-color: #1e88e5;
+}
+
+.followButtonLight:hover {
+  background-color: #1565c0;
+}
+
+.unfollowButtonDark {
+  border-color: #2196f3;
+  color: #2196f3;
+}
+
+.unfollowButtonLight {
+  border-color: #1976d2;
+  color: #1976d2;
+}
+
+.unfollowButtonDark:hover {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.unfollowButtonLight:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.editButton {
+  font-weight: 600;
+}
+
+.editButtonDark {
+  border-color: #f48fb1;
+  color: #f48fb1;
+}
+
+.editButtonLight {
+  border-color: #ec407a;
+  color: #ec407a;
+}
+
+.editButtonDark:hover {
+  background-color: rgba(244, 143, 177, 0.1);
+}
+
+.editButtonLight:hover {
+  background-color: rgba(236, 64, 122, 0.1);
+}
+
+.viewButton {
+  font-weight: 600;
+}
+
+.viewButtonDark {
+  border-color: #90caf9;
+  color: #90caf9;
+}
+
+.viewButtonLight {
+  border-color: #42a5f5;
+  color: #42a5f5;
+}
+
+.viewButtonDark:hover {
+  background-color: rgba(144, 202, 249, 0.1);
+}
+
+.viewButtonLight:hover {
+  background-color: rgba(66, 165, 245, 0.1);
+}
+
+@media (max-width: 600px) {
+  .avatar {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  
+  .button {
+    margin-bottom: 8px;
+  }
+} 

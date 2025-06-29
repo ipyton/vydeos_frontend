@@ -1,0 +1,62 @@
+.suggestionList {
+  margin-top: 1%;
+  width: 80%;
+  max-width: 280px;
+  max-height: 500px;
+  border-radius: 12px;
+  overflow: auto;
+}
+
+.suggestionList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestionList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestionList::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+}
+
+.categoryContainer {
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin: 8px;
+}
+
+.categoryButton {
+  border-radius: 4px;
+}
+
+.suggestionItem {
+  border-radius: 8px;
+  margin: 4px 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.suggestionItem:hover {
+  transform: translateY(-1px);
+}
+
+.suggestionItem:active {
+  transform: translateY(0px);
+}
+
+.avatar {
+  border-radius: 8px;
+}
+
+.darkGlassEffect {
+  background-color: rgba(30, 30, 30, 0.4);
+  backdrop-filter: blur(20px) saturate(1.8);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.lightGlassEffect {
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px) saturate(1.8);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+} 

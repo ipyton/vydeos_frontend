@@ -1,36 +1,138 @@
 .container {
+  width: 100%;
+  margin: 0 auto;
   padding: 16px;
-  min-height: calc(100vh - 64px);
-  width: 100%;
 }
 
-.articleList {
+@media (min-width: 600px) {
+  .container {
+    width: 80%;
+  }
+}
+
+.list {
+  width: 100%;
+  list-style: none;
   padding: 0;
-  margin: 0;
-}
-
-.articleItem {
-  padding: 16px 0;
-  width: 100%;
 }
 
 .buttonGroup {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 1000;
+  transition: all 0.3s ease;
 }
 
-.actionButton {
-  transition: transform 0.2s ease;
+@media (min-width: 600px) {
+  .buttonGroup {
+    bottom: 30px;
+    right: 30px;
+    flex-direction: row;
+    gap: 8px;
+  }
 }
 
-.actionButton:hover {
-  transform: scale(1.05);
+.buttonGroupDark {
+  background-color: rgba(44, 44, 46, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-.actionButton:active {
-  transform: scale(0.95);
+.buttonGroupLight {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.button {
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: none;
+  min-width: 80px;
+  height: 40px;
+}
+
+@media (min-width: 600px) {
+  .button {
+    border-radius: 16px;
+    gap: 8px;
+    font-size: 14px;
+    min-width: 100px;
+    height: 48px;
+  }
+}
+
+.addButton {
+  min-width: 44px;
+}
+
+@media (min-width: 600px) {
+  .addButton {
+    min-width: 56px;
+  }
 }
 
 .activeButton {
-  font-weight: bold;
+  color: #ffffff;
+}
+
+.activeDark {
+  background-color: rgba(10, 132, 255, 0.9);
+}
+
+.activeLight {
+  background-color: rgba(0, 122, 255, 0.9);
+}
+
+.buttonDark {
+  background-color: rgba(58, 58, 60, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.buttonLight {
+  background-color: rgba(242, 242, 247, 0.8);
+  color: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.buttonDark:hover {
+  background-color: rgba(72, 72, 74, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.buttonLight:hover {
+  background-color: rgba(229, 229, 234, 0.9);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.activeDark:hover {
+  background-color: rgba(10, 132, 255, 1);
+}
+
+.activeLight:hover {
+  background-color: rgba(0, 122, 255, 1);
+}
+
+.button:active {
+  transform: scale(0.95);
 } 
