@@ -13,7 +13,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoginIcon from '@mui/icons-material/Login';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import NetworkError from '../../Errors/NetworkError';
 import AccountUtil from '../../../util/io_utils/AccountUtil';
 import { useNotification } from '../../../Providers/NotificationProvider';
@@ -27,92 +27,13 @@ import store from "../../redux/store"; // Adjust path to your Redux store
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-// Custom theme with a more modern palette - matching the signup theme
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#3f51b5',
-      light: '#757de8',
-      dark: '#002984',
-    },
-    secondary: {
-      main: '#f50057',
-      light: '#ff5983',
-      dark: '#bb002f',
-    },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    fontFamily: [
-      'Poppins',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-    h4: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 500,
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600,
-          boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
-        },
-        containedPrimary: {
-          '&:hover': {
-            boxShadow: '0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)',
-          },
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          marginBottom: '16px',
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 8,
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07)',
-        },
-      },
-    },
-    MuiAvatar: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
-        },
-      },
-    },
-    MuiCheckbox: {
-      styleOverrides: {
-        root: {
-          color: '#3f51b5',
-        },
-      },
-    },
-  },
-});
+import { useThemeMode } from '../../../Themes/ThemeContext';
+import { getAccountTheme } from '../theme';
 
 function Copyright(props) {
+  const { mode } = useThemeMode();
   return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+    <Typography variant="body2" color={mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary'} align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" href="/">
         Vydeo.xyz
@@ -131,7 +52,9 @@ export default function Login(props) {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const { showNotification } = useNotification();
-const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const { mode } = useThemeMode();
+  const theme = getAccountTheme(mode);
 
   const navigate = useNavigate();
 
@@ -151,9 +74,10 @@ const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
     }
     setBarState({...barState, open: false});
   };
+  
   if (isAuthenticated) {
-  return <Navigate to="/" replace />;
-}
+    return <Navigate to="/" replace />;
+  }
 
   if (true === networkErr) {
     return <NetworkError />;
@@ -295,136 +219,112 @@ const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-
-        <Container 
-          component="main" 
-          maxWidth="sm"
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Paper
+          elevation={6}
           sx={{
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)', // For Safari compatibility
-            backgroundColor: 'rgba(255, 255, 255, 0.1)', // Optional: semi-transparent background
-            borderRadius: '16px', // Optional: rounded corners
-            padding: '20px', // Optional: internal padding
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mt: 8,
+            mb: 4,
           }}
         >
-          <Snackbar
-            anchorOrigin={{ vertical, horizontal }}
-            open={open}
-            onClose={handleClose}
-            autoHideDuration={5000}
-            sx={{ mt: 6 }}
-          >
-            <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
-              {message}
-            </Alert>
-          </Snackbar>
+          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+            <LoginIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+            Sign in
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              value={email}
+              onChange={handleEmailChange}
+              error={!!emailError}
+              helperText={emailError}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={handlePasswordChange}
+              error={!!passwordError}
+              helperText={passwordError}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  value="remember"
+                  color="primary"
+                  checked={selected}
+                  onChange={handleSelection}
+                />
+              }
+              label="Remember me"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isLoading}
+            >
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Sign In"}
+            </Button>
+            <Grid container>
+              <Grid item xs>
+                <Link href="/forget" variant="body2">
+                  Forgot password?
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link href="/signup" variant="body2">
+                  {"Don't have an account? Sign Up"}
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
           
-
-            <Fade in={true}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-              >
-                <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-                  <LoginIcon fontSize="large" />
-                </Avatar>
-                
-                <Typography component="h1" variant="h4" gutterBottom>
-                  Welcome Back
-                </Typography>
-                
-                <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-                  Sign in to access your account
-                </Typography>
-                
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
-                    autoFocus
-                    value={email}
-                    onChange={handleEmailChange}
-                    error={!!emailError}
-                    helperText={emailError}
-                    sx={{ mb: 2 }}
-                  />
-                  
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    error={!!passwordError}
-                    helperText={passwordError}
-                    sx={{ mb: 1 }}
-                  />
-                  
-                  <FormControlLabel
-                    control={
-                      <Checkbox 
-                        checked={selected}
-                        onChange={handleSelection} 
-                        value="remember" 
-                        color="primary" 
-                        sx={{ borderRadius: 1 }}
-                      />
-                    }
-                    label="Remember me for 30 days"
-                    sx={{ mb: 2 }}
-                  />
-                          <GoogleOAuthProvider clientId="282080402821-e07eo98flrekqkh8p4rja2kr5f387psi.apps.googleusercontent.com">
-            <SignInButton />
-          </GoogleOAuthProvider>
-                  
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    disabled={isLoading}
-                    sx={{ py: 1.5, mt: 2 }}
-                  >
-                    {isLoading ? (
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
-                        Signing In...
-                      </Box>
-                    ) : (
-                      "Sign In"
-                    )}
-                  </Button>
-                  
-                  <Grid container spacing={2} sx={{ mt: 2 }}>
-                    <Grid item xs={12} sm={6} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
-                      <Link href="/forget" variant="body2" color="primary.main">
-                        Forgot password?
-                      </Link>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={{ textAlign: { xs: 'center', sm: 'right' } }}>
-                      <Link href="/signup" variant="body2" color="primary.main">
-                        Don't have an account? Sign Up
-                      </Link>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-            </Fade>          
-          <Copyright sx={{ mt: 3, color: 'white' }} />
-        </Container>
+          <Box sx={{ mt: 4, width: '100%' }}>
+            <Divider sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                OR
+              </Typography>
+            </Divider>
+            
+            <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+              <SignInButton />
+            </GoogleOAuthProvider>
+          </Box>
+        </Paper>
+        <Copyright sx={{ mt: 5 }} />
+        <Snackbar
+          anchorOrigin={{ vertical, horizontal }}
+          open={open}
+          autoHideDuration={6000}
+          onClose={handleClose}
+        >
+          <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+            {message}
+          </Alert>
+        </Snackbar>
+      </Container>
     </ThemeProvider>
   );
 }

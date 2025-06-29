@@ -9,9 +9,11 @@ import store from "../../redux/store";
 import AuthUtil from '../../../util/io_utils/AuthUtil';
 import { useNotification } from '../../../Providers/NotificationProvider';
 import localforage from 'localforage';
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 const SignInButton = () => {
   const { showNotification } = useNotification();
+  const { mode } = useThemeMode();
 
   const handleGoogleSuccess = (credentialResponse) => {
     AccountUtil.googleLogin({ idToken: credentialResponse.credential }).then((res) => {
@@ -90,11 +92,11 @@ const SignInButton = () => {
             startIcon={<Google />}
             sx={{
               py: 1.5,
-              borderColor: '#dadce0',
-              color: '#3c4043',
+              borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : '#dadce0',
+              color: mode === 'dark' ? '#ffffff' : '#3c4043',
               '&:hover': {
-                borderColor: '#dadce0',
-                backgroundColor: '#f8f9fa'
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : '#dadce0',
+                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f8f9fa'
               }
             }}
           >

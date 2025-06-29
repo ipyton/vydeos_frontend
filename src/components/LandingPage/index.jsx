@@ -323,7 +323,7 @@ const LandingPage = () => {
           <Toolbar disableGutters>
             {/* Logo */}
             <Typography variant="h5" sx={navbarStyles.logo}>
-              <Box component="span" sx={{ color: '#2196F3' }}>B</Box>log
+              <Box component="span" sx={{ color: '#2196F3' }}>Vydeo</Box>.xyz
             </Typography>
             
             <Box sx={{ flexGrow: 1 }} />

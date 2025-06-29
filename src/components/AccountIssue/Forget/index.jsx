@@ -11,9 +11,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import EmailIcon from '@mui/icons-material/Email';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import LockResetIcon from '@mui/icons-material/LockReset';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { Navigate, useNavigate } from 'react-router-dom';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -24,92 +25,30 @@ import Snackbar from '@mui/material/Snackbar';
 import { useNotification } from '../../../Providers/NotificationProvider';
 import { useRef } from 'react';
 import { CountDownButton } from '../CountDownButton.jsx';
-
-// Custom theme with a more modern palette
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#3f51b5',
-      light: '#757de8',
-      dark: '#002984',
-    },
-    secondary: {
-      main: '#f50057',
-      light: '#ff5983',
-      dark: '#bb002f',
-    },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    fontFamily: [
-      'Poppins',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-    h4: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 500,
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600,
-          boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
-        },
-        containedPrimary: {
-          '&:hover': {
-            boxShadow: '0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)',
-          },
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          marginBottom: '16px',
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 8,
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07)',
-        },
-      },
-    },
-    MuiAvatar: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
-        },
-      },
-    },
-  },
-});
-
+import { useThemeMode } from '../../../Themes/ThemeContext';
+import { getAccountTheme } from '../theme';
 
 const StepIcons = {
   0: <EmailIcon />,
   1: <LockOutlinedIcon />,
-  2: <PersonAddIcon />,
+  2: <LockResetIcon />,
   3: <CheckCircleIcon />
 };
 
-export default function SignUp(props) {
+function Copyright(props) {
+  const { mode } = useThemeMode();
+  return (
+    <Typography variant="body2" color={mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary'} align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" href="/">
+        Vydeo.xyz
+      </Link>{' '}
+      {new Date().getFullYear()}
+    </Typography>
+  );
+}
+
+export default function Forget(props) {
   const [skipped, setSkipped] = useState(new Set());
   const [receive, setReceive] = useState(false);
   const [selected, setSelected] = useState(false);
@@ -123,6 +62,8 @@ export default function SignUp(props) {
   const navigate = useNavigate();
   const [step3Tokens, setStep3Tokens] = useState("");
   const { showNotification } = useNotification();
+  const { mode } = useThemeMode();
+  const theme = getAccountTheme(mode);
   
   // Snackbar state
   const [barState, setBarState] = useState({
@@ -265,7 +206,7 @@ export default function SignUp(props) {
   };
 
   const previousStep = () => {
-    setActiveStep(activeStep - 1);
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
   const isStepSkipped = (step) => {
@@ -273,285 +214,224 @@ export default function SignUp(props) {
   };
 
   const jumpToLoginPage = () => {
-    navigate("/account/login");
+    navigate('/login');
   };
 
   const steps = [
-    'Email Address',
-    'Verification',
-    'Set Password',
-    'Complete',
+    'Verify Email',
+    'Confirm Code',
+    'Reset Password',
+    'Complete'
   ];
 
-  // Step Content Components
   const StepContent = () => {
     switch (activeStep) {
       case 0:
         return (
-          <Box
-          
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-              <EmailIcon fontSize="large" />
-            </Avatar>
-            <Typography component="h1" variant="h4" gutterBottom>
-              Forget Password
-            </Typography>
-            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-              Enter your email to recover your account
-            </Typography>
-            
-            <Box component="form" noValidate onSubmit={step1} sx={{ width: '100%' }}>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                sx={{ width: '100%' }}
-                variant="outlined"
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                disabled={isLoading}
-                sx={{ py: 1.5 }}
-              >
-                {isLoading ? "Sending Verification..." : "Continue"}
-              </Button>
-              <Grid container justifyContent="center" sx={{ mt: 3 }}>
-                <Grid item>
-                  <Link href="/account/login" variant="body2" color="primary.main">
-                  Go to login page
-                  </Link>
-                </Grid>
+          <Box component="form" onSubmit={step1} sx={{ mt: 3 }}>
+            <TextField
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isLoading}
+            >
+              {isLoading ? "Sending..." : "Send Verification Code"}
+            </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link href="/login" variant="body2">
+                  Remember your password? Sign in
+                </Link>
               </Grid>
-            </Box>
+            </Grid>
           </Box>
         );
       case 1:
         return (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-              <LockOutlinedIcon fontSize="large" />
-            </Avatar>
-            <Typography component="h1" variant="h4" gutterBottom>
-              Verify Email
-            </Typography>
-            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 1 }}>
-              We've sent a verification code to
-            </Typography>
-            <Typography variant="body1" fontWeight="bold" sx={{ mb: 3 }}>
-              {email}
-            </Typography>
-            
-            <Box component="form" noValidate onSubmit={step2} sx={{ width: '100%' }}>
-              <TextField
-                required
-                fullWidth
-                id="digits"
-                label="6-Digit Code"
-                name="digits"
-                placeholder="000000"
-                inputProps={{ maxLength: 6 }}
-                sx={{ mb: 2 }}
-              />
-              
-              <Stack direction="row" spacing={2}>
-                <Button
-                  onClick={previousStep}
+          <Box component="form" onSubmit={step2} sx={{ mt: 3 }}>
+            <TextField
+              required
+              fullWidth
+              name="digits"
+              label="6-Digit Code"
+              id="digits"
+              autoComplete="one-time-code"
+              autoFocus
+              inputProps={{ maxLength: 6 }}
+            />
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={7}>
+                <CountDownButton
+                  fullWidth
                   variant="outlined"
-                  sx={{ py: 1.5, flex: 1 }}
-                  disabled={isLoading}
-                >
-                  Back
-                </Button>
+                  onClick={() => {
+                    AccountUtil.sendVerificationCode(email).then(
+                      (response) => {
+                        if (response && response.data && response.data.code === 0) {
+                          showNotification("Verification code resent", "success");
+                        } else {
+                          showNotification("Failed to resend verification code", "error");
+                        }
+                      }
+                    );
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={5}>
                 <Button
                   type="submit"
+                  fullWidth
                   variant="contained"
-                  sx={{ py: 1.5, flex: 2 }}
                   disabled={isLoading}
                 >
                   {isLoading ? "Verifying..." : "Verify Code"}
                 </Button>
-              </Stack>
-              <CountDownButton email={email} activeStep={activeStep} />
-            </Box>
+              </Grid>
+            </Grid>
+            <Button
+              fullWidth
+              variant="text"
+              onClick={previousStep}
+              sx={{ mt: 2 }}
+            >
+              Back
+            </Button>
           </Box>
         );
-        
       case 2:
         return (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Avatar sx={{ m: 2, bgcolor: 'primary.main', width: 56, height: 56 }}>
-              <PersonAddIcon fontSize="large" />
-            </Avatar>
-            <Typography component="h1" variant="h4" gutterBottom>
-              Set Password
-            </Typography>
-            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-              Create a secure password for your new account.
-            </Typography>
-            
-            <Box component="form" noValidate onSubmit={step3} sx={{ width: '100%' }}>
-              <TextField
-                required
-                fullWidth
-                id="password"
-                label="Password"
-                name="password"
-                type="password"
-                error={!!passwordError}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                required
-                fullWidth
-                id="confirmPassword"
-                label="Confirm Password"
-                type="password"
-                error={!!passwordError}
-                helperText={passwordError}
-                sx={{ mb: 2 }}
-              />
-              
-              <Stack direction="row" spacing={2}>
-                <Button
-                  onClick={previousStep}
-                  variant="outlined"
-                  sx={{ py: 1.5, flex: 1 }}
-                  disabled={isLoading}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{ py: 1.5, flex: 2 }}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Resetting..." : "Complete Reset"}
-                </Button>
-              </Stack>
-            </Box>
-          </Box>
-        );
-        
-      case 3:
-        return (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-            }}
-          >
-            <Avatar sx={{ m: 2, bgcolor: 'success.main', width: 64, height: 64 }}>
-              <CheckCircleIcon fontSize="large" />
-            </Avatar>
-            <Typography component="h1" variant="h4" gutterBottom>
-              Reset Complete!
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 400 }}>
-              Your account has been successfully reset. You can now sign in to access your account.
-            </Typography>
-            
+          <Box component="form" onSubmit={step3} sx={{ mt: 3 }}>
+            <TextField
+              required
+              fullWidth
+              name="password"
+              label="New Password"
+              type="password"
+              id="password"
+              autoComplete="new-password"
+              autoFocus
+              error={!!passwordError}
+              helperText={passwordError || "Password must include uppercase, lowercase, number, and special character"}
+            />
+            <TextField
+              required
+              fullWidth
+              name="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              id="confirmPassword"
+              autoComplete="new-password"
+              sx={{ mt: 2 }}
+            />
             <Button
-              onClick={jumpToLoginPage}
+              type="submit"
               fullWidth
               variant="contained"
-              sx={{ py: 1.5 }}
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isLoading}
+            >
+              {isLoading ? "Resetting Password..." : "Reset Password"}
+            </Button>
+            <Button
+              fullWidth
+              variant="text"
+              onClick={previousStep}
+            >
+              Back
+            </Button>
+          </Box>
+        );
+      case 3:
+        return (
+          <Box sx={{ mt: 3, textAlign: 'center' }}>
+            <Avatar sx={{ m: '0 auto', bgcolor: 'success.main', width: 60, height: 60 }}>
+              <CheckCircleIcon fontSize="large" />
+            </Avatar>
+            <Typography variant="h5" sx={{ mt: 2 }}>
+              Password Reset Complete!
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+              Your password has been reset successfully.
+            </Typography>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={jumpToLoginPage}
+              sx={{ mt: 3 }}
             >
               Sign In
             </Button>
           </Box>
         );
-        
       default:
-        return <Typography>Something went wrong!</Typography>;
+        return <div>Unknown step</div>;
     }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container 
-        component="main" 
-        maxWidth="sm"
-        sx={{
-          backdropFilter: 'blur(40px)',
-          WebkitBackdropFilter: 'blur(40px)', // For Safari compatibility
-          backgroundColor: 'rgba(255, 255, 255, 0.1)', // Optional: semi-transparent background
-          borderRadius: '16px', // Optional: rounded corners
-          padding: '20px', // Optional: internal padding
-        }}
-      >
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Paper
+          elevation={6}
+          sx={{
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mt: 8,
+            mb: 4,
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+            <LockResetIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Reset Password
+          </Typography>
+          
+          <Stepper activeStep={activeStep} sx={{ width: '100%', mt: 3 }}>
+            {steps.map((label, index) => {
+              const stepProps = {};
+              const labelProps = {};
+              if (isStepSkipped(index)) {
+                stepProps.completed = false;
+              }
+              return (
+                <Step key={label} {...stepProps}>
+                  <StepLabel {...labelProps} StepIconComponent={() => StepIcons[index]}>
+                    {label}
+                  </StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
+          
+          <Box sx={{ width: '100%', mt: 2 }}>
+            <StepContent />
+          </Box>
+        </Paper>
+        <Copyright sx={{ mt: 5 }} />
         <Snackbar
           anchorOrigin={{ vertical, horizontal }}
           open={open}
+          autoHideDuration={6000}
           onClose={handleClose}
-          autoHideDuration={5000}
-          sx={{ mt: 6 }}
         >
           <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
             {message}
           </Alert>
         </Snackbar>
-        
-        <Fade in={true}>
-          <Box>
-            <Box sx={{ pt: 2, pb: 4 }}>
-              <Stepper activeStep={activeStep} alternativeLabel>
-                {steps.map((label, index) => {
-                  const stepProps = {};
-                  const labelProps = {};
-                  
-                  if (isStepSkipped(index)) {
-                    stepProps.completed = false;
-                  }
-                  
-                  return (
-                    <Step key={label} {...stepProps}>
-                      <StepLabel 
-                        {...labelProps}
-                        StepIconProps={{
-                          icon: StepIcons[index]
-                        }}
-                      >
-                        {label}
-                      </StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
-            </Box>
-            
-            <Divider sx={{ mb: 4 }} />
-            
-            <StepContent />
-          </Box>
-        </Fade>
-        
       </Container>
     </ThemeProvider>
   );

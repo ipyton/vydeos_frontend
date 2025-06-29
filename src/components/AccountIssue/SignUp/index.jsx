@@ -13,7 +13,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { Navigate, useNavigate } from 'react-router-dom';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -24,95 +24,8 @@ import Snackbar from '@mui/material/Snackbar';
 import { useNotification } from '../../../Providers/NotificationProvider';
 import { useRef } from 'react';
 import { CountDownButton } from '../CountDownButton.jsx';
-
-// Custom theme with a more modern palette
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#3f51b5',
-      light: '#757de8',
-      dark: '#002984',
-    },
-    secondary: {
-      main: '#f50057',
-      light: '#ff5983',
-      dark: '#bb002f',
-    },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    fontFamily: [
-      'Poppins',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-    h4: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 500,
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600,
-          boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
-        },
-        containedPrimary: {
-          '&:hover': {
-            boxShadow: '0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)',
-          },
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          marginBottom: '16px',
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 8,
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07)',
-        },
-      },
-    },
-    MuiAvatar: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
-        },
-      },
-    },
-  },
-});
-
-// Copyright component
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="/">
-        Vydeo.xyz
-      </Link>{' '}
-      {new Date().getFullYear()}
-    </Typography>
-  );
-}
+import { useThemeMode } from '../../../Themes/ThemeContext';
+import { getAccountTheme } from '../theme';
 
 // Step icons for the stepper
 const StepIcons = {
@@ -121,6 +34,20 @@ const StepIcons = {
   2: <PersonAddIcon />,
   3: <CheckCircleIcon />
 };
+
+// Copyright component
+function Copyright(props) {
+  const { mode } = useThemeMode();
+  return (
+    <Typography variant="body2" color={mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary'} align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" href="/">
+        Vydeo.xyz
+      </Link>{' '}
+      {new Date().getFullYear()}
+    </Typography>
+  );
+}
 
 export default function SignUp(props) {
   const [skipped, setSkipped] = useState(new Set());
@@ -131,6 +58,8 @@ export default function SignUp(props) {
   const navigate = useNavigate();
   const [step3Tokens, setStep3Tokens] = useState("");
   const { showNotification } = useNotification();
+  const { mode } = useThemeMode();
+  const theme = getAccountTheme(mode);
   
   // Snackbar state
   const [barState, setBarState] = useState({
@@ -144,10 +73,6 @@ export default function SignUp(props) {
 
   const { loginState, setLoginState } = props;
   
-
-
-  
-
   // Redirect if already logged in
   if (loginState === true) {
     return <Navigate to="/" replace />;
@@ -156,7 +81,6 @@ export default function SignUp(props) {
   const validate = (nickname, username, password) => {
     return true;
   };
-
 
   const step1 = (event) => {
     event.preventDefault();
@@ -279,8 +203,6 @@ export default function SignUp(props) {
     }
     setBarState({...barState, open: false});
   };
-
-
 
   const previousStep = () => {
     setActiveStep(activeStep - 1);

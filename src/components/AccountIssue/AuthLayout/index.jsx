@@ -1,8 +1,11 @@
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import Iridescence from '../../../Animations/Iridescence/Iridescence';
+import { useThemeMode } from '../../../Themes/ThemeContext';
 
 export default function AuthLayout() {
+  const { mode } = useThemeMode();
+  
   return (
     <Box
       sx={{
@@ -10,7 +13,8 @@ export default function AuthLayout() {
         position: 'relative',
         width: '100vw',
         height: '100vh',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        backgroundColor: mode === 'dark' ? '#000000' : '#ffffff',
       }}
     >
       {/* Background Animation */}
@@ -24,7 +28,12 @@ export default function AuthLayout() {
           zIndex: 0
         }}
       >
-        <Iridescence color={[1,1,1]} mouseReact={false} amplitude={0.1} speed={1.0} />
+        <Iridescence 
+          color={mode === 'dark' ? [0.3, 0.4, 0.6] : [1, 1, 1]} 
+          mouseReact={true} 
+          amplitude={0.15} 
+          speed={0.8} 
+        />
       </Box>
 
       {/* Outlet for the real forms */}
