@@ -39,6 +39,7 @@
     "react": "^18.2.0",
     "react-chat-elements": "^12.0.11",
     "react-dom": "^18.2.0",
+    "react-globe.gl": "^2.34.0",
     "react-icons": "^5.0.1",
     "react-image-gallery": "^1.3.0",
     "react-material-ui-carousel": "^3.4.2",

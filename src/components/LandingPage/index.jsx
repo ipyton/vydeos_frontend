@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -30,8 +30,28 @@ import {
 
 // If we have a theme context, we can use it
 import { useThemeMode } from '../../Themes/ThemeContext';
-import GlobeAnimation from './GlobeAnimation';
+//import GlobeAnimation from './GlobeAnimation';
+import Globe from 'react-globe.gl';
 
+const arcsData = [
+    {
+      startLat: 37.7749, startLng: -122.4194,  // 旧金山
+      endLat: 48.8566, endLng: 2.3522,         // 巴黎
+      color: ["red", "orange"]
+    },
+    {
+      startLat: 48.8566, startLng: 2.3522,     // 巴黎
+      endLat: 35.6895, endLng: 139.6917,       // 东京
+      color: ["blue", "cyan"]
+    },
+    {
+      startLat: 35.6895, startLng: 139.6917,   // 东京
+      endLat: -33.8688, endLng: 151.2093,      // 悉尼
+      color: ["green", "lime"]
+    }
+  ];
+
+  
 // Styles for the landing page
 const styles = {
   heroSection: {
@@ -226,6 +246,7 @@ const LandingPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const globeRef = useRef();
   
   // Use theme context if available, otherwise fallback to light mode
   const { mode = 'light' } = useThemeMode() || {};
@@ -235,6 +256,29 @@ const LandingPage = () => {
   const [showFeatures, setShowFeatures] = useState(false);
   const [showScreenshots, setShowScreenshots] = useState(false);
   const [showTestimonials, setShowTestimonials] = useState(false);
+
+  // Auto-rotate globe
+  useEffect(() => {
+    let frameId;
+    
+    const rotateGlobe = () => {
+      if (globeRef.current) {
+        globeRef.current.controls().autoRotate = true;
+        globeRef.current.controls().autoRotateSpeed = 0.5;
+        
+        // Make sure controls are updated
+        globeRef.current.controls().update();
+      }
+      frameId = requestAnimationFrame(rotateGlobe);
+    };
+    
+    // Start rotation
+    rotateGlobe();
+    
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, []);
 
   // Animation on page load
   useEffect(() => {
@@ -376,15 +420,33 @@ const LandingPage = () => {
                 <Box
                   sx={{
                     width: '100%',
-                    maxWidth: '400px',
-                    height: '400px',
+                    maxWidth: '700px',
+                    height: '700px',
                     position: 'relative',
                     marginTop: '2rem',
-                    className: 'globe-float'
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    '& > div': { width: '100%', height: '100%' }
                   }}
                   className="globe-float"
                 >
-                  <GlobeAnimation size={400} />
+                  <Globe
+                    ref={globeRef}
+                    width={700}
+                    height={700}
+                    backgroundColor="rgba(0,0,0,0)"
+                    globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
+                    arcsData={arcsData}
+                    arcColor={"color"}
+                    arcStroke={0.5}
+                    arcAltitude={0.2}
+                    arcDashLength={0.4}
+                    arcDashGap={0.2}
+                    arcDashAnimateTime={4000}
+                    atmosphereColor="#1976d2"
+                    atmosphereAltitude={0.15}
+                  />
                 </Box>
               </Grid>
             </Grid>
