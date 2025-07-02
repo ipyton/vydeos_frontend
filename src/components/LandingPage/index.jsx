@@ -687,7 +687,7 @@ const LandingPage = () => {
                   >
                     <Box
                       component="img"
-                      src="/images/landing/screenshot1.jpg"
+                      src="/images/landing/screenshot1.png"
                       alt="Chat interface"
                       sx={{ 
                         width: '100%', 
@@ -712,7 +712,7 @@ const LandingPage = () => {
                   >
                     <Box
                       component="img"
-                      src="/images/landing/screenshot2.jpg"
+                      src="/images/landing/screenshot2.png"
                       alt="Feed interface"
                       sx={{ 
                         width: '100%', 
@@ -736,7 +736,31 @@ const LandingPage = () => {
                   >
                     <Box
                       component="img"
-                      src="/images/landing/screenshot3.jpg"
+                      src="/images/landing/screenshot3.png"
+                      alt="Profile interface"
+                      sx={{ 
+                        width: '100%', 
+                        height: 'auto', 
+                        display: 'block',
+                        maxHeight: { xs: '300px', sm: 'none' },
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Paper 
+                    elevation={4} 
+                    sx={{ 
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      transition: 'transform 0.3s ease',
+                      '&:hover': { transform: 'scale(1.03)' }
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src="/images/landing/screenshot4.png"
                       alt="Profile interface"
                       sx={{ 
                         width: '100%', 
