@@ -472,15 +472,15 @@ const LandingPage = () => {
           }}
         >
           <Container maxWidth="lg" sx={{ py: { xs: 4, md: 0 } }}>
-            <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
+            <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center" direction={{ xs: 'column-reverse', md: 'row' }}>
               <Grid item xs={12} md={6}>
-                <Box sx={{ pt: { xs: 4, md: 0 } }}>
+                <Box sx={{ pt: { xs: 0, md: 0 } }}>
                   <Typography variant="h2" gutterBottom sx={{ 
                     color: 'white', 
                     fontWeight: 700,
                     fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
                     lineHeight: 1.2,
-                    marginTop: { xs: '60px', md: 0 }
+                    marginTop: { xs: '0', md: 0 }
                   }}>
                     Connect. Create. <span style={styles.gradientText}>Share.</span>
                   </Typography>
@@ -530,16 +530,16 @@ const LandingPage = () => {
                 </Box>
               </Grid>
               <Grid item xs={12} md={6} sx={{ 
-                display: { xs: 'none', md: 'flex' }, 
+                display: 'flex', 
                 justifyContent: 'center', 
                 alignItems: 'center' 
               }}>
-                {/* 3D Globe Animation - Hidden on mobile */}
+                {/* 3D Globe Animation - Responsive for all devices */}
                 <Box
                   sx={{
                     width: '100%',
-                    maxWidth: '700px',
-                    height: '700px',
+                    maxWidth: { xs: '350px', sm: '500px', md: '700px' },
+                    height: { xs: '350px', sm: '500px', md: '700px' },
                     position: 'relative',
                     marginTop: '2rem',
                     display: 'flex',
@@ -551,8 +551,8 @@ const LandingPage = () => {
                 >
                   <Globe
                     ref={globeRef}
-                    width={700}
-                    height={700}
+                    width={isMobile ? 350 : isTablet ? 500 : 700}
+                    height={isMobile ? 350 : isTablet ? 500 : 700}
                     backgroundColor="rgba(0,0,0,0)"
                     globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
                     arcsData={arcsData}
