@@ -472,15 +472,15 @@ const LandingPage = () => {
           }}
         >
           <Container maxWidth="lg" sx={{ py: { xs: 4, md: 0 } }}>
-            <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center" direction={{ xs: 'column-reverse', md: 'row' }}>
+            <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
               <Grid item xs={12} md={6}>
-                <Box sx={{ pt: { xs: 0, md: 0 } }}>
+                <Box sx={{ pt: { xs: 4, md: 0 } }}>
                   <Typography variant="h2" gutterBottom sx={{ 
                     color: 'white', 
                     fontWeight: 700,
                     fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
                     lineHeight: 1.2,
-                    marginTop: { xs: '0', md: 0 }
+                    marginTop: { xs: '60px', md: 0 }
                   }}>
                     Connect. Create. <span style={styles.gradientText}>Share.</span>
                   </Typography>
@@ -530,16 +530,16 @@ const LandingPage = () => {
                 </Box>
               </Grid>
               <Grid item xs={12} md={6} sx={{ 
-                display: 'flex', 
+                display: { xs: 'none', md: 'flex' }, 
                 justifyContent: 'center', 
                 alignItems: 'center' 
               }}>
-                {/* 3D Globe Animation - Responsive for all devices */}
+                {/* 3D Globe Animation - Hidden on mobile */}
                 <Box
                   sx={{
                     width: '100%',
-                    maxWidth: { xs: '350px', sm: '500px', md: '700px' },
-                    height: { xs: '350px', sm: '500px', md: '700px' },
+                    maxWidth: '700px',
+                    height: '700px',
                     position: 'relative',
                     marginTop: '2rem',
                     display: 'flex',
@@ -551,8 +551,8 @@ const LandingPage = () => {
                 >
                   <Globe
                     ref={globeRef}
-                    width={isMobile ? 350 : isTablet ? 500 : 700}
-                    height={isMobile ? 350 : isTablet ? 500 : 700}
+                    width={700}
+                    height={700}
                     backgroundColor="rgba(0,0,0,0)"
                     globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
                     arcsData={arcsData}
@@ -674,7 +674,7 @@ const LandingPage = () => {
             <Box sx={{ position: 'relative', my: { xs: 2, md: 4 } }}>
               <Grid container spacing={{ xs: 2, md: 2 }}>
                 {/* Make screenshots stack vertically on mobile for better visibility */}
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12}>
                   <Paper 
                     elevation={4} 
                     sx={{ 
@@ -682,7 +682,7 @@ const LandingPage = () => {
                       overflow: 'hidden',
                       transition: 'transform 0.3s ease',
                       '&:hover': { transform: 'scale(1.03)' },
-                      mb: { xs: 2, sm: 0 }
+                      mb: { xs: 2, sm: 2 }
                     }}
                   >
                     <Box
@@ -699,7 +699,7 @@ const LandingPage = () => {
                     />
                   </Paper>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <Paper 
                     elevation={4} 
                     sx={{ 
@@ -724,7 +724,7 @@ const LandingPage = () => {
                     />
                   </Paper>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <Paper 
                     elevation={4} 
                     sx={{ 
@@ -748,14 +748,15 @@ const LandingPage = () => {
                     />
                   </Paper>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12}>
                   <Paper 
                     elevation={4} 
                     sx={{ 
                       borderRadius: '12px',
                       overflow: 'hidden',
                       transition: 'transform 0.3s ease',
-                      '&:hover': { transform: 'scale(1.03)' }
+                      '&:hover': { transform: 'scale(1.03)' },
+                      mb: { xs: 2, sm: 0 }
                     }}
                   >
                     <Box
@@ -766,7 +767,7 @@ const LandingPage = () => {
                         width: '100%', 
                         height: 'auto', 
                         display: 'block',
-                        maxHeight: { xs: '300px', sm: 'none' },
+                        maxHeight: { xs: '300px', sm: '600px' },
                         objectFit: 'cover'
                       }}
                     />
