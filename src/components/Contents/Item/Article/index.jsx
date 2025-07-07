@@ -446,6 +446,18 @@ export default function Article(props) {
         />
 
 
+        {props?.content?.content && (
+          <CardContent sx={{ px: 3, py: 2 }}>
+            <Typography variant="body1" sx={{ 
+              color: mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+              lineHeight: 1.7,
+              whiteSpace: 'pre-wrap'
+            }}>
+              {props.content.content}
+            </Typography>
+          </CardContent>
+        )}
+
         {images.length > 0 && renderImages()}
 
         <CardActions disableSpacing sx={{ px: 2 }}>
