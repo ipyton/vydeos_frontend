@@ -1,0 +1,145 @@
+
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient definitions -->
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#6c8ebf;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4572c4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4e1f5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b1c5e7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8cecc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ea6b66;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#d5e8d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#97d077;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#ffffff" />
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">
+    React Web Application Architecture
+  </text>
+  
+  <!-- Client-Side Components -->
+  <rect x="100" y="80" width="600" height="400" rx="10" ry="10" fill="#f5f5f5" stroke="#666666" stroke-width="2" />
+  <text x="400" y="100" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">
+    Frontend Application
+  </text>
+  
+  <!-- UI Components -->
+  <rect x="130" y="120" width="260" height="140" rx="5" ry="5" fill="url(#grad2)" stroke="#666666" stroke-width="1" />
+  <text x="260" y="140" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">
+    UI Components
+  </text>
+  <rect x="150" y="150" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="200" y="170" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Auth Components
+  </text>
+  <rect x="270" y="150" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="320" y="170" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Content Components
+  </text>
+  <rect x="150" y="190" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="200" y="210" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Header/Footer
+  </text>
+  <rect x="270" y="190" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="320" y="210" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Animation Components
+  </text>
+  
+  <!-- State Management -->
+  <rect x="410" y="120" width="260" height="140" rx="5" ry="5" fill="url(#grad2)" stroke="#666666" stroke-width="1" />
+  <text x="540" y="140" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">
+    State Management
+  </text>
+  <rect x="430" y="150" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="480" y="170" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Redux Store
+  </text>
+  <rect x="550" y="150" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="600" y="170" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Context API
+  </text>
+  <rect x="430" y="190" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="480" y="210" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Auth Slice
+  </text>
+  <rect x="550" y="190" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="600" y="210" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Chat Session
+  </text>
+  
+  <!-- Utilities -->
+  <rect x="130" y="270" width="260" height="100" rx="5" ry="5" fill="url(#grad2)" stroke="#666666" stroke-width="1" />
+  <text x="260" y="290" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">
+    Utilities
+  </text>
+  <rect x="150" y="300" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="200" y="320" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    API Client
+  </text>
+  <rect x="270" y="300" width="100" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="320" y="320" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Auth Utils
+  </text>
+  
+  <!-- Routing -->
+  <rect x="410" y="270" width="260" height="100" rx="5" ry="5" fill="url(#grad2)" stroke="#666666" stroke-width="1" />
+  <text x="540" y="290" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">
+    Routing
+  </text>
+  <rect x="430" y="300" width="220" height="30" rx="5" ry="5" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="540" y="320" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    React Router
+  </text>
+  
+  <!-- External Services -->
+  <rect x="130" y="380" width="540" height="80" rx="5" ry="5" fill="url(#grad4)" stroke="#666666" stroke-width="1" />
+  <text x="400" y="400" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">
+    External Services
+  </text>
+  <rect x="150" y="410" width="100" height="30" rx="5" ry="5" fill="url(#grad3)" stroke="#666666" stroke-width="1" />
+  <text x="200" y="430" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    REST API
+  </text>
+  <rect x="270" y="410" width="100" height="30" rx="5" ry="5" fill="url(#grad3)" stroke="#666666" stroke-width="1" />
+  <text x="320" y="430" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    WebSockets
+  </text>
+  <rect x="390" y="410" width="100" height="30" rx="5" ry="5" fill="url(#grad3)" stroke="#666666" stroke-width="1" />
+  <text x="440" y="430" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Auth Services
+  </text>
+  <rect x="510" y="410" width="140" height="30" rx="5" ry="5" fill="url(#grad3)" stroke="#666666" stroke-width="1" />
+  <text x="580" y="430" font-family="Arial" font-size="12" text-anchor="middle" fill="white">
+    Storage Services
+  </text>
+  
+  <!-- Legend -->
+  <rect x="280" y="500" width="240" height="80" rx="5" ry="5" fill="#f5f5f5" stroke="#666666" stroke-width="1" />
+  <text x="400" y="520" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">
+    Legend
+  </text>
+  
+  <!-- Legend Items -->
+  <rect x="300" y="530" width="20" height="15" fill="url(#grad2)" stroke="#666666" stroke-width="1" />
+  <text x="330" y="542" font-family="Arial" font-size="12" text-anchor="start">Component Group</text>
+  
+  <rect x="300" y="550" width="20" height="15" fill="url(#grad1)" stroke="#666666" stroke-width="1" />
+  <text x="330" y="562" font-family="Arial" font-size="12" text-anchor="start">Individual Component</text>
+  
+  <rect x="440" y="530" width="20" height="15" fill="url(#grad4)" stroke="#666666" stroke-width="1" />
+  <text x="470" y="542" font-family="Arial" font-size="12" text-anchor="start">Integration Layer</text>
+  
+  <rect x="440" y="550" width="20" height="15" fill="url(#grad3)" stroke="#666666" stroke-width="1" />
+  <text x="470" y="562" font-family="Arial" font-size="12" text-anchor="start">External Service</text>
+</svg>

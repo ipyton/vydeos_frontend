@@ -311,7 +311,7 @@ export default function Login(props) {
               </Typography>
             </Divider>
             
-            <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+            <GoogleOAuthProvider clientId="282080402821-e07eo98flrekqkh8p4rja2kr5f387psi.apps.googleusercontent.com">
               <SignInButton />
             </GoogleOAuthProvider>
           </Box>
