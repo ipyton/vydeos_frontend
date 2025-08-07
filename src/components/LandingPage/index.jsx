@@ -17,12 +17,12 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Drawer,
   List,
   ListItem,
   ListItemText,
   ListItemButton,
-  SwipeableDrawer
+  SwipeableDrawer,
+  Link
 } from '@mui/material';
 import { 
   ArrowForward, 
@@ -923,6 +923,83 @@ const LandingPage = () => {
               </Grid>
             </Grid>
           </Paper>
+        </Container>
+      </Box>
+
+      {/* Footer */}
+      <Box 
+        component="footer" 
+        sx={{ 
+          py: 6, 
+          px: 2,
+          mt: 'auto',
+          backgroundColor: mode === 'dark' ? '#121212' : '#f9f9f9',
+          borderTop: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4}>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="h6" color="text.primary" gutterBottom>
+                Vydeo.xyz
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Connect. Create. Share. The all-in-one platform for social networking, content sharing, and real-time communication.
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="h6" color="text.primary" gutterBottom>
+                Links
+              </Typography>
+              <Box>
+                <Link 
+                  href="/about-us" 
+                  color="text.secondary" 
+                  sx={{ display: 'block', mb: 1, textDecoration: 'none', '&:hover': { color: 'primary.main' } }}
+                >
+                  About Us
+                </Link>
+                <Link 
+                  href="/privacy-policy" 
+                  color="text.secondary" 
+                  sx={{ display: 'block', mb: 1, textDecoration: 'none', '&:hover': { color: 'primary.main' } }}
+                >
+                  Privacy Policy
+                </Link>
+                <Link 
+                  href="/terms-of-service" 
+                  color="text.secondary" 
+                  sx={{ display: 'block', mb: 1, textDecoration: 'none', '&:hover': { color: 'primary.main' } }}
+                >
+                  Terms of Service
+                </Link>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="h6" color="text.primary" gutterBottom>
+                Contact Us
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                123 Tech Street
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Melbourne, VIC 3000
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Australia
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Email: info@vydeo.xyz
+              </Typography>
+            </Grid>
+          </Grid>
+          <Box sx={{ mt: 5 }}>
+            <Typography variant="body2" color="text.secondary" align="center">
+              {'© '}
+              {new Date().getFullYear()}
+              {' Vydeo.xyz. All rights reserved.'}
+            </Typography>
+          </Box>
         </Container>
       </Box>
     </Box>

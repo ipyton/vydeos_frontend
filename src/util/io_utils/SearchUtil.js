@@ -10,10 +10,6 @@ export default class SearchUtil {
     dispatch(batchAdd(list))
   }
 
-  static mockSearch(dispatch) {
-    let list = [{ name: "james", pics: "siehru", intro: "sus", type: "contact" }, { name: "time", pics: "zdxf", intro: "sfs", type: "movie" }]
-    this.stateSetter(list, dispatch)
-  }
 
   static searchChatContactById(keyword, setList) {
     return apiClient({

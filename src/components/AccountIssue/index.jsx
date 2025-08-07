@@ -9,6 +9,9 @@ import { Route, Routes, useNavigate, Navigate, redirect, BrowserRouter, } from '
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import LandingPage from '../LandingPage';
+import PrivacyPolicy from '../LandingPage/PrivacyPolicy';
+import TermsOfService from '../LandingPage/TermsOfService';
+import AboutUs from '../LandingPage/AboutUs';
 import { ThemeContextProvider } from '../../Themes/ThemeContext';
 
 function Copyright(props) {
@@ -29,6 +32,9 @@ export default function (props) {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<LandingPage />}></Route>
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />}></Route>
+                    <Route path="/terms-of-service" element={<TermsOfService />}></Route>
+                    <Route path="/about-us" element={<AboutUs />}></Route>
                     <Route element={<AuthLayout />}>
                         <Route path="forget" element={<Forget />}></Route>
                         <Route path="login" element={<Login login={props.loginState} setLogin={props.setLoginState} />}></Route>
